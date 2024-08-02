@@ -124,9 +124,8 @@ def extract_output(completion):
     - The generated test case
     - The generated test error or stack trace
     """
-    message = completion.choices[0].message.content
-
     try:
+        message = completion.choices[0].message.content
         buggy_function = message.split("### Buggy Function")[1].split("```java")[1].split("```")[0].strip()
         test_case = message.split("### Unit Test")[1].split("```java")[1].split("```")[0].strip()
         error_message = message.split("### Error Message or Stack Trace")[1].split("```")[1].strip()
