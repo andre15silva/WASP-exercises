@@ -1,4 +1,5 @@
 import subprocess
+import tqdm
 from typing import List, Optional
 from datasets import load_dataset
 
@@ -125,6 +126,8 @@ def extract_output(completion):
     - The generated test error or stack trace
     """
     try:
+        if completion is None or completion.choices is None or completion.choices[0] is None or completion.choices[0].message is None:
+            return None, None, None
         message = completion.choices[0].message.content
         buggy_function = message.split("### Buggy Function")[1].split("```java")[1].split("```")[0].strip()
         test_case = message.split("### Unit Test")[1].split("```java")[1].split("```")[0].strip()
@@ -141,9 +144,9 @@ def extract_output_v2(completion):
     - The generated test case
     - The generated test error or stack trace
     """
-    message = completion.choices[0].message.content
-
     try:
+        if completion is None or completion.choices is None or completion.choices[0] is None or completion.choices[0].message is None:
+            return None, None, None
         test_case = message.split("### Unit Test")[1].split("```java")[1].split("```")[0].strip()
         error_message = message.split("### Error Message or Stack Trace")[1].split("```")[1].strip()
         return test_case, error_message
@@ -159,16 +162,16 @@ def main():
     megadiff_sf = load_dataset("ASSERT-KTH/megadiff-single-function")
     megadiff_sf = megadiff_sf.map(lambda x: {"short_diff": compute_diff(x["buggy_function"], x["fixed_function"], context_len=3)})
 
-    with concurrent.futures.ThreadPoolExecutor() as executor:
-        for i in range(len(megadiff_sf["train"][:]["short_diff"])):
+    with concurrent.futures.ThreadPoolExecutor(max_workers=40) as executor:
+        for i in range(len(megadiff_sf["train"]["short_diff"])):
             task = executor.submit(call_openai, system_prompt_v2(), user_prompt_v2(megadiff_sf["train"][i]["short_diff"]), model="gpt-4o-mini")
             tasks.append(task)
 
-        completions = [future.result() for future in tasks]
+        completions = [future.result() for future in tqdm.tqdm(tasks, total=len(tasks))]
 
     outputs = [extract_output_v2(completion) for completion in completions]
 
-    megadiff_sf_plus = megadiff_sf["train"].add_column("generated_test_case", [output[0] for output in outputs]).add_column("generated_error_message", [output[1] for output in outputs]).add_column("completion", [completion.to_dict() for completion in completions])
+    megadiff_sf_plus = megadiff_sf["train"].add_column("generated_test_case", [output[0] for output in outputs]).add_column("generated_error_message", [output[1] for output in outputs]).add_column("completion", [completion.to_dict() if completion is not None else None for completion in completions])
     megadiff_sf_plus.save_to_disk("megadiff_sf_plus")
     
     
