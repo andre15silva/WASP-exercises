@@ -1,6 +1,6 @@
 import subprocess
 import tqdm
-from typing import List, Optional
+from typing import List, Optional, Tuple
 from datasets import load_dataset
 
 def compute_diff(
@@ -116,7 +116,7 @@ def call_openai(system_prompt: str, user_prompt: str, model: str = "gpt-4o-mini"
 
     return completion
 
-def extract_output(completion):
+def extract_output(completion) -> Tuple[Optional[str], Optional[str], Optional[str]]:
     """
     Extracts the output from the completion object.
     
@@ -136,7 +136,7 @@ def extract_output(completion):
     except Exception as e:
         return None, None, None
 
-def extract_output_v2(completion):
+def extract_output_v2(completion) -> Tuple[Optional[str], Optional[str], Optional[str]]:
     """
     Extracts the output from the completion object.
     
@@ -147,11 +147,12 @@ def extract_output_v2(completion):
     try:
         if completion is None or completion.choices is None or completion.choices[0] is None or completion.choices[0].message is None:
             return None, None, None
+        message = completion.choices[0].message.content
         test_case = message.split("### Unit Test")[1].split("```java")[1].split("```")[0].strip()
         error_message = message.split("### Error Message or Stack Trace")[1].split("```")[1].strip()
         return test_case, error_message
     except Exception as e:
-        return None, None
+        return None, None, None
 
 import concurrent.futures
 
