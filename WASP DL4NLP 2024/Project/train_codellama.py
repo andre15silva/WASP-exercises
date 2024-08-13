@@ -63,6 +63,7 @@ sft_config = SFTConfig(
     gradient_accumulation_steps=4,
     per_device_eval_batch_size=1,
     packing=False,
+    bf16=True,
 )
 
 trainer = SFTTrainer(
