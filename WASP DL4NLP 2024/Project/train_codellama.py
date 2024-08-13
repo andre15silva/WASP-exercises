@@ -11,7 +11,7 @@ tokenizer.pad_token = tokenizer.eos_token
 def format_texts(examples, begin_inst="[INST]", end_inst="[\INST]"):
     output_texts = []
     for i in range(len(examples['prompt'])):
-        text = f"<s>{begin_inst} {examples['prompt'][i]} {end_inst} {examples['answer'][i]}"
+        text = f"<s>{begin_inst} {examples['prompt'][i]} {end_inst} {examples['answer'][i]}</s>"
         output_texts.append(text)
     return output_texts
 
