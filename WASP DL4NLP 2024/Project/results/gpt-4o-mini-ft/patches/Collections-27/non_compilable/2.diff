@@ -1,0 +1,33 @@
+diff --git a/tmp/4fa6ebdd-be1e-4855-830a-5a52f9a0c82f_buggy.java b/tmp/d1566037-113e-4c60-9ae6-191126312f0b_fixed.java
+index e69de29..a2ff81c 100644
+--- a/tmp/4fa6ebdd-be1e-4855-830a-5a52f9a0c82f_buggy.java
++++ b/tmp/d1566037-113e-4c60-9ae6-191126312f0b_fixed.java
+@@ -0,0 +1,27 @@
++import org.springframework.http.client.HttpComponentsClientHttpRequestFactory;
++import org.springframework.http.client.HttpComponentsAsyncClientHttpRequestFactory;
++import org.springframework.http.client.ClientHttpRequest;
++import org.springframework.http.client.ClientHttpRequestInterceptor;
++
++/**
++ * Test that serializes the MultiValueMap and deserializes it back to ensure
++ * it throws exception if unsafe for the server.
++ */
++public class MultiValueMapSerializationTests {
++    public void testUnsafeDeSerialization() throws Exception {
++        MultiValueMap<String, String> map1 = MultiValueMap.multiValueMap(new HashMap<String, String>(), ArrayList.class);
++        byte[] bytes = serialize(map1);
++        MultiValueMap result = deserialize(bytes);
++        assertEquals(map1, result);
++        
++        MultiValueMap map2 = MultiValueMap.multiValueMap(new HashMap(), (Class) String.class);
++        bytes = serialize(map2);
++        try {
++            result = deserialize(bytes);
++            fail("unsafe clazz accepted when de-serializing MultiValueMap");
++        } catch (UnsupportedOperationException ex) {
++            // expected
++        }
++    }
++
++}
+\ No newline at end of file

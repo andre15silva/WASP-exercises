@@ -1,0 +1,44 @@
+diff --git a/tmp/7d5618de-9582-453e-9ef6-f8061fd3ad10_buggy.java b/tmp/d16153b8-c0b9-4e8c-a210-05305cd37bce_fixed.java
+index 822447c..329ad8c 100644
+--- a/tmp/7d5618de-9582-453e-9ef6-f8061fd3ad10_buggy.java
++++ b/tmp/d16153b8-c0b9-4e8c-a210-05305cd37bce_fixed.java
+@@ -1,37 +1,38 @@
+     /**
+      * <p>
+      * Escapes the characters in the <code>String</code> passed and writes the result to the <code>Writer</code>
+      * passed.
+      * </p>
+      * 
+      * @param writer
+      *            The <code>Writer</code> to write the results of the escaping to. Assumed to be a non-null value.
+      * @param str
+      *            The <code>String</code> to escape. Assumed to be a non-null value.
+      * @throws IOException
+      *             when <code>Writer</code> passed throws the exception from calls to the {@link Writer#write(int)}
+      *             methods.
+      * 
+      * @see #escape(String)
+      * @see Writer
+      */
+     public void escape(Writer writer, String str) throws IOException {
+         int len = str.length();
+         for (int i = 0; i < len; i++) {
+             char c = str.charAt(i);
+             String entityName = this.entityName(c);
+             if (entityName == null) {
+                 if (c > 0x7F) {
+                     writer.write("&#");
+-                    writer.write(Integer.toString(c, 10));
++                    // TODO: JAVA-1.5: writer.write(Integer.toString(c, 16)); // 16 for hex decimal
++                    writer.write(Integer.toString(c, 10)); // 10 for decimal
+                     writer.write(';');
+                 } else {
+                     writer.write(c);
+                 }
+             } else {
+                 writer.write('&');
+                 writer.write(entityName);
+                 writer.write(';');
+             }
+         }
+     }

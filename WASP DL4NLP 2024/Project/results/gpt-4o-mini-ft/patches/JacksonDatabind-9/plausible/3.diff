@@ -1,0 +1,18 @@
+diff --git a/tmp/1796996e-7b83-407a-9308-bf67b57ebfce_buggy.java b/tmp/3c0ec508-3a0c-4989-8d37-a0905e8b0563_fixed.java
+index 51430e1..f11795d 100644
+--- a/tmp/1796996e-7b83-407a-9308-bf67b57ebfce_buggy.java
++++ b/tmp/3c0ec508-3a0c-4989-8d37-a0905e8b0563_fixed.java
+@@ -1,12 +1,12 @@
+     @Override
+     public void serialize(Object value, JsonGenerator jgen, SerializerProvider provider) throws IOException {
+         String str;
+         
+         if (value instanceof Date) {
+             provider.defaultSerializeDateKey((Date) value, jgen);
+             return;
+         } else {
+-            str = value.toString();
++            str = value.toString().replaceFirst("class ", "");
+         }
+         jgen.writeFieldName(str);
+     }

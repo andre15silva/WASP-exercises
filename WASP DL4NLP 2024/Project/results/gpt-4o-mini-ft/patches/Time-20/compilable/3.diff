@@ -1,0 +1,17 @@
+diff --git a/tmp/9e14155f-f05d-4a19-b5ca-af9d1c7ea8bd_buggy.java b/tmp/42488988-6ed9-417c-8765-5dc9d7e065ca_fixed.java
+index ae6c2b1..a3ad7f3 100644
+--- a/tmp/9e14155f-f05d-4a19-b5ca-af9d1c7ea8bd_buggy.java
++++ b/tmp/42488988-6ed9-417c-8765-5dc9d7e065ca_fixed.java
+@@ -1,10 +1,11 @@
+         public int parseInto(DateTimeParserBucket bucket, String text, int position) {
+             String str = text.substring(position);
+             for (String id : ALL_IDS) {
+-                if (str.startsWith(id)) {
++                // compares with 'id.replaceAll("/", "_")' because of bug in Joda Output for UN
++                if (str.startsWith(id.replaceAll("/", "_"))) {
+                     bucket.setZone(DateTimeZone.forID(id));
+                     return position + id.length();
+                 }
+             }
+             return ~position;
+         }

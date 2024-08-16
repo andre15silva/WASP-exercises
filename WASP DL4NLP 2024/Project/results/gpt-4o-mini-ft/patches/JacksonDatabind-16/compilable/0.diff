@@ -1,0 +1,15 @@
+diff --git a/tmp/f019bb50-ed41-4494-abe3-3cec8be590ef_buggy.java b/tmp/f4ed47b0-82c0-497d-9915-8df66124b275_fixed.java
+index 27520a0..d6c262d 100644
+--- a/tmp/f019bb50-ed41-4494-abe3-3cec8be590ef_buggy.java
++++ b/tmp/f4ed47b0-82c0-497d-9915-8df66124b275_fixed.java
+@@ -1,7 +1,9 @@
+     protected final boolean _add(Annotation ann) {
++        // [mix-serializer#111]: "stuff" is used within mix in ObjectMapper but targets
++        // Java code added by user (https://github.com/FasterXML/jackson-databind/issues/399)
+         if (_annotations == null) {
+-            _annotations = new HashMap<Class<? extends Annotation>,Annotation>();
++            _annotations = new HashMap<Class<? extends Annotation>,Annotation>(3);
+         }
+         Annotation previous = _annotations.put(ann.annotationType(), ann);
+         return (previous != null) && previous.equals(ann);
+     }

@@ -1,0 +1,63 @@
+diff --git a/tmp/8c201217-6334-44a8-800f-4f9dde6161fe_buggy.java b/tmp/5e450fc3-9d18-44d4-9e80-c6d52bdc7943_fixed.java
+index 63641d0..332fd33 100644
+--- a/tmp/8c201217-6334-44a8-800f-4f9dde6161fe_buggy.java
++++ b/tmp/5e450fc3-9d18-44d4-9e80-c6d52bdc7943_fixed.java
+@@ -1,33 +1,57 @@
+   /**
+    * For functions with function(this: T, ...) and T as parameters, type
+    * inference will set the type of this on a function literal argument to the
+-   * the actual type of T.
++   * actual type of T.
+    */
+   private boolean inferTemplatedTypesForCall(
+       Node n, FunctionType fnType) {
+     final ImmutableList<TemplateType> keys = fnType.getTemplateTypeMap()
+         .getTemplateKeys();
+     if (keys.isEmpty()) {
+       return false;
+     }
+ 
+     // Try to infer the template types
+     Map<TemplateType, JSType> inferred =
+         inferTemplateTypesFromParameters(fnType, n);
+ 
+ 
+     // Replace all template types. If we couldn't find a replacement, we
+     // replace it with UNKNOWN.
+     TemplateTypeReplacer replacer = new TemplateTypeReplacer(
+         registry, inferred);
+     Node callTarget = n.getFirstChild();
+ 
+     FunctionType replacementFnType = fnType.visit(replacer)
+         .toMaybeFunctionType();
+     Preconditions.checkNotNull(replacementFnType);
+ 
+     callTarget.setJSType(replacementFnType);
+     n.setJSType(replacementFnType.getReturnType());
+ 
++    if (replacer.madeChanges) {
++      Node maybeCallContextNode = n.getParent();
++      while (maybeCallContextNode != null && maybeCallContextNode.isCall()) {
++        if (maybeCallContextNode.getFirstChild().isFunction()) {
++          // See Issue 1058:
++          // To infer types in a function expression, we need to have both
++          // this and the function expression in the same scope. We use the
++          // function's scope instead of the call context node so that we
++          // can be sure to find the dehoisted, added to the call context
++          // node.
++          Node functionNode = maybeCallContextNode.getFirstChild();
++          Node functionParentNode = functionNode.getParent();
++          if (functionParentNode != null
++              && functionParentNode.isFunction()
++              && functionNode.getJSType() != null
++              && functionNode.getJSType().isFunctionType()) {
++            fnType = functionNode.getJSType().toMaybeFunctionType();
++            break;
++          }
++        }
++        maybeCallContextNode = maybeCallContextNode.getParent();
++      }
++    }
++
+     return replacer.madeChanges;
+   }

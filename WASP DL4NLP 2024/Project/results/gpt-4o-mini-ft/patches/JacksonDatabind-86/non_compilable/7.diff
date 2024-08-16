@@ -1,0 +1,14 @@
+diff --git a/tmp/4739d2fa-fe39-4d5c-b13f-c11e1dc6dcc6_buggy.java b/tmp/e3cd852d-c5fd-4897-b748-19ba163d5b94_fixed.java
+index e69de29..f9d325e 100644
+--- a/tmp/4739d2fa-fe39-4d5c-b13f-c11e1dc6dcc6_buggy.java
++++ b/tmp/e3cd852d-c5fd-4897-b748-19ba163d5b94_fixed.java
+@@ -0,0 +1,9 @@
++    public void testSuperClassWithReferencedJavaType() {
++        TypeFactory tf = objectMapper().getTypeFactory();
++        tf.constructType(Base.class); // must be constructed before sub to set the cache correctly
++        JavaType subType = tf.constructType(Sub.class);
++        // baseTypeFromSub should be a ResolvedRecursiveType in this test
++        JavaType baseTypeFromSub = subType.getSuperClass();
++        assertNotNull(baseTypeFromSub.getSuperClass());
++        assertFalse(baseTypeFromSub.isGeneric());
++    }

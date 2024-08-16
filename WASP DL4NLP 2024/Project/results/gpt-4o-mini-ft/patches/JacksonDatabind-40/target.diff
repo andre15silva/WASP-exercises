@@ -1,0 +1,16 @@
+diff --git a/tmp/d8c2d80f-be8a-4e2c-92ac-1b4cd42b595f_buggy.java b/tmp/831b518a-e254-40d7-88a4-46f26e4e51b7_fixed.java
+index e69de29..911e1c1 100644
+--- a/tmp/d8c2d80f-be8a-4e2c-92ac-1b4cd42b595f_buggy.java
++++ b/tmp/831b518a-e254-40d7-88a4-46f26e4e51b7_fixed.java
+@@ -0,0 +1,11 @@
++        @Override
++        public T getEmptyValue(DeserializationContext ctxt) throws JsonMappingException {
++            // [databind#1095]: Should not allow coercion from into null from Empty String
++            // either, if `null` not allowed
++            if (_primitive && ctxt.isEnabled(DeserializationFeature.FAIL_ON_NULL_FOR_PRIMITIVES)) {
++                throw ctxt.mappingException(
++                        "Can not map Empty String as null into type %s (set DeserializationConfig.DeserializationFeature.FAIL_ON_NULL_FOR_PRIMITIVES to 'false' to allow)",
++                        handledType().toString());
++            }
++            return _nullValue;
++        }

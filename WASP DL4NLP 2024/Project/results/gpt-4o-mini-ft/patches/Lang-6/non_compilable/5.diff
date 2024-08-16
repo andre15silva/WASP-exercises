@@ -1,0 +1,45 @@
+diff --git a/tmp/a9c8535f-2ebc-4ce6-ba9d-a3539d69aeaa_buggy.java b/tmp/a073477a-5467-4dbb-a3d6-7dadd776bb15_fixed.java
+index 4c1ed27..9763a99 100644
+--- a/tmp/a9c8535f-2ebc-4ce6-ba9d-a3539d69aeaa_buggy.java
++++ b/tmp/a073477a-5467-4dbb-a3d6-7dadd776bb15_fixed.java
+@@ -1,32 +1,34 @@
+     /**
+      * Translate an input onto a Writer. This is intentionally final as its algorithm is 
+      * tightly coupled with the abstract method of this class. 
+      *
+      * @param input CharSequence that is being translated
+      * @param out Writer to translate the text to
+      * @throws IOException if and only if the Writer produces an IOException
+      */
+     public final void translate(CharSequence input, Writer out) throws IOException {
+         if (out == null) {
+             throw new IllegalArgumentException("The Writer must not be null");
+         }
+         if (input == null) {
+             return;
+         }
+         int pos = 0;
+         int len = input.length();
+         while (pos < len) {
+             int consumed = translate(input, pos, out);
+             if (consumed == 0) {
+-                char[] c = Character.toChars(Character.codePointAt(input, pos));
+-                out.write(c);
+-                pos+= c.length;
++                //  transform surrogate pairs
++                int codepoint = Character.codePointAt(input, pos);
++                pos+= Character.charCount(codepoint);
++                String escaped = StringEscapeUtils.escapeCsv(new String(Character.toChars(codepoint)));
++                out.write(charToHTML(escaped));
+                 continue;
+             }
+ //          // contract with translators is that they have to understand codepoints 
+ //          // and they just took care of a surrogate pair
+-            for (int pt = 0; pt < consumed; pt++) {
+-                pos += Character.charCount(Character.codePointAt(input, pos));
+-            }
++//            for (int pt = 0; pt < consumed; pt++) {
++//                pos += Character.charCount(Character.codePointAt(input, pos));
++//            }
+         }
+     }

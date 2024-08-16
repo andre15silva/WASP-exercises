@@ -1,0 +1,17 @@
+diff --git a/tmp/04f1a8fb-862c-402a-b762-486ab8416587_buggy.java b/tmp/fa26a615-5040-46a3-8aa8-beb01ae91060_fixed.java
+index c222270..ac76c71 100644
+--- a/tmp/04f1a8fb-862c-402a-b762-486ab8416587_buggy.java
++++ b/tmp/fa26a615-5040-46a3-8aa8-beb01ae91060_fixed.java
+@@ -1,7 +1,10 @@
+     public Object generateId(Object forPojo) {
+         // 04-Jun-2016, tatu: As per [databind#1255], need to consider possibility of
+         //    id being generated for "alwaysAsId", but not being written as POJO; regardless,
+         //    need to use existing id if there is one:
+-            id = generator.generateId(forPojo);
+-        return id;
++            Object id = generator.generateId(forPojo);
++            if (id != null) {
++                this.id = id;
++            }
++        return this.id;
+     }

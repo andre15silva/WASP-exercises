@@ -1,0 +1,35 @@
+diff --git a/tmp/86b00216-cc61-4b1a-935d-ed834d426014_buggy.java b/tmp/629b63bf-7b8f-471d-a6d4-bc189045882a_fixed.java
+index cc69d41..73e5204 100644
+--- a/tmp/86b00216-cc61-4b1a-935d-ed834d426014_buggy.java
++++ b/tmp/629b63bf-7b8f-471d-a6d4-bc189045882a_fixed.java
+@@ -1,29 +1,30 @@
+     /**
+      * Create an Option using the current settings and with
+      * the specified Option <code>char</code>.
+      *
+      * @param opt the <code>java.lang.String</code> representation
+      * of the Option
+      * @return the Option instance
+      * @throws IllegalArgumentException if <code>opt</code> is not
+      * a valid character.  See Option.
+      */
+     public static Option create(String opt) throws IllegalArgumentException
+     {
+             // create the option
+         Option option = new Option(opt, description);
+ 
+             // set the option properties
+             option.setLongOpt(longopt);
+             option.setRequired(required);
+             option.setOptionalArg(optionalArg);
+             option.setArgs(numberOfArgs);
+             option.setType(type);
+             option.setValueSeparator(valuesep);
+             option.setArgName(argName);
+             // reset the OptionBuilder properties
+             OptionBuilder.reset();
++            description = null;
+ 
+         // return the Option instance
+         return option;
+     }

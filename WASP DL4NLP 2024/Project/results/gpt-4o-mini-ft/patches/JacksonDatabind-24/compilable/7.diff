@@ -1,0 +1,31 @@
+diff --git a/tmp/ab007701-cd60-4410-a4f9-5415201e91d3_buggy.java b/tmp/23c2669e-716f-4da5-9c65-fe07f18b941d_fixed.java
+index 0502fea..0294a62 100644
+--- a/tmp/ab007701-cd60-4410-a4f9-5415201e91d3_buggy.java
++++ b/tmp/23c2669e-716f-4da5-9c65-fe07f18b941d_fixed.java
+@@ -1,9 +1,25 @@
+     public BaseSettings withDateFormat(DateFormat df) {
+         if (_dateFormat == df) {
+             return this;
+         }
+         TimeZone tz = (df == null) ? _timeZone : df.getTimeZone();
+         return new BaseSettings(_classIntrospector, _annotationIntrospector, _visibilityChecker, _propertyNamingStrategy, _typeFactory,
+                 _typeResolverBuilder, df, _handlerInstantiator, _locale,
+                 tz, _defaultBase64);
+     }
++
++    // [Issue#1319] maybe most likely, let it orphaned
++    /*
++    public ObjectMapper asMergeable( )
++    {
++        if (_permutations != null) {
++            return this;
++        }
++        ObjectMapper m = new ObjectMapper( _config );
++        if (_dateFormat != null) {
++            m.setDateFormat(_dateFormat);
++        }
++        return m;
++    }
++    */
++    
+\ No newline at end of file

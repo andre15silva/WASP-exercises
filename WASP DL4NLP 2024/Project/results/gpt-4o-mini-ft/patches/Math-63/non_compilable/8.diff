@@ -1,0 +1,21 @@
+diff --git a/tmp/c8d37d44-5cde-4424-b111-1ca24c5781c1_buggy.java b/tmp/d40a0248-d37f-448b-9a41-218672a8f653_fixed.java
+index 9033e1c..a114336 100644
+--- a/tmp/c8d37d44-5cde-4424-b111-1ca24c5781c1_buggy.java
++++ b/tmp/d40a0248-d37f-448b-9a41-218672a8f653_fixed.java
+@@ -1,11 +1,13 @@
+     /**
+      * Returns true iff they are equal as defined by
+-     * {@link #equals(double,double,int) equals(x, y, 1)}.
++     * {@link #equalsIncludingNaN(double[],double[]) equalsIncludingNaN(x, y)}.
+      *
+      * @param x first value
+      * @param y second value
+      * @return {@code true} if the values are equal.
+      */
+-    public static boolean equals(double x, double y) {
+-        return (Double.isNaN(x) && Double.isNaN(y)) || x == y;
++    public static boolean equals(double[] x, double[] y) {
++       if (x == y) return true;
++       if (x == null || y == null) return false;
++       return equalsIncludingNaN(x, y);
+     }

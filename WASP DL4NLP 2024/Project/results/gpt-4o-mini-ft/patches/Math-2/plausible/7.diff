@@ -1,0 +1,18 @@
+diff --git a/tmp/37995e1e-fad2-4dd1-9f63-232210ef51b8_buggy.java b/tmp/df682459-c9bf-46c2-9267-00c02ab728d2_fixed.java
+index e3e3ec4..b1a1b19 100644
+--- a/tmp/37995e1e-fad2-4dd1-9f63-232210ef51b8_buggy.java
++++ b/tmp/df682459-c9bf-46c2-9267-00c02ab728d2_fixed.java
+@@ -1,9 +1,11 @@
+     /**
+      * {@inheritDoc}
+      *
+      * For population size {@code N}, number of successes {@code m}, and sample
+-     * size {@code n}, the mean is {@code n * m / N}.
++     * size {@code n},
++     *
++     * <p>For hypergeometric distribution, the mean is {@code n * m / N}.
+      */
+     public double getNumericalMean() {
+-        return (double) (getSampleSize() * getNumberOfSuccesses()) / (double) getPopulationSize();
++        return (double) getSampleSize() * (double) getNumberOfSuccesses() / (double) getPopulationSize();
+     }

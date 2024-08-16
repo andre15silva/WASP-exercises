@@ -1,0 +1,22 @@
+diff --git a/tmp/e93064a3-fcbb-48a1-b0ba-8f0b3f01ae40_buggy.java b/tmp/2694e154-4056-449d-be90-66e24bc4a576_fixed.java
+index b86b44d..b0269c0 100644
+--- a/tmp/e93064a3-fcbb-48a1-b0ba-8f0b3f01ae40_buggy.java
++++ b/tmp/2694e154-4056-449d-be90-66e24bc4a576_fixed.java
+@@ -1,4 +1,15 @@
+     public final Object computeValue(EvalContext context) {
+-        return compute(args[0].computeValue(context), args[1].computeValue(context))
+-                ? Boolean.TRUE : Boolean.FALSE;
++        boolean res;
++        Object a = args[0].computeValue(context);
++        Object b = args[1].computeValue(context);
++        if (a instanceof NodeSet) {
++            NodeSet ns = (NodeSet) a;
++            return Boolean.valueOf(ns.isEmpty());
++        }
++        if (b instanceof NodeSet) {
++            NodeSet ns = (NodeSet) b;
++            return Boolean.valueOf(ns.isEmpty());
++        }
++        res = XPathUtility.equals(a, b);
++        return res ? Boolean.TRUE : Boolean.FALSE;
+     }

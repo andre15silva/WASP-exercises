@@ -1,0 +1,13 @@
+diff --git a/tmp/1d6b0edd-489a-4de7-aa18-dbc94498dda7_buggy.java b/tmp/46d7063d-a2bc-48a0-95f0-025b8dd476f3_fixed.java
+index 91b7957..131dada 100644
+--- a/tmp/1d6b0edd-489a-4de7-aa18-dbc94498dda7_buggy.java
++++ b/tmp/46d7063d-a2bc-48a0-95f0-025b8dd476f3_fixed.java
+@@ -1,6 +1,8 @@
+         private void readTypeVariables() {
+             for (Type type : typeVariable.getBounds()) {
+                 registerTypeVariablesOn(type);
++                classHierarchy.traverseTypes(type, this);
+             }
+             registerTypeVariablesOn(getActualTypeArgumentFor(typeVariable));
++            classHierarchy.traverseTypes(getActualTypeArgumentFor(typeVariable), this);
+         }

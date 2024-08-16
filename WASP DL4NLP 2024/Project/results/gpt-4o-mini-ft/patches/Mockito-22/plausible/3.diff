@@ -1,0 +1,17 @@
+diff --git a/tmp/4d364011-adeb-43ac-9254-779af3910b54_buggy.java b/tmp/b84e33b4-c396-40ba-b03d-7d777a05f2cf_fixed.java
+index 111ba5e..030c406 100644
+--- a/tmp/4d364011-adeb-43ac-9254-779af3910b54_buggy.java
++++ b/tmp/b84e33b4-c396-40ba-b03d-7d777a05f2cf_fixed.java
+@@ -1,9 +1,12 @@
+     public static boolean areEqual(Object o1, Object o2) {
++        if(o1 == o2) {
++            return true;
++        }
+         if (o1 == null || o2 == null) {
+             return o1 == null && o2 == null;
+         } else if (isArray(o1)) {
+             return isArray(o2) && areArraysEqual(o1, o2);
+         } else {
+             return o1.equals(o2);
+         }
+     }

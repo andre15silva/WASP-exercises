@@ -1,0 +1,19 @@
+diff --git a/tmp/0f29b81e-4da5-4a40-992a-230e6674fcbe_buggy.java b/tmp/c6f2d13d-415c-4c5c-8c0e-48c128182873_fixed.java
+index a667cbe..6ff384c 100644
+--- a/tmp/0f29b81e-4da5-4a40-992a-230e6674fcbe_buggy.java
++++ b/tmp/c6f2d13d-415c-4c5c-8c0e-48c128182873_fixed.java
+@@ -1,10 +1,14 @@
+     /**
+      * Recalculate the hash code after deserialization. The hash code of some
+      * keys might have change (hash codes based on the system hash code are
+      * only stable for the same process).
+      * @return the instance with recalculated hash code
+      */
+     private Object readResolve() {
++        if (keyClass != null) {
++            // is specialization of multi-key: short-circuit
++            return this;
++        }
+         calculateHashCode(keys);
+         return this;
+     }

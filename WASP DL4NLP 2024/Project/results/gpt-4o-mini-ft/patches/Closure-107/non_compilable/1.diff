@@ -1,0 +1,72 @@
+diff --git a/tmp/7412ff82-dc89-4011-9346-16ecae31f591_buggy.java b/tmp/bdd334b2-4929-4426-98fe-7260fc7efb98_fixed.java
+index fa9dfcc..fd4cd4e 100644
+--- a/tmp/7412ff82-dc89-4011-9346-16ecae31f591_buggy.java
++++ b/tmp/bdd334b2-4929-4426-98fe-7260fc7efb98_fixed.java
+@@ -1,61 +1,67 @@
+   @Override
+   protected CompilerOptions createOptions() {
+     CompilerOptions options = new CompilerOptions();
+     if (flags.processJqueryPrimitives) {
+       options.setCodingConvention(new JqueryCodingConvention());
+     } else {
+       options.setCodingConvention(new ClosureCodingConvention());
+     }
+ 
+     options.setExtraAnnotationNames(flags.extraAnnotationName);
+ 
+     CompilationLevel level = flags.compilationLevel;
+     level.setOptionsForCompilationLevel(options);
+ 
+     if (flags.debug) {
+       level.setDebugOptionsForCompilationLevel(options);
+     }
+ 
+     if (flags.useTypesForOptimization) {
+       level.setTypeBasedOptimizationOptions(options);
+     }
+ 
+     if (flags.generateExports) {
+       options.setGenerateExports(flags.generateExports);
+     }
+ 
+     WarningLevel wLevel = flags.warningLevel;
+     wLevel.setOptionsForWarningLevel(options);
+     for (FormattingOption formattingOption : flags.formatting) {
+       formattingOption.applyToOptions(options);
+     }
+ 
+     options.closurePass = flags.processClosurePrimitives;
+ 
+     options.jqueryPass = CompilationLevel.ADVANCED_OPTIMIZATIONS == level &&
+         flags.processJqueryPrimitives;
+ 
+     options.angularPass = flags.angularPass;
+ 
+     if (!flags.translationsFile.isEmpty()) {
+       try {
+         options.messageBundle = new XtbMessageBundle(
+             new FileInputStream(flags.translationsFile),
+             flags.translationsProject);
+       } catch (IOException e) {
+         throw new RuntimeException("Reading XTB file", e);
+       }
+     } else if (CompilationLevel.ADVANCED_OPTIMIZATIONS == level) {
+       // In SIMPLE or WHITESPACE mode, if the user hasn't specified a
+       // translations file, they might reasonably try to write their own
+       // implementation of goog.getMsg that makes the substitution at
+       // run-time.
+       //
+       // In ADVANCED mode, goog.getMsg is going to be renamed anyway,
+       // so we might as well inline it. But shut off the i18n warnings,
+       // because the user didn't really ask for i18n.
+       options.messageBundle = new EmptyMessageBundle();
++      options.addWarnings(ImmutableList.<JSError>of(new JSError(
++          "Warning: 'goog.getMsg' is not a function",
++          JSError.SOURCE_FILE, JSError.ERROR_LEVEL)));// just so users do not get mad with warnings..
++      options.addWarnings(ImmutableList.<JSError>of(new JSError(
++          "Warning: 'goog.getMsg' no longer works as middleware for i18n.",
++          JSError.SOURCE_FILE, JSError.ERROR_LEVEL)));// really just to shut up users
+     }
+ 
+     return options;
+   }

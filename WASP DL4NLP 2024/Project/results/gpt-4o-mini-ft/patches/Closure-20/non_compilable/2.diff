@@ -1,0 +1,30 @@
+diff --git a/tmp/c9b6b76e-0c20-48a3-95cc-2f048a21ec28_buggy.java b/tmp/477d3725-1154-4ea8-aa05-60b30041f4d9_fixed.java
+index d4e6d48..ff5d4c1 100644
+--- a/tmp/c9b6b76e-0c20-48a3-95cc-2f048a21ec28_buggy.java
++++ b/tmp/477d3725-1154-4ea8-aa05-60b30041f4d9_fixed.java
+@@ -1,23 +1,23 @@
+   private Node tryFoldSimpleFunctionCall(Node n) {
+     Preconditions.checkState(n.isCall());
+     Node callTarget = n.getFirstChild();
+     if (callTarget != null && callTarget.isName() &&
+           callTarget.getString().equals("String")) {
+       // Fold String(a) to '' + (a) on immutable literals,
+       // which allows further optimizations
+       //
+       // We can't do this in the general case, because String(a) has
+       // slightly different semantics than '' + (a). See
+       // http://code.google.com/p/closure-compiler/issues/detail?id=759
+-      Node value = callTarget.getNext();
+-      if (value != null) {
++      Node value = callTarget.getSecondChild();
++      if (value != null && value.isImmutableValue()) {
+         Node addition = IR.add(
+             IR.string("").srcref(callTarget),
+             value.detachFromParent());
+         n.getParent().replaceChild(n, addition);
+         reportCodeChange();
+         return addition;
+       }
+     }
+     return n;
+   }

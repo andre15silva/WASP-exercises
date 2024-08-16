@@ -1,0 +1,43 @@
+diff --git a/tmp/8daae3fa-8dc6-427f-b102-ce47f44082fb_buggy.java b/tmp/942a7ec0-1119-4cd6-a4cf-6772996a7118_fixed.java
+index cae5e03..bd43164 100644
+--- a/tmp/8daae3fa-8dc6-427f-b102-ce47f44082fb_buggy.java
++++ b/tmp/942a7ec0-1119-4cd6-a4cf-6772996a7118_fixed.java
+@@ -1,33 +1,35 @@
+     /*
+      * (non-Javadoc)
+      * 
+      * @see java.io.InputStream#read(byte[], int, int)
+      */
+     @Override
+     public int read(final byte[] dest, final int offs, final int len)
+         throws IOException {
+         if (offs < 0) {
+             throw new IndexOutOfBoundsException("offs(" + offs + ") < 0.");
+         }
+         if (len < 0) {
+             throw new IndexOutOfBoundsException("len(" + len + ") < 0.");
+         }
+         if (offs + len > dest.length) {
+             throw new IndexOutOfBoundsException("offs(" + offs + ") + len("
+                                                 + len + ") > dest.length(" + dest.length + ").");
+         }
+         if (this.in == null) {
+             throw new IOException("stream closed");
+         }
+ 
+         final int hi = offs + len;
+         int destOffs = offs;
+-        int b;
++        int b = -1;
+         while (destOffs < hi && ((b = read0()) >= 0)) {
+             dest[destOffs++] = (byte) b;
+             count(1);
+         }
+ 
+-        int c = (destOffs == offs) ? -1 : (destOffs - offs);
+-        return c;
++        if (-1 == b && destOffs == offs) {
++            return -1;
++        }
++        return destOffs - offs;
+     }

@@ -1,0 +1,16 @@
+diff --git a/tmp/bd755bd7-20c7-409a-97cd-07deeae94d20_buggy.java b/tmp/b0a5f4cc-82d7-4753-a22c-7f729bd2ba42_fixed.java
+index 1c92640..e3d18e9 100644
+--- a/tmp/bd755bd7-20c7-409a-97cd-07deeae94d20_buggy.java
++++ b/tmp/b0a5f4cc-82d7-4753-a22c-7f729bd2ba42_fixed.java
+@@ -1,7 +1,10 @@
+     /**
+      * Set the name of the entry.
+      * @param name the name to use
+      */
+     protected void setName(String name) {
+-        this.name = name;
++        // Fix for https://issues.apache.org/jira/browse/COMPRESS-176
++        // The default here is fine: it avoids interleaving backslashes in
++        // Zip file names with directory separators on Windows.
++        this.name = name.replace("\\", "/");
+     }

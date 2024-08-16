@@ -1,0 +1,40 @@
+diff --git a/tmp/1702d2de-67a8-4cae-9b30-7c9113bd3505_buggy.java b/tmp/a9facf0e-e52d-4709-98f1-941b5509402c_fixed.java
+index 0b7c52e..b118e05 100644
+--- a/tmp/1702d2de-67a8-4cae-9b30-7c9113bd3505_buggy.java
++++ b/tmp/a9facf0e-e52d-4709-98f1-941b5509402c_fixed.java
+@@ -1,27 +1,33 @@
+     /**
+      * Processes a OBJECTLIT node.
+      */
+     private void handleObjectLit(NodeTraversal t, Node n) {
+       for (Node child = n.getFirstChild();
+           child != null;
+           child = child.getNext()) {
+-        // Maybe STRING, GET, SET
++        // TODO(johnlenz): add a test case for this option.
++        boolean external = !t.inGlobalScope();
++        // TODO(johnlenz): add a test case for this option.
++        boolean isConstructorCall = true;
+ 
+         // We should never see a mix of numbers and strings.
+         String name = child.getString();
+         T type = typeSystem.getType(getScope(), n, name);
+ 
+         Property prop = getProperty(name);
+         if (!prop.scheduleRenaming(child,
+-                                   processProperty(t, prop, type, null))) {
++                                   processProperty(t, prop, type,
++                                                   external,
++                                                   false,
++                                                   isConstructorCall))) {
+           // TODO(user): It doesn't look like the user can do much in this
+           // case right now.
+           if (propertiesToErrorFor.containsKey(name)) {
+             compiler.report(JSError.make(
+                 t.getSourceName(), child, propertiesToErrorFor.get(name),
+                 Warnings.INVALIDATION, name,
+                 (type == null ? "null" : type.toString()), n.toString(), ""));
+           }
+         }
+       }
+     }

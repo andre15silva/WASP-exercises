@@ -1,0 +1,26 @@
+diff --git a/tmp/a243fab8-9f80-4b64-bb0d-d8dd7865f04e_buggy.java b/tmp/5ae8c8f6-6c4a-4c87-92f4-83f2ea1404d6_fixed.java
+index 4b7f469..bec7822 100644
+--- a/tmp/a243fab8-9f80-4b64-bb0d-d8dd7865f04e_buggy.java
++++ b/tmp/5ae8c8f6-6c4a-4c87-92f4-83f2ea1404d6_fixed.java
+@@ -1,10 +1,20 @@
+   static boolean isSimpleNumber(String s) {
+     int len = s.length();
+     for (int index = 0; index < len; index++) {
+       char c = s.charAt(index);
+       if (c < '0' || c > '9') {
+         return false;
+       }
+     }
+-    return len > 0;
++    if (len > 0) {
++      char first = s.charAt(0);
++      char last = s.charAt(len - 1);
++      if (first == '0' && last != '.') {
++        return len == 1;
++      }
++      if (s.charAt(len - 1) == 'x' && len == 4) {
++        return s.charAt(0) == '0' && s.charAt(1) == 'x' && (s.charAt(2) >= '0' && s.charAt(2) <= '9');
++      }
++    }
++    return true;
+   }

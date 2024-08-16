@@ -1,0 +1,61 @@
+diff --git a/tmp/c7a50810-40e7-4210-ab80-38070398438b_buggy.java b/tmp/cba0a368-c5f4-4bf0-890c-6aca409f89d0_fixed.java
+index 544303b..a145601 100644
+--- a/tmp/c7a50810-40e7-4210-ab80-38070398438b_buggy.java
++++ b/tmp/cba0a368-c5f4-4bf0-890c-6aca409f89d0_fixed.java
+@@ -1,29 +1,56 @@
+     /**
+      * Get the current solution.
+      * <p>
+      * {@link #solve} should be called first for this to be the optimal solution.
+      * </p>
+      * @return current solution
+      */
+     protected RealPointValuePair getSolution() {
+         double[] coefficients = new double[getOriginalNumDecisionVariables()];
+         Integer basicRow =
+             getBasicRow(getNumObjectiveFunctions() + getOriginalNumDecisionVariables());
+         double mostNegative = basicRow == null ? 0 : getEntry(basicRow, getRhsOffset());
+         for (int i = 0; i < coefficients.length; i++) {
+             basicRow = getBasicRow(getNumObjectiveFunctions() + i);
+                 // if multiple variables can take a given value 
+                 // then we choose the first and set the rest equal to 0
+                 coefficients[i] =
+                     (basicRow == null ? 0 : getEntry(basicRow, getRhsOffset())) -
+                     (restrictToNonNegative ? 0 : mostNegative);
+             if (basicRow != null) {
+                 for (int j = getNumObjectiveFunctions(); j < getNumObjectiveFunctions() + i; j++) {
+                     if (tableau.getEntry(basicRow, j) == 1) {
+                          coefficients[i] = 0;
+                     }
+                 }
+             }
+         }
++        for (int j = 0; j < coefficients.length; j++) {
++        }
++        int index = 0;
++        for (int j = 0; j < coefficients.length; j++) {
++            if (coefficients[j] == 0) {
++                if (j < getOriginalNumDecisionVariables()) {
++                     index++;
++                }
++            } else {
++                if (j < getOriginalNumDecisionVariables()) {
++                     index++;
++                }
++                else if (j >= getNumObjectiveFunctions()) {
++                    index--;
++                }
++            }
++        }
++        //this handles test case 272 where we have multiple optimal solutions and the simplex decides
++        //to set a different variable to zero than the one that we suggest above
++        double offering = 0;
++        for (int j = 0; j < coefficients.length; j++) {
++            if (coefficients[j] > 0)
++                coefficients[j] = offering;
++            if (j < getOriginalNumDecisionVariables()) {
++                offering = coefficients[j];
++            }
++        }
+         return new RealPointValuePair(coefficients, f.getValue(coefficients));
+     }

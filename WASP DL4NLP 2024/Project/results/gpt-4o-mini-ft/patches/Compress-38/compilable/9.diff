@@ -1,0 +1,28 @@
+diff --git a/tmp/03d1ab4a-94a6-4b41-bde2-b8d37ae0525c_buggy.java b/tmp/075c01da-e306-49d7-b42f-de6d6ab5fdf9_fixed.java
+index 192e83d..b866016 100644
+--- a/tmp/03d1ab4a-94a6-4b41-bde2-b8d37ae0525c_buggy.java
++++ b/tmp/075c01da-e306-49d7-b42f-de6d6ab5fdf9_fixed.java
+@@ -1,21 +1,22 @@
+     /**
+      * Return whether or not this entry represents a directory.
+      *
+      * @return True if this entry is a directory.
+      */
+     @Override
+     public boolean isDirectory() {
+         if (file != null) {
+             return file.isDirectory();
+         }
+ 
+         if (linkFlag == LF_DIR) {
+             return true;
+         }
+ 
+-        if (getName().endsWith("/")) {
++        // Some implementations assign an empty name to the pax header with a name ending with /
++        if (name.length() > 0 && name.endsWith("/")) {
+             return true;
+         }
+ 
+         return false;
+     }

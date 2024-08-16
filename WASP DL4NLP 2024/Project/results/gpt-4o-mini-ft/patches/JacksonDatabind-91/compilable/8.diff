@@ -1,0 +1,26 @@
+diff --git a/tmp/5008ac89-abe5-4825-96b4-0a494342f37b_buggy.java b/tmp/2a3b4579-4fec-4538-a0f5-c6e4e0226289_fixed.java
+index a5ff4fc..6d3a0fe 100644
+--- a/tmp/5008ac89-abe5-4825-96b4-0a494342f37b_buggy.java
++++ b/tmp/2a3b4579-4fec-4538-a0f5-c6e4e0226289_fixed.java
+@@ -1,17 +1,21 @@
+     /**
+      * Helper method used to prevent both caching and cache lookups for structured
+      * types that have custom value handlers
+      *
+      * @since 2.8.11
+      */
+     private boolean _hasCustomHandlers(JavaType t) {
+         if (t.isContainerType()) {
+             // First: value types may have both value and type handlers
+             JavaType ct = t.getContentType();
+             if (ct != null) {
+                 return (ct.getValueHandler() != null) || (ct.getTypeHandler() != null);
++            }
+             // Second: map(-like) types may have value handler for key (but not type; keys are untyped)
++            JavaType kt = t.getKeyType();
++            if (kt != null) {
++                return (kt.getValueHandler() != null) || (kt.getTypeHandler() != null);
+             }
+         }
+         return false;
+     }

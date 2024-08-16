@@ -1,0 +1,28 @@
+diff --git a/tmp/ccf08d0b-f183-4627-8649-2f9b23e61c8c_buggy.java b/tmp/f4988a45-dc37-4939-90dd-c2cd196d7b7a_fixed.java
+index 00914da..00db0b1 100644
+--- a/tmp/ccf08d0b-f183-4627-8649-2f9b23e61c8c_buggy.java
++++ b/tmp/f4988a45-dc37-4939-90dd-c2cd196d7b7a_fixed.java
+@@ -1,17 +1,21 @@
+     // does not recurse.
+     private void normalise(Element element) {
+         List<Node> toMove = new ArrayList<Node>();
+         for (Node node: element.childNodes) {
+             if (node instanceof TextNode) {
+                 TextNode tn = (TextNode) node;
+                 if (!tn.isBlank())
+                     toMove.add(tn);
+             }
+         }
+ 
++        // since the body is now before the first div in body, and we have already restored the parent of
++        // all the nodes, we'll skip the body snippet and hope that parent's insert returns reasonable
++        // results. 
+         for (Node node: toMove) {
+             element.removeChild(node);
+-            body().appendChild(new TextNode(" ", ""));
+-            body().appendChild(node);
++            parent.insert(0, child);
++            child.owner.appendChild(child);
++            child.appendChild(node);
+         }
+     }

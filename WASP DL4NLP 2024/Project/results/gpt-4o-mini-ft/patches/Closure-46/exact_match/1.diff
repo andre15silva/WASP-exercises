@@ -1,0 +1,36 @@
+diff --git a/tmp/df693d7b-67a3-4336-a4c3-4eab80615fc4_buggy.java b/tmp/b8939d26-7089-4ca8-b06c-4a268ae192b9_fixed.java
+index 46817a7..b31c1cb 100644
+--- a/tmp/df693d7b-67a3-4336-a4c3-4eab80615fc4_buggy.java
++++ b/tmp/b8939d26-7089-4ca8-b06c-4a268ae192b9_fixed.java
+@@ -1,16 +1,19 @@
+   @Override
+   public JSType getLeastSupertype(JSType that) {
+-    if (!that.isRecordType()) {
++    if (that.isRecordType()) {
++      // Record types with the same key set can be unified.
++      JSType union = originalUnionType;
++      RecordType rType = that.toMaybeRecordType();
++      if (rType != null) {
++        for (String property : rType.getPropertyNames()) {
++          JSType prop = rType.getPropertyType(property);
++          if (!isSymbolType(prop) && !getPropertyType(property).isEquivalentTo(prop)) {
++            union = (union == null) ? prop : getNativeType(ALL_TYPE);
++            break;
++          }
++        }
++      }
++      return union;
++    }
+     return super.getLeastSupertype(that);
+   }
+-    RecordTypeBuilder builder = new RecordTypeBuilder(registry);
+-    for (String property : properties.keySet()) {
+-      if (that.toMaybeRecordType().hasProperty(property) &&
+-          that.toMaybeRecordType().getPropertyType(property).isEquivalentTo(
+-              getPropertyType(property))) {
+-        builder.addProperty(property, getPropertyType(property),
+-            getPropertyNode(property));
+-      }
+-    }
+-    return builder.build();
+-  }

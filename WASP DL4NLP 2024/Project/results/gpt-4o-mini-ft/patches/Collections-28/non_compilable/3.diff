@@ -1,0 +1,16 @@
+diff --git a/tmp/bc3b1e1a-8794-4391-9a37-1babfa775ef3_buggy.java b/tmp/df1e9c23-cafb-46a3-acd7-9132271bb71e_fixed.java
+index e69de29..848001e 100644
+--- a/tmp/bc3b1e1a-8794-4391-9a37-1babfa775ef3_buggy.java
++++ b/tmp/df1e9c23-cafb-46a3-acd7-9132271bb71e_fixed.java
+@@ -0,0 +1,11 @@
++public void testPrefixMapClear() {
++        SortedMap<String, Integer> prefixMap = trie.subMap("And", "Anatole");
++        assertEquals(new HashSet<String>(Arrays.asList("Andrea", "Andreas", "Andres")), prefixMap.keySet());
++        assertEquals(Arrays.asList(5, 4, 6), new ArrayList<Integer>(prefixMap.values()));
++        prefixMap.clear();
++        assertTrue(prefixMap.isEmpty());
++        assertTrue(prefixMap.keySet().isEmpty());
++        assertTrue(prefixMap.values().isEmpty());
++        assertEquals(new HashSet<String>(Arrays.asList("Anael", "Analu", "Anatole", "Anna")), trie.keySet());
++        assertEquals(Arrays.asList(2, 3, 7, 1), new ArrayList<Integer>(trie.values()));
++    }

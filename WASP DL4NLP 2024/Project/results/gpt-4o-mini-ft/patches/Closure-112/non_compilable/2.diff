@@ -1,0 +1,44 @@
+diff --git a/tmp/85cf361c-b83d-486d-9ba5-eb0ebfd9cae4_buggy.java b/tmp/196bc0f2-2b25-4a13-9bc0-236c306f2a19_fixed.java
+index 63641d0..e6b0683 100644
+--- a/tmp/85cf361c-b83d-486d-9ba5-eb0ebfd9cae4_buggy.java
++++ b/tmp/196bc0f2-2b25-4a13-9bc0-236c306f2a19_fixed.java
+@@ -1,33 +1,37 @@
+   /**
+    * For functions with function(this: T, ...) and T as parameters, type
+    * inference will set the type of this on a function literal argument to the
+    * the actual type of T.
+    */
+   private boolean inferTemplatedTypesForCall(
+       Node n, FunctionType fnType) {
+-    final ImmutableList<TemplateType> keys = fnType.getTemplateTypeMap()
+-        .getTemplateKeys();
++    if (!(fnType instanceof JSDocInfo.TypeAdapter)) {
++      return false;
++    }
++    final JSDocInfo.TypeAdapter typeAdapter = (JSDocInfo.TypeAdapter) fnType;
++    ImmutableList<TemplateType> keys =
++        typeAdapter.getTemplateTypeMap().getTemplateKeys();
+     if (keys.isEmpty()) {
+       return false;
+     }
+ 
+     // Try to infer the template types
+     Map<TemplateType, JSType> inferred =
+         inferTemplateTypesFromParameters(fnType, n);
+ 
+ 
+     // Replace all template types. If we couldn't find a replacement, we
+     // replace it with UNKNOWN.
+     TemplateTypeReplacer replacer = new TemplateTypeReplacer(
+         registry, inferred);
+     Node callTarget = n.getFirstChild();
+ 
+     FunctionType replacementFnType = fnType.visit(replacer)
+         .toMaybeFunctionType();
+     Preconditions.checkNotNull(replacementFnType);
+ 
+     callTarget.setJSType(replacementFnType);
+     n.setJSType(replacementFnType.getReturnType());
+ 
+     return replacer.madeChanges;
+   }

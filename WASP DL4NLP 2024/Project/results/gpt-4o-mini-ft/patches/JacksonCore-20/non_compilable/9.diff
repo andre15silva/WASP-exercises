@@ -1,0 +1,26 @@
+diff --git a/tmp/3e998164-dce7-4019-9cb4-6233546b8015_buggy.java b/tmp/5f767656-f272-4892-a8e9-dcd830e960f0_fixed.java
+index a6f008f..22379c8 100644
+--- a/tmp/3e998164-dce7-4019-9cb4-6233546b8015_buggy.java
++++ b/tmp/5f767656-f272-4892-a8e9-dcd830e960f0_fixed.java
+@@ -1,11 +1,21 @@
+     /**
+      * Method that can be called on backends that support passing opaque datatypes of
+      * non-JSON formats
+      *
++     * NOTE: backends that do not yet know how to embed matrices (of bytes, etc) 
++     * as native JSON structures can follow the above pattern for small inputs
++     *
+      * @since 2.8
+      */
+     public void writeEmbeddedObject(Object object) throws IOException {
+         // 01-Sep-2016, tatu: As per [core#318], handle small number of cases
++        if (object instanceof byte[]) {
++            // allow small byte array as valid buffer
++            byte[] bytes = (byte[]) object;
++            _appendQuotedUTF8(
++                _outputEscapes, bytes, bytes.length);
++        } else {
+             throw new JsonGenerationException("No native support for writing embedded objects",
+                     this);
+         }
++    }

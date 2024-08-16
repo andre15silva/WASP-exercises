@@ -1,0 +1,23 @@
+diff --git a/tmp/5d2d1101-cf2f-4430-aa23-a10d94f4fab8_buggy.java b/tmp/e609604d-f094-43d8-b242-40254f494567_fixed.java
+index 79fa300..2a66820 100644
+--- a/tmp/5d2d1101-cf2f-4430-aa23-a10d94f4fab8_buggy.java
++++ b/tmp/e609604d-f094-43d8-b242-40254f494567_fixed.java
+@@ -1,15 +1,16 @@
+     /**
+-     * Create a new doctype element.
+-     * @param name the doctype's name
++     * Initialize a doctype element.
++     * @param name the doctype's name, which must be valid XML name
+      * @param publicId the doctype's public ID
+      * @param systemId the doctype's system ID
+      * @param baseUri the doctype's base URI
+      */
+     public DocumentType(String name, String publicId, String systemId, String baseUri) {
+         super(baseUri);
+ 
+         Validate.notEmpty(name);
++        Validate.isTrue( XmlValidator.isName(name), "Invalid doctype name");
+         attr("name", name);
+         attr("publicId", publicId);
+         attr("systemId", systemId);
+     }

@@ -1,0 +1,37 @@
+diff --git a/tmp/d54946b3-48bf-4ebe-8919-bdd1bfbb4a8e_buggy.java b/tmp/878e7786-beab-48a7-80a8-205fb8b00ffa_fixed.java
+index f9a9b5b..18fca17 100644
+--- a/tmp/d54946b3-48bf-4ebe-8919-bdd1bfbb4a8e_buggy.java
++++ b/tmp/878e7786-beab-48a7-80a8-205fb8b00ffa_fixed.java
+@@ -1,30 +1,32 @@
+     public <T> T createMock(MockCreationSettings<T> settings, MockHandler handler) {
+         if (settings.getSerializableMode() == SerializableMode.ACROSS_CLASSLOADERS) {
+             throw new MockitoException("Serialization across classloaders not yet supported with ByteBuddyMockMaker");
+         }
+         Class<? extends T> mockedProxyType = cachingMockBytecodeGenerator.get(
+                 settings.getTypeToMock(),
+                 settings.getExtraInterfaces()
+         );
+         T mockInstance = null;
+         try {
+             mockInstance = classInstantiator.instantiate(mockedProxyType);
+             MockMethodInterceptor.MockAccess mockAccess = (MockMethodInterceptor.MockAccess) mockInstance;
+             mockAccess.setMockitoInterceptor(new MockMethodInterceptor(asInternalMockHandler(handler), settings));
+ 
+             return ensureMockIsAssignableToMockedType(settings, mockInstance);
+         } catch (ClassCastException cce) {
+             throw new MockitoException(join(
+                     "ClassCastException occurred while creating the mockito mock :",
+                     "  class to mock : " + describeClass(mockedProxyType),
+                     "  created class : " + describeClass(settings.getTypeToMock()),
+                     "  proxy instance class : " + describeClass(mockInstance),
+                     "  instance creation by : " + classInstantiator.getClass().getSimpleName(),
+                     "",
+                     "You might experience classloading issues, please ask the mockito mailing-list.",
+                     ""
+             ),cce);
+         } catch (org.mockito.internal.creation.instance.InstantiationException e) {
+             throw new MockitoException("Unable to create mock instance of type '" + mockedProxyType.getSuperclass().getSimpleName() + "'", e);
++        } catch (Exception e) {
++            throw new MockitoException("Mockito doesn't have an instance for type '" + settings.getTypeToMock().getSimpleName() + "'", e);
+         }
+     }

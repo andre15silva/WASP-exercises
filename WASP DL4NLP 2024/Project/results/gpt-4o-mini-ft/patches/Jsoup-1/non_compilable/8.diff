@@ -1,0 +1,29 @@
+diff --git a/tmp/88ddeb85-fb66-45e7-98d1-c3c43dec3738_buggy.java b/tmp/b9437dcf-a319-4150-98b3-aa41b5235b98_fixed.java
+index 00914da..54a6a74 100644
+--- a/tmp/88ddeb85-fb66-45e7-98d1-c3c43dec3738_buggy.java
++++ b/tmp/b9437dcf-a319-4150-98b3-aa41b5235b98_fixed.java
+@@ -1,17 +1,22 @@
+     // does not recurse.
+     private void normalise(Element element) {
+         List<Node> toMove = new ArrayList<Node>();
+         for (Node node: element.childNodes) {
+             if (node instanceof TextNode) {
+                 TextNode tn = (TextNode) node;
+                 if (!tn.isBlank())
+                     toMove.add(tn);
+             }
+         }
+ 
++        // need to re-parent in a new order for structure; the <head> styles refer to the <base>. So better to normalise any text
++        // into body.
++        List<Node> lastToMove = new ArrayList<Node>();
+         for (Node node: toMove) {
+-            element.removeChild(node);
+-            body().appendChild(new TextNode(" ", ""));
++            if (node.parent() == element)
++                lastToMove.add(element.childNodes.remove((Object)node));
++        }
++        for (Node node: lastToMove) {
+             body().appendChild(node);
+         }
+     }

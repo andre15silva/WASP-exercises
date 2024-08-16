@@ -1,0 +1,52 @@
+diff --git a/tmp/911352fd-6abe-4d38-9eea-38b7daa416c7_buggy.java b/tmp/07d19020-7d54-499f-a430-184800e7172a_fixed.java
+index addeb8d..da16d4e 100644
+--- a/tmp/911352fd-6abe-4d38-9eea-38b7daa416c7_buggy.java
++++ b/tmp/07d19020-7d54-499f-a430-184800e7172a_fixed.java
+@@ -1,38 +1,47 @@
+     /**
+      * Searches the string builder to find the first reference to the specified
+      * string starting searching from the given index.
+      * <p>
++     * If this instance contains less characters than the specified string length
++     * and the specified index is equal to the length of this instance then
++     * it will return length. However, as per jdk String behaviour if the
++     * this instance length is less than the argument string length then 
++     * its return is unchanged.
++     * <p>
+      * Note that a null input string will return -1, whereas the JDK throws an exception.
+      * 
+      * @param str  the string to find, null returns -1
+      * @param startIndex  the index to start at, invalid index rounded to edge
+      * @return the first index of the string, or -1 if not found
+      */
+     public int indexOf(String str, int startIndex) {
+         startIndex = (startIndex < 0 ? 0 : startIndex);
+         if (str == null || startIndex >= size) {
+             return -1;
+         }
+         int strLen = str.length();
+         if (strLen == 1) {
+             return indexOf(str.charAt(0), startIndex);
+         }
+         if (strLen == 0) {
+             return startIndex;
+         }
+         if (strLen > size) {
+             return -1;
+         }
+         char[] thisBuf = buffer;
+         int len = thisBuf.length - strLen;
+         outer:
+         for (int i = startIndex; i < len; i++) {
+             for (int j = 0; j < strLen; j++) {
+                 if (str.charAt(j) != thisBuf[i + j]) {
+                     continue outer;
+                 }
+             }
+             return i;
+         }
++        if (size >= strLen && startIndex == len) {
++            return len;
++        }
+         return -1;
+     }

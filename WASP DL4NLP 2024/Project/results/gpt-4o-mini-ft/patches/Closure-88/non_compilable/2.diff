@@ -1,0 +1,60 @@
+diff --git a/tmp/f928e2ab-1997-47c8-b3d4-cdd3080022ef_buggy.java b/tmp/1df79914-1b02-49c6-81b8-5a513be87324_fixed.java
+index 9353941..05e2d15 100644
+--- a/tmp/f928e2ab-1997-47c8-b3d4-cdd3080022ef_buggy.java
++++ b/tmp/1df79914-1b02-49c6-81b8-5a513be87324_fixed.java
+@@ -1,30 +1,54 @@
+   /**
+    * Give an expression and a variable. It returns READ, if the first
+    * reference of that variable is a read. It returns KILL, if the first
+    * reference of that variable is an assignment. It returns MAY_LIVE otherwise.
+    */
+   private VariableLiveness isVariableReadBeforeKill(
+       Node n, String variable) {
++    boolean isLocal = false;
+     if (NodeUtil.isName(n) && variable.equals(n.getString())) {
+       if (NodeUtil.isLhs(n, n.getParent())) {
+         // The expression to which the assignment is made is evaluated before
+         // the RHS is evaluated (normal left to right evaluation) but the KILL
+         // occurs after the RHS is evaluated.
+         return VariableLiveness.KILL;
+       } else {
++        isLocal = n.getParent().isLocal();
++        if ((!isLocal || !nodeIsLocal(n))) {
+           return VariableLiveness.READ;
+         }
+       }
++    } else if (n.isFunction()) {
++      for (Node child = n.getFirstChild();
++          child != null; child = child.getNext()) {
++        if (!ControlFlowGraph.isEnteringNewCfgNode(child)) {
++          // GUESS: the function argument may have been translated.
++          if (isLocal = !NodeUtil.isName(child)) {
++            VariableLiveness state = isVariableReadBeforeKill(child, variable);
++            if (state != VariableLiveness.MAYBE_LIVE) {
++              return state;
++            }
++          } else {
++            return VariableLiveness.READ;
++          }
++        }
++      }
++      return VariableLiveness.MAYBE_LIVE;
++    }
+ 
+-    // Expressions are evaluated left-right, depth first.
++    // variable is being assigned to; in whatever kind of expression: evaluate children
++    // of n first;
+     for (Node child = n.getFirstChild();
+         child != null; child = child.getNext()) {
+       if (!ControlFlowGraph.isEnteringNewCfgNode(child)) { // Not a FUNCTION
+         VariableLiveness state = isVariableReadBeforeKill(child, variable);
+         if (state != VariableLiveness.MAYBE_LIVE) {
+           return state;
+         }
+       }
+     }
++    if (isLocal) {
++      return VariableLiveness.READ;
++    }
+     return VariableLiveness.MAYBE_LIVE;
+   }

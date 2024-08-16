@@ -1,0 +1,22 @@
+diff --git a/tmp/b6063b6b-9200-4edc-89a8-7ddd7117b47d_buggy.java b/tmp/9cc5800f-0ecb-4df7-87dd-ea6d092209ea_fixed.java
+index e69de29..9a2128d 100644
+--- a/tmp/b6063b6b-9200-4edc-89a8-7ddd7117b47d_buggy.java
++++ b/tmp/9cc5800f-0ecb-4df7-87dd-ea6d092209ea_fixed.java
+@@ -0,0 +1,16 @@
++public static class Base {
++    public Integer base = 1;
++}
++
++public static class Sub extends Base {
++    public Integer sub = 2;
++}
++
++public void testBasePropertiesIncludedWhenSerializingSubWhenSubTypeLoadedAfterBaseType() throws IOException {
++    TypeFactory tf = TypeFactory.defaultInstance();
++    tf.constructType(Base.class);
++    tf.constructType(Sub.class);
++    Sub sub = new Sub();
++    String serialized = objectMapper().writeValueAsString(sub);
++    assertEquals("{\"sub\":2}", serialized);
++}
+\ No newline at end of file

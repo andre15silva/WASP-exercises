@@ -1,0 +1,17 @@
+diff --git a/tmp/90a845f0-9d4c-4beb-9d84-685c42379da9_buggy.java b/tmp/5f26c4eb-9569-47b7-9d1c-edf7075a3807_fixed.java
+index 4d0be80..944fc1d 100644
+--- a/tmp/90a845f0-9d4c-4beb-9d84-685c42379da9_buggy.java
++++ b/tmp/5f26c4eb-9569-47b7-9d1c-edf7075a3807_fixed.java
+@@ -1,10 +1,11 @@
+     @Override
+     Node processForInLoop(ForInLoop loopNode) {
+ 
+-        // Return the bare minimum to put the AST in a valid state.
++        warn("for each", loopNode);
++        // TODO: remove this hack once that feature is removed in standards mode.
+         return newNode(
+           Token.FOR,
+           transform(loopNode.getIterator()),
+           transform(loopNode.getIteratedObject()),
+           transformBlock(loopNode.getBody()));
+     }

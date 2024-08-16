@@ -1,0 +1,24 @@
+diff --git a/tmp/750ef9de-ba89-4736-8c00-ace6d1908249_buggy.java b/tmp/cc6ce7ad-70d7-4707-96da-14ce8973ad8f_fixed.java
+index e69de29..7af0432 100644
+--- a/tmp/750ef9de-ba89-4736-8c00-ace6d1908249_buggy.java
++++ b/tmp/cc6ce7ad-70d7-4707-96da-14ce8973ad8f_fixed.java
+@@ -0,0 +1,18 @@
++MultiValueMap<Object, Collection<Object>> multiValueMap = new MultiValueMap<Object, Collection<Object>>(MapUtils.makeMap(1));
++multiValueMap.addAll(asList("", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", new Integer(1), new Integer(1), new Integer(1), new Integer(1)));
++class SerializeStrategy extends AbstractSerializationTest {
++    protected SerializationStrategy serializationStrategy() {
++        return MultiValueMap.getDefaultSerializationStrategy();
++    }
++    protected void asyncTestMessages() {
++        this.addBody(MultiValueMap.class);
++    }
++}
++class CollectionSerializationTest extends AbstractSerializationTest {
++    protected SerializationStrategy serializationStrategy() {
++        return MultiValueMap.getDefaultSerializationStrategy();
++    }
++    protected void asyncTestMessages() {
++        this.addBody(MultiValueMap.class);
++    }
++}
+\ No newline at end of file

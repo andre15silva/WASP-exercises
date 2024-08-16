@@ -1,0 +1,35 @@
+diff --git a/tmp/ea4a2505-e30d-487f-9d91-2d7f3bc0bc0f_buggy.java b/tmp/393d8edc-9a59-4a02-9f91-8b797d5f503f_fixed.java
+index 9a3a9db..e46821a 100644
+--- a/tmp/ea4a2505-e30d-487f-9d91-2d7f3bc0bc0f_buggy.java
++++ b/tmp/393d8edc-9a59-4a02-9f91-8b797d5f503f_fixed.java
+@@ -1,27 +1,30 @@
+     /**
+      * If the stack contains an element with this tag's name, pop up the stack to remove the first occurrence. If not
+      * found, skips.
+      *
+      * @param endTag tag to close
+      */
+     private void popStackToClose(Token.EndTag endTag) {
+         String elName = endTag.name();
+         Element firstFound = null;
+ 
+         for (int pos = stack.size() -1; pos >= 0; pos--) {
+             Element next = stack.get(pos);
+             if (next.nodeName().equals(elName)) {
+                 firstFound = next;
+                 break;
+             }
+         }
+         if (firstFound == null)
+             return; // not found, skip
+ 
+         for (int pos = stack.size() -1; pos >= 0; pos--) {
+             Element next = stack.get(pos);
+             stack.remove(pos);
+             if (next == firstFound)
+                 break;
+         }
++        // fix incorrectly nested tags
++        // todo: this is harsh -- as it’s expensive to do the fix, will have the docHtml vary during manipulation.
++        domTree.$.html(Jsoup.clean(toString(), ParseSettings.htmlDefault));
+     }

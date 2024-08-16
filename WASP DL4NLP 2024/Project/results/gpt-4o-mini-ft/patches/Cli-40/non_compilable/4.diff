@@ -1,0 +1,86 @@
+diff --git a/tmp/c47d6c92-3b68-49e2-b2da-29078fd94e42_buggy.java b/tmp/39707708-2cbe-45d5-8f43-37aa82b83578_fixed.java
+index a7d0787..c99ce83 100644
+--- a/tmp/c47d6c92-3b68-49e2-b2da-29078fd94e42_buggy.java
++++ b/tmp/39707708-2cbe-45d5-8f43-37aa82b83578_fixed.java
+@@ -1,54 +1,69 @@
+     /**
+      * Returns the <code>Object</code> of type <code>clazz</code>
+      * with the value of <code>str</code>.
+      *
+      * @param str the command line value
+      * @param clazz the type of argument
+      * @return The instance of <code>clazz</code> initialised with
+      * the value of <code>str</code>.
+      * @throws ParseException if the value creation for the given class failed
+      */
+     @SuppressWarnings("unchecked") // returned value will have type T because it is fixed by clazz
+-    public static <T> T createValue(final String str, final Class<T> clazz) throws ParseException
++    public static <T> T createValue(final String str, final Class<T> clazz, String pattern) throws ParseException
+     {
+         if (PatternOptionBuilder.STRING_VALUE == clazz)
+         {
+             return (T) str;
+         }
+-        else if (PatternOptionBuilder.OBJECT_VALUE == clazz)
++        if (PatternOptionBuilder.OBJECT_VALUE == clazz)
+         {
+             return (T) createObject(str);
+         }
+-        else if (PatternOptionBuilder.NUMBER_VALUE == clazz)
++        if (PatternOptionBuilder.NUMBER_VALUE == clazz)
+         {
++            try {
+                 return (T) createNumber(str);
++            } catch (NumberFormatException e) {
++                throw new ParseException("Number Format: " + e.getMessage());
+             }
+-        else if (PatternOptionBuilder.DATE_VALUE == clazz)
++        }
++        if (PatternOptionBuilder.DATE_VALUE == clazz)
+         {
++            try {
+                 return (T) createDate(str);
++            } catch (ParseException e) {
++                throw e;
++            } catch (Exception e) {
++                throw new ParseException("Date Format: " + e.getMessage());
+             }
+-        else if (PatternOptionBuilder.CLASS_VALUE == clazz)
++        }
++        if (PatternOptionBuilder.CLASS_VALUE == clazz)
+         {
+             return (T) createClass(str);
+         }
+-        else if (PatternOptionBuilder.FILE_VALUE == clazz)
++        if (PatternOptionBuilder.FILE_VALUE == clazz)
+         {
+             return (T) createFile(str);
+         }
+-        else if (PatternOptionBuilder.EXISTING_FILE_VALUE == clazz)
++        if (PatternOptionBuilder.EXISTING_FILE_VALUE == clazz)
+         {
+             return (T) openFile(str);
+         }
+-        else if (PatternOptionBuilder.FILES_VALUE == clazz)
++        if (PatternOptionBuilder.FILES_VALUE == clazz)
+         {
+-            return (T) createFiles(str);
++            return (T) createMultiFiles(pattern, str);
+         }
+-        else if (PatternOptionBuilder.URL_VALUE == clazz)
++        if (PatternOptionBuilder.URL_VALUE == clazz)
+         {
+             return (T) createURL(str);
+         }
+-        else
++        if (PatternOptionBuilder.BOOLEAN_VALUE == clazz)
+         {
+-            return null;
++            if (str.equalsIgnoreCase("true") || str.equalsIgnoreCase("yes"))
++            {
++                return (T) Boolean.TRUE;
++            }
++            return (T) Boolean.FALSE;
+         }
++        throw new ParseException("Unknow type: " + clazz.getName());
+     }

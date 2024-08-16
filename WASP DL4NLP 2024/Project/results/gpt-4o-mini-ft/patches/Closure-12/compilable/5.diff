@@ -1,0 +1,9 @@
+diff --git a/tmp/9802ca63-6abc-4999-a806-6b19bff7bd63_buggy.java b/tmp/e42c9030-dfd9-4f9b-8a6d-b0825119a8ab_fixed.java
+index 22640dd..8cd67b5 100644
+--- a/tmp/9802ca63-6abc-4999-a806-6b19bff7bd63_buggy.java
++++ b/tmp/e42c9030-dfd9-4f9b-8a6d-b0825119a8ab_fixed.java
+@@ -1,3 +1,3 @@
+   private boolean hasExceptionHandler(Node cfgNode) {
+-    return false;
++    return true;
+   }

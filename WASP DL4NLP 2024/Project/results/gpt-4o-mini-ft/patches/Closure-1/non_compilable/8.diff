@@ -1,0 +1,61 @@
+diff --git a/tmp/e40e06f0-dee9-4c9a-8ce0-256cd51eefb9_buggy.java b/tmp/64d2eae0-fcf8-441c-9fab-305566d78741_fixed.java
+index 61ffdbf..7782b96 100644
+--- a/tmp/e40e06f0-dee9-4c9a-8ce0-256cd51eefb9_buggy.java
++++ b/tmp/64d2eae0-fcf8-441c-9fab-305566d78741_fixed.java
+@@ -1,44 +1,37 @@
+   /**
+    * Removes unreferenced arguments from a function declaration and when
+    * possible the function's callSites.
+    *
+    * @param fnScope The scope inside the function
+    */
+   private void removeUnreferencedFunctionArgs(Scope fnScope) {
+     // Notice that removing unreferenced function args breaks
+-    // Function.prototype.length. In advanced mode, we don't really care
+-    // about this: we consider "length" the equivalent of reflecting on
+-    // the function's lexical source.
++    // Function.prototype.length. 
++    // In advanced mode, we don't need to preserve Function.prototype.length.
++    // However, when stripping unreferenced arguments from Simple/Line mode
++    // code, we must preserve the Function.prototype.length property, so
++    // that chained calls involving "new" will work:
++    // "var a=(new B)(3,4)", when "B" is a constructor.
++    // In defense of the usage, note that a naive user may expect it to work,
++    // especially since it works without "--compilation_level=ADVANCED_OPTIMIZATIONS".
+     //
+     // Rather than create a new option for this, we assume that if the user
+-    // is removing globals, then it's OK to remove unused function args.
+-    //
+-    // See http://code.google.com/p/closure-compiler/issues/detail?id=253
++    // is removing globals, then it's OK to remove unused function params.
+ 
+     Node function = fnScope.getRootNode();
+ 
+     Preconditions.checkState(function.isFunction());
+     if (NodeUtil.isGetOrSetKey(function.getParent())) {
+       // The parameters object literal setters can not be removed.
+       return;
+     }
+ 
+     Node argList = getFunctionArgList(function);
+     boolean modifyCallers = modifyCallSites
+         && callSiteOptimizer.canModifyCallers(function);
+-    if (!modifyCallers) {
+-      // Strip unreferenced args off the end of the function declaration.
+-      Node lastArg;
+-      while ((lastArg = argList.getLastChild()) != null) {
+-        Var var = fnScope.getVar(lastArg.getString());
+-        if (!referenced.contains(var)) {
+-          argList.removeChild(lastArg);
+-          compiler.reportCodeChange();
+-        } else {
+-          break;
+-        }
+-      }
+-    } else {
++    if (modifyCallers) {
+       callSiteOptimizer.optimize(fnScope, referenced);
++    } else {
++      callSiteOptimizer.stripUnusedParams(function);
+     }
+   }

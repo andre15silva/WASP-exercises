@@ -1,0 +1,27 @@
+diff --git a/tmp/4faab9dd-f63a-42eb-888b-aba4d94c6ed9_buggy.java b/tmp/8d0f972d-6ed2-41a6-ae6b-65760f4c304e_fixed.java
+index 08e51e4..ead29db 100644
+--- a/tmp/4faab9dd-f63a-42eb-888b-aba4d94c6ed9_buggy.java
++++ b/tmp/8d0f972d-6ed2-41a6-ae6b-65760f4c304e_fixed.java
+@@ -1,16 +1,19 @@
+     /**
+      * <p>Reduce the fraction to the smallest values for the numerator and
+      * denominator, returning the result.</p>
+      * 
+      * <p>For example, if this fraction represents 2/4, then the result
+      * will be 1/2.</p>
+      *
+      * @return a new reduced fraction instance, or this if no simplification possible
+      */
+     public Fraction reduce() {
+-        int gcd = greatestCommonDivisor(Math.abs(numerator), denominator);
+-        if (gcd == 1) {
++        if (numerator != 0) {
++            int denomGcd = greatestCommonDivisor(Math.abs(numerator), denominator);
++            if (denomGcd == 1) {
+                 return this;
+             }
+-        return Fraction.getFraction(numerator / gcd, denominator / gcd);
++            return Fraction.getFraction(numerator / denomGcd, denominator / denomGcd);
++        }
++        return this;
+     }

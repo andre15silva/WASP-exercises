@@ -1,0 +1,57 @@
+diff --git a/tmp/7f65e128-129c-47e2-a2e7-ab2fe71c7a53_buggy.java b/tmp/6ad9b881-004d-401b-88fb-7f85303b6763_fixed.java
+index 07b0792..d71638e 100644
+--- a/tmp/7f65e128-129c-47e2-a2e7-ab2fe71c7a53_buggy.java
++++ b/tmp/6ad9b881-004d-401b-88fb-7f85303b6763_fixed.java
+@@ -1,22 +1,52 @@
+     /**
+      * @return Whether the variable is only assigned a value once for its
+      *     lifetime.
+      */
+     boolean isAssignedOnceInLifetime() {
+       Reference ref = getOneAndOnlyAssignment();
+       if (ref == null) {
+         return false;
+       }
+ 
+       // Make sure this assignment is not in a loop.
+       for (BasicBlock block = ref.getBasicBlock();
+            block != null; block = block.getParent()) {
+         if (block.isFunction) {
+           break;
+         } else if (block.isLoop) {
+           return false;
+         }
+       }
+ 
++      // Check for recursion. But this is dangerous, since we're in the middle of
++      // an iterative process of resolving references...
++      if (getLastAssumption() == null) {
++        return true; // Assume no recursive references if we don't know the
++                     // state of the variable.
++      }
++      if (ref.getParent().isFunction) {
++        for (Reference s = mData.get("f") + ref.mOffset; s != null; s = s.mNext) {
++          // Only care about functions that assign a value, but only to variables
++          // at all.
++          if (!s.isFunction || s.isRef() || s.getParent().isDirectCall) {
++            continue;
++          }
++
++          // Move off the function to check if the next reference is an
++          // assignment.
++          for (s = s.mNext; s != null; s = s.mNext) {
++            if (s.isRef() && !s.getParent().isDirectCall) {
++              return false;
++            }
++          }
++
++          // Only assign a value once if none of their non-parameter locals call
++          // the function recursively.
++          if (!checkOpBehavior(mData.get("f", s), null, false)) {
++            return false;
++          }
++        }
++      }
++
+       return true;
+     }

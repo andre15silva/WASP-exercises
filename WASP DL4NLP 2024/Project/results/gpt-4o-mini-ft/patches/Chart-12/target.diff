@@ -1,0 +1,27 @@
+diff --git a/tmp/36d608c6-bf89-4d56-825d-c06eddddb38b_buggy.java b/tmp/7efa6793-0712-410c-986b-92c90c70e743_fixed.java
+index 8a93c9d..3073ce5 100644
+--- a/tmp/36d608c6-bf89-4d56-825d-c06eddddb38b_buggy.java
++++ b/tmp/7efa6793-0712-410c-986b-92c90c70e743_fixed.java
+@@ -1,21 +1,21 @@
+     /**
+      * Creates a new plot.
+      *
+      * @param dataset  the dataset (<code>null</code> permitted).
+      */
+     public MultiplePiePlot(CategoryDataset dataset) {
+         super();
+-        this.dataset = dataset;
++        setDataset(dataset);
+         PiePlot piePlot = new PiePlot(null);
+         this.pieChart = new JFreeChart(piePlot);
+         this.pieChart.removeLegend();
+         this.dataExtractOrder = TableOrder.BY_COLUMN;
+         this.pieChart.setBackgroundPaint(null);
+         TextTitle seriesTitle = new TextTitle("Series Title",
+                 new Font("SansSerif", Font.BOLD, 12));
+         seriesTitle.setPosition(RectangleEdge.BOTTOM);
+         this.pieChart.setTitle(seriesTitle);
+         this.aggregatedItemsKey = "Other";
+         this.aggregatedItemsPaint = Color.lightGray;
+         this.sectionPaints = new HashMap();
+     }

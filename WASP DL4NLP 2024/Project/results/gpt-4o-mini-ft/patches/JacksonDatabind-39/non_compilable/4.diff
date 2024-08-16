@@ -1,0 +1,22 @@
+diff --git a/tmp/048b05ed-fe15-4977-a42d-952396997a35_buggy.java b/tmp/e216ce7a-12ec-43d3-a050-cb26a83d1ac4_fixed.java
+index ec709bd..ade127c 100644
+--- a/tmp/048b05ed-fe15-4977-a42d-952396997a35_buggy.java
++++ b/tmp/e216ce7a-12ec-43d3-a050-cb26a83d1ac4_fixed.java
+@@ -1,8 +1,16 @@
+     @Override
+     public Object deserialize(JsonParser p, DeserializationContext ctxt) throws IOException
+     {
+         // 29-Jan-2016, tatu: Simple skipping for all other tokens, but FIELD_NAME bit
+-        //    special unfortunately
++        //    special unfortunately, but going to live with it, so that we can
++        //    have working compatibility
++        int t = p.getCurrentTokenId();
++        if (t >= 0) {
++            if (t == JsonTokenId.ID_FIELD_NAME) {
++                p.getCodec().parser.skipChildren();
++            } else {
+                 p.skipChildren();
++            }
++        }
+         return null;
+     }

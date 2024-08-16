@@ -1,0 +1,30 @@
+diff --git a/tmp/3941cc9f-4c4b-4aa2-a772-6b96dc19b352_buggy.java b/tmp/45360246-af6d-47de-893b-36b35bc99bed_fixed.java
+index 939f49b..a50c732 100644
+--- a/tmp/3941cc9f-4c4b-4aa2-a772-6b96dc19b352_buggy.java
++++ b/tmp/45360246-af6d-47de-893b-36b35bc99bed_fixed.java
+@@ -1,21 +1,25 @@
+     private boolean isPrototypePropertyAssign(Node assign) {
+       Node n = assign.getFirstChild();
+       if (n != null && NodeUtil.isVarOrSimpleAssignLhs(n, assign)
+           && n.getType() == Token.GETPROP
+           ) {
+         // We want to exclude the assignment itself from the usage list
+         boolean isChainedProperty =
+             n.getFirstChild().getType() == Token.GETPROP;
+ 
+         if (isChainedProperty) {
+           Node child = n.getFirstChild().getFirstChild().getNext();
+ 
+           if (child.getType() == Token.STRING &&
+               child.getString().equals("prototype")) {
++            // The assignment function is part of the definition,
++            // but we can still get to the prototype method.
++            if (!NodeUtil.isFunctionDeclaration(assign.getParent().getParent())) {
+               return true;
+             }
+           }
+         }
++      }
+ 
+       return false;
+     }

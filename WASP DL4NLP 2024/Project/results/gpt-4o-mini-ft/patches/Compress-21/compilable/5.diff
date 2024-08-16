@@ -1,0 +1,25 @@
+diff --git a/tmp/d57a8d8f-4955-462b-9a5e-26757f651ff8_buggy.java b/tmp/514c768c-9223-4529-a73f-e1db73c7bba0_fixed.java
+index ce3d60f..b391e4e 100644
+--- a/tmp/d57a8d8f-4955-462b-9a5e-26757f651ff8_buggy.java
++++ b/tmp/514c768c-9223-4529-a73f-e1db73c7bba0_fixed.java
+@@ -1,16 +1,16 @@
+     private void writeBits(final DataOutput header, final BitSet bits, final int length) throws IOException {
+         int cache = 0;
+-        int shift = 7;
++        int shift = 8;
+         for (int i = 0; i < length; i++) {
+-            cache |= ((bits.get(i) ? 1 : 0) << shift);
++            cache |= ((bits.get(i) ? 1 : 0) << (shift - 1));
+             --shift;
+             if (shift == 0) {
+                 header.write(cache);
+-                shift = 7;
++                shift = 8;
+                 cache = 0;
+             }
+         }
+-        if (length > 0 && shift > 0) {
++        if (length > 0 && shift < 8) {
+             header.write(cache);
+         }
+     }

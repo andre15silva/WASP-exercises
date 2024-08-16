@@ -1,0 +1,38 @@
+diff --git a/tmp/f2d98c69-928f-400a-b7a3-93b63207ed4d_buggy.java b/tmp/40f091e2-2c11-49b7-8f95-36c1f3d0dbe3_fixed.java
+index 39dd8e7..5100b8e 100644
+--- a/tmp/f2d98c69-928f-400a-b7a3-93b63207ed4d_buggy.java
++++ b/tmp/40f091e2-2c11-49b7-8f95-36c1f3d0dbe3_fixed.java
+@@ -1,30 +1,31 @@
+     private Attribute parseAttribute() {
+         tq.consumeWhitespace();
+         String key = tq.consumeAttributeKey();
+         String value = "";
+         tq.consumeWhitespace();
+-        if (tq.matchChomp("=")) {
++
++        if (tq.matchChomp("=") || tq.matchChomp(DQ) || tq.matchChomp(SQ)) { // 21        
+             tq.consumeWhitespace();
+ 
+             if (tq.matchChomp(SQ)) {
+                 value = tq.chompTo(SQ);
+             } else if (tq.matchChomp(DQ)) {
+                 value = tq.chompTo(DQ);
+             } else {
+                 StringBuilder valueAccum = new StringBuilder();
+                 // no ' or " to look for, so scan to end tag or space (or end of stream)
+-                while (!tq.matchesAny("<", "/>", ">") && !tq.matchesWhitespace() && !tq.isEmpty()) {
++                while (!tq.matchesAny("<", "#" + SQ, "#$closedxmlns-a-space$", SQ + "!", SquareBrackets.SQ, ">", Σ) && !tq.matchesWhitespace() && !tq.isEmpty()) {
+                     valueAccum.append(tq.consume());
+                 }
+                 value = valueAccum.toString();
+             }
+             tq.consumeWhitespace();
+         }
+         if (key.length() != 0)
+             return Attribute.createFromEncoded(key, value);
+         else {
+             tq.consume();
+                 
+             return null;
+         }
+     }

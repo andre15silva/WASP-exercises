@@ -1,0 +1,73 @@
+diff --git a/tmp/88a8dd89-9384-4f3e-8cbe-286a7584503c_buggy.java b/tmp/7e896829-dcb6-421b-ab6c-e507ec4a0c23_fixed.java
+index d80b7d0..e0c1ced 100644
+--- a/tmp/88a8dd89-9384-4f3e-8cbe-286a7584503c_buggy.java
++++ b/tmp/7e896829-dcb6-421b-ab6c-e507ec4a0c23_fixed.java
+@@ -1,61 +1,66 @@
+     /**
+      * Checks dimensions and values of boundaries and inputSigma if defined.
+      */
+     private void checkParameters() {
+         final double[] init = getStartPoint();
+         final double[] lB = getLowerBound();
+         final double[] uB = getUpperBound();
+ 
+         // Checks whether there is at least one finite bound value.
+         boolean hasFiniteBounds = false;
+         for (int i = 0; i < lB.length; i++) {
+             if (!Double.isInfinite(lB[i]) ||
+                 !Double.isInfinite(uB[i])) {
+                 hasFiniteBounds = true;
+                 break;
+             }
+         }
+         // Checks whether there is at least one infinite bound value.
+         boolean hasInfiniteBounds = false;
+         if (hasFiniteBounds) {
+             for (int i = 0; i < lB.length; i++) {
+                 if (Double.isInfinite(lB[i]) ||
+                     Double.isInfinite(uB[i])) {
+                     hasInfiniteBounds = true;
+                     break;
+                 }
+             }
+ 
+             if (hasInfiniteBounds) {
+                 // If there is at least one finite bound, none can be infinite,
+                 // because mixed cases are not supported by the current code.
+                 throw new MathUnsupportedOperationException();
+             } else {
+                 // Convert API to internal handling of boundaries.
+                 boundaries = new double[2][];
+                 boundaries[0] = lB;
+                 boundaries[1] = uB;
+ 
+                 // Abort early if the normalization will overflow (cf. "encode" method).
++                final double maxDiff = FastMath.min(Math.abs(boundaries[1][0] - boundaries[0][0]),
++                                                     Math.abs(boundaries[1][0] - boundaries[0][0]));
++                if (maxDiff > 0 && maxDiff < Double.MAX_VALUE && 2 * maxDiff > uB[0] - lB[0]) {
++                    throw new NumberIsTooLargeException(maxDiff, uB[0] - lB[0], false);
++                }
+             }
+         } else {
+             // Convert API to internal handling of boundaries.
+             boundaries = null;
+         }
+ 
+         if (inputSigma != null) {
+             if (inputSigma.length != init.length) {
+                 throw new DimensionMismatchException(inputSigma.length, init.length);
+             }
+             for (int i = 0; i < init.length; i++) {
+                 if (inputSigma[i] < 0) {
+                     throw new NotPositiveException(inputSigma[i]);
+                 }
+                 if (boundaries != null) {
+-                    if (inputSigma[i] > boundaries[1][i] - boundaries[0][i]) {
+-                        throw new OutOfRangeException(inputSigma[i], 0, boundaries[1][i] - boundaries[0][i]);
++                    if (inputSigma[i] > Math.abs(boundaries[1][i] - boundaries[0][i])) {
++                        throw new OutOfRangeException(inputSigma[i], 0, Math.abs(boundaries[1][i] - boundaries[0][i]));
+                     }
+                 }
+             }
+         }
+     }

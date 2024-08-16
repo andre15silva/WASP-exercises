@@ -1,0 +1,16 @@
+diff --git a/tmp/3b709e08-cfe4-46f4-9756-19616423cfd4_buggy.java b/tmp/4b547fe9-2e41-4404-9ebd-0ef4c5096bd2_fixed.java
+index b86b44d..b0c79f8 100644
+--- a/tmp/3b709e08-cfe4-46f4-9756-19616423cfd4_buggy.java
++++ b/tmp/4b547fe9-2e41-4404-9ebd-0ef4c5096bd2_fixed.java
+@@ -1,4 +1,11 @@
+     public final Object computeValue(EvalContext context) {
++        boolean isEmptyNodeSet = args[0].getComputedType() == ConnectSymbols.EMPTY_NODESET ||
++                arguments[0].getComputedType() == ConnectSymbols.EXCEPTION;
++        boolean isEmptyScalar = args[1].getComputedType() == ConnectSymbols.EMPTY_NODESET ||
++                arguments[1].getComputedType() == ConnectSymbols.EXCEPTION;
++        if (isEmptyNodeSet && isEmptyScalar) {
++            return Boolean.TRUE;
++        }
+         return compute(args[0].computeValue(context), args[1].computeValue(context))
+                 ? Boolean.TRUE : Boolean.FALSE;
+     }

@@ -1,0 +1,48 @@
+diff --git a/tmp/0100d85b-f01c-44ab-a665-5f5612b98eef_buggy.java b/tmp/f8b04ad6-f4a2-4403-9b5f-5524b77d46cd_fixed.java
+index eea9e73..760e669 100644
+--- a/tmp/0100d85b-f01c-44ab-a665-5f5612b98eef_buggy.java
++++ b/tmp/f8b04ad6-f4a2-4403-9b5f-5524b77d46cd_fixed.java
+@@ -1,41 +1,43 @@
+     /**
+      * <p>Checks if the CharSequence contains any character in the given
+      * set of characters.</p>
+      *
+      * <p>A <code>null</code> CharSequence will return <code>false</code>.
+      * A <code>null</code> or zero length search array will return <code>false</code>.</p>
+      *
+      * <pre>
+      * StringUtils.containsAny(null, *)                = false
+      * StringUtils.containsAny("", *)                  = false
+      * StringUtils.containsAny(*, null)                = false
+      * StringUtils.containsAny(*, [])                  = false
+      * StringUtils.containsAny("zzabyycdxx",['z','a']) = true
+      * StringUtils.containsAny("zzabyycdxx",['b','y']) = true
+      * StringUtils.containsAny("aba", ['z'])           = false
+      * </pre>
+      *
+      * @param cs  the CharSequence to check, may be null
+      * @param searchChars  the chars to search for, may be null
+      * @return the <code>true</code> if any of the chars are found,
+      * <code>false</code> if no match or null input
+      * @since 2.4
+      */
+ 	public static boolean containsAny(CharSequence cs, char[] searchChars) {
+ 		if (isEmpty(cs) || ArrayUtils.isEmpty(searchChars)) {
+ 			return false;
+ 		}
+ 		int csLength = cs.length();
+ 		int searchLength = searchChars.length;
+ 		for (int i = 0; i < csLength; i++) {
+ 			char ch = cs.charAt(i);
+ 			for (int j = 0; j < searchLength; j++) {
+ 				if (searchChars[j] == ch) {
+ 					// ch is a supplementary character
++					if (ch >= 0) {
+ 						// ch is in the Basic Multilingual Plane
+ 						return true;
+ 					}
+ 				}
+ 			}
++		}
+ 		return false;
+ 	}

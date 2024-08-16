@@ -1,0 +1,21 @@
+diff --git a/tmp/42145fec-277a-4fc3-a6a6-04adaa5fd478_buggy.java b/tmp/4a632456-fc65-468f-95cf-2d9cb50ed0f5_fixed.java
+index f47d784..7c2fa14 100644
+--- a/tmp/42145fec-277a-4fc3-a6a6-04adaa5fd478_buggy.java
++++ b/tmp/4a632456-fc65-468f-95cf-2d9cb50ed0f5_fixed.java
+@@ -1,12 +1,15 @@
+   @Override
+   public void process(Node externs, Node root) {
+     NodeTraversal.traverse(compiler, root, this);
+     if (MAKE_LOCAL_NAMES_UNIQUE) {
+       MakeDeclaredNamesUnique renamer = new MakeDeclaredNamesUnique();
+       NodeTraversal t = new NodeTraversal(compiler, renamer);
+       t.traverseRoots(externs, root);
+     }
+-    removeDuplicateDeclarations(root);
++    // TODO(johns): Since this is done in Compiler, there is some
++    // duplication to get rid of in the dependency analysis, but
++    // moving this method to the Compiler class breaks a bunch of tests.
+     new PropogateConstantAnnotations(compiler, assertOnChange)
+         .process(externs, root);
++    removeDuplicateDeclarations(root);
+   }

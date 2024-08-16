@@ -1,0 +1,23 @@
+diff --git a/tmp/94a9ce3f-fe31-430b-8812-443a54793fb2_buggy.java b/tmp/946af568-4752-465d-a37e-052ea6aa8916_fixed.java
+index 618906f..b6e0b0d 100644
+--- a/tmp/94a9ce3f-fe31-430b-8812-443a54793fb2_buggy.java
++++ b/tmp/946af568-4752-465d-a37e-052ea6aa8916_fixed.java
+@@ -1,15 +1,16 @@
+     @Override
+     public void acceptJsonFormatVisitor(JsonFormatVisitorWrapper visitor, JavaType typeHint) throws JsonMappingException
+     {
++        JsonNumberFormatVisitor v2;
+         if (_isInt) {
+             visitIntFormat(visitor, typeHint, JsonParser.NumberType.BIG_INTEGER);
+         } else {
+             Class<?> h = handledType();
+             if (h == BigDecimal.class) {
+-                visitFloatFormat(visitor, typeHint, JsonParser.NumberType.BIG_INTEGER);
++                visitFloatFormat(visitor, typeHint, JsonParser.NumberType.BIG_DECIMAL);
+             } else {
+                 // otherwise bit unclear what to call... but let's try:
+-                /*JsonNumberFormatVisitor v2 =*/ visitor.expectNumberFormat(typeHint);
++                v2 = visitor.expectNumberFormat(typeHint);
+             }
+         }
+     }

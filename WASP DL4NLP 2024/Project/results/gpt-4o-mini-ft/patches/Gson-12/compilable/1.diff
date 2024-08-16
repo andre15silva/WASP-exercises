@@ -1,0 +1,22 @@
+diff --git a/tmp/3cb38616-0c73-4a04-a602-a04315b18f72_buggy.java b/tmp/dc2afe99-c01b-4927-87f4-bbde5f956540_fixed.java
+index 6e155da..7bd4ed3 100644
+--- a/tmp/3cb38616-0c73-4a04-a602-a04315b18f72_buggy.java
++++ b/tmp/dc2afe99-c01b-4927-87f4-bbde5f956540_fixed.java
+@@ -1,10 +1,16 @@
+   @Override public void skipValue() throws IOException {
+     if (peek() == JsonToken.NAME) {
+       nextName();
+       pathNames[stackSize - 2] = "null";
+-    } else {
++    }
++    else {
++      int position = stackSize - 1;
++      // Skip any child arrays and objects. The stack is 
++      // only changed if we are skipping a root node
++      if (position > 0) {
+         popStack();
++      }
+       pathNames[stackSize - 1] = "null";
+     }
+     pathIndices[stackSize - 1]++;
+   }

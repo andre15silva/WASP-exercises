@@ -1,0 +1,43 @@
+diff --git a/tmp/287cc153-66c8-4b25-ba12-58d32c12d376_buggy.java b/tmp/e1c87e35-b045-4679-afd6-1cf0ab9c339d_fixed.java
+index a5ff4fc..76266bf 100644
+--- a/tmp/287cc153-66c8-4b25-ba12-58d32c12d376_buggy.java
++++ b/tmp/e1c87e35-b045-4679-afd6-1cf0ab9c339d_fixed.java
+@@ -1,17 +1,37 @@
+     /**
+      * Helper method used to prevent both caching and cache lookups for structured
+      * types that have custom value handlers
+      *
+      * @since 2.8.11
+      */
+     private boolean _hasCustomHandlers(JavaType t) {
+         if (t.isContainerType()) {
++            // Second: map(-like) types may have value handler for key (but not type; keys are untyped)
++            if (t.isMapLikeType()) {
++                Class<?> raw = t.getRawClass();
++                // (NOTE: can't actually call getKeyType here, as it may 
++                // become a recursive call for key types implemented in type property)
++                if (raw == Map.class) {
++                    return true;
++                    // [databind#1209]: if Map<K,V> where K is typed, should look for key handler
++                } else if (raw == Object.class) {
++                    // as a "Object" Map
++                    return false;
++                } else {
++                    // possibly `Map<K,?>`, need to manually pull info
++                    JavaType valueType = t.getContentType();
++                    if (valueType != null) {
++                        return (valueType.getValueHandler() != null) ||
++                                (valueType.getTypeHandler() != null);
++                    }
++                }
++            } else {
+                 // First: value types may have both value and type handlers
+                 JavaType ct = t.getContentType();
+                 if (ct != null) {
+                     return (ct.getValueHandler() != null) || (ct.getTypeHandler() != null);
+-            // Second: map(-like) types may have value handler for key (but not type; keys are untyped)
++                }
+             }
+         }
+         return false;
+     }

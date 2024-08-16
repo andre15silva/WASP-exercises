@@ -1,0 +1,24 @@
+diff --git a/tmp/3785b80a-f5f6-41ff-812b-807e234104bc_buggy.java b/tmp/6a80280e-9a42-4ba4-aab3-a6dd44c9c8e5_fixed.java
+index 3002587..f0f6a5f 100644
+--- a/tmp/3785b80a-f5f6-41ff-812b-807e234104bc_buggy.java
++++ b/tmp/6a80280e-9a42-4ba4-aab3-a6dd44c9c8e5_fixed.java
+@@ -1,10 +1,17 @@
+     /**
+      * Fits a Gaussian function to the observed points.
+      *
+      * @return the parameters of the Gaussian function that best fits the
+      * observed points (in the same order as above).
+      */
+     public double[] fit() {
+-        final double[] guess = (new ParameterGuesser(getObservations())).guess();
+-        return fit(new Gaussian.Parametric(), guess);
++        final ParameterGuesser guesser = new ParameterGuesser(getObservations());
++        SwitchableRealMatrix covariances = new BlockRealMatrix(guess.getNumParameters(), guess.getNumParameters());
++        try {
++            covariances = getOptimizer().optimize(new Gaussian.Parametric(), covariances,
++                guesser.getTephraUnit(), getMonitoringListener());
++        } catch (NotStrictlyPositiveException e) {
++            // expected
++        }
++        return covariances;
+     }

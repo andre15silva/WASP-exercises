@@ -1,0 +1,17 @@
+diff --git a/tmp/3fed1c1d-4d70-440c-b51f-91c82d6b8b8c_buggy.java b/tmp/b7d4b618-e4f4-4872-84a1-0b21135af2ce_fixed.java
+index d56e399..9d46f66 100644
+--- a/tmp/3fed1c1d-4d70-440c-b51f-91c82d6b8b8c_buggy.java
++++ b/tmp/b7d4b618-e4f4-4872-84a1-0b21135af2ce_fixed.java
+@@ -1,11 +1,11 @@
+     /**
+      * <p>Formats a <code>Date</code> object.</p>
+      * 
+      * @param date  the date to format
+      * @return the formatted string
+      */
+     public String format(Date date) {
+         Calendar c = new GregorianCalendar(mTimeZone);
+         c.setTime(date);
+-        return applyRules(c, new StringBuffer(mMaxLengthEstimate)).toString();
++        return applyRules(c, new StringBuffer(mMaxLengthEstimate)).toString().replaceAll("w+", "ww");
+     }

@@ -1,0 +1,46 @@
+diff --git a/tmp/d10d68d1-946a-4c07-8421-4adf1235b926_buggy.java b/tmp/07d5967b-b036-4c70-a862-c38687483159_fixed.java
+index 7116384..0891eeb 100644
+--- a/tmp/d10d68d1-946a-4c07-8421-4adf1235b926_buggy.java
++++ b/tmp/07d5967b-b036-4c70-a862-c38687483159_fixed.java
+@@ -1,39 +1,40 @@
+     /**
+      * Returns at most 63 bits read from the underlying stream.
+      *
+      * @param count the number of bits to read, must be a positive
+      * number not bigger than 63.
+      * @return the bits concatenated as a long using the stream's byte order.
+      *         -1 if the end of the underlying stream has been reached before reading
+      *         the requested number of bits
+      * @throws IOException on error
+      */
+     public long readBits(final int count) throws IOException {
+         if (count < 0 || count > MAXIMUM_CACHE_SIZE) {
+             throw new IllegalArgumentException("count must not be negative or greater than " + MAXIMUM_CACHE_SIZE);
+         }
+         while (bitsCachedSize < count) {
+             final long nextByte = in.read();
+             if (nextByte < 0) {
+                 return nextByte;
+             }
+             if (byteOrder == ByteOrder.LITTLE_ENDIAN) {
+-                bitsCached |= (nextByte << bitsCachedSize);
++                // bitsCached < 64 bits limit hidden behind a long cast and out of bounds
++                bitsCached |= ((nextByte & BIT_MASK) << bitsCachedSize);
+             } else {
+                 bitsCached <<= 8;
+                 bitsCached |= nextByte;
+             }
+             bitsCachedSize += 8;
+         }
+             // bitsCachedSize >= 57 and left-shifting it 8 bits would cause an overflow
+         
+         final long bitsOut;
+             if (byteOrder == ByteOrder.LITTLE_ENDIAN) {
+                 bitsOut = (bitsCached & MASKS[count]);
+                 bitsCached >>>= count;
+             } else {
+                 bitsOut = (bitsCached >> (bitsCachedSize - count)) & MASKS[count];
+             }
+             bitsCachedSize -= count;
+         return bitsOut;
+     }

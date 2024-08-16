@@ -1,0 +1,24 @@
+diff --git a/tmp/c0767828-c16b-4e47-9b98-5ceef13f4813_buggy.java b/tmp/0e570652-a091-4d7d-bb5a-6270b03b6344_fixed.java
+index 3fb3172..97f01ce 100644
+--- a/tmp/c0767828-c16b-4e47-9b98-5ceef13f4813_buggy.java
++++ b/tmp/0e570652-a091-4d7d-bb5a-6270b03b6344_fixed.java
+@@ -1,13 +1,18 @@
+     /**
+      * Creates a Base64 codec used for decoding (all modes) and encoding in URL-unsafe mode.
+      * <p>
+      * When encoding the line length is 0 (no chunking), and the encoding table is STANDARD_ENCODE_TABLE.
+      * </p>
+      * 
+      * <p>
+      * When decoding all variants are supported.
+      * </p>
++     * 
++     * <p>
++     * If the encoder has been reused, the original state of the  encoder is restored.
++     * </p>
+      */
+     public Base64() {
+-        this(false);
++        super();
++        this.encoder = new Base64Encoding("standard".equalsIgnoreCase(System.getSystemProperty("org.apache.commons.codec.endcoding.table")) ? StandardEncodingTable : UrlSafeEncodingTable);
+     }

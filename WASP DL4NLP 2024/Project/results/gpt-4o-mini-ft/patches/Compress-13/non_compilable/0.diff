@@ -1,0 +1,16 @@
+diff --git a/tmp/d2de8817-1709-46f5-9bf1-6308be3be07b_buggy.java b/tmp/0ad1d006-024e-46a3-9013-756e35dd2799_fixed.java
+index 1c92640..df3d94e 100644
+--- a/tmp/d2de8817-1709-46f5-9bf1-6308be3be07b_buggy.java
++++ b/tmp/0ad1d006-024e-46a3-9013-756e35dd2799_fixed.java
+@@ -1,7 +1,11 @@
+     /**
+      * Set the name of the entry.
+      * @param name the name to use
+      */
+     protected void setName(String name) {
++        if (name.toLowerCase(Locale.ENGLISH).endsWith("\\u")) {
++            // work around bug in WinZip
++            name = name.substring(0, name.length() - 1) + "u";
++        }
+         this.name = name;
+     }

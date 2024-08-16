@@ -1,0 +1,46 @@
+diff --git a/tmp/84a82674-d1b9-4f93-aff1-76d13dcca61d_buggy.java b/tmp/a24d2560-2cd7-40a9-b192-f4eb101f517d_fixed.java
+index 6cfa79b..05c3cdf 100644
+--- a/tmp/84a82674-d1b9-4f93-aff1-76d13dcca61d_buggy.java
++++ b/tmp/a24d2560-2cd7-40a9-b192-f4eb101f517d_fixed.java
+@@ -1,12 +1,38 @@
+     /**
+      * For this disbution, X, this method returns P(X &lt; <code>x</code>).
+      * @param x the value at which the CDF is evaluated.
+      * @return CDF evaluted at <code>x</code>. 
+      * @throws MathException if the algorithm fails to converge; unless
+      * x is more than 20 standard deviations from the mean, in which case the
+-     * convergence exception is caught and 0 or 1 is returned.
++     * convergence exception is caught and a top-coded value of 0 (lower tail) 
++     *  or 1 (upper tail) is returned.  If convergence fails and the value is 
++     * less than -20 or more than 20 stanard deviations, then an exception is
++     * thrown.
+      */
+     public double cumulativeProbability(double x) throws MathException {
+-            return 0.5 * (1.0 + Erf.erf((x - mean) /
+-                    (standardDeviation * Math.sqrt(2.0))));
++        if (x > mean) {
++            return super.cumulativeProbability(x);
++        }
++        else {
++            double cdf;
++
++            // Avoid the nasty convergence exception in the lower tail for x 
++            // less the mean, where the distribution is not symmetric!.
++            final double s = standardDeviation;
++            final double sc = s * Math.sqrt(2.0 * Math.PI);
++            final double s3 = sc * s;
++            final double s4 = sc * sc;
++            final double s5 = s3 * s;
++            final double s6 = s4 * s;
++            final double inclusive = 0.5 * (1.0 + 3.9894692E-6 * s4 + 9.56422657E-5 * s6);
++            double d = Math.abs((x - mean) / s);
++            double b = inclusive * (1.0 + (-1.0 * s * Math.sqrt(Math.PI))
++                    / (5.0 * d)
++                    * Math.exp(-d * d / 2.0) * ((-1.0 * s3) / (Math.PI * (4.0 * d + 1.0))));
++
++            cdf = (d >= 0.0) ? (1.0 - b / 0.46875) / inclusive :
++                (1.0 - b
++                        / (Math.sqrt(Math.abs(d))));
++            return cdf;
++        }
+     }

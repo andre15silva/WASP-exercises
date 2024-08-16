@@ -1,0 +1,17 @@
+diff --git a/tmp/6fd7820a-e11c-4510-abe6-c522c53555fb_buggy.java b/tmp/3693cd17-c53f-4f2a-ae2d-cc096bb54200_fixed.java
+index a7cb64f..0b09adc 100644
+--- a/tmp/6fd7820a-e11c-4510-abe6-c522c53555fb_buggy.java
++++ b/tmp/3693cd17-c53f-4f2a-ae2d-cc096bb54200_fixed.java
+@@ -1,10 +1,11 @@
+     /**
+      * Test if this element has an attribute.
+      * @param attributeKey The attribute key to check.
+      * @return true if the attribute exists, false if not.
+      */
+     public boolean hasAttr(String attributeKey) {
+         Validate.notNull(attributeKey);
+ 
+-        return attributes.hasKey(attributeKey);
++        String absKey = attributeKey.startsWith("abs:") ? attributeKey.substring(4) : attributeKey;
++        return attributes.hasKey(absKey);
+     }

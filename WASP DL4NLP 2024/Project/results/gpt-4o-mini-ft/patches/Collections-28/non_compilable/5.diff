@@ -1,0 +1,49 @@
+diff --git a/tmp/19150279-b56b-4fd3-aaad-52584bf8cf30_buggy.java b/tmp/24c19ad0-18b7-4408-8649-238c1017ce2a_fixed.java
+index e69de29..ed4eac7 100644
+--- a/tmp/19150279-b56b-4fd3-aaad-52584bf8cf30_buggy.java
++++ b/tmp/24c19ad0-18b7-4408-8649-238c1017ce2a_fixed.java
+@@ -0,0 +1,43 @@
++package de.walware.ecommons.lgdp.trie;
++
++import java.util.Arrays;
++import java.util.HashSet;
++import java.util.Map;
++import java.util.SortedMap;
++
++import junit.framework.TestSuite;
++
++public class PrefixMapTest
++	extends PatriciaTrieTest
++{
++
++	public PrefixMapTest( String name ) {
++		super( name );
++	}
++
++	public void testPrefixMapClear() {
++		Trie<String, Integer> trie = new PatriciaTrie<Integer>();
++		trie.put("Anna", 1);
++		trie.put("Anael", 2);
++		trie.put("Analu", 3);
++		trie.put("Andreas", 4);
++		trie.put("Andrea", 5);
++		trie.put("Andres", 6);
++		trie.put("Anatole", 7);
++		SortedMap<String, Integer> prefixMap = trie.prefixMap("And");
++		assertEquals(new HashSet<String>(Arrays.asList("Andrea", "Andreas", "Andres")), prefixMap.keySet());
++		assertEquals(Arrays.asList(5, 4, 6), new ArrayList<Integer>(prefixMap.values()));
++
++		prefixMap.clear();
++		assertTrue(prefixMap.isEmpty());
++		assertTrue(prefixMap.keySet().isEmpty());
++		assertTrue(prefixMap.values().isEmpty());
++		assertEquals(new HashSet<String>(Arrays.asList("Anael", "Analu", "Anatole", "Anna")), trie.keySet());
++		assertEquals(Arrays.asList(2, 3, 7, 1), new ArrayList<Integer>(trie.values()));
++	}
++
++	public static TestSuite suite() {
++		return new TestSuite( PrefixMapTest.class );
++	}
++
++}
+\ No newline at end of file

@@ -1,0 +1,56 @@
+diff --git a/tmp/fbbd7002-0a0c-41dd-b21a-cd6b1f1ab3e2_buggy.java b/tmp/ffad110e-792b-4910-9e4d-f4d6cbbf2a5f_fixed.java
+index 730ab7d..0392634 100644
+--- a/tmp/fbbd7002-0a0c-41dd-b21a-cd6b1f1ab3e2_buggy.java
++++ b/tmp/ffad110e-792b-4910-9e4d-f4d6cbbf2a5f_fixed.java
+@@ -1,48 +1,50 @@
+     /**
+      * Parses the raw bytes read from the central directory extra
+      * field with knowledge which fields are expected to be there.
+      *
+      * <p>All four fields inside the zip64 extended information extra
+      * field are optional and must only be present if their corresponding
+      * entry inside the central directory contains the correct magic
+      * value.</p>
+      */
+     public void reparseCentralDirectoryData(boolean hasUncompressedSize,
+                                             boolean hasCompressedSize,
+                                             boolean hasRelativeHeaderOffset,
+                                             boolean hasDiskStart)
+         throws ZipException {
+         if (rawCentralDirectoryData != null) {
++            // mkj: Jan 11 08: Issue #COMPRESS-228 - Add 4 to the length to account
++            // ....
+             int expectedLength = (hasUncompressedSize ? DWORD : 0)
+                 + (hasCompressedSize ? DWORD : 0)
+                 + (hasRelativeHeaderOffset ? DWORD : 0)
+-                + (hasDiskStart ? WORD : 0);
++                + (hasDiskStart ? WORD : 0) + 4;
+             if (rawCentralDirectoryData.length != expectedLength) {
+                 throw new ZipException("central directory zip64 extended"
+                                        + " information extra field's length"
+                                        + " doesn't match central directory"
+                                        + " data.  Expected length "
+                                        + expectedLength + " but is "
+                                        + rawCentralDirectoryData.length);
+             }
+             int offset = 0;
+             if (hasUncompressedSize) {
+                 size = new ZipEightByteInteger(rawCentralDirectoryData, offset);
+                 offset += DWORD;
+             }
+             if (hasCompressedSize) {
+                 compressedSize = new ZipEightByteInteger(rawCentralDirectoryData,
+                                                          offset);
+                 offset += DWORD;
+             }
+             if (hasRelativeHeaderOffset) {
+                 relativeHeaderOffset =
+                     new ZipEightByteInteger(rawCentralDirectoryData, offset);
+                 offset += DWORD;
+             }
+             if (hasDiskStart) {
+                 diskStart = new ZipLong(rawCentralDirectoryData, offset);
+                 offset += WORD;
+             }
+         }
+     }

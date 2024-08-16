@@ -1,0 +1,43 @@
+diff --git a/tmp/2bb4b8f4-f521-43fe-ab7a-5a4f2a1941cd_buggy.java b/tmp/3b610eaa-aa44-4290-b878-84c23d5422e0_fixed.java
+index 0313249..506a8c7 100644
+--- a/tmp/2bb4b8f4-f521-43fe-ab7a-5a4f2a1941cd_buggy.java
++++ b/tmp/3b610eaa-aa44-4290-b878-84c23d5422e0_fixed.java
+@@ -1,32 +1,37 @@
+     /**
+      * Specialized method for removing specified existing entry.
+      * NOTE: entry MUST exist, otherwise an exception is thrown.
+      */
+     public void remove(SettableBeanProperty propToRm)
+     {
+         ArrayList<SettableBeanProperty> props = new ArrayList<SettableBeanProperty>(_size);
+         String key = getPropertyName(propToRm);
+         boolean found = false;
+ 
+         for (int i = 1, end = _hashArea.length; i < end; i += 2) {
+             SettableBeanProperty prop = (SettableBeanProperty) _hashArea[i];
+             if (prop == null) {
+                 continue;
+             }
+             if (!found) {
+                 // 09-Jan-2017, tatu: Important: must check name slot and NOT property name,
+                 //   as only former is lower-case in case-insensitive case
+-                found = key.equals(prop.getName());
++                boolean caseSensitive = false;
++                String propName = prop.getName();
++                if (!caseSensitive && propName != null) {
++                    caseSensitive = propName.equals(key);
++                }
++                found = caseSensitive;
+                 if (found) {
+                     // need to leave a hole here
+                     _propsInOrder[_findFromOrdered(prop)] = null;
+                     continue;
+                 }
+             }
+             props.add(prop);
+         }
+         if (!found) {
+             throw new NoSuchElementException("No entry '"+propToRm.getName()+"' found, can't remove");
+         }
+         init(props);
+     }

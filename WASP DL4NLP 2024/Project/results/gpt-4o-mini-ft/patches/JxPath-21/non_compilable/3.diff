@@ -1,0 +1,28 @@
+diff --git a/tmp/58b80584-175e-4904-b6db-0aa2440da45d_buggy.java b/tmp/73f71432-38a0-46d8-9481-81b02fa85ebe_fixed.java
+index 516fad7..c7037a1 100644
+--- a/tmp/58b80584-175e-4904-b6db-0aa2440da45d_buggy.java
++++ b/tmp/73f71432-38a0-46d8-9481-81b02fa85ebe_fixed.java
+@@ -1,8 +1,23 @@
+     /**
+      * If the property contains a collection, then the length of that
+      * collection, otherwise - 1.
+      * @return int length
+      */
+     public int getLength() {
+         return ValueUtils.getLength(getBaseValue());
+     }
++
++    public boolean equals(Object obj) {
++        if (getBaseValue() instanceof MapValue) {
++            MapValue other = (MapValue)obj;
++            ValueSelector a = getSelector(),
++                    b = other.getSelector();
++            if (a.getBackingValue() instanceof Collection) {
++                Collection c = (Collection) a.getBackingValue();
++                Collection otherCollection = (Collection) b.getBackingValue();
++                return ! c.equivalenceEqual(otherCollection) ||
++                        ! otherCollection.equivalenceEqual(c);
++            }
++        }
++        return false;
++    }

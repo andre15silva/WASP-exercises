@@ -1,0 +1,56 @@
+diff --git a/tmp/fadc7242-6af1-4292-a18a-410f4beba827_buggy.java b/tmp/669ecca9-b1b6-4d6e-96ff-d7e5745ad1ec_fixed.java
+index 4ebe4f9..0cc0157 100644
+--- a/tmp/fadc7242-6af1-4292-a18a-410f4beba827_buggy.java
++++ b/tmp/669ecca9-b1b6-4d6e-96ff-d7e5745ad1ec_fixed.java
+@@ -1,41 +1,50 @@
+     /*
+     /**********************************************************
+     /* Validation, post-processing
+     /**********************************************************
+      */
+     @Override
+     public JsonDeserializer<?> createContextual(DeserializationContext ctxt,
+             BeanProperty property) throws JsonMappingException
+     {
+         // May need to resolve types for delegate-based creators:
+         JsonDeserializer<Object> delegate = null;
+         if (_valueInstantiator != null) {
+             // [databind#2324]: check both array-delegating and delegating
+             AnnotatedWithParams delegateCreator = _valueInstantiator.getDelegateCreator();
+             if (delegateCreator != null) {
+                 JavaType delegateType = _valueInstantiator.getDelegateType(ctxt.getConfig());
+                 delegate = findDeserializer(ctxt, delegateType, property);
+             }
+         }
+         JsonDeserializer<?> valueDeser = _valueDeserializer;
+         final JavaType valueType = _containerType.getContentType();
+         if (valueDeser == null) {
+             // [databind#125]: May have a content converter
+             valueDeser = findConvertingContentDeserializer(ctxt, property, valueDeser);
+             if (valueDeser == null) {
+             // And we may also need to get deserializer for String
+                 valueDeser = ctxt.findContextualValueDeserializer(valueType, property);
+             }
+         } else { // if directly assigned, probably not yet contextual, so:
+             valueDeser = ctxt.handleSecondaryContextualization(valueDeser, property, valueType);
+         }
+         // 11-Dec-2015, tatu: Should we pass basic `Collection.class`, or more refined? Mostly
+         //   comes down to "List vs Collection" I suppose... for now, pass Collection
+         Boolean unwrapSingle = findFormatFeature(ctxt, property, Collection.class,
+                 JsonFormat.Feature.ACCEPT_SINGLE_VALUE_AS_ARRAY);
+         NullValueProvider nuller = findContentNullProvider(ctxt, property, valueDeser);
+         if (isDefaultDeserializer(valueDeser)) {
+             valueDeser = null;
+         }
+-        return withResolved(delegate, valueDeser, nuller, unwrapSingle);
++        final JsonDeserializer<?> valueDeserResolved = withResolved(delegate, valueDeser, nuller, unwrapSingle);
++        // 21-Aug-2018, tatu: Should make sure that the final result is applicable as value-type
++        // thing: if they ask to deserialize into Right type, and missing no-args constructor,
++        // they'd get an exception. So, need to re-wrap for Bags.
++        if ((_containerType.getRawClass() != null)
++                && !_containerType.getRawClass().isAssignableFrom(_containerType.getRawClass())) {
++            // 02-June-2021, tatu: When failing for `ImmutableBag`, say that without extra info
++            _checkIfBags(ctxt, _containerType);
++        }
++        return valueDeserResolved;
+     }

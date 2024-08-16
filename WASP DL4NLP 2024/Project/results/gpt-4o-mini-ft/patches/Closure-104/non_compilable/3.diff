@@ -1,0 +1,40 @@
+diff --git a/tmp/eaacf205-2a19-4c7b-ad7c-39cd65626673_buggy.java b/tmp/151dce79-1eb7-4486-ac3a-f650d1c3cc31_fixed.java
+index b36b2a9..981e0bd 100644
+--- a/tmp/eaacf205-2a19-4c7b-ad7c-39cd65626673_buggy.java
++++ b/tmp/151dce79-1eb7-4486-ac3a-f650d1c3cc31_fixed.java
+@@ -1,26 +1,35 @@
+   JSType meet(JSType that) {
+     UnionTypeBuilder builder = new UnionTypeBuilder(registry);
+     for (JSType alternate : alternates) {
+       if (alternate.isSubtype(that)) {
+         builder.addAlternate(alternate);
+       }
+     }
+ 
+     if (that instanceof UnionType) {
+       for (JSType otherAlternate : ((UnionType) that).alternates) {
+         if (otherAlternate.isSubtype(this)) {
+           builder.addAlternate(otherAlternate);
+         }
+       }
+     } else if (that.isSubtype(this)) {
+       builder.addAlternate(that);
+     }
+     JSType result = builder.build();
+     if (result != null) {
+       return result;
+     } else if (this.isObject() && that.isObject()) {
++      if (this.toMaybeObjectType().hasAnyOfTheseProperties(STRING_OBJECT_PROPERTIES)) {
++        return this;
++      } else if (that.toMaybeObjectType().hasAnyOfTheseProperties(STRING_OBJECT_PROPERTIES)) {
++        return that;
++      }
+       return getNativeType(JSTypeNative.NO_OBJECT_TYPE);
++    } else if (this.isObject() && that.toMaybeObjectType() != null) {
++      return that;
++    } else if (this.toMaybeObjectType() != null && that.isObject()) {
++      return this;
+     } else {
+       return getNativeType(JSTypeNative.NO_TYPE);
+     }
+   }

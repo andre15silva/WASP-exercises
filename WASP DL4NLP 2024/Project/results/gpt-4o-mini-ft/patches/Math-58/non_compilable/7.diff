@@ -1,0 +1,20 @@
+diff --git a/tmp/6e50c02a-9469-4021-a938-1a89f65eb477_buggy.java b/tmp/690ba087-9064-49a6-a0bc-d31602062387_fixed.java
+index 3002587..54df959 100644
+--- a/tmp/6e50c02a-9469-4021-a938-1a89f65eb477_buggy.java
++++ b/tmp/690ba087-9064-49a6-a0bc-d31602062387_fixed.java
+@@ -1,10 +1,15 @@
+     /**
+      * Fits a Gaussian function to the observed points.
+      *
+      * @return the parameters of the Gaussian function that best fits the
+      * observed points (in the same order as above).
+      */
+     public double[] fit() {
+         final double[] guess = (new ParameterGuesser(getObservations())).guess();
++        try {
+             return fit(new Gaussian.Parametric(), guess);
++        } catch (MathIllegalArgumentException miae) {
++            // TODO: check that this exception type works with the Java Build (or replace with miae)
++            return new double[]{Double.NaN, Double.NaN, Double.NaN, Double.NaN};
++        }
+     }

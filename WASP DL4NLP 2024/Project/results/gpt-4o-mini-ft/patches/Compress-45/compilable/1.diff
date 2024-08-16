@@ -1,0 +1,44 @@
+diff --git a/tmp/d8633cc8-5a65-4ed2-aa3b-6cfbc5b8966b_buggy.java b/tmp/e235c326-2573-4c15-b503-ecae3dbdc202_fixed.java
+index 1bbc082..4fbfd11 100644
+--- a/tmp/d8633cc8-5a65-4ed2-aa3b-6cfbc5b8966b_buggy.java
++++ b/tmp/e235c326-2573-4c15-b503-ecae3dbdc202_fixed.java
+@@ -1,36 +1,39 @@
+     /**
+      * Write an long integer into a buffer as an octal string if this
+      * will fit, or as a binary number otherwise.
+      * 
+      * Uses {@link #formatUnsignedOctalString} to format
+      * the value as an octal string with leading zeros.
+      * The converted number is followed by a space.
+      * 
+      * @param value The value to write into the buffer.
+      * @param buf The destination buffer.
+      * @param offset The starting offset into the buffer.
+      * @param length The length of the buffer.
+      * @return The updated offset.
+      * @throws IllegalArgumentException if the value (and trailer)
+      * will not fit in the buffer.
+      * @since 1.4
+      */
+     public static int formatLongOctalOrBinaryBytes(
+         final long value, final byte[] buf, final int offset, final int length) {
+ 
+         // Check whether we are dealing with UID/GID or SIZE field
+         final long maxAsOctalChar = length == TarConstants.UIDLEN ? TarConstants.MAXID : TarConstants.MAXSIZE;
+ 
+         final boolean negative = value < 0;
+         if (!negative && value <= maxAsOctalChar) { // OK to store as octal chars
+             return formatLongOctalBytes(value, buf, offset, length);
+         }
+ 
++        // Bytes 0-4 for 5 bytes or fewer == size;// Will use 8 for long-8 field
+         if (length < 9) {
+             formatLongBinary(value, buf, offset, length, negative);
+         }
++        else {
+             formatBigIntegerBinary(value, buf, offset, length, negative);
++        }
+ 
+         buf[offset] = (byte) (negative ? 0xff : 0x80);
+         return offset + length;
+     }

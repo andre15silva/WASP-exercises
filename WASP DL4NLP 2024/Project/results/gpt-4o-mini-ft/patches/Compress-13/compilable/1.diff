@@ -1,0 +1,21 @@
+diff --git a/tmp/5131852a-450c-46a5-99f6-2db8d13213a9_buggy.java b/tmp/f6f06274-309d-4b72-855f-3f739511dd97_fixed.java
+index 1c92640..ff3b738 100644
+--- a/tmp/5131852a-450c-46a5-99f6-2db8d13213a9_buggy.java
++++ b/tmp/f6f06274-309d-4b72-855f-3f739511dd97_fixed.java
+@@ -1,7 +1,16 @@
+     /**
+      * Set the name of the entry.
+      * @param name the name to use
+      */
+     protected void setName(String name) {
++        if (name != null) {
++            if (name.length() > 0) {
++                // Winzip uses backslash as a separator char. This workaround
++                // makes the parsing work.
++                if (File.separatorChar != '/') {
++                    name = name.replace('\\', '/');
++                }
++            }
+             this.name = name;
+         }
++    }

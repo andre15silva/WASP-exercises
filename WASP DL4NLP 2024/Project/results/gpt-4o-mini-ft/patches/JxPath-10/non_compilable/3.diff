@@ -1,0 +1,15 @@
+diff --git a/tmp/b14654e2-4e0e-4e5e-b9e8-c5d223fcafe2_buggy.java b/tmp/7fa81d7d-4721-418b-964d-5262f73436a8_fixed.java
+index b86b44d..8500d73 100644
+--- a/tmp/b14654e2-4e0e-4e5e-b9e8-c5d223fcafe2_buggy.java
++++ b/tmp/7fa81d7d-4721-418b-964d-5262f73436a8_fixed.java
+@@ -1,4 +1,10 @@
+     public final Object computeValue(EvalContext context) {
+         return compute(args[0].computeValue(context), args[1].computeValue(context))
+                 ? Boolean.TRUE : Boolean.FALSE;
+     }
++
++    public boolean compute(Object a, Object b) {
++        assert a instanceof Boolean; // NOSONAR
++        assert b instanceof Boolean; // NOSONAR
++        return super.compute(a, b);
++    }

@@ -1,0 +1,18 @@
+diff --git a/tmp/0f93348f-83af-452d-890d-65a1d6b372de_buggy.java b/tmp/4962ccbf-5fce-4117-9615-0b6f89840cfd_fixed.java
+index b86b44d..96756c8 100644
+--- a/tmp/0f93348f-83af-452d-890d-65a1d6b372de_buggy.java
++++ b/tmp/4962ccbf-5fce-4117-9615-0b6f89840cfd_fixed.java
+@@ -1,4 +1,12 @@
+     public final Object computeValue(EvalContext context) {
+         return compute(args[0].computeValue(context), args[1].computeValue(context))
+                 ? Boolean.TRUE : Boolean.FALSE;
+     }
++
++    protected boolean evaluate(final String path) {
++        final NodeSet test = new NodeSet();
++        test.addNode((short) 1, null);
++        test.addNode((short) 2, null);
++        final EvalContext context = new EvalContext(test, null, SystemContext.get());
++        return XPathUtil.getXPathValue(context, path, Boolean.class).booleanValue();
++    }
+\ No newline at end of file

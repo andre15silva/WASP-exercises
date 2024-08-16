@@ -1,0 +1,20 @@
+diff --git a/tmp/4f022507-4147-4088-85c6-2b658d50ac3c_buggy.java b/tmp/a6fb7e16-7f17-4ef6-83ee-1c0c0a410066_fixed.java
+index 29d025a..537766d 100644
+--- a/tmp/4f022507-4147-4088-85c6-2b658d50ac3c_buggy.java
++++ b/tmp/a6fb7e16-7f17-4ef6-83ee-1c0c0a410066_fixed.java
+@@ -1,13 +1,14 @@
+     private void _verifySharing()
+     {
+         if (_hashShared) {
+             _hashArea = Arrays.copyOf(_hashArea, _hashArea.length);
+             _names = Arrays.copyOf(_names, _names.length);
+             _hashShared = false;
+-            // 09-Sep-2015, tatu: As per [jackson-core#216], also need to ensure
++            // 09-Sep-2015, tatu: As per [jackson-core#216], need to ensure
+             //    we rehash as needed, as need-rehash flag is not copied from parent
++            _needRehash = true;
+         }
+         if (_needRehash) {
+             rehash();
+         }
+     }

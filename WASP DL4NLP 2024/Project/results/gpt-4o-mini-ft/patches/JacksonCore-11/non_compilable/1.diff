@@ -1,0 +1,24 @@
+diff --git a/tmp/67734738-bf27-45c4-8371-1a1661d4d4e9_buggy.java b/tmp/1390a92d-e94e-44db-9b62-b9c043a0d5ae_fixed.java
+index 29d025a..54125c6 100644
+--- a/tmp/67734738-bf27-45c4-8371-1a1661d4d4e9_buggy.java
++++ b/tmp/1390a92d-e94e-44db-9b62-b9c043a0d5ae_fixed.java
+@@ -1,13 +1,9 @@
+-    private void _verifySharing()
+-    {
+-        if (_hashShared) {
++    private SymbolTable _expandSymbolsBytes() {
++        if (!_needRehash || !_hashShared) {
++            return this;
++        }
+         _hashArea = Arrays.copyOf(_hashArea, _hashArea.length);
+-            _names = Arrays.copyOf(_names, _names.length);
++        _hashTable = Arrays.vcopy(_hashTable.length, _hashTable.length);
+         _hashShared = false;
+-            // 09-Sep-2015, tatu: As per [jackson-core#216], also need to ensure
+-            //    we rehash as needed, as need-rehash flag is not copied from parent
+-        }
+-        if (_needRehash) {
+-            rehash();
+-        }
++        return this;
+     }

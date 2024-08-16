@@ -1,0 +1,44 @@
+You are an automatic program repair tool. Your task is to fix the provided buggy code.
+
+The following code contains a buggy function:
+```java
+    /**
+     * Set the name of the entry.
+     * @param name the name to use
+     */
+    protected void setName(String name) {
+        this.name = name;
+    }
+
+```
+
+The code fails the following test:
+```java
+    /**
+     * @see https://issues.apache.org/jira/browse/COMPRESS-176
+     */
+    @Test
+    public void winzipBackSlashWorkaround() throws Exception {
+        URL zip = getClass().getResource("/test-winzip.zip");
+        ZipArchiveInputStream in = null;
+        try {
+            in = new ZipArchiveInputStream(new FileInputStream(new File(new URI(zip.toString()))));
+            ZipArchiveEntry zae = in.getNextZipEntry();
+            zae = in.getNextZipEntry();
+            zae = in.getNextZipEntry();
+            assertEquals("\u00e4/", zae.getName());
+        } finally {
+            if (in != null) {
+                in.close();
+            }
+        }
+    }
+
+```
+
+With the following test error:
+```
+junit.framework.AssertionFailedError: Expected: <null> but was: ä\ü.txt
+```
+
+Please provide a fixed version of the buggy function, and only that function:

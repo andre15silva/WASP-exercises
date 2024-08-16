@@ -1,0 +1,39 @@
+diff --git a/tmp/cc6b1fd0-faf2-419e-8f64-f27fe6ae842c_buggy.java b/tmp/e4bed62a-467a-4145-9484-69b30118897b_fixed.java
+index 658036e..edf6875 100644
+--- a/tmp/cc6b1fd0-faf2-419e-8f64-f27fe6ae842c_buggy.java
++++ b/tmp/e4bed62a-467a-4145-9484-69b30118897b_fixed.java
+@@ -1,29 +1,33 @@
+     // off-lined to keep main method lean and mean...
+     @SuppressWarnings("resource")
+     protected Object _deserializeTypedUsingDefaultImpl(JsonParser p, DeserializationContext ctxt,
+             TokenBuffer tb) throws IOException
+     {
+         // As per [JACKSON-614], may have default implementation to use
+         JsonDeserializer<Object> deser = _findDefaultImplDeserializer(ctxt);
+         if (deser != null) {
+             if (tb != null) {
+                 tb.writeEndObject();
+                 p = tb.asParser(p);
+                 // must move to point to the first token:
+                 p.nextToken();
+             }
+             return deser.deserialize(p, ctxt);
+         }
+         // or, perhaps we just bumped into a "natural" value (boolean/int/double/String)?
+         Object result = TypeDeserializer.deserializeIfNatural(p, ctxt, _baseType);
+         if (result != null) {
+             return result;
+         }
+         // or, something for which "as-property" won't work, changed into "wrapper-array" type:
+         if (p.getCurrentToken() == JsonToken.START_ARRAY) {
+             return super.deserializeTypedFromAny(p, ctxt);
+         }
++        String failedId = baseTypeName();
++        if (failedId.length() == 0) { // Error scenario, should not happen
++            failedId = getClass().getSimpleName();
++        }
+         ctxt.reportWrongTokenException(p, JsonToken.FIELD_NAME,
+-                "missing property '"+_typePropertyName+"' that is to contain type id  (for class "+baseTypeName()+")");
++                "missing property '"+_typePropertyName+"' that is to contain type id  (for class "+failedId+")");
+         return null;
+     }

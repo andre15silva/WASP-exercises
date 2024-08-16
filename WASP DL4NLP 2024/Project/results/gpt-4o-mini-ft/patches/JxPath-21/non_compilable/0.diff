@@ -1,0 +1,20 @@
+diff --git a/tmp/4c30cf3a-2dda-4957-9718-dac519050b4a_buggy.java b/tmp/5acbc9d2-dbc0-444d-9e30-b368a0d8f0c7_fixed.java
+index 516fad7..27df5c6 100644
+--- a/tmp/4c30cf3a-2dda-4957-9718-dac519050b4a_buggy.java
++++ b/tmp/5acbc9d2-dbc0-444d-9e30-b368a0d8f0c7_fixed.java
+@@ -1,8 +1,15 @@
+     /**
+      * If the property contains a collection, then the length of that
+      * collection, otherwise - 1.
+      * @return int length
+      */
+     public int getLength() {
+         return ValueUtils.getLength(getBaseValue());
+     }
++
++    @Override
++    public boolean isEqual(final XPathContext context, final XPathValue value) {
++        // XPath 2.0 says that map item mappings can result in a map-value
++        // being returned - this is an issue for the XQTS tests ...
++        return super.isEqual(context, value);
++    }

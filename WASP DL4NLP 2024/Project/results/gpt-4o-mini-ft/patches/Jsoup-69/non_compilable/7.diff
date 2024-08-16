@@ -1,0 +1,32 @@
+diff --git a/tmp/bafbabcb-68fe-4ffa-a29e-9733ab8915be_buggy.java b/tmp/0069a259-dc3e-4c8f-8796-2050949ffef6_fixed.java
+index e69de29..41200b5 100644
+--- a/tmp/bafbabcb-68fe-4ffa-a29e-9733ab8915be_buggy.java
++++ b/tmp/0069a259-dc3e-4c8f-8796-2050949ffef6_fixed.java
+@@ -0,0 +1,26 @@
++@@ -1,4 +1,4 @@
++ public Connection.Response submit(String method, Map<String, String> data)
++ {
++     // Ensure all form data is added
++     for (Map.Entry<String, String> entry : formData.entrySet())
++         method(data.keySet());
++     return jsoupResponse();
++ }
++-    
+++    
++     public String body()
++     {
++         return body;
++@@ -28,10 +28,6 @@
++     public List<Connection.KeyVal> formData() {
++         List<Connection.KeyVal> data = new ArrayList<Connection.KeyVal>(2);
++         data.add(Nodes.formDataToKeyVal((FormElement) this));
++         Element element = selectFirst("input[type=submit]");
++         if (element != null) {
++             String submitName = submitQuery.name();
++             System.out.println("submitName=" + submitName);
++            submitQuery = new Connection.KeyValImpl(element.val(), element.toString());
++        }
++         data.add(submitQuery);
++         return data;
++     }
+\ No newline at end of file

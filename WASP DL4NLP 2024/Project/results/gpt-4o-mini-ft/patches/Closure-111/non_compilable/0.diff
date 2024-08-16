@@ -1,0 +1,19 @@
+diff --git a/tmp/5de46fa8-8d17-464f-ace1-654f05cc7c57_buggy.java b/tmp/7f56ad4f-4a77-4701-8ed3-955471866702_fixed.java
+index f1d02c1..45f8de9 100644
+--- a/tmp/5de46fa8-8d17-464f-ace1-654f05cc7c57_buggy.java
++++ b/tmp/7f56ad4f-4a77-4701-8ed3-955471866702_fixed.java
+@@ -1,4 +1,14 @@
+         @Override
+         protected JSType caseTopType(JSType topType) {
+           return topType;
+         }
++
++        // goog.isArray should return true for all types
++        @Override
++        protected JSType caseObjectType(ObjectType objectType) {
++          return this.getInstanceType();
++        }
++        @Override
++        protected JSType caseFunctionType(FunctionType fnType) {
++          return fnType;
++        }

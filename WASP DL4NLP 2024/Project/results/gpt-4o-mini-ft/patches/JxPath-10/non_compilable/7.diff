@@ -1,0 +1,20 @@
+diff --git a/tmp/b847a1b8-8571-4d86-bc4b-dbd2345a65ef_buggy.java b/tmp/f2e3b545-84e3-44c9-946d-000d4a9f89fa_fixed.java
+index b86b44d..be43366 100644
+--- a/tmp/b847a1b8-8571-4d86-bc4b-dbd2345a65ef_buggy.java
++++ b/tmp/f2e3b545-84e3-44c9-946d-000d4a9f89fa_fixed.java
+@@ -1,4 +1,13 @@
+     public final Object computeValue(EvalContext context) {
+-        return compute(args[0].computeValue(context), args[1].computeValue(context))
+-                ? Boolean.TRUE : Boolean.FALSE;
++        Object o1 = args[0].computeValue(context);
++        Object o2 = args[1].computeValue(context);
++        if (o1 instanceof NodeSet && o2 instanceof Literal) {
++            // perform an empty node set typescript style, 0 is falsy, so we should convert to a boolean.
++            return ((NodeSet) o1).size() == 0 == (o2).equals(new Integer(0)) ? Boolean.TRUE : Boolean.FALSE;
++        } else if (o2 instanceof NodeSet && o1 instanceof Literal) {
++            // perform an empty node set typescript style, 0 is falsy, so we should convert to a boolean.
++            return ((NodeSet) o2).size() == 0 == (o1).equals(new Integer(0)) ? Boolean.TRUE : Boolean.FALSE;
++        } else {
++            return compute(o1, o2) ? Boolean.TRUE : Boolean.FALSE;
++        }
+     }

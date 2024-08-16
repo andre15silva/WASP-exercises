@@ -1,0 +1,49 @@
+diff --git a/tmp/73fbce60-3936-4e8b-81bc-aa0cbb3862bf_buggy.java b/tmp/f9c77473-5da3-4155-a5ca-448fdf1030ba_fixed.java
+index 442a001..e94242e 100644
+--- a/tmp/73fbce60-3936-4e8b-81bc-aa0cbb3862bf_buggy.java
++++ b/tmp/f9c77473-5da3-4155-a5ca-448fdf1030ba_fixed.java
+@@ -1,39 +1,40 @@
+     /**
+      * Get the data that this form submits. The returned list is a copy of the data, and changes to the contents of the
+      * list will not be reflected in the DOM.
+      * @return a list of key vals
+      */
+     public List<Connection.KeyVal> formData() {
+         ArrayList<Connection.KeyVal> data = new ArrayList<Connection.KeyVal>();
+ 
+         // iterate the form control elements and accumulate their values
+         for (Element el: elements) {
+             if (!el.tag().isFormSubmittable()) continue; // contents are form listable, superset of submitable
+             String name = el.attr("name");
+             if (name.length() == 0) continue;
+             String type = el.attr("type");
+ 
+             if ("select".equals(el.tagName())) {
+                 Elements options = el.select("option[selected]");
+-                boolean set = false;
++                boolean found = false;
+                 for (Element option: options) {
+                     data.add(HttpConnection.KeyVal.create(name, option.val()));
+-                    set = true;
++                    found = true;
+                 }
+-                if (!set) {
++                if (!found) {
+                     Element option = el.select("option").first();
+                     if (option != null)
+                         data.add(HttpConnection.KeyVal.create(name, option.val()));
+                 }
+             } else if ("checkbox".equalsIgnoreCase(type) || "radio".equalsIgnoreCase(type)) {
+                 // only add checkbox or radio if they have the checked attribute
+                 if (el.hasAttr("checked")) {
+                     final String val = el.val();
+                     data.add(HttpConnection.KeyVal.create(name, val));
+                 }
+-            } else {
++            } else if (!"disabled".equalsIgnoreCase(el.attr("disabled"))) {
++ {
+                 data.add(HttpConnection.KeyVal.create(name, el.val()));
+             }
+         }
+         return data;
+     }

@@ -1,0 +1,51 @@
+diff --git a/tmp/13ad10aa-ef6e-43c0-8cd7-faf26f29f7b3_buggy.java b/tmp/fb391899-4dba-4e46-9afe-1ca690da03bf_fixed.java
+index eea9e73..297802a 100644
+--- a/tmp/13ad10aa-ef6e-43c0-8cd7-faf26f29f7b3_buggy.java
++++ b/tmp/fb391899-4dba-4e46-9afe-1ca690da03bf_fixed.java
+@@ -1,41 +1,45 @@
+     /**
+      * <p>Checks if the CharSequence contains any character in the given
+      * set of characters.</p>
+      *
+      * <p>A <code>null</code> CharSequence will return <code>false</code>.
+      * A <code>null</code> or zero length search array will return <code>false</code>.</p>
+      *
+      * <pre>
+      * StringUtils.containsAny(null, *)                = false
+      * StringUtils.containsAny("", *)                  = false
+      * StringUtils.containsAny(*, null)                = false
+      * StringUtils.containsAny(*, [])                  = false
+      * StringUtils.containsAny("zzabyycdxx",['z','a']) = true
+      * StringUtils.containsAny("zzabyycdxx",['b','y']) = true
+      * StringUtils.containsAny("aba", ['z'])           = false
+      * </pre>
+      *
+      * @param cs  the CharSequence to check, may be null
+      * @param searchChars  the chars to search for, may be null
+      * @return the <code>true</code> if any of the chars are found,
+      * <code>false</code> if no match or null input
+      * @since 2.4
+      */
+ 	public static boolean containsAny(CharSequence cs, char[] searchChars) {
+ 		if (isEmpty(cs) || ArrayUtils.isEmpty(searchChars)) {
+ 			return false;
+ 		}
++		if (cs.getClass() != String.class && hasAny(cs, searchChars)) {
++			return true;
++		}
++		// potentially supplementary traversal.
+ 		int csLength = cs.length();
+ 		int searchLength = searchChars.length;
+ 		for (int i = 0; i < csLength; i++) {
+ 			char ch = cs.charAt(i);
+ 			for (int j = 0; j < searchLength; j++) {
+-				if (searchChars[j] == ch) {
++				if (charAt(cs, i) == searchChars[j]) {
+ 						// ch is a supplementary character
+ 						// ch is in the Basic Multilingual Plane
+ 						return true;
+ 				}
+ 			}
+ 		}
+ 		return false;
+ 	}

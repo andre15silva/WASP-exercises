@@ -1,0 +1,27 @@
+diff --git a/tmp/99c97c18-0c2e-4f6d-be5e-ac0d8d1fbeeb_buggy.java b/tmp/16c6ffcf-c704-4f7c-95a7-ddddee6923a3_fixed.java
+index e69de29..a24aa75 100644
+--- a/tmp/99c97c18-0c2e-4f6d-be5e-ac0d8d1fbeeb_buggy.java
++++ b/tmp/16c6ffcf-c704-4f7c-95a7-ddddee6923a3_fixed.java
+@@ -0,0 +1,21 @@
++    // for [databind#1647]
++    public void testSuperClassWithReferencedJavaType() {
++        TypeFactory tf = objectMapper().getTypeFactory();
++        tf.constructType(Base.class); // must be constructed before sub to set the cache correctly
++        JavaType subType = tf.constructType(Sub.class);
++        // baseTypeFromSub should be a ResolvedRecursiveType in this test
++        JavaType baseTypeFromSub = subType.getSuperClass().getContentType();
++        assertNotNull(baseTypeFromSub.getSuperClass());
++    }
++
++/* to be verified for 2.8 (and possibly for 2.7)
++    // for [databind#1647]
++    public void testSuperClassWithReferencedJavaType() {
++        TypeFactory tf = objectMapper().getTypeFactory();
++        tf.constructType(Base.class); // must be constructed before sub to set the cache correctly
++        JavaType subType = tf.constructType(Sub.class);
++        // baseTypeFromSub should be a ResolvedRecursiveType in this test
++        JavaType baseTypeFromSub = subType.getSuperType();
++        assertNotNull(baseTypeFromSub.getSuperType());
++    }
++*/
+\ No newline at end of file

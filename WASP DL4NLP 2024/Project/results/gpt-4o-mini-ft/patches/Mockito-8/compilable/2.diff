@@ -1,0 +1,33 @@
+diff --git a/tmp/806d5954-90b3-42d9-95a2-57eee4c44144_buggy.java b/tmp/bbb1697e-c6b1-47c1-9065-3db994a3929a_fixed.java
+index 42b58d0..d787813 100644
+--- a/tmp/806d5954-90b3-42d9-95a2-57eee4c44144_buggy.java
++++ b/tmp/bbb1697e-c6b1-47c1-9065-3db994a3929a_fixed.java
+@@ -1,19 +1,28 @@
+     protected void registerTypeVariablesOn(Type classType) {
+         if (!(classType instanceof ParameterizedType)) {
+             return;
+         }
+         ParameterizedType parameterizedType = (ParameterizedType) classType;
+         TypeVariable[] typeParameters = ((Class<?>) parameterizedType.getRawType()).getTypeParameters();
+         Type[] actualTypeArguments = parameterizedType.getActualTypeArguments();
+         for (int i = 0; i < actualTypeArguments.length; i++) {
+             TypeVariable typeParameter = typeParameters[i];
+             Type actualTypeArgument = actualTypeArguments[i];
+ 
+             if (actualTypeArgument instanceof WildcardType) {
+                 contextualActualTypeParameters.put(typeParameter, boundsOf((WildcardType) actualTypeArgument));
++            } else {
++                if (actualTypeArgument instanceof ParameterizedType) {
++                    Type rawParamType = ((ParameterizedType) actualTypeArgument).getRawType();
++                    if (rawParamType instanceof Class<?> && ((Class<?>) rawParamType).isAnonymousClass()) {
++                        rawParamType = ((ParameterizedType) rawParamType).getOwnerType();
++                    }
++                    // TODO
++                    /*contextualActualTypeParameters.put(typeParameter, rawParamType);*/
+                 } else {
+                     contextualActualTypeParameters.put(typeParameter, actualTypeArgument);
+                 }
++            }
+             // logger.log("For '" + parameterizedType + "' found type variable : { '" + typeParameter + "(" + System.identityHashCode(typeParameter) + ")" + "' : '" + actualTypeArgument + "(" + System.identityHashCode(typeParameter) + ")" + "' }");
+         }
+     }

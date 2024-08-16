@@ -1,0 +1,18 @@
+diff --git a/tmp/66c3f978-d4b1-4717-95c7-5348c7e24952_buggy.java b/tmp/cfca3881-9b4a-4357-91bb-6bc2e1ffcf03_fixed.java
+index d68a69c..e9b4652 100644
+--- a/tmp/66c3f978-d4b1-4717-95c7-5348c7e24952_buggy.java
++++ b/tmp/cfca3881-9b4a-4357-91bb-6bc2e1ffcf03_fixed.java
+@@ -1,9 +1,13 @@
+     public void captureArgumentsFrom(Invocation i) {
+         int k = 0;
+         for (Matcher m : matchers) {
+             if (m instanceof CapturesArguments) {
++                if (i.isVarargs() && i.getArguments().length == 1) {
++                    ((CapturesArguments) m).captureFrom(i.getArguments()[0]);
++                } else {
+                     ((CapturesArguments) m).captureFrom(i.getArguments()[k]);
+                 }
++            }
+             k++;
+         }
+     }

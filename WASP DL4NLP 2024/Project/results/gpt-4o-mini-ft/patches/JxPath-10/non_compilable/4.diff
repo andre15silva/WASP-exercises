@@ -1,0 +1,24 @@
+diff --git a/tmp/4433e63b-6826-499a-bd49-713ad7300c2b_buggy.java b/tmp/2a48b95a-992e-4c74-8e4b-97e41d3d68e9_fixed.java
+index b86b44d..3f3e6d9 100644
+--- a/tmp/4433e63b-6826-499a-bd49-713ad7300c2b_buggy.java
++++ b/tmp/2a48b95a-992e-4c74-8e4b-97e41d3d68e9_fixed.java
+@@ -1,4 +1,17 @@
+     public final Object computeValue(EvalContext context) {
+-        return compute(args[0].computeValue(context), args[1].computeValue(context))
+-                ? Boolean.TRUE : Boolean.FALSE;
++    	Object arg0 = args[0].computeValue(context);
++    	Object arg1 = args[1].computeValue(context);
++    	if (arg0 instanceof NodeSet && ((NodeSet)arg0).isEmpty()
++    			|| arg1 instanceof NodeSet && ((NodeSet)arg1).isEmpty()) {
++    		// The test expression never returns either true or false because the
++    		// operand is always at least one-node. This is because the NodeSet
++    		// case returned either true for 'not(../zero)' and false for 'not(
++    		// install_state = "0")'. In these cases, it ultimately returns
++    		// org.apache.xpath.VariableStack#elementOfNodeSet(Object).
++    		String name = getName();
++    		String message = MessageUtils.messages.messageForContext(
++    				"ojc.ssa.error.testNotSupported", worker, name);
++    		throw new JasperException(message);
++    	}
++        return compute(arg0, arg1) ? Boolean.TRUE : Boolean.FALSE;
+     }

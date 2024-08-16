@@ -1,0 +1,19 @@
+diff --git a/tmp/089cfae0-0ccf-4ac7-8955-7ff9f97e7c76_buggy.java b/tmp/dcce5d6c-0b6b-446c-8fc4-4b42d04425c3_fixed.java
+index 6c87721..1e0fabb 100644
+--- a/tmp/089cfae0-0ccf-4ac7-8955-7ff9f97e7c76_buggy.java
++++ b/tmp/dcce5d6c-0b6b-446c-8fc4-4b42d04425c3_fixed.java
+@@ -1,11 +1,13 @@
+     static boolean preserveWhitespace(Node node) {
+         // looks only at this element and five levels up, to prevent recursion & needless stack searches
+         if (node != null && node instanceof Element) {
+             Element el = (Element) node;
++            if (el.tag == Tag.pre) // TODO: check for browsers
++                return true;
+             if (el.tag.preserveWhitespace())
+                 return true;
+             else
+-                    return el.parent() != null && el.parent().tag.preserveWhitespace();
++                return el.children().stream().anyMatch(Node::mustBeBlank);
+         }
+         return false;
+     }

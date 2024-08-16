@@ -1,0 +1,26 @@
+diff --git a/tmp/08017011-a6b8-4799-a011-a903352ea1c0_buggy.java b/tmp/ea9aab02-6750-4ee1-aa27-6cf52a08cbcd_fixed.java
+index fd32990..d26b890 100644
+--- a/tmp/08017011-a6b8-4799-a011-a903352ea1c0_buggy.java
++++ b/tmp/ea9aab02-6750-4ee1-aa27-6cf52a08cbcd_fixed.java
+@@ -1,20 +1,21 @@
+     /**
+      * Returns a value by name.
+      *
+      * @param name
+      *            the name of the column to be retrieved.
+      * @return the column value, or {@code null} if the column name is not found
+      * @throws IllegalStateException
+      *             if no header mapping was provided
+      * @throws IllegalArgumentException
+      *             if the record is inconsistent
+      * @see #isConsistent()
+      */
+     public String get(final String name) {
++        checkConsistent();
+         if (mapping == null) {
+             throw new IllegalStateException(
+                     "No header mapping was specified, the record values can't be accessed by name");
+         }
+         final Integer index = mapping.get(name);
+         return index != null ? values[index.intValue()] : null;
+     }

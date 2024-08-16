@@ -1,0 +1,14 @@
+diff --git a/tmp/fd7ed21a-93cb-4f4b-b9b0-cf01aafe64a6_buggy.java b/tmp/84dbf860-ea09-4639-970e-73fcb9f93256_fixed.java
+index 516fad7..821e60b 100644
+--- a/tmp/fd7ed21a-93cb-4f4b-b9b0-cf01aafe64a6_buggy.java
++++ b/tmp/84dbf860-ea09-4639-970e-73fcb9f93256_fixed.java
+@@ -1,8 +1,8 @@
+     /**
+      * If the property contains a collection, then the length of that
+      * collection, otherwise - 1.
+      * @return int length
+      */
+     public int getLength() {
+-        return ValueUtils.getLength(getBaseValue());
++        return ValueUtils.getLength(getBaseSequence());
+     }

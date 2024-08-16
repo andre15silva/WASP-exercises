@@ -1,0 +1,31 @@
+diff --git a/tmp/72e0c98e-8cbe-4082-afd0-04d79e0df8e9_buggy.java b/tmp/d9576396-b920-4bf3-a851-201e98110f13_fixed.java
+index b5d94e0..9a62e9e 100644
+--- a/tmp/72e0c98e-8cbe-4082-afd0-04d79e0df8e9_buggy.java
++++ b/tmp/d9576396-b920-4bf3-a851-201e98110f13_fixed.java
+@@ -1,26 +1,15 @@
+   private void traverse(Node node) {
+     // The goal here is to avoid retraversing
+     // the entire AST to catch newly created opportunities.
+     // So we track whether a "unit of code" has changed,
+     // and revisit immediately.
+     if (!shouldVisit(node)) {
+       return;
+     }
+ 
+-    int visits = 0;
+     do {
+-      Node c = node.getFirstChild();
+-      while(c != null) {
+-        traverse(c);
+-        Node next = c.getNext();
+-        c = next;
+-      }
+-
+       visit(node);
+-      visits++;
+-
+-      Preconditions.checkState(visits < 10000, "too many interations");
+     } while (shouldRetraverse(node));
+ 
+     exitNode(node);
+   }

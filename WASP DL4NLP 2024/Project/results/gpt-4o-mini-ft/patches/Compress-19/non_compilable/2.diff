@@ -1,0 +1,63 @@
+diff --git a/tmp/7b4639d8-d829-4582-8cf9-3722cac02036_buggy.java b/tmp/1bcd13c4-9c40-48df-8241-24357e948506_fixed.java
+index 730ab7d..6a8e4ca 100644
+--- a/tmp/7b4639d8-d829-4582-8cf9-3722cac02036_buggy.java
++++ b/tmp/1bcd13c4-9c40-48df-8241-24357e948506_fixed.java
+@@ -1,48 +1,56 @@
+     /**
+      * Parses the raw bytes read from the central directory extra
+      * field with knowledge which fields are expected to be there.
+      *
+      * <p>All four fields inside the zip64 extended information extra
+      * field are optional and must only be present if their corresponding
+      * entry inside the central directory contains the correct magic
+-     * value.</p>
++     * value.  So we can tolerate added extra data in case another tool
++     * has added them in.</p>
+      */
+     public void reparseCentralDirectoryData(boolean hasUncompressedSize,
+                                             boolean hasCompressedSize,
+                                             boolean hasRelativeHeaderOffset,
+                                             boolean hasDiskStart)
+         throws ZipException {
+         if (rawCentralDirectoryData != null) {
+             int expectedLength = (hasUncompressedSize ? DWORD : 0)
+                 + (hasCompressedSize ? DWORD : 0)
+                 + (hasRelativeHeaderOffset ? DWORD : 0)
+                 + (hasDiskStart ? WORD : 0);
+-            if (rawCentralDirectoryData.length != expectedLength) {
++            int excess = rawCentralDirectoryData.length - expectedLength;
++            if (excess < 0) {
+                 throw new ZipException("central directory zip64 extended"
+                                        + " information extra field's length"
+                                        + " doesn't match central directory"
+                                        + " data.  Expected length "
+                                        + expectedLength + " but is "
+                                        + rawCentralDirectoryData.length);
+             }
+             int offset = 0;
+             if (hasUncompressedSize) {
+                 size = new ZipEightByteInteger(rawCentralDirectoryData, offset);
+                 offset += DWORD;
+             }
+             if (hasCompressedSize) {
+                 compressedSize = new ZipEightByteInteger(rawCentralDirectoryData,
+                                                          offset);
+                 offset += DWORD;
+             }
+             if (hasRelativeHeaderOffset) {
+                 relativeHeaderOffset =
+                     new ZipEightByteInteger(rawCentralDirectoryData, offset);
+                 offset += DWORD;
+             }
+             if (hasDiskStart) {
+                 diskStart = new ZipLong(rawCentralDirectoryData, offset);
+                 offset += WORD;
+             }
++            if (excess > 0) {
++                // store the excess data for later processing.
++                additionalData = new byte[excess];
++                System.arraycopy(rawCentralDirectoryData, offset,
++                                 additionalData, 0, excess);
++            }
+         }
+     }

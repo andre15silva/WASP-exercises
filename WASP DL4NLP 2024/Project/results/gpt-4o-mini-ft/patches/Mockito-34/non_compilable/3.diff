@@ -1,0 +1,21 @@
+diff --git a/tmp/86707d96-5b24-4ba6-88dd-d99fc5608a63_buggy.java b/tmp/ebe4254b-8fee-4dce-9486-01c99193bf52_fixed.java
+index d68a69c..258c4c8 100644
+--- a/tmp/86707d96-5b24-4ba6-88dd-d99fc5608a63_buggy.java
++++ b/tmp/ebe4254b-8fee-4dce-9486-01c99193bf52_fixed.java
+@@ -1,9 +1,16 @@
+     public void captureArgumentsFrom(Invocation i) {
+         int k = 0;
+         for (Matcher m : matchers) {
+             if (m instanceof CapturesArguments) {
++                if(this.isVarargs()) {
++                    // varargs method matched. Capture all but last argument
+                     ((CapturesArguments) m).captureFrom(i.getArguments()[k]);
+                 }
++                else {
++                    // standard method or vararg matcher had fewer arguments than captured
++                    ((CapturesArguments) m).captureFrom(i.getArguments()[k]);
++                }
++            }
+             k++;
+         }
+     }

@@ -1,0 +1,17 @@
+diff --git a/tmp/a26bdd8c-d81e-4e8c-86f2-9d35b59c0019_buggy.java b/tmp/251ae218-61dc-4fa9-952c-b63b35fb4707_fixed.java
+index 13db7da..1682017 100644
+--- a/tmp/a26bdd8c-d81e-4e8c-86f2-9d35b59c0019_buggy.java
++++ b/tmp/251ae218-61dc-4fa9-952c-b63b35fb4707_fixed.java
+@@ -1,11 +1,11 @@
+     /**
+      * Generates a tooltip string to go in an HTML image map.
+      *
+      * @param toolTipText  the tooltip.
+      * 
+      * @return The formatted HTML area tag attribute(s).
+      */
+     public String generateToolTipFragment(String toolTipText) {
+-        return " title=\"" + toolTipText
++        return " title=\"" + EscaperUtilities.appletEscape(toolTipText)
+             + "\" alt=\"\"";
+     }

@@ -1,0 +1,38 @@
+diff --git a/tmp/31eb57cd-5855-41f6-9c62-0fe8c3e04bfe_buggy.java b/tmp/319f0cb3-844c-4b5e-bac0-9b96728de248_fixed.java
+index 10616db..6c2ccb6 100644
+--- a/tmp/31eb57cd-5855-41f6-9c62-0fe8c3e04bfe_buggy.java
++++ b/tmp/319f0cb3-844c-4b5e-bac0-9b96728de248_fixed.java
+@@ -1,19 +1,31 @@
+     //-----------------------------------------------------------------------
+     public int[] add(ReadablePartial partial, int fieldIndex, int[] values, int valueToAdd) {
+         // overridden as superclass algorithm can't handle
+         // 2004-02-29 + 48 months -> 2008-02-29 type dates
+         if (valueToAdd == 0) {
+             return values;
+         }
+             // month is largest field and being added to, such as month-day
+-        if (DateTimeUtils.isContiguous(partial)) {
+         long instant = 0L;
++        if (DateTimeUtils.isContiguous(partial)) {
+             for (int i = 0, isize = partial.size(); i < isize; i++) {
+                 instant = partial.getFieldType(i).getField(iChronology).set(instant, values[i]);
+             }
++        }
++        if (valueToAdd < 0) {
++            MonthDay monthDay = MonthDay.fromMillisSinceEpoch(instant, partial.getChronology());
++            MonthDay newMonthDay = monthDay.plusMonths(valueToAdd);
++            instant = newMonthDay.getMillisSinceEpoch();
++        } else {
+             instant = add(instant, valueToAdd);
+-            return iChronology.get(partial, instant);
++        }
++        if (partial instanceof MonthDay) {
++            return iChronology.get(monthDay, instant);
+         } else {
++            if (DateTimeUtils.isContiguous(partial)) {
+                 return super.add(partial, fieldIndex, values, valueToAdd);
++            } else {
++                return partial.getChronology().get(partial, instant);
++            }
+         }
+     }

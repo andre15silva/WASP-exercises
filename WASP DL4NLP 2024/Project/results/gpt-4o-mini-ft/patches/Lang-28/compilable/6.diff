@@ -1,0 +1,55 @@
+diff --git a/tmp/d7fa4917-b299-4760-863c-2b0222ad7a6e_buggy.java b/tmp/b65a360c-97c1-4259-ab7a-b421ac319419_fixed.java
+index 4bbd561..2a984ad 100644
+--- a/tmp/d7fa4917-b299-4760-863c-2b0222ad7a6e_buggy.java
++++ b/tmp/b65a360c-97c1-4259-ab7a-b421ac319419_fixed.java
+@@ -1,37 +1,49 @@
+     /**
+      * {@inheritDoc}
+      */
+     @Override
+     public int translate(CharSequence input, int index, Writer out) throws IOException {
+         // TODO: Protect from ArrayIndexOutOfBounds
+         if(input.charAt(index) == '&' && input.charAt(index + 1) == '#') {
+             int start = index + 2;
+             boolean isHex = false;
+ 
+             char firstChar = input.charAt(start);
+             if(firstChar == 'x' || firstChar == 'X') {
+                 start++;
+                 isHex = true;
+             }
+ 
+             int end = start;
+-            while(input.charAt(end) != ';') {
++            while(end < input.length() - 1 && input.charAt(end) != ';') {
+                 end++;
+             }
+ 
+             int entityValue;
+             try {
+                 if(isHex) {
+                     entityValue = Integer.parseInt(input.subSequence(start, end).toString(), 16);
+                 } else {
+                     entityValue = Integer.parseInt(input.subSequence(start, end).toString(), 10);
+                 }
+             } catch(NumberFormatException nfe) {
+                 return 0;
+             }
+ 
++            /*
++             * If the character is greater than 0xFFFF we perform the conversion
++             * by hand. See http://unicode.org/faq/utf_bom.html#SURROGATE for details
++             * regarding UTF-16 surrogate pairs.
++             */
++            if(entityValue > 0xFFFF) {
++                // Convert to UTF-16 UTF-16	U+D800-U+DBFF, U+DC00-U+DFFF
++                entityValue += 0x10000 + 0xD800 - 0x10000 - 0xDC00;
++                out.write((char)((entityValue >> 10) + 0xD800));
++                out.write((char)(entityValue + 0xDC00));
++            } else {
+                 out.write(entityValue);
++            }
+             return 2 + (end - start) + (isHex ? 1 : 0) + 1;
+         }
+         return 0;
+     }

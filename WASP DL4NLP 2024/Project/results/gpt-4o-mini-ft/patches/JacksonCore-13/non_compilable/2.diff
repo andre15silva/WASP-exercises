@@ -1,0 +1,27 @@
+diff --git a/tmp/1ed509d4-f081-4e31-b0db-adb06988bdf5_buggy.java b/tmp/ec0c0c1d-baf2-4350-b2db-f8955d8d0e05_fixed.java
+index e69de29..f124f98 100644
+--- a/tmp/1ed509d4-f081-4e31-b0db-adb06988bdf5_buggy.java
++++ b/tmp/ec0c0c1d-baf2-4350-b2db-f8955d8d0e05_fixed.java
+@@ -0,0 +1,22 @@
++    // for [core#246]
++    public void testFieldNameQuotingEnabled() throws IOException
++    {
++        _testFieldNameQuotingEnabled(JSON_F, true, true, "{\"foo\":1}");
++        _testFieldNameQuotingEnabled(JSON_F, false, true, "{\"foo\":1}");
++
++        // then without quotes
++        _testFieldNameQuotingEnabled(JSON_F, true, false, "{foo:1}");
++        _testFieldNameQuotingEnabled(JSON_F, false, false, "{foo:1}");
++
++        // // Then with alternatively configured factory
++
++        JsonFactory JF2 = new JsonFactory();
++        JF2.disable(JsonGenerator.Feature.QUOTE_FIELD_NAMES);
++
++        _testFieldNameQuotingEnabled(JF2, true, true, "{\"foo\":1}");
++        _testFieldNameQuotingEnabled(JF2, false, true, "{\"foo\":1}");
++
++        // then without quotes
++        _testFieldNameQuotingEnabled(JF2, true, false, "{foo:1}");
++        _testFieldNameQuotingEnabled(JF2, false, false, "{foo:1}");
++    }

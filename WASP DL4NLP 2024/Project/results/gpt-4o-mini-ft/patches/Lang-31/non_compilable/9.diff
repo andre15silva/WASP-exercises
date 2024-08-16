@@ -1,0 +1,61 @@
+diff --git a/tmp/59829787-e3ac-4d07-9695-5dfc8db423a1_buggy.java b/tmp/6a93b43b-3e5d-4001-9bdf-98b0124cee13_fixed.java
+index eea9e73..01f5465 100644
+--- a/tmp/59829787-e3ac-4d07-9695-5dfc8db423a1_buggy.java
++++ b/tmp/6a93b43b-3e5d-4001-9bdf-98b0124cee13_fixed.java
+@@ -1,41 +1,55 @@
+     /**
+      * <p>Checks if the CharSequence contains any character in the given
+      * set of characters.</p>
+      *
+      * <p>A <code>null</code> CharSequence will return <code>false</code>.
+      * A <code>null</code> or zero length search array will return <code>false</code>.</p>
+      *
+      * <pre>
+      * StringUtils.containsAny(null, *)                = false
+      * StringUtils.containsAny("", *)                  = false
+      * StringUtils.containsAny(*, null)                = false
+      * StringUtils.containsAny(*, [])                  = false
+      * StringUtils.containsAny("zzabyycdxx",['z','a']) = true
+      * StringUtils.containsAny("zzabyycdxx",['b','y']) = true
+      * StringUtils.containsAny("aba", ['z'])           = false
+      * </pre>
+      *
+      * @param cs  the CharSequence to check, may be null
+      * @param searchChars  the chars to search for, may be null
+      * @return the <code>true</code> if any of the chars are found,
+      * <code>false</code> if no match or null input
+      * @since 2.4
+      */
+ 	public static boolean containsAny(CharSequence cs, char[] searchChars) {
+ 		if (isEmpty(cs) || ArrayUtils.isEmpty(searchChars)) {
+ 			return false;
+ 		}
+ 		int csLength = cs.length();
+ 		int searchLength = searchChars.length;
+ 		for (int i = 0; i < csLength; i++) {
+ 			char ch = cs.charAt(i);
+ 			for (int j = 0; j < searchLength; j++) {
+ 				if (searchChars[j] == ch) {
+-						// ch is a supplementary character
++					return true;
++				}
++				if (searchChars[j] <= 127) {
++					// the value ch is not greater than 127
+ 					// ch is in the Basic Multilingual Plane
++					// Bounded by Java 1.5 or less
++					if (searchChars[j] == (ch & 0x7F)) {
+ 						return true;
+ 					}
++				} else {
++					// the value ch is greater than 127
++					// the supplementary character ch is in 0x10000 => 0x10FFFF
++					// the character searchChars[j] is in 0x10000 => 0x10FFFF
++					// Bounded by Java 1.4 or less
++					if (searchChars[j] == Character.forChar(ch)) {
++						return true;
++					}
++				}
+ 			}
+ 		}
+ 		return false;
+ 	}

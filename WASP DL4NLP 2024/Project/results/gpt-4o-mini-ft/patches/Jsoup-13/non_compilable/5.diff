@@ -1,0 +1,38 @@
+diff --git a/tmp/9ee40bd9-47b4-4b3c-a913-64ef7e2309ed_buggy.java b/tmp/a37b39db-fea7-4958-8bad-e200d5cd0afd_fixed.java
+index a7cb64f..6a50437 100644
+--- a/tmp/9ee40bd9-47b4-4b3c-a913-64ef7e2309ed_buggy.java
++++ b/tmp/a37b39db-fea7-4958-8bad-e200d5cd0afd_fixed.java
+@@ -1,10 +1,33 @@
+     /**
+      * Test if this element has an attribute.
+      * @param attributeKey The attribute key to check.
+      * @return true if the attribute exists, false if not.
+      */
+     public boolean hasAttr(String attributeKey) {
+         Validate.notNull(attributeKey);
+ 
+         return attributes.hasKey(attributeKey);
+     }
++
++    public boolean hasAttrAbs(String attributeKey) {
++        Validate.notNull(attributeKey);
++        return attributes.hasKey(getAbsKey(attributeKey));
++    }
++
++    protected String getAbsKey(String attrName) {
++        if (attrName.equals("href")) {
++            return absKey_hrefs;
++        }
++        if (deepEquals(attrName, "src")) {
++            return absKey_srcs;
++        }
++        if (deepEquals(attrName, "combined")) {
++            return absKey_combined;
++        }
++        String absKey = (String) absKeys.get(attrName);
++        if (absKey != null) {
++            return absKey;
++        }
++
++        return absKey;
++    }

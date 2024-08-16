@@ -1,0 +1,12 @@
+diff --git a/tmp/6e21b378-ed4e-45b3-ad9a-8c0701c81aaf_buggy.java b/tmp/f7aaa869-e515-4f8f-be7f-3e8b6324351f_fixed.java
+index b86b44d..d185cbf 100644
+--- a/tmp/6e21b378-ed4e-45b3-ad9a-8c0701c81aaf_buggy.java
++++ b/tmp/f7aaa869-e515-4f8f-be7f-3e8b6324351f_fixed.java
+@@ -1,4 +1,5 @@
+     public final Object computeValue(EvalContext context) {
+-        return compute(args[0].computeValue(context), args[1].computeValue(context))
+-                ? Boolean.TRUE : Boolean.FALSE;
++        boolean result = compute(args[0].computeValue(context), args[1].computeValue(context));
++        // XPath cannot coerce empty node set to boolean
++        return result == true ? Boolean.TRUE : Boolean.FALSE;
+     }

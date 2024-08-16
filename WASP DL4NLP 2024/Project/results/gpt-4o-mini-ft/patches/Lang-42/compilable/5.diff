@@ -1,0 +1,46 @@
+diff --git a/tmp/d4b36b5a-bfeb-424b-ae17-9153dd972073_buggy.java b/tmp/7d659878-dbff-4ff6-b257-809580081c05_fixed.java
+index 822447c..6b0085f 100644
+--- a/tmp/d4b36b5a-bfeb-424b-ae17-9153dd972073_buggy.java
++++ b/tmp/7d659878-dbff-4ff6-b257-809580081c05_fixed.java
+@@ -1,37 +1,41 @@
+     /**
+      * <p>
+      * Escapes the characters in the <code>String</code> passed and writes the result to the <code>Writer</code>
+      * passed.
+      * </p>
+      * 
+      * @param writer
+      *            The <code>Writer</code> to write the results of the escaping to. Assumed to be a non-null value.
+      * @param str
+      *            The <code>String</code> to escape. Assumed to be a non-null value.
+      * @throws IOException
+      *             when <code>Writer</code> passed throws the exception from calls to the {@link Writer#write(int)}
+      *             methods.
+      * 
+      * @see #escape(String)
+      * @see Writer
+      */
+     public void escape(Writer writer, String str) throws IOException {
+         int len = str.length();
+         for (int i = 0; i < len; i++) {
+             char c = str.charAt(i);
+             String entityName = this.entityName(c);
+             if (entityName == null) {
+                 if (c > 0x7F) {
++                    // only escape if char is a BMP char
++                    // issue LANG-480
++                    if (c < 0x10000) {
+                         writer.write("&#");
+                         writer.write(Integer.toString(c, 10));
+                         writer.write(';');
++                    } 
+                 } else {
+                     writer.write(c);
+                 }
+             } else {
+                 writer.write('&');
+                 writer.write(entityName);
+                 writer.write(';');
+             }
+         }
+     }

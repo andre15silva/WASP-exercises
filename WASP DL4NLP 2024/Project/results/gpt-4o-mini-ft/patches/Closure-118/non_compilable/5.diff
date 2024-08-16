@@ -1,0 +1,45 @@
+diff --git a/tmp/78f3678f-aa5b-4189-8c00-a2e669bf0d89_buggy.java b/tmp/64acf75f-5432-40bc-a032-a5b09fd66f19_fixed.java
+index 0b7c52e..7ee7289 100644
+--- a/tmp/78f3678f-aa5b-4189-8c00-a2e669bf0d89_buggy.java
++++ b/tmp/64acf75f-5432-40bc-a032-a5b09fd66f19_fixed.java
+@@ -1,27 +1,39 @@
+     /**
+      * Processes a OBJECTLIT node.
+      */
+     private void handleObjectLit(NodeTraversal t, Node n) {
+       for (Node child = n.getFirstChild();
+           child != null;
+           child = child.getNext()) {
+         // Maybe STRING, GET, SET
+ 
+-        // We should never see a mix of numbers and strings.
+         String name = child.getString();
+         T type = typeSystem.getType(getScope(), n, name);
+ 
++        String definedOn = propertiesToDefinedOn.get(name);
++        if (definedOn == null) {
++          definedOn = getDefiningName(searchType(TYPES), processType(t, type, this));
++          propertiesToDefinedOn.put(name, definedOn);
++        }
++        if (!definedOn.equals("Number")) {
++          ObjectType namedTsType = getScope().getType(definedOn);
++          if (namedTsType != null) {
++            name = definedOn;
++            type = namedTsType;
++          }
++        }
++
+         Property prop = getProperty(name);
+         if (!prop.scheduleRenaming(child,
+                                    processProperty(t, prop, type, null))) {
+           // TODO(user): It doesn't look like the user can do much in this
+           // case right now.
+           if (propertiesToErrorFor.containsKey(name)) {
+             compiler.report(JSError.make(
+                 t.getSourceName(), child, propertiesToErrorFor.get(name),
+                 Warnings.INVALIDATION, name,
+                 (type == null ? "null" : type.toString()), n.toString(), ""));
+           }
+         }
+       }
+     }

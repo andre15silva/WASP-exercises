@@ -1,0 +1,35 @@
+diff --git a/tmp/789f7171-cc19-4cd1-ae6c-fd62630e6602_buggy.java b/tmp/8ca858d7-47fc-4461-914f-1c16576b065f_fixed.java
+index 42b58d0..582b822 100644
+--- a/tmp/789f7171-cc19-4cd1-ae6c-fd62630e6602_buggy.java
++++ b/tmp/8ca858d7-47fc-4461-914f-1c16576b065f_fixed.java
+@@ -1,19 +1,30 @@
+     protected void registerTypeVariablesOn(Type classType) {
+         if (!(classType instanceof ParameterizedType)) {
+             return;
+         }
+         ParameterizedType parameterizedType = (ParameterizedType) classType;
+         TypeVariable[] typeParameters = ((Class<?>) parameterizedType.getRawType()).getTypeParameters();
+         Type[] actualTypeArguments = parameterizedType.getActualTypeArguments();
+         for (int i = 0; i < actualTypeArguments.length; i++) {
+             TypeVariable typeParameter = typeParameters[i];
+             Type actualTypeArgument = actualTypeArguments[i];
+ 
+             if (actualTypeArgument instanceof WildcardType) {
+                 contextualActualTypeParameters.put(typeParameter, boundsOf((WildcardType) actualTypeArgument));
++            } else if (actualTypeArgument instanceof ParameterizedType) {
++                ParameterizedType pt = (ParameterizedType) actualTypeArgument;
++                Type rawType = pt.getRawType();
++                if (rawType instanceof Class<?>) {
++                    Class<?> rawTypeClass = (Class<?>) rawType;
++                    if (!rawTypeClass.isAnonymousClass() && !Modifier.isFinal(rawTypeClass.getModifiers())) {
++                        contextualActualTypeParameters.put(typeParameter, pt.getRawType());
++                    } else {
++                        contextualActualTypeParameters.put(typeParameter, rawType);
++                    }
++                }
+             } else {
+                 contextualActualTypeParameters.put(typeParameter, actualTypeArgument);
+             }
+             // logger.log("For '" + parameterizedType + "' found type variable : { '" + typeParameter + "(" + System.identityHashCode(typeParameter) + ")" + "' : '" + actualTypeArgument + "(" + System.identityHashCode(typeParameter) + ")" + "' }");
+         }
+     }

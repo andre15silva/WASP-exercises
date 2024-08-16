@@ -1,0 +1,15 @@
+diff --git a/tmp/ae7b1795-7d57-4836-9ad5-2f4f1764663b_buggy.java b/tmp/ecdfe240-5453-4c63-8330-b6863cae848c_fixed.java
+index 1ed78d0..e1b5b44 100644
+--- a/tmp/ae7b1795-7d57-4836-9ad5-2f4f1764663b_buggy.java
++++ b/tmp/ecdfe240-5453-4c63-8330-b6863cae848c_fixed.java
+@@ -1,9 +1,9 @@
+     /**
+      * @since 2.8.9
+      */
+     protected XmlSerializerProvider(XmlSerializerProvider src) {
+         super(src);
+         // 21-May-2018, tatu: As per [dataformat-xml#282], should NOT really copy
+-        //    root name lookup as that may link back to diff version, configuration
++        //    root name lookup. Same reasoning as other classes
+         _rootNameLookup = src._rootNameLookup;
+     }

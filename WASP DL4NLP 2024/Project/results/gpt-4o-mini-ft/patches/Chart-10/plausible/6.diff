@@ -1,0 +1,53 @@
+diff --git a/tmp/ad5445a8-3f76-4a8b-b5fe-205b6208ce59_buggy.java b/tmp/22e83b90-b031-4a49-b29d-8bcca6189c0f_fixed.java
+index 13db7da..aa58a6d 100644
+--- a/tmp/ad5445a8-3f76-4a8b-b5fe-205b6208ce59_buggy.java
++++ b/tmp/22e83b90-b031-4a49-b29d-8bcca6189c0f_fixed.java
+@@ -1,11 +1,46 @@
+     /**
+      * Generates a tooltip string to go in an HTML image map.
+      *
+      * @param toolTipText  the tooltip.
+      * 
+      * @return The formatted HTML area tag attribute(s).
+      */
+     public String generateToolTipFragment(String toolTipText) {
+-        return " title=\"" + toolTipText
+-            + "\" alt=\"\"";
++        return " title=\"" + makeTooltipSafe(toolTipText) + "\" alt=\"\"";
++    }
++
++    /**
++     * Transform tooltip strings into a HTML-safe string.
++     * 
++     * @param toolTipText tooltip to transform into HTML-safe string
++     * 
++     * @return transformed tooltip
++     */
++    protected String makeTooltipSafe(String toolTipText) {
++        StringBuilder sb = new StringBuilder();
++        int len = toolTipText.length();
++        for (int i = 0; i < len; i++) {
++            char c = toolTipText.charAt(i);
++            switch (c) {
++            case '<':
++                sb.append("&lt;");
++                break;
++            case '>':
++                sb.append("&gt;");
++                break;
++            case '&':
++                sb.append("&amp;");
++                break;
++            case '"':
++                sb.append("&quot;");
++                break;
++            case '\'':
++                sb.append("&#39;");
++                break;
++            default:
++                sb.append(c);
++                break;
++            }
++        }
++        return sb.toString();
+     }

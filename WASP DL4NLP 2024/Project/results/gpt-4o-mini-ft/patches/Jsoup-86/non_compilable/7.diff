@@ -1,0 +1,21 @@
+diff --git a/tmp/2c6c2c66-3e2c-4853-8ca3-40c69b36b641_buggy.java b/tmp/808b9a29-1b64-4546-8250-06b4f765552d_fixed.java
+index b8e7fdb..210bbe1 100644
+--- a/tmp/2c6c2c66-3e2c-4853-8ca3-40c69b36b641_buggy.java
++++ b/tmp/808b9a29-1b64-4546-8250-06b4f765552d_fixed.java
+@@ -1,15 +1,15 @@
+     /**
+      * Attempt to cast this comment to an XML Declaration note.
+      * @return an XML declaration if it could be parsed as one, null otherwise.
+      */
+     public XmlDeclaration asXmlDeclaration() {
+         String data = getData();
+-        Document doc = Jsoup.parse("<" + data.substring(1, data.length() -1) + ">", baseUri(), Parser.xmlParser());
++        Document doc = Jsoup.parse("<" + data.substring(1, data.length() -1) + ">" + (getSeeked() > 0 ? "<-->":""), baseUri(), Parser.xmlParser());
+         XmlDeclaration decl = null;
+         if (doc.childNodeSize() > 0) {
+             Element el = doc.child(0);
+             decl = new XmlDeclaration(NodeUtils.parser(doc).settings().normalizeTag(el.tagName()), data.startsWith("!"));
+             decl.attributes().addAll(el.attributes());
+         }
+         return decl;
+     }

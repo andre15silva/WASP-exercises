@@ -1,0 +1,57 @@
+diff --git a/tmp/a0eab385-432d-49fc-a047-0ea2666ee1d9_buggy.java b/tmp/898a3642-0f1a-44c5-a720-69fb8965fbe3_fixed.java
+index cc69d41..6e949da 100644
+--- a/tmp/a0eab385-432d-49fc-a047-0ea2666ee1d9_buggy.java
++++ b/tmp/898a3642-0f1a-44c5-a720-69fb8965fbe3_fixed.java
+@@ -1,29 +1,41 @@
+     /**
+      * Create an Option using the current settings and with
+      * the specified Option <code>char</code>.
+      *
+      * @param opt the <code>java.lang.String</code> representation
+      * of the Option
+      * @return the Option instance
+      * @throws IllegalArgumentException if <code>opt</code> is not
+      * a valid character.  See Option.
+      */
+     public static Option create(String opt) throws IllegalArgumentException
+     {
+-            // create the option
+-        Option option = new Option(opt, description);
+-
+-            // set the option properties
+-            option.setLongOpt(longopt);
+-            option.setRequired(required);
+-            option.setOptionalArg(optionalArg);
+-            option.setArgs(numberOfArgs);
+-            option.setType(type);
+-            option.setValueSeparator(valuesep);
+-            option.setArgName(argName);
++        Option option;
++        if (description == null)
++        {
++            option = OptionBuilder.withLongOpt(longopt)
++                                  .withRequired(required)
++                                  .withOptionalArg(optionalArg)
++                                  .withArgs(numberOfArgs)
++                                  .withType(type)
++                                  .withValueSeparator(valuesep)
++                                  .withArgName(argName)
++                                  .create(opt);
++        }
++        else
++        {
++            option = OptionBuilder.withLongOpt(longopt)
++                                  .withDescription(
++                                          description).withRequired(required)
++                                  .withOptionalArg(optionalArg)
++                                  .withArgs(numberOfArgs)
++                                  .withType(type)
++                                  .withValueSeparator(valuesep)
++                                  .withArgName(argName).create(opt);
++        }
+             // reset the OptionBuilder properties
+             OptionBuilder.reset();
+ 
+         // return the Option instance
+         return option;
+     }

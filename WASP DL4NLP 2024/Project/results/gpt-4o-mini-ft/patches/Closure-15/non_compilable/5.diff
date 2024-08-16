@@ -1,0 +1,37 @@
+diff --git a/tmp/d07d8ad4-c40d-4682-85a6-092e006fd3e7_buggy.java b/tmp/0b143604-11ec-4108-b480-5ad47ea7d7e4_fixed.java
+index b56897c..399546e 100644
+--- a/tmp/d07d8ad4-c40d-4682-85a6-092e006fd3e7_buggy.java
++++ b/tmp/0b143604-11ec-4108-b480-5ad47ea7d7e4_fixed.java
+@@ -1,27 +1,31 @@
+       @Override
+       public boolean apply(Node n) {
+         // When the node is null it means, we reached the implicit return
+         // where the function returns (possibly without an return statement)
+         if (n == null) {
+           return false;
+         }
+ 
+         // TODO(user): We only care about calls to functions that
+         // passes one of the dependent variable to a non-side-effect free
+         // function.
+         if (n.isCall() && NodeUtil.functionCallHasSideEffects(n)) {
+           return true;
+         }
+ 
+         if (n.isNew() && NodeUtil.constructorCallHasSideEffects(n)) {
+           return true;
+         }
+ 
+ 
+         for (Node c = n.getFirstChild(); c != null; c = c.getNext()) {
+-          if (!ControlFlowGraph.isEnteringNewCfgNode(c) && apply(c)) {
++          // Don't inline the loop variable of a for loop:
++          // a for loop with a for-in and a call within, can lead
++          // to unexpected behavior.
++          if (!ControlFlowGraph.isEnteringNewCfgNode(c) && (c.isFor() && c.isForIn()) ||
++              apply(c)) {
+             return true;
+           }
+         }
+         return false;
+       }

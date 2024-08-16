@@ -1,0 +1,16 @@
+diff --git a/tmp/464aca6e-195c-4d02-90d1-880190b686f0_buggy.java b/tmp/0d7345fe-a09e-45a5-959f-0a13818d9ec2_fixed.java
+index a37dc7a..96581af 100644
+--- a/tmp/464aca6e-195c-4d02-90d1-880190b686f0_buggy.java
++++ b/tmp/0d7345fe-a09e-45a5-959f-0a13818d9ec2_fixed.java
+@@ -1,10 +1,10 @@
+     protected void addChildren(int index, Node... children) {
+         Validate.noNullElements(children);
+         ensureChildNodes();
+         for (int i = children.length - 1; i >= 0; i--) {
+             Node in = children[i];
+             reparentChild(in);
+             childNodes.add(index, in);
+-        }
+             reindexChildren(index);
+         }
++    }

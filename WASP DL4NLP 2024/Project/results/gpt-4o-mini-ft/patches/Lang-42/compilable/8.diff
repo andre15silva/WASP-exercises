@@ -1,0 +1,50 @@
+diff --git a/tmp/1bb378f0-ee32-44be-ba55-400ca1f19690_buggy.java b/tmp/c122e858-85a0-41f8-a415-876ebdbd53a7_fixed.java
+index 822447c..54be008 100644
+--- a/tmp/1bb378f0-ee32-44be-ba55-400ca1f19690_buggy.java
++++ b/tmp/c122e858-85a0-41f8-a415-876ebdbd53a7_fixed.java
+@@ -1,37 +1,45 @@
+     /**
+      * <p>
+      * Escapes the characters in the <code>String</code> passed and writes the result to the <code>Writer</code>
+      * passed.
+      * </p>
+      * 
+      * @param writer
+      *            The <code>Writer</code> to write the results of the escaping to. Assumed to be a non-null value.
+      * @param str
+      *            The <code>String</code> to escape. Assumed to be a non-null value.
+      * @throws IOException
+      *             when <code>Writer</code> passed throws the exception from calls to the {@link Writer#write(int)}
+      *             methods.
+      * 
+      * @see #escape(String)
+      * @see Writer
+      */
+     public void escape(Writer writer, String str) throws IOException {
+         int len = str.length();
+         for (int i = 0; i < len; i++) {
+             char c = str.charAt(i);
++            if ((c >= 0xD800 && c <= 0xDBFF) && (i + 1 < len) && (str.charAt(i + 1) >= 0xDC00 && str.charAt(i + 1) <= 0xDFFF)) {
++                writer.write("&#" + (((((c & 0x3FF) << 10) | (c & 0x3FF)) + 0x10000) + (c & 0x5000)) + ';');
++                i++;
++            } else {
+                 String entityName = this.entityName(c);
+                 if (entityName == null) {
+                     if (c > 0x7F) {
+                         writer.write("&#");
+                         writer.write(Integer.toString(c, 10));
+                         writer.write(';');
++                    } else if (c == 0x7F || c < 0x20) {
++                        // Do not escape non-printing chars
++                        writer.write(c);
+                     } else {
+                         writer.write(c);
+                     }
+                 } else {
+                     writer.write('&');
+                     writer.write(entityName);
+                     writer.write(';');
+                 }
+             }
+         }
++    }

@@ -1,0 +1,39 @@
+diff --git a/tmp/77c09813-010a-4435-a455-d0c8ffd11816_buggy.java b/tmp/0ac11e33-6e8f-4e96-b070-440d9c8fed46_fixed.java
+index c6b65da..73fd6cc 100644
+--- a/tmp/77c09813-010a-4435-a455-d0c8ffd11816_buggy.java
++++ b/tmp/0ac11e33-6e8f-4e96-b070-440d9c8fed46_fixed.java
+@@ -1,25 +1,32 @@
+     /**
+      * Returns the options with a long name starting with the name specified.
+      * 
+      * @param opt the partial name of the option
+      * @return the options matching the partial name specified, or an empty list if none matches
+      * @since 1.3
+      */
+     public List<String> getMatchingOptions(String opt)
+     {
+         opt = Util.stripLeadingHyphens(opt);
+         
+-        List<String> matchingOpts = new ArrayList<String>();
++        List<String> matchingOpts = new ArrayList<String>(1);
+ 
+         // for a perfect match return the single option only
+ 
++        String exactOpt = (String) longOpts.get(opt);
++        if (exactOpt != null && exactOpt.equals(opt))
++        {
++            matchingOpts.add(exactOpt);
++        }
++
++        // add all the options that are matching
+         for (String longOpt : longOpts.keySet())
+         {
+-            if (longOpt.startsWith(opt))
++            if (longOpt.startsWith(opt) && !isAmbiguous(matchingOpts, longOpt))
+             {
+                 matchingOpts.add(longOpt);
+             }
+         }
+         
+         return matchingOpts;
+     }

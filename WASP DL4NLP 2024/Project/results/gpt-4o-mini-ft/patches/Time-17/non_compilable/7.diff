@@ -1,0 +1,59 @@
+diff --git a/tmp/aa9113b5-0b92-497a-8905-4e413c0a6131_buggy.java b/tmp/9131acb6-2723-4cc8-8c16-59b061a421e1_fixed.java
+index 03b03d7..5b1e69c 100644
+--- a/tmp/aa9113b5-0b92-497a-8905-4e413c0a6131_buggy.java
++++ b/tmp/9131acb6-2723-4cc8-8c16-59b061a421e1_fixed.java
+@@ -1,25 +1,52 @@
+     /**
+      * Adjusts the offset to be the earlier or later one during an overlap.
+      * 
+      * @param instant  the instant to adjust
+      * @param earlierOrLater  false for earlier, true for later
++     * @param strict false to omit standard DateTimeZone rounding
+      * @return the adjusted instant millis
+      */
+-    public long adjustOffset(long instant, boolean earlierOrLater) {
++    public long adjustOffset(long instant, boolean earlierOrLater, boolean strict) {
+         // a bit messy, but will work in all non-pathological cases
+         
+         // evaluate 3 hours before and after to work out if anything is happening
+         long instantBefore = convertUTCToLocal(instant - 3 * DateTimeConstants.MILLIS_PER_HOUR);
+         long instantAfter = convertUTCToLocal(instant + 3 * DateTimeConstants.MILLIS_PER_HOUR);
+         if (instantBefore == instantAfter) {
+             return instant;  // not an overlap (less than is a gap, equal is normal case)
+         }
+         
+         // work out range of instants that have duplicate local times
++        if (strict && (this.getOffset(instant) != this.getOffset(instantBefore))) {
++            return instant;
++        }
++        if (strict && (this.getOffset(instant) != this.getOffset(instantAfter))) {
++            return instant;
++        }
+         long local = convertUTCToLocal(instant);
+-        return convertLocalToUTC(local, false, earlierOrLater ? instantAfter : instantBefore);
++        if (earlierOrLater) {
++            // should never happen
++            if (instantAfter < convertLocalToUTC(local - 1, false, false)) {
++                return convertLocalToUTC(local, false, false);  // earlier offset
++            }
++            if (instantAfter > convertLocalToUTC(local + 1, false, false)) {
++                return convertLocalToUTC(local, true, false);  // later offset
++            }
++            // take later offset
++            return convertLocalToUTC(local, false, true);
++        } else {
++            // if localOffset is not the same as instantes offset
++            if (instantBefore < convertLocalToUTC(local - 1, false, false)) {
++                return convertLocalToUTC(local, false, true);  // later offset
++            }
++            if (instantBefore > convertLocalToUTC(local + 1, false, false)) {
++                return convertLocalToUTC(local, false, false);  // earlier offset
++            }
++            // take earlier offset
++            return convertLocalToUTC(local, false, false);
++        }
+         
+         // calculate result
+           // currently in later offset
+           // currently in earlier offset
+     }

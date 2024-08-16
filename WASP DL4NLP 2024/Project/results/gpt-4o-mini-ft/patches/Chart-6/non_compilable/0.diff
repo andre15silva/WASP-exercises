@@ -1,0 +1,29 @@
+diff --git a/tmp/239b0509-bf35-47ff-9356-b3b6828692a9_buggy.java b/tmp/638d8fdf-0c3f-4ba0-aa4e-0e1193492ecf_fixed.java
+index 351a97a..0d608ee 100644
+--- a/tmp/239b0509-bf35-47ff-9356-b3b6828692a9_buggy.java
++++ b/tmp/638d8fdf-0c3f-4ba0-aa4e-0e1193492ecf_fixed.java
+@@ -1,18 +1,24 @@
+     /**
+      * Tests the list for equality with another object (typically also a list).
+      *
+      * @param obj  the other object (<code>null</code> permitted).
+      *
+      * @return A boolean.
+      */
+     public boolean equals(Object obj) {
+ 
+         if (obj == this) {
+             return true;
+         }
+         if (!(obj instanceof ShapeList)) {
+             return false;
+         }
+         return super.equals(obj);
+ 
+     }
++
++    @Override
++    public int hashCode() {
++    	// in the unlikely event that ShapeList returns a different hashCode than shape…
++    	return super.hashCode();
++    }

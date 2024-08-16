@@ -1,0 +1,28 @@
+diff --git a/tmp/a7e5f425-b6e6-4e06-8f37-f3dab6d7b2d1_buggy.java b/tmp/a77f3903-d211-4850-94cc-85d0fdf8d120_fixed.java
+index dda9103..3c222a2 100644
+--- a/tmp/a7e5f425-b6e6-4e06-8f37-f3dab6d7b2d1_buggy.java
++++ b/tmp/a77f3903-d211-4850-94cc-85d0fdf8d120_fixed.java
+@@ -1,13 +1,20 @@
+     @Override
+     public final void serialize(JsonGenerator gen, SerializerProvider ctxt) throws IOException
+     {
++        String strValue = null;
+         if (_value == null) {
+             ctxt.defaultSerializeNull(gen);
+         } else if (_value instanceof JsonSerializable) {
+             ((JsonSerializable) _value).serialize(gen, ctxt);
++        } else if (_value instanceof ObjectNode) {
++            ObjectNode pojoNode = (ObjectNode) _value;
++            _serializerContainerOk = true;
++            strValue = _treeTraversal.writeLeaf(pojoNode.traverse(ctxt), ctxt);
+         } else {
+-            // 25-May-2018, tatu: [databind#1991] do not call via generator but through context;
+-            //    this to preserve contextual information
+-            gen.writeObject(_value);
++            // TBD: add a better fallback than "toString"?
++            strValue = _value.toString();
+         }
++        gen.writeStartObject();
++        gen.writeStringField(thestring[0], strValue);
++        gen.writeEndObject();
+     }

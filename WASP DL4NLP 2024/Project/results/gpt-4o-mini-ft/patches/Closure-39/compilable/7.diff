@@ -1,0 +1,62 @@
+diff --git a/tmp/cbe367a2-eaaa-4b8e-a839-0ea6f7c39ef2_buggy.java b/tmp/93132921-3951-4135-922c-e430dab6e578_fixed.java
+index e4d90e7..3a6babf 100644
+--- a/tmp/cbe367a2-eaaa-4b8e-a839-0ea6f7c39ef2_buggy.java
++++ b/tmp/93132921-3951-4135-922c-e430dab6e578_fixed.java
+@@ -1,45 +1,46 @@
+   @Override
+   String toStringHelper(boolean forAnnotations) {
+-    if (hasReferenceName()) {
+-      return getReferenceName();
+-    } else if (prettyPrint) {
+-      // Don't pretty print recursively.
+-      prettyPrint = false;
+-
+-      // Use a tree set so that the properties are sorted.
++    RecordType rootRecord =
++        (RecordType) (getImplicitPrototype() == null ? this : getImplicitPrototype());
++    JSType rootType = rootRecord.getImplicitPrototype();
+     Set<String> propertyNames = Sets.newTreeSet();
+-      for (ObjectType current = this;
+-           current != null && !current.isNativeObjectType() &&
+-               propertyNames.size() <= MAX_PRETTY_PRINTED_PROPERTIES;
++    // Use a tree set so that the properties are sorted.
++    for (ObjectType current = rootRecord;
++         current != null && !current.isNativeObjectType();
+          current = current.getImplicitPrototype()) {
+       propertyNames.addAll(current.getOwnPropertyNames());
+     }
+-
+     StringBuilder sb = new StringBuilder();
++    // Display mutually referencial structs as part of their own properties as long
++    // as Annotation prints record values in non-annotated form.
++    if (!rootType.isUnknownType() && !rootType.isFunctionType() &&
++        prettyPrint && forAnnotations) {
++      prettyPrint = false;
++
+       sb.append("{");
+ 
+       int i = 0;
+       for (String property : propertyNames) {
+         if (i > 0) {
+           sb.append(", ");
+         }
+ 
+         sb.append(property);
+         sb.append(": ");
+         sb.append(getPropertyType(property).toString());
+ 
+         ++i;
+         if (i == MAX_PRETTY_PRINTED_PROPERTIES) {
+           sb.append(", ...");
+           break;
+         }
+       }
+ 
+       sb.append("}");
+ 
+       prettyPrint = true;
+       return sb.toString();
+     } else {
+       return "{...}";
+     }
+   }

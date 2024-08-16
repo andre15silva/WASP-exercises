@@ -1,0 +1,15 @@
+diff --git a/tmp/a4f00b57-eafd-48d6-b3ca-fee0fb2009a8_buggy.java b/tmp/29c58f82-b57b-458d-8643-dbd7cc3a33b4_fixed.java
+index f1d02c1..25860af 100644
+--- a/tmp/a4f00b57-eafd-48d6-b3ca-fee0fb2009a8_buggy.java
++++ b/tmp/29c58f82-b57b-458d-8643-dbd7cc3a33b4_fixed.java
+@@ -1,4 +1,10 @@
+         @Override
+         protected JSType caseTopType(JSType topType) {
+           return topType;
+         }
++
++        @Override
++        protected JSType caseNamedType(JSToBeInferredType type) {
++          // The produced type is already narrowed down to the right type as an Array.
++          return type;
++        }

@@ -1,0 +1,38 @@
+diff --git a/tmp/23159e84-90a5-45f8-9c58-067049f1c1a2_buggy.java b/tmp/604566dd-76db-4efe-9882-a9f28a9634c7_fixed.java
+index b56897c..8f71da7 100644
+--- a/tmp/23159e84-90a5-45f8-9c58-067049f1c1a2_buggy.java
++++ b/tmp/604566dd-76db-4efe-9882-a9f28a9634c7_fixed.java
+@@ -1,27 +1,33 @@
+       @Override
+       public boolean apply(Node n) {
+         // When the node is null it means, we reached the implicit return
+         // where the function returns (possibly without an return statement)
+         if (n == null) {
+           return false;
+         }
+ 
+         // TODO(user): We only care about calls to functions that
+         // passes one of the dependent variable to a non-side-effect free
+         // function.
+         if (n.isCall() && NodeUtil.functionCallHasSideEffects(n)) {
+           return true;
+         }
+ 
+         if (n.isNew() && NodeUtil.constructorCallHasSideEffects(n)) {
+           return true;
+         }
+ 
+ 
+         for (Node c = n.getFirstChild(); c != null; c = c.getNext()) {
++          // The simple for-in loops do not require inlining since simple for-in impacted
++          // statements unfold to complex control flow, which may be incorrect if multiple variables are declared.
++          // See discussion: https://bugs.webkit.org/show_bug.cgi?id=81165
++          if (n.isForIn() || n.getType() == Token.WHILE || n.getType() == Token.FOR) {
++             return true;
++          }
+           if (!ControlFlowGraph.isEnteringNewCfgNode(c) && apply(c)) {
+             return true;
+           }
+         }
+         return false;
+       }

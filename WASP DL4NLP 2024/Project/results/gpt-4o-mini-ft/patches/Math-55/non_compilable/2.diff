@@ -1,0 +1,50 @@
+diff --git a/tmp/71475250-a17c-4313-9206-5fe2ae3e2dac_buggy.java b/tmp/8f45dcde-fc58-45c3-a7cc-93786135d6e0_fixed.java
+index 1478ee1..bbb5848 100644
+--- a/tmp/71475250-a17c-4313-9206-5fe2ae3e2dac_buggy.java
++++ b/tmp/8f45dcde-fc58-45c3-a7cc-93786135d6e0_fixed.java
+@@ -1,24 +1,44 @@
+   /** Compute the cross-product of two vectors.
+    * @param v1 first vector
+    * @param v2 second vector
+    * @return the cross product v1 ^ v2 as a new Vector
+    */
+   public static Vector3D crossProduct(final Vector3D v1, final Vector3D v2) {
+ 
+ 
+       // rescale both vectors without losing precision,
+       // to ensure their norm are the same order of magnitude
+ 
+       // we reduce cancellation errors by preconditioning,
+       // we replace v1 by v3 = v1 - rho v2 with rho chosen in order to compute
+       // v3 without loss of precision. See Kahan lecture
+       // "Computing Cross-Products and Rotations in 2- and 3-Dimensional Euclidean Spaces"
+       // available at http://www.cs.berkeley.edu/~wkahan/MathH110/Cross.pdf
+ 
+       // compute rho as an 8 bits approximation of v1.v2 / v2.v2
++      double rho_1 = (v1.dotProduct(v2) / v2.dotProduct(v2));
+ 
++      // find the largest power of two betwwen 1 and Math.scalb(1.0, 10).
++      double scale;
++      if (Math.abs(rho_1) > 0.99) {
++          scale = FastMath.scalb(1.0, 100);
++          BigDecimal big_rho_1 = new BigDecimal(rho_1);
++          BigDecimal big_scale = new BigDecimal(scale);
++          BigDecimal rescale = big_rho_1.multiply(big_scale).divide(big_scale.add(big_rho_1));
++          rho_1 *= rescale.doubleValue();
++      } else {
++          scale = 1;
++      }
++      double new_v1_x = scale * v1.x;
++      double new_v1_y = scale * v1.y;
++      double new_v1_z = scale * v1.z;
++      double new_v2_x = v2.x * scale;
++      double new_v2_y = v2.y * scale;
++      double new_v2_z = v2.z * scale;
+ 
+       // compute cross product from v3 and v2 instead of v1 and v2
+-      return new Vector3D(v1.y * v2.z - v1.z * v2.y, v1.z * v2.x - v1.x * v2.z, v1.x * v2.y - v1.y * v2.x);
++      return new Vector3D(new_v1_y * new_v2_z - new_v1_z * new_v2.y,
++                          new_v1_z * new_v2.x - new_v1_x * new_v2.z,
++                          new_v1_x * new_v2.y - new_v1_y * new_v2.x);
+ 
+   }

@@ -1,0 +1,65 @@
+diff --git a/tmp/2476fa5e-12a3-4126-a585-9722edd10025_buggy.java b/tmp/5c14f9ed-084e-487a-bdc4-4a3a39662ea4_fixed.java
+index d926eea..032bb86 100644
+--- a/tmp/2476fa5e-12a3-4126-a585-9722edd10025_buggy.java
++++ b/tmp/5c14f9ed-084e-487a-bdc4-4a3a39662ea4_fixed.java
+@@ -1,48 +1,56 @@
+     @Override
+     public JsonSerializer<?> createContextual(SerializerProvider serializers,
+             BeanProperty property) throws JsonMappingException
+     {
+         if (property == null) {
+             return this;
+         }
+         JsonFormat.Value format = findFormatOverrides(serializers, property, handledType());
+         if (format == null) {
+             return this;
+         }
+         // Simple case first: serialize as numeric timestamp?
+         JsonFormat.Shape shape = format.getShape();
+         if (shape.isNumeric()) {
+             return withFormat(Boolean.TRUE, null);
+         }
+ 
+         // 08-Jun-2017, tatu: With [databind#1648], this gets bit tricky..
+         // First: custom pattern will override things
+                 if ((shape == JsonFormat.Shape.STRING) || format.hasPattern()
+                                 || format.hasLocale() || format.hasTimeZone()) {
+                     TimeZone tz = format.getTimeZone();
+-                    final String pattern = format.hasPattern()
++                    String patternStr = format.hasPattern()
+                                     ? format.getPattern()
+                                     : StdDateFormat.DATE_FORMAT_STR_ISO8601;
+             final Locale loc = format.hasLocale()
+                             ? format.getLocale()
+                             : serializers.getLocale();
+-                    SimpleDateFormat df = new SimpleDateFormat(pattern, loc);
++                    SimpleDateFormat df = new SimpleDateFormat(patternStr, loc);
+                     if (tz == null) {
+                         tz = serializers.getTimeZone();
+                     }
+             df.setTimeZone(tz);
+             return withFormat(Boolean.FALSE, df);
+         }
+ 
+         // Otherwise, need one of these changes:
+ 
+ 
+         // Jackson's own `StdDateFormat` is quite easy to deal with...
+ 
+         // 08-Jun-2017, tatu: Unfortunately there's no generally usable
+         //    mechanism for changing `DateFormat` instances (or even clone()ing)
+-        //    So: require it be `SimpleDateFormat`; can't config other types
++        //    So: require it to be `SimpleDateFormat`; can't config other types
+ //            serializers.reportBadDefinition(handledType(), String.format(
+-            // Ugh. No way to change `Locale`, create copy; must re-crete completely:
++        // Ugh. No way to change `Locale`, create copy; must re-cret
++		
++		/**
++		 * Fix for: http://jackson.codehaus.org/jira/browse/JACKSON-141
++		 * Cannot `serialize` neither `date` or `date-time` (timestamp) using 'propertyDefault' format
++		 * wasm to puttex = null.
++		 *
++		 * 18/01/04: === Robert -- 'muhicse' ===
++		 */
+         return this;
+     }

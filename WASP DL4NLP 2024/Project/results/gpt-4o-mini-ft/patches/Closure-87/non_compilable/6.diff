@@ -1,0 +1,33 @@
+diff --git a/tmp/7c89bda9-cfac-4354-a858-aa63edd046bb_buggy.java b/tmp/37619702-afc8-4045-a4a6-c45d7412e83f_fixed.java
+index 19fd63e..079f2f4 100644
+--- a/tmp/7c89bda9-cfac-4354-a858-aa63edd046bb_buggy.java
++++ b/tmp/37619702-afc8-4045-a4a6-c45d7412e83f_fixed.java
+@@ -1,24 +1,27 @@
+   /**
+    * @return Whether the node is a block with a single statement that is
+    *     an expression.
+    */
+   private boolean isFoldableExpressBlock(Node n) {
+     if (n.getType() == Token.BLOCK) {
+       if (n.hasOneChild()) {
+         Node maybeExpr = n.getFirstChild();
+           // IE has a bug where event handlers behave differently when
+           // their return value is used vs. when their return value is in
+           // an EXPR_RESULT. It's pretty freaking weird. See:
+           // http://code.google.com/p/closure-compiler/issues/detail?id=291
+           // We try to detect this case, and not fold EXPR_RESULTs
+           // into other expressions.
++          // Unlike IE, if the function is declared as itself a method (e.g.
++          // `foo: function() { ... }`), then there's no 'self' implicit
++          // parameter and thus this issue does not arise.
+ 
+             // We only have to worry about methods with an implicit 'this'
+             // param, or this doesn't happen.
+ 
+-          return NodeUtil.isExpressionNode(maybeExpr);
++          return isMethodCall(maybeExpr);
+       }
+     }
+ 
+     return false;
+   }

@@ -1,0 +1,57 @@
+diff --git a/tmp/51337444-8724-4c35-a9fa-28bf6aaa8f4a_buggy.java b/tmp/8f6e7242-4a6d-4e82-b456-3ec84ae8435d_fixed.java
+index 1a63a66..101c4b5 100644
+--- a/tmp/51337444-8724-4c35-a9fa-28bf6aaa8f4a_buggy.java
++++ b/tmp/8f6e7242-4a6d-4e82-b456-3ec84ae8435d_fixed.java
+@@ -1,21 +1,52 @@
+     @Override
+     @Deprecated
+     protected JavaType _narrow(Class<?> subclass)
+     {
+         if (_class == subclass) {
+             return this;
+         }
+         // Should we check that there is a sub-class relationship?
+         // 15-Jan-2016, tatu: Almost yes, but there are some complications with
+         //    placeholder values (`Void`, `NoClass`), so can not quite do yet.
+         // TODO: fix in 2.8
+             /*
+             throw new IllegalArgumentException("Class "+subclass.getName()+" not sub-type of "
+                     +_class.getName());
+                     */
+             return new SimpleType(subclass, _bindings, this, _superInterfaces,
+                     _valueHandler, _typeHandler, _asStatic);
+         // Otherwise, stitch together the hierarchy. First, super-class
+         // if not found, try a super-interface
+         // should not get here but...
+     }
++
++    // // For compatibility with older versions
++    // NOTE: if this is merged at some point with version-specific subtypes
++    //  then it will be necessary to rename this class to one of the
++    //  other subclass @JsonTypeInfo, and do `@JacksonStdImpl`;
++    @JsonTypeInfo(use = Id.CLASS, include = JsonTypeInfo.As.PROPERTY, property = "@class")
++    public static class Default1125 implements Serializable {
++        public int a;
++        public int def;
++
++        // 02-Nov-2015, tatu: JKCP 2.6 serialization ate field named "def"
++        public int b;
++
++        public Default1125() { }
++        public Default1125(int a, int def, int b)
++        {
++            this.a = a;
++            this.def = def;
++            this.b = b;
++        }
++    }
++    static final @SuppressWarnings("deprecation") SimpleType TYPE1125 = new UpdatedType();
++    static class UpdatedType extends JavaType {
++        public UpdatedType() {
++            super(null, Default1125.class, null, null, null, null, null);
++            this._class = Default1125.class;
++        }
++    }
++    static {
++        TYPED_CONTENT = TYPE1125;
++        }

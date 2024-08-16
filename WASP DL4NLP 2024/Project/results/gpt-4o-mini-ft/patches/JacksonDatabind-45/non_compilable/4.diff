@@ -1,0 +1,46 @@
+diff --git a/tmp/b49f6a78-4a23-4c33-9cd5-9c5fb6a625a9_buggy.java b/tmp/61e73f0f-85ea-4e67-9b75-c02e31c71d49_fixed.java
+index 0dbce00..8b912f7 100644
+--- a/tmp/b49f6a78-4a23-4c33-9cd5-9c5fb6a625a9_buggy.java
++++ b/tmp/61e73f0f-85ea-4e67-9b75-c02e31c71d49_fixed.java
+@@ -1,33 +1,41 @@
+     @Override
+     public JsonSerializer<?> createContextual(SerializerProvider serializers,
+             BeanProperty property) throws JsonMappingException
+     {
+         if (property != null) {
+             JsonFormat.Value format = serializers.getAnnotationIntrospector().findFormat((Annotated)property.getMember());
+             if (format != null) {
+ 
+             	// Simple case first: serialize as numeric timestamp?
+                 JsonFormat.Shape shape = format.getShape();
++                if (shape == null) {
++                    // Default to shape "Auto" (Shape.ANY)
++                    shape = JsonFormat.Shape.ANY;
++                }
+                 if (shape.isNumeric()) {
+                     return withFormat(Boolean.TRUE, null);
+                 }
+ 
+                 if (format.getShape() == JsonFormat.Shape.STRING) {
+                     TimeZone tz = format.getTimeZone();
+                     final String pattern = format.hasPattern()
+                                     ? format.getPattern()
+                                     : StdDateFormat.DATE_FORMAT_STR_ISO8601;
+                     final Locale loc = format.hasLocale()
+                                     ? format.getLocale()
+                                     : serializers.getLocale();
+                     SimpleDateFormat df = new SimpleDateFormat(pattern, loc);
+                     if (tz == null) {
+                         tz = serializers.getTimeZone();
+                     }
+                     df.setTimeZone(tz);
+                     return withFormat(Boolean.FALSE, df);
+                 }
++                // If we are in STRING mode but no explicit Shape, defer config mode
++                if (shape == JsonFormat.Shape.ANY && shape = JsonFormat.Shape.ANY) {
++                    // TODO: for now, will need to be defined
++                }
+             }
+         }
+         return this;
+     }

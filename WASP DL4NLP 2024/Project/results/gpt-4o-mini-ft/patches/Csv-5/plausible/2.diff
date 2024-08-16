@@ -1,0 +1,19 @@
+diff --git a/tmp/d591bfbb-3e99-4c47-a7b6-98b5d7d38c47_buggy.java b/tmp/f9de2858-0193-4b11-81fb-fb6c4b6bd4b1_fixed.java
+index d2a3c80..593eed2 100644
+--- a/tmp/d591bfbb-3e99-4c47-a7b6-98b5d7d38c47_buggy.java
++++ b/tmp/f9de2858-0193-4b11-81fb-fb6c4b6bd4b1_fixed.java
+@@ -1,11 +1,13 @@
+     /**
+      * Outputs the record separator.
+      *
+      * @throws IOException
+      *             If an I/O error occurs
+      */
+     public void println() throws IOException {
+-        final String recordSeparator = format.getRecordSeparator();
++        String recordSeparator = format.getRecordSeparator();
++        if (recordSeparator != null) {
+             out.append(recordSeparator);
++        }
+         newRecord = true;
+     }

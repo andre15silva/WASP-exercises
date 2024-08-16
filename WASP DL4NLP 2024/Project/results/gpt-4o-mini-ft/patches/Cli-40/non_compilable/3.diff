@@ -1,0 +1,69 @@
+diff --git a/tmp/8ea1d7e5-1b4d-497f-8cd0-fd9cb06e6886_buggy.java b/tmp/64ebb50c-75d1-4f90-9cc2-95d0b95e2fce_fixed.java
+index a7d0787..9663578 100644
+--- a/tmp/8ea1d7e5-1b4d-497f-8cd0-fd9cb06e6886_buggy.java
++++ b/tmp/64ebb50c-75d1-4f90-9cc2-95d0b95e2fce_fixed.java
+@@ -1,54 +1,53 @@
+     /**
+      * Returns the <code>Object</code> of type <code>clazz</code>
+      * with the value of <code>str</code>.
+      *
+      * @param str the command line value
+      * @param clazz the type of argument
+      * @return The instance of <code>clazz</code> initialised with
+      * the value of <code>str</code>.
+      * @throws ParseException if the value creation for the given class failed
+      */
+-    @SuppressWarnings("unchecked") // returned value will have type T because it is fixed by clazz
+-    public static <T> T createValue(final String str, final Class<T> clazz) throws ParseException
++    public static Object createValue(final String str, final Class clazz) throws ParseException
+     {
+         if (PatternOptionBuilder.STRING_VALUE == clazz)
+         {
+-            return (T) str;
++            return str;
+         }
+         else if (PatternOptionBuilder.OBJECT_VALUE == clazz)
+         {
+-            return (T) createObject(str);
++            return createObject(str);
+         }
+         else if (PatternOptionBuilder.NUMBER_VALUE == clazz)
+         {
+-            return (T) createNumber(str);
++            return createNumber(str);
+         }
+         else if (PatternOptionBuilder.DATE_VALUE == clazz)
+         {
+-            return (T) createDate(str);
++            return createDate(str);
+         }
+         else if (PatternOptionBuilder.CLASS_VALUE == clazz)
+         {
+-            return (T) createClass(str);
++            return createClass(str);
+         }
+         else if (PatternOptionBuilder.FILE_VALUE == clazz)
+         {
+-            return (T) createFile(str);
++            return createFile(str);
+         }
+         else if (PatternOptionBuilder.EXISTING_FILE_VALUE == clazz)
+         {
+-            return (T) openFile(str);
++            return openFile(str);
+         }
+         else if (PatternOptionBuilder.FILES_VALUE == clazz)
+         {
+-            return (T) createFiles(str);
++            return createFiles(str);
+         }
+         else if (PatternOptionBuilder.URL_VALUE == clazz)
+         {
+-            return (T) createURL(str);
++            return createURL(str);
+         }
+         else
+         {
+             return null;
+         }
+     }

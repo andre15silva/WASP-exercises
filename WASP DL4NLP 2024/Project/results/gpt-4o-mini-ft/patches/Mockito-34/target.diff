@@ -1,0 +1,15 @@
+diff --git a/tmp/e72b6a1b-6f3c-49c7-9619-3c1e0ec30ded_buggy.java b/tmp/dc8115a4-6bfe-4219-8683-7699948a24ee_fixed.java
+index d68a69c..b41a6c3 100644
+--- a/tmp/e72b6a1b-6f3c-49c7-9619-3c1e0ec30ded_buggy.java
++++ b/tmp/dc8115a4-6bfe-4219-8683-7699948a24ee_fixed.java
+@@ -1,9 +1,9 @@
+     public void captureArgumentsFrom(Invocation i) {
+         int k = 0;
+         for (Matcher m : matchers) {
+-            if (m instanceof CapturesArguments) {
++            if (m instanceof CapturesArguments && i.getArguments().length > k) {
+                 ((CapturesArguments) m).captureFrom(i.getArguments()[k]);
+             }
+             k++;
+         }
+     }

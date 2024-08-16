@@ -1,0 +1,24 @@
+diff --git a/tmp/55ab15e9-4707-45e8-8d3d-41e43bf3cfd1_buggy.java b/tmp/8bfe9daf-b2e8-4b3b-ad5c-df5176aee5c7_fixed.java
+index 51430e1..8f2aff5 100644
+--- a/tmp/55ab15e9-4707-45e8-8d3d-41e43bf3cfd1_buggy.java
++++ b/tmp/8bfe9daf-b2e8-4b3b-ad5c-df5176aee5c7_fixed.java
+@@ -1,12 +1,19 @@
+     @Override
+     public void serialize(Object value, JsonGenerator jgen, SerializerProvider provider) throws IOException {
+         String str;
+         
++        // 18-Nov-2008, tzuriz: Fix for Serialization of Class Object
++        // [JACKSON-131]: serializing Class objects yields 'class java.lang.String'
++        // instead of simple 'java.lang.String'
+         if (value instanceof Date) {
+             provider.defaultSerializeDateKey((Date) value, jgen);
+             return;
++        } else if (value instanceof Class<?>) {
++            Class<?> cls = (Class<?>) value;
++            jgen.writeFieldName(cls.getName());
++            return;
+         } else {
+             str = value.toString();
+         }
+         jgen.writeFieldName(str);
+     }

@@ -1,0 +1,25 @@
+diff --git a/tmp/41588c73-e469-4d49-a13e-e9686ac2cfd9_buggy.java b/tmp/54b374c8-ad96-4ffe-874c-f48b8c08ce6f_fixed.java
+index b86b44d..8e326bc 100644
+--- a/tmp/41588c73-e469-4d49-a13e-e9686ac2cfd9_buggy.java
++++ b/tmp/54b374c8-ad96-4ffe-874c-f48b8c08ce6f_fixed.java
+@@ -1,4 +1,20 @@
+     public final Object computeValue(EvalContext context) {
+         return compute(args[0].computeValue(context), args[1].computeValue(context))
+                 ? Boolean.TRUE : Boolean.FALSE;
+     }
++
++    /*
++     * Unary strategy for comparing empty nodesets the order of tests
++     * matters! Example:  
++     * a:   context-root = foo			// I'll return empty sequence
++     * a[1]: context-root[1] = foo		// I'll return Boolean.FALSE no
++     * matter what.  Unless you affix branches!
++     * a[2]: context-root = foo[not(node())]  // I'll return false no 
++     *   matter what nested format you might say.
++     * a[3]: context-root = foo[1] = foo[not(node())] 
++     *	update this test!
++     *!
++     */
++    protected static Object internals(EvalContext context) {
++        return context.getValue().stringValue(false);
++    }

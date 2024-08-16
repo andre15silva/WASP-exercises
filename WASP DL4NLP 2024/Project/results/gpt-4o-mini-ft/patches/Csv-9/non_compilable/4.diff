@@ -1,0 +1,35 @@
+diff --git a/tmp/743f3747-8f3e-4094-aa86-d74c6a700b70_buggy.java b/tmp/607ba23a-8494-458b-8f90-39729e3c47b4_fixed.java
+index 826e9ae..18b57a7 100644
+--- a/tmp/743f3747-8f3e-4094-aa86-d74c6a700b70_buggy.java
++++ b/tmp/607ba23a-8494-458b-8f90-39729e3c47b4_fixed.java
+@@ -1,15 +1,29 @@
++    /**
++     * Returns this record as a Map. If there is no header previously read, the map is empty.
++     *
++     * @return a Map representation of this record.
++     */
++    @Override
++    public Map<String, String> toMap() {
++        final Map<String, String> map = new HashMap<>();
++        if (header != null) {
++            putIn(map);
++        }
++        return map;
++    }
++
+     /**
+      * Puts all values of this record into the given Map.
+      *
+      * @param map The Map to populate.
+      * @return the given map.
+      */
+-    <M extends Map<String, String>> M putIn(final M map) {
++    private <M extends Map<String, String>> M putIn(final M map) {
+         for (final Entry<String, Integer> entry : mapping.entrySet()) {
+             final int col = entry.getValue().intValue();
+             if (col < values.length) {
+                 map.put(entry.getKey(), values[col]);
+             }
+         }
+         return map;
+     }

@@ -1,0 +1,31 @@
+diff --git a/tmp/a1291904-896d-4546-83b8-20541c68a803_buggy.java b/tmp/4c91f5b7-f124-4b48-bf4b-9743dd9417c2_fixed.java
+index 192e83d..5deebc5 100644
+--- a/tmp/a1291904-896d-4546-83b8-20541c68a803_buggy.java
++++ b/tmp/4c91f5b7-f124-4b48-bf4b-9743dd9417c2_fixed.java
+@@ -1,21 +1,26 @@
+     /**
+      * Return whether or not this entry represents a directory.
+      *
+      * @return True if this entry is a directory.
+      */
+     @Override
+     public boolean isDirectory() {
+         if (file != null) {
+             return file.isDirectory();
+         }
+ 
++        // Check if it was marked with paxHeader as directory flag...
++        if (isPaxHeader) {
++            return true;
++        }
++
+         if (linkFlag == LF_DIR) {
+             return true;
+         }
+ 
+         if (getName().endsWith("/")) {
+             return true;
+         }
+ 
+         return false;
+     }

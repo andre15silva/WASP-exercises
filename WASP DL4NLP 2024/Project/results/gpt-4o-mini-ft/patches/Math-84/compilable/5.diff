@@ -1,0 +1,61 @@
+diff --git a/tmp/9737d633-3757-4bb2-8be5-58724ebaed02_buggy.java b/tmp/931c91b2-2bb1-4d26-8287-6846b14213f2_fixed.java
+index 5f1dcf2..91d07ca 100644
+--- a/tmp/9737d633-3757-4bb2-8be5-58724ebaed02_buggy.java
++++ b/tmp/931c91b2-2bb1-4d26-8287-6846b14213f2_fixed.java
+@@ -1,41 +1,56 @@
+     /** {@inheritDoc} */
+     @Override
+     protected void iterateSimplex(final Comparator<RealPointValuePair> comparator)
+         throws FunctionEvaluationException, OptimizationException, IllegalArgumentException {
+ 
+         while (true) {
+ 
+             incrementIterationsCounter();
+ 
+             // save the original vertex
+             final RealPointValuePair[] original = simplex;
+             final RealPointValuePair best = original[0];
+ 
+             // perform a reflection step
+             final RealPointValuePair reflected = evaluateNewSimplex(original, 1.0, comparator);
+             if (comparator.compare(reflected, best) < 0) {
+ 
+                 // compute the expanded simplex
+                 final RealPointValuePair[] reflectedSimplex = simplex;
+                 final RealPointValuePair expanded = evaluateNewSimplex(original, khi, comparator);
+                 if (comparator.compare(reflected, expanded) <= 0) {
+                     // accept the reflected simplex
+                     simplex = reflectedSimplex;
+                 }
+ 
+                 return;
+ 
+             }
+ 
+             // compute the contracted simplex
+             final RealPointValuePair contracted = evaluateNewSimplex(original, gamma, comparator);
+             if (comparator.compare(contracted, best) < 0) {
+                 // accept the contracted simplex
+ 
+             // check convergence
+                 return;
+             }
+ 
++            // if i don't check for the value of best
++            // before returning from simplex
++            // i will end up in a nasty case like:
++            //      best = 0.0001
++            //      simplex = 0
++            // and fail the final phase by never getting
++            // close enough to zero. so i check for it
++            // specifically and return a best guess right away
++            // unless contracted goes wrong. the simplex
++            // should at least support that case.
++            if (comparator.compare(contracted, best) <= 0) {
++                simplex = original;
++                return;
++            }
++
+         }
+ 
+     }

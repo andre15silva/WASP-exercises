@@ -1,0 +1,30 @@
+diff --git a/tmp/d671fa06-6387-4c8a-bb75-13fe0693d3d4_buggy.java b/tmp/2fd2f50b-e0de-42e5-b8b5-735fbaeac7bb_fixed.java
+index b8e7fdb..1efc10d 100644
+--- a/tmp/d671fa06-6387-4c8a-bb75-13fe0693d3d4_buggy.java
++++ b/tmp/2fd2f50b-e0de-42e5-b8b5-735fbaeac7bb_fixed.java
+@@ -1,15 +1,25 @@
+     /**
+      * Attempt to cast this comment to an XML Declaration note.
+      * @return an XML declaration if it could be parsed as one, null otherwise.
+      */
+     public XmlDeclaration asXmlDeclaration() {
+         String data = getData();
+         Document doc = Jsoup.parse("<" + data.substring(1, data.length() -1) + ">", baseUri(), Parser.xmlParser());
+         XmlDeclaration decl = null;
+         if (doc.childNodeSize() > 0) {
+             Element el = doc.child(0);
+             decl = new XmlDeclaration(NodeUtils.parser(doc).settings().normalizeTag(el.tagName()), data.startsWith("!"));
+             decl.attributes().addAll(el.attributes());
+         }
++        else {
++            // convert for script, can see <!@CDATA?>
++            doc = Jsoup.parse("<" + Jsoup.clean(data, "", Whitelist.none(), Parser.xmlParser(), StringUtil.notEmpty()) + ">", baseUri(), Parser.xmlParser());
++        }
++        // in case there's a false NULL
++        if (doc.childNodeSize() > 0) {
++            Element el = doc.child(0);
++            decl = new XmlDeclaration(NodeUtils.parser(doc).settings().normalizeTag(el.tagName()), data.startsWith("!"));
++            decl.attributes().addAll(el.attributes());
++        }
+         return decl;
+     }

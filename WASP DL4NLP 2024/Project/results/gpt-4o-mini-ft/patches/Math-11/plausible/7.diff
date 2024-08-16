@@ -1,0 +1,17 @@
+diff --git a/tmp/fd6f0c40-079c-4f5a-82c0-9b720b063d80_buggy.java b/tmp/22139c69-41e0-4af1-b8ab-074cb7fb08d2_fixed.java
+index 51a0115..b677e91 100644
+--- a/tmp/fd6f0c40-079c-4f5a-82c0-9b720b063d80_buggy.java
++++ b/tmp/22139c69-41e0-4af1-b8ab-074cb7fb08d2_fixed.java
+@@ -1,11 +1,11 @@
+     /** {@inheritDoc} */
+     public double density(final double[] vals) throws DimensionMismatchException {
+         final int dim = getDimension();
+         if (vals.length != dim) {
+             throw new DimensionMismatchException(vals.length, dim);
+         }
+ 
+-        return FastMath.pow(2 * FastMath.PI, -dim / 2) *
++        return FastMath.pow(2 * FastMath.PI, -dim / 2.0) *
+             FastMath.pow(covarianceMatrixDeterminant, -0.5) *
+             getExponentTerm(vals);
+     }

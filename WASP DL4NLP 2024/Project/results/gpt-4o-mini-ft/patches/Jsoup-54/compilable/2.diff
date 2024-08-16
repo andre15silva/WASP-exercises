@@ -1,0 +1,18 @@
+diff --git a/tmp/9c29e288-2cbe-4a7c-a53d-2633e395c7e1_buggy.java b/tmp/74c72683-d3d4-4078-be9f-d654ab5b2e79_fixed.java
+index d5b3da9..eeac2c1 100644
+--- a/tmp/9c29e288-2cbe-4a7c-a53d-2633e395c7e1_buggy.java
++++ b/tmp/74c72683-d3d4-4078-be9f-d654ab5b2e79_fixed.java
+@@ -1,7 +1,12 @@
+         private void copyAttributes(org.jsoup.nodes.Node source, Element el) {
+             for (Attribute attribute : source.attributes()) {
+                 // valid xml attribute names are: ^[a-zA-Z_:][-a-zA-Z0-9_:.]
+-                String key = attribute.getKey().replaceAll("[^-a-zA-Z0-9_:.]", "");
++                // work around for:
++                //   http://www.w3.org/2008/08/w3c-dom/issues-w3c-dom-core/errata.html
++                //   https://bugs.webkit.org/show_bug.cgi?id=25478
++                //   https://github.com/jhy/jsoup/issues/1270
++                //   https://github.com/w3c/jigsaw/issues/133
++                String key = attribute.getKey().replaceAll("[^-a-zA-Z0-9_:.\"']", "");
+                     el.setAttribute(key, attribute.getValue());
+             }
+         }
