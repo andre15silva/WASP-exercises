@@ -8,7 +8,7 @@ from transformers import AutoTokenizer
 tokenizer = AutoTokenizer.from_pretrained("meta-llama/CodeLlama-7b-Instruct-hf")
 tokenizer.pad_token = tokenizer.eos_token
 
-def format_texts(examples, begin_inst="[INST]", end_inst="[\INST]"):
+def format_texts(examples, begin_inst="[INST]", end_inst="[\\INST]"):
     output_texts = []
     for i in range(len(examples['prompt'])):
         text = f"<s>{begin_inst} {examples['prompt'][i]} {end_inst} {examples['answer'][i]}</s>"
@@ -28,7 +28,7 @@ print(f"Validation dataset size: {len(tokenized_dataset['test'])}")
 
 from trl import DataCollatorForCompletionOnlyLM
 
-response_template_with_context = "[\INST]"
+response_template_with_context = "[\\INST]"
 response_template_ids = tokenizer.encode(response_template_with_context, add_special_tokens=False)
 
 collator = DataCollatorForCompletionOnlyLM(response_template_ids, tokenizer=tokenizer)
@@ -40,6 +40,8 @@ from accelerate import PartialState
 
 import torch
 
+# FIXME: to enable more than 1 sample per batch, the extra padding token must be set in the model and the embedding layer resized
+# the current workaround simply adds a new pad_token so that the eos_token is not ignored during training, since the models needs to learn when to stop
 device_string = PartialState().process_index
 model = AutoModelForCausalLM.from_pretrained("meta-llama/CodeLlama-7b-Instruct-hf",
                                              torch_dtype=torch.bfloat16,
