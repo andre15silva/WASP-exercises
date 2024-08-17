@@ -6,7 +6,8 @@ dataset = dataset.train_test_split(test_size=0.02)
 from transformers import AutoTokenizer
 
 tokenizer = AutoTokenizer.from_pretrained("meta-llama/CodeLlama-7b-Instruct-hf")
-tokenizer.pad_token = tokenizer.eos_token
+tokenizer.add_special_tokens({"pad_token":"<pad>"})
+tokenizer.padding_side = 'right'
 
 def format_texts(examples, begin_inst="[INST]", end_inst="[\\INST]"):
     output_texts = []
@@ -46,6 +47,7 @@ device_string = PartialState().process_index
 model = AutoModelForCausalLM.from_pretrained("meta-llama/CodeLlama-7b-Instruct-hf",
                                              torch_dtype=torch.bfloat16,
                                              device_map={'':device_string})
+model.config.pad_token_id = tokenizer.pad_token_id
 
 peft_config = LoraConfig(
     r=8,
