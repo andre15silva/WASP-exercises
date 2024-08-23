@@ -1,0 +1,33 @@
+diff --git a/tmp/0505794e-d48a-4e69-8801-13d793964928_buggy.java b/tmp/5eb6c50c-2029-4328-b138-ca4ca4580ed2_fixed.java
+index cce9d1e..a9783fb 100644
+--- a/tmp/0505794e-d48a-4e69-8801-13d793964928_buggy.java
++++ b/tmp/5eb6c50c-2029-4328-b138-ca4ca4580ed2_fixed.java
+@@ -1,14 +1,17 @@
+-    /**
+-     * <p>Stop the stopwatch.</p>
+-     * 
+-     * <p>This method ends a new timing session, allowing the time to be retrieved.</p>
+-     *
+-     * @throws IllegalStateException if the StopWatch is not running.
+-     */
+-    public void stop() {
+-        if(this.runningState != STATE_RUNNING && this.runningState != STATE_SUSPENDED) {
++diff
++--- a/org/apache/commons/lang3/time/StopWatch.java
+++++ b/org/apache/commons/lang3/time/StopWatch.java
++@@ -91,8 +91,8 @@
++        } catch (IllegalStateException ex) {
+             throw new IllegalStateException("Stopwatch is not running. ");
+         }
+-            stopTime = System.currentTimeMillis();
++-        stopTime = System.currentTimeMillis();
+++        stopTime = System.nanoTime();
+         this.runningState = STATE_STOPPED;
+     }
++-
+++
++    /**
++     * <p>
++     * Determines if the <code>StopWatch</code> is currently running.
++     *
+\ No newline at end of file

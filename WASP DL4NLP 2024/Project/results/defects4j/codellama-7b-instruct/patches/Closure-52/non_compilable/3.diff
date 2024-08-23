@@ -1,0 +1,18 @@
+diff --git a/tmp/35dc0ec1-af55-45d1-bc74-c192b5e35d32_buggy.java b/tmp/407b4267-6053-4b04-aad9-f941b9dd984d_fixed.java
+index 4b7f469..3c4dfde 100644
+--- a/tmp/35dc0ec1-af55-45d1-bc74-c192b5e35d32_buggy.java
++++ b/tmp/407b4267-6053-4b04-aad9-f941b9dd984d_fixed.java
+@@ -1,10 +1,3 @@
+-  static boolean isSimpleNumber(String s) {
+-    int len = s.length();
+-    for (int index = 0; index < len; index++) {
+-      char c = s.charAt(index);
+-      if (c < '0' || c > '9') {
+-        return false;
+-      }
+-    }
+-    return len > 0;
++static boolean isNumericKey(String key) {
++    return key.matches("\\d+");
+ }
+\ No newline at end of file

@@ -1,0 +1,30 @@
+diff --git a/tmp/16ae09f5-feda-4d2d-ad28-b501bee23dcb_buggy.java b/tmp/afcf4061-c812-4068-9ce9-9d8d0b634297_fixed.java
+index e69de29..d78c448 100644
+--- a/tmp/16ae09f5-feda-4d2d-ad28-b501bee23dcb_buggy.java
++++ b/tmp/afcf4061-c812-4068-9ce9-9d8d0b634297_fixed.java
+@@ -0,0 +1,24 @@
++import java.util.HashMap;
++import java.util.List;
++import java.util.Map;
++
++public class MultiValueMap {
++    private Map<String, List<String>> map = new HashMap<>();
++
++    public static MultiValueMap multiValueMap(Map<String, String> map, Class<?> clazz) {
++        MultiValueMap result = new MultiValueMap();
++        for (Map.Entry<String, String> entry : map.entrySet()) {
++            result.map.put(entry.getKey(), entry.getValue());
++        }
++        return result;
++    }
++
++    public static void main(String[] args) {
++        Map<String, String> map = new HashMap<>();
++        map.put("key1", "value1");
++        map.put("key2", "value2");
++        MultiValueMap multiValueMap = multiValueMap(map, MultiValueMap.class);
++        System.out.println(multiValueMap.get("key1"));
++        System.out.println(multiValueMap.get("key2"));
++    }
++}
+\ No newline at end of file

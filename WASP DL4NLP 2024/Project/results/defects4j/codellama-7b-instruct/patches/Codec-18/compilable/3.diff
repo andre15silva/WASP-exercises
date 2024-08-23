@@ -1,0 +1,68 @@
+diff --git a/tmp/83655b89-202b-4e0b-a5a3-db1ea9d65da2_buggy.java b/tmp/625799e3-7625-4508-80b2-c59b45a49997_fixed.java
+index ae1bc64..b1dce43 100644
+--- a/tmp/83655b89-202b-4e0b-a5a3-db1ea9d65da2_buggy.java
++++ b/tmp/625799e3-7625-4508-80b2-c59b45a49997_fixed.java
+@@ -1,42 +1,55 @@
+     /**
+      * <p>
+      * Compares two CharSequences, returning <code>true</code> if they represent equal sequences of characters.
+      * </p>
+      *
+      * <p>
+      * <code>null</code>s are handled without exceptions. Two <code>null</code> references are considered to be equal.
+      * The comparison is case sensitive.
+      * </p>
+      *
+      * <pre>
+      * StringUtils.equals(null, null)   = true
+      * StringUtils.equals(null, "abc")  = false
+      * StringUtils.equals("abc", null)  = false
+      * StringUtils.equals("abc", "abc") = true
+      * StringUtils.equals("abc", "ABC") = false
+      * </pre>
+      *
+      * <p>
+      * Copied from Apache Commons Lang r1583482 on April 10, 2014 (day of 3.3.2 release).
+      * </p>
+      *
+      * @see Object#equals(Object)
+-     * @param cs1
++     * @param firstString
+      *            the first CharSequence, may be <code>null</code>
+-     * @param cs2
++     * @param secondString
+      *            the second CharSequence, may be <code>null</code>
+      * @return <code>true</code> if the CharSequences are equal (case-sensitive), or both <code>null</code>
+      * @since 1.10
+      */
+-    public static boolean equals(final CharSequence cs1, final CharSequence cs2) {
+-        if (cs1 == cs2) {
++    public static boolean equals(final CharSequence firstString, final CharSequence secondString) {
++        if (firstString == secondString) {
+             return true;
+         }
+-        if (cs1 == null || cs2 == null) {
++        if (firstString == null || secondString == null) {
+             return false;
+         }
+-        if (cs1 instanceof String && cs2 instanceof String) {
+-            return cs1.equals(cs2);
++        if (firstString instanceof String && secondString instanceof String) {
++            return firstString.equals(secondString);
+         }
+-        return CharSequenceUtils.regionMatches(cs1, false, 0, cs2, 0, Math.max(cs1.length(), cs2.length()));
++        return isSubstringOf(secondString, firstString.length());
++    }
++
++    private static boolean isSubstringOf(final CharSequence charSequence, final int endIndex) {
++        return isSubstringOf(charSequence, 0, endIndex);
++    }
++
++    private static boolean isSubstringOf(final CharSequence charSequence, int startIndex, final int endIndex) {
++        for (int i = startIndex; i <= endIndex; i++) {
++            if (charSequence.charAt(i) == charSequence.charAt(endIndex)) {
++                return true;
++            }
++        }
++        return false;
+     }

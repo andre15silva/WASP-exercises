@@ -1,0 +1,13 @@
+diff --git a/tmp/8d3bd46c-6ebe-4e5c-9a99-9d7c9c618e2d_buggy.java b/tmp/8fc36f54-9f2f-4db9-ba10-b19ae5ccdedb_fixed.java
+index 10da689..40a3930 100644
+--- a/tmp/8d3bd46c-6ebe-4e5c-9a99-9d7c9c618e2d_buggy.java
++++ b/tmp/8fc36f54-9f2f-4db9-ba10-b19ae5ccdedb_fixed.java
+@@ -1,7 +1,8 @@
+     /** Multiply this by a single digit x.
+      * @param x multiplicand
+      * @return product of this and x
+      */
+     public Dfp multiply(final int x)  {
++        // TODO: is multiplyFast the best option?  What about round in multiply?
+             return multiplyFast(x);
+     }

@@ -1,0 +1,41 @@
+diff --git a/tmp/f3c524c0-157d-4fa8-a424-8b2116d9c9d9_buggy.java b/tmp/94846e57-10fe-4c47-901a-7a63f5aa453b_fixed.java
+index eb0a5c8..d160a5f 100644
+--- a/tmp/f3c524c0-157d-4fa8-a424-8b2116d9c9d9_buggy.java
++++ b/tmp/94846e57-10fe-4c47-901a-7a63f5aa453b_fixed.java
+@@ -1,27 +1,33 @@
+   public static Try<Done> registerCallContext(
+       final ActorRef<CallContextProviderMessage> callContextProvider,
+       final String callContext,
+       final AriCommand ariCommand) {
+ 
+-    if (!ariCommand.extractCommandType().isCreationCommand()) {
+-      return Try.success(Done.done());
++    // 1. Add an if statement to check if the commandType is DELETE.
++    if (ariCommand.extractCommandType().equals("DELETE")) {
++      return Try.success();
+     }
+ 
++    // 2. Replace the return Try.success(Done.done()); with Try.success();.
++    return Try.success();
++
++    if (ariCommand.extractCommandType().isCreationCommand()) {
++      // 3. Remove the if statement for the RegisterCallContext message.
+       final Option<AriResource> maybeResource =
+           ariCommand
+               .extractResourceRelations()
+               .find(AriResourceRelation::isCreated)
+               .map(AriResourceRelation::getResource);
+ 
+       if (maybeResource.isEmpty()) {
+         return Try.failure(
+             new RuntimeException(
+                 String.format(
+                     "Failed to extract resourceId from command '%s'", ariCommand.toString())));
+       }
+ 
+       final AriResource resource = maybeResource.get();
+ 
+       callContextProvider.tell(new RegisterCallContext(resource.getId(), callContext));
+-    return Try.success(Done.done());
++    }
+   }

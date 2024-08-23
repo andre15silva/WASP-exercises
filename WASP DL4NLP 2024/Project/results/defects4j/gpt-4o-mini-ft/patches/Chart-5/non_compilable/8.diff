@@ -1,0 +1,59 @@
+diff --git a/tmp/d6bdcc37-78d0-4c66-bcd6-466471dab6b6_buggy.java b/tmp/973dc04a-4079-4c79-9ec6-86bd0a2fd723_fixed.java
+index fd8eae5..8971929 100644
+--- a/tmp/d6bdcc37-78d0-4c66-bcd6-466471dab6b6_buggy.java
++++ b/tmp/973dc04a-4079-4c79-9ec6-86bd0a2fd723_fixed.java
+@@ -1,47 +1,49 @@
+     /**
+      * Adds or updates an item in the series and sends a
+      * {@link SeriesChangeEvent} to all registered listeners.
+      *
+-     * @param x  the x-value (<code>null</code> not permitted).
+-     * @param y  the y-value (<code>null</code> permitted).
++     * @param x  the x-value (null not permitted).
++     * @param y  the y-value (null permitted).
+      *
+      * @return A copy of the overwritten data item, or <code>null</code> if no
+      *         item was overwritten.
+      */
+     public XYDataItem addOrUpdate(Number x, Number y) {
+         if (x == null) {
+             throw new IllegalArgumentException("Null 'x' argument.");
+         }
+ 
+         // if we get to here, we know that duplicate X values are not permitted
+         XYDataItem overwritten = null;
+         int index = indexOf(x);
+         if (index >= 0 && !this.allowDuplicateXValues) {
+             XYDataItem existing = (XYDataItem) this.data.get(index);
+             try {
+                 overwritten = (XYDataItem) existing.clone();
+             }
+             catch (CloneNotSupportedException e) {
+-                throw new SeriesException("Couldn't clone XYDataItem!");
++                throw new SeriesException("Couldn't clone XYDataItem!", e);
+             }
+             existing.setY(y);
+         }
+         else {
+             // if the series is sorted, the negative index is a result from
+             // Collections.binarySearch() and tells us where to insert the
+             // new item...otherwise it will be just -1 and we should just
+             // append the value to the list...
++            XYDataItem newItem = new XYDataItem(x, y);
+             if (this.autoSort) {
+-                this.data.add(-index - 1, new XYDataItem(x, y));
++                int insertionIndex = -index - 1;
++                this.data.add(insertionIndex, newItem);
+             }
+             else {
+-                this.data.add(new XYDataItem(x, y));
++                this.data.add(newItem);
+             }
+             // check if this addition will exceed the maximum item count...
+             if (getItemCount() > this.maximumItemCount) {
+                 this.data.remove(0);
+             }
+         }
+         fireSeriesChanged();
+         return overwritten;
+     }

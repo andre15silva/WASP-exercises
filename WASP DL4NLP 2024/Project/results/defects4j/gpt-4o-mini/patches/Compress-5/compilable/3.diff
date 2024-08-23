@@ -1,0 +1,70 @@
+diff --git a/tmp/aeee3d9c-56d5-49a1-a3cb-4f5088cd70b9_buggy.java b/tmp/b36b2711-f439-4fb2-a9bf-0b6be44bd4e9_fixed.java
+index d907b39..32cf2e7 100644
+--- a/tmp/aeee3d9c-56d5-49a1-a3cb-4f5088cd70b9_buggy.java
++++ b/tmp/b36b2711-f439-4fb2-a9bf-0b6be44bd4e9_fixed.java
+@@ -1,56 +1,57 @@
+ public int read(byte[] buffer, int start, int length) throws IOException {
+     if (closed) {
+         throw new IOException("The stream is closed");
+     }
+     if (inf.finished() || current == null) {
+         return -1;
+     }
+ 
+     // avoid int overflow, check null buffer
+-        if (start <= buffer.length && length >= 0 && start >= 0
+-            && buffer.length - start >= length) {
++    if (start < 0 || length < 0 || start + length > buffer.length) {
++        throw new ArrayIndexOutOfBoundsException();
++    }
++
+     if (current.getMethod() == ZipArchiveOutputStream.STORED) {
+         int csize = (int) current.getSize();
+         if (readBytesOfEntry >= csize) {
+             return -1;
+         }
+         if (offsetInBuffer >= lengthOfLastRead) {
+             offsetInBuffer = 0;
+             if ((lengthOfLastRead = in.read(buf)) == -1) {
+                 return -1;
+             }
+             count(lengthOfLastRead);
+             bytesReadFromStream += lengthOfLastRead;
+         }
+-                int toRead = length > lengthOfLastRead
+-                    ? lengthOfLastRead - offsetInBuffer
+-                    : length;
++        int toRead = Math.min(length, lengthOfLastRead - offsetInBuffer);
+         if ((csize - readBytesOfEntry) < toRead) {
+             toRead = csize - readBytesOfEntry;
+         }
+         System.arraycopy(buf, offsetInBuffer, buffer, start, toRead);
+         offsetInBuffer += toRead;
+         readBytesOfEntry += toRead;
+         crc.update(buffer, start, toRead);
+         return toRead;
+     }
+     if (inf.needsInput()) {
+         fill();
+         if (lengthOfLastRead > 0) {
+             bytesReadFromStream += lengthOfLastRead;
+         }
+     }
+     int read = 0;
+     try {
+         read = inf.inflate(buffer, start, length);
+     } catch (DataFormatException e) {
+         throw new ZipException(e.getMessage());
+     }
+     if (read == 0 && inf.finished()) {
+         return -1;
+     }
++    if (read == 0 && !inf.needsInput() && !inf.finished()) {
++        throw new IOException("Truncated ZIP file");
++    }
+     crc.update(buffer, start, read);
+     return read;
+ }
+\ No newline at end of file
+-        throw new ArrayIndexOutOfBoundsException();
+-    }

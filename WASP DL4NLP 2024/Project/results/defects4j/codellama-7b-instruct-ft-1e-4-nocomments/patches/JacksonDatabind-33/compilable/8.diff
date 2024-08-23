@@ -1,0 +1,35 @@
+diff --git a/tmp/2bb64b19-2ec2-4188-8c3b-e20cde9d486b_buggy.java b/tmp/6851e78c-cdba-4fe0-b82e-59b514a8a5d7_fixed.java
+index 3cb9232..781aa5f 100644
+--- a/tmp/2bb64b19-2ec2-4188-8c3b-e20cde9d486b_buggy.java
++++ b/tmp/6851e78c-cdba-4fe0-b82e-59b514a8a5d7_fixed.java
+@@ -1,26 +1,24 @@
+     @Override
+     public PropertyName findNameForSerialization(Annotated a)
+     {
+         String name = null;
+-
+         JsonGetter jg = _findAnnotation(a, JsonGetter.class);
+         if (jg != null) {
+             name = jg.value();
+         } else {
+             JsonProperty pann = _findAnnotation(a, JsonProperty.class);
+             if (pann != null) {
+                 name = pann.value();
+-                /* 22-Apr-2014, tatu: Should figure out a better way to do this, but
+-                 *   it's actually bit tricky to do it more efficiently (meta-annotations
+-                 *   add more lookups; AnnotationMap costs etc)
+-                 */
+             } else if (_hasAnnotation(a, JsonSerialize.class)
+                     || _hasAnnotation(a, JsonView.class)
+                     || _hasAnnotation(a, JsonRawValue.class)) {
+                 name = "";
+             } else {
+                 return null;
+             }
+         }
++        if (name != null && name.length() > 0) {
+             return PropertyName.construct(name);
+         }
++        return PropertyName.USE_DEFAULT;
++    }
+\ No newline at end of file

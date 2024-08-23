@@ -1,0 +1,10 @@
+diff --git a/tmp/4bd9c0c9-eeaf-4a7a-8cc7-75eb19d84b45_buggy.java b/tmp/1f21fbdc-8a3c-47b5-a150-46f2f17fccb1_fixed.java
+index f1d02c1..623df26 100644
+--- a/tmp/4bd9c0c9-eeaf-4a7a-8cc7-75eb19d84b45_buggy.java
++++ b/tmp/1f21fbdc-8a3c-47b5-a150-46f2f17fccb1_fixed.java
+@@ -1,4 +1,4 @@
+         @Override
+-        protected JSType caseTopType(JSType topType) {
++        public JSType caseTopType(JSType topType) {
+           return topType;
+         }

@@ -1,0 +1,39 @@
+diff --git a/tmp/334fe1b8-a733-4568-90e7-76079149f148_buggy.java b/tmp/6107acc2-c569-4db6-a097-71c0ed5dcd0d_fixed.java
+index d6a560a..6d5d7e1 100644
+--- a/tmp/334fe1b8-a733-4568-90e7-76079149f148_buggy.java
++++ b/tmp/6107acc2-c569-4db6-a097-71c0ed5dcd0d_fixed.java
+@@ -1,33 +1,23 @@
+-  /**
+-   * Resolve the referenced type within the enclosing scope.
+-   */
+   @Override
+   JSType resolveInternal(ErrorReporter t, StaticScope<JSType> enclosing) {
+-    // TODO(user): Investigate whether it is really necessary to keep two
+-    // different mechanisms for resolving named types, and if so, which order
+-    // makes more sense. Now, resolution via registry is first in order to
+-    // avoid triggering the warnings built into the resolution via properties.
+     boolean resolved = resolveViaRegistry(t, enclosing);
+     if (detectImplicitPrototypeCycle()) {
+       handleTypeCycle(t);
+     }
+-
+     if (resolved) {
+       super.resolveInternal(t, enclosing);
+       finishPropertyContinuations();
+       return registry.isLastGeneration() ?
+           getReferencedType() : this;
+     }
+-
+     resolveViaProperties(t, enclosing);
+     if (detectImplicitPrototypeCycle()) {
+       handleTypeCycle(t);
+     }
+-
+     super.resolveInternal(t, enclosing);
+     if (isResolved()) {
+       finishPropertyContinuations();
+     }
+     return registry.isLastGeneration() ?
+         getReferencedType() : this;
+   }
+\ No newline at end of file

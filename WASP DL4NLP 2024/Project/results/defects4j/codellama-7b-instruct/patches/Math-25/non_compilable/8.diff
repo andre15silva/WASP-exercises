@@ -1,0 +1,125 @@
+diff --git a/tmp/bce225c1-d77b-48e9-b7d9-2894d86b9931_buggy.java b/tmp/d6e8afa9-0af5-4627-8d69-da171c043934_fixed.java
+index 940af3f..4200b65 100644
+--- a/tmp/bce225c1-d77b-48e9-b7d9-2894d86b9931_buggy.java
++++ b/tmp/d6e8afa9-0af5-4627-8d69-da171c043934_fixed.java
+@@ -1,82 +1,56 @@
+-        /**
+-         * Estimate a first guess of the amplitude and angular frequency.
+-         * This method assumes that the {@link #sortObservations()} method
+-         * has been called previously.
+-         *
+-         * @throws ZeroException if the abscissa range is zero.
+-         * @throws MathIllegalStateException when the guessing procedure cannot
+-         * produce sensible results.
+-         */
+ private void guessAOmega() {
+-            // initialize the sums for the linear model between the two integrals
++    // Sort the observations by x-coordinate.
++    final LinkedList<WeightedObservedPoint> sortedObservations
++        = new LinkedList<>(Arrays.asList(observations));
++    sortedObservations.sort(new ObservationComparator());
++
++    // Iterate over the series of observations and compute the integrals.
+     double sx2 = 0;
+     double sy2 = 0;
+     double sxy = 0;
+-            double sxz = 0;
+-            double syz = 0;
+-
+-            double currentX = observations[0].getX();
+-            double currentY = observations[0].getY();
+     double f2Integral = 0;
+-            double fPrime2Integral = 0;
+-            final double startX = currentX;
+-            for (int i = 1; i < observations.length; ++i) {
+-                // one step forward
+-                final double previousX = currentX;
+-                final double previousY = currentY;
+-                currentX = observations[i].getX();
+-                currentY = observations[i].getY();
+-
+-                // update the integrals of f<sup>2</sup> and f'<sup>2</sup>
+-                // considering a linear model for f (and therefore constant f')
+-                final double dx = currentX - previousX;
+-                final double dy = currentY - previousY;
+-                final double f2StepIntegral =
+-                    dx * (previousY * previousY + previousY * currentY + currentY * currentY) / 3;
+-                final double fPrime2StepIntegral = dy * dy / dx;
++    for (int i = 1; i < sortedObservations.size(); ++i) {
++        final WeightedObservedPoint current = sortedObservations.get(i);
++        final WeightedObservedPoint previous = sortedObservations.get(i - 1);
++        final double dx = current.getX() - previous.getX();
++        final double dy = current.getY() - previous.getY();
++        final double fx = current.getY();
++        final double fPrimex = (fx - previous.getY()) / dx;
++        final double f2 = fx * fx;
++        sx2 += dx * dx;
++        sy2 += f2 * dx * dx;
++        sxy += dx * f2;
++        f2Integral += f2 * dx;
++    }
+ 
+-                final double x = currentX - startX;
+-                f2Integral += f2StepIntegral;
+-                fPrime2Integral += fPrime2StepIntegral;
++    // Compute the amplitude and pulsation coefficients.
++    final double c1 = sy2 * sxz - sxy * syz;
++    final double c2 = sxy * sxz - sx2 * syz;
++    final double c3 = sx2 * sy2 - sxy * sxy;
+ 
+-                sx2 += x * x;
+-                sy2 += f2Integral * f2Integral;
+-                sxy += x * f2Integral;
+-                sxz += x * fPrime2Integral;
+-                syz += f2Integral * fPrime2Integral;
++    if (c1 / c2 < 0 || c2 / c3 < 0) {
++        throw new MathIllegalStateException();
+     }
+ 
+-            // compute the amplitude and pulsation coefficients
+-            double c1 = sy2 * sxz - sxy * syz;
+-            double c2 = sxy * sxz - sx2 * syz;
+-            double c3 = sx2 * sy2 - sxy * sxy;
+-            if ((c1 / c2 < 0) || (c2 / c3 < 0)) {
+-                final int last = observations.length - 1;
+-                // Range of the observations, assuming that the
+-                // observations are sorted.
+-                final double xRange = observations[last].getX() - observations[0].getX();
++    // Ensure that the initial conditions are satisfied.
++    final WeightedObservedPoint first = sortedObservations.get(0);
++    final WeightedObservedPoint last = sortedObservations.get(sortedObservations.size() - 1);
++    final double xRange = last.getX() - first.getX();
+     if (xRange == 0) {
+-                    throw new ZeroException();
++        throw new MathIllegalStateException();
+     }
+-                omega = 2 * Math.PI / xRange;
+-
+-                double yMin = Double.POSITIVE_INFINITY;
+-                double yMax = Double.NEGATIVE_INFINITY;
+-                for (int i = 1; i < observations.length; ++i) {
+-                    final double y = observations[i].getY();
++    final double yMin = Double.POSITIVE_INFINITY;
++    final double yMax = Double.NEGATIVE_INFINITY;
++    for (int i = 1; i < sortedObservations.size(); ++i) {
++        final WeightedObservedPoint point = sortedObservations.get(i);
++        final double y = point.getY();
+         if (y < yMin) {
+             yMin = y;
+         }
+         if (y > yMax) {
+             yMax = y;
+         }
+     }
+-                a = 0.5 * (yMax - yMin);
+-            } else {
+-                    // In some ill-conditioned cases (cf. MATH-844), the guesser
+-                    // procedure cannot produce sensible results.
+-
+-                a = FastMath.sqrt(c1 / c2);
+-                omega = FastMath.sqrt(c2 / c3);
+-            }
++    final double a = 0.5 * (yMax - yMin);
++    omega = 2 * Math.PI / xRange;
+ }
+\ No newline at end of file

@@ -1,0 +1,26 @@
+diff --git a/tmp/6a3ecc2a-6c57-4c90-9cba-845c5be686e2_buggy.java b/tmp/6a48a382-5f1e-4361-aefe-815a7d972a44_fixed.java
+index 08a41cf..0a19d76 100644
+--- a/tmp/6a3ecc2a-6c57-4c90-9cba-845c5be686e2_buggy.java
++++ b/tmp/6a48a382-5f1e-4361-aefe-815a7d972a44_fixed.java
+@@ -1,12 +1,18 @@
+     /**
+      * Overloaded version of {@link #readValue(InputStream)}.
+      */
+     public <T> MappingIterator<T> readValues(byte[] src, int offset, int length)
+         throws IOException, JsonProcessingException
+     {
+-        if (_dataFormatReaders != null) {
++        // NOTE: to preserve original behavior, check TF_READER_NULL instead of TF_READER_MISSING first
++        if (_dataFormatReaders != null
++            && _dataFormatReaders.findFormat(src, offset, length) != null)
++        {
+             return _detectBindAndReadValues(_dataFormatReaders.findFormat(src, offset, length), false);
+         }
+-        return _bindAndReadValues(_considerFilter(_parserFactory.createParser(src),
+-                true));
++        JsonParser jp = _parserFactory.createParser(src);
++        MappingIterator<T> it = _bindAndReadValues(_considerFilter(jp, true));
++        it._valueToUpdate = valueToUpdate;
++        it._readFeatureFlags = _readFeatureFlags;
++        return it;
+     }

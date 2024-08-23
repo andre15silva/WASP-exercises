@@ -1,0 +1,27 @@
+diff --git a/tmp/031e095e-110c-4e61-9edb-daf96a578bf6_buggy.java b/tmp/a6bb516e-7d94-4b79-8535-c960670e5600_fixed.java
+index dcc36a4..5be7d1b 100644
+--- a/tmp/031e095e-110c-4e61-9edb-daf96a578bf6_buggy.java
++++ b/tmp/a6bb516e-7d94-4b79-8535-c960670e5600_fixed.java
+@@ -1,12 +1,11 @@
+-    protected void replaceChild(Node out, Node in) {
+-        Validate.isTrue(out.parentNode == this);
+-        Validate.notNull(in);
+-        if (in.parentNode != null)
+-            in.parentNode.removeChild(in);
++    @Test void replaceWithSelf() {
++        // https://github.com/jhy/jsoup/issues/1843
++        Document doc = Jsoup.parse("<p>One<p>Two");
++        Elements ps = doc.select("p");
++        Element first = ps.first();
+ 
+-        final int index = out.siblingIndex;
+-        ensureChildNodes().set(index, in);
+-        in.parentNode = this;
+-        in.setSiblingIndex(index);
+-        out.parentNode = null;
++        assertNotNull(first);
++        first.replaceWith(first);
++        assertEquals(ps.get(1), first.nextSibling());
++        assertEquals("<p>One</p>\n<p>Two</p>", first.parent().html());
+     }
+\ No newline at end of file

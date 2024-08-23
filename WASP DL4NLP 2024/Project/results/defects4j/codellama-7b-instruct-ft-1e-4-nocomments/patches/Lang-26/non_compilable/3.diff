@@ -1,0 +1,23 @@
+diff --git a/tmp/88d86448-5448-4a42-8e37-d94f35417f46_buggy.java b/tmp/0589b0fb-b894-44c0-9cbd-9e507a2064b1_fixed.java
+index d56e399..7bc3e8c 100644
+--- a/tmp/88d86448-5448-4a42-8e37-d94f35417f46_buggy.java
++++ b/tmp/0589b0fb-b894-44c0-9cbd-9e507a2064b1_fixed.java
+@@ -1,11 +1,17 @@
+     /**
+      * <p>Formats a <code>Date</code> object.</p>
+      * 
+      * @param date  the date to format
+      * @return the formatted string
+      */
+     public String format(Date date) {
++        if(mUseIsoFormat){
++            StringBuilder buf = new StringBuilder(mMaxLengthEstimate);
++            SimpleDateFormat df = getIsoTimeInstance();
++            df.format(date, buf, mTimeZone);
++            return buf.toString();
++        }
+         Calendar c = new GregorianCalendar(mTimeZone);
+         c.setTime(date);
+         return applyRules(c, new StringBuffer(mMaxLengthEstimate)).toString();
+     }
+\ No newline at end of file

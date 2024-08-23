@@ -1,0 +1,46 @@
+diff --git a/tmp/1e9f37e1-ae05-49c0-b1a8-964c9689b454_buggy.java b/tmp/c42ff8c7-1832-4c04-a13e-aafe84b2e0da_fixed.java
+index 9c25814..5c7ab75 100644
+--- a/tmp/1e9f37e1-ae05-49c0-b1a8-964c9689b454_buggy.java
++++ b/tmp/c42ff8c7-1832-4c04-a13e-aafe84b2e0da_fixed.java
+@@ -1,27 +1,18 @@
+-    /**
+-     * <p>Throws a {@link MissingOptionException} if all of the
+-     * required options are no present.</p>
+-     *
+-     * @throws MissingOptionException if any of the required Options
+-     * are not present.
+-     */
+-    private void checkRequiredOptions()
+-        throws MissingOptionException
+-    {
++private void checkRequiredOptions() throws MissingOptionException {
+     // if there are required options that have not been
+-        // processsed
+-        if (requiredOptions.size() > 0)
+-        {
+-            Iterator iter = requiredOptions.iterator();
+-            StringBuffer buff = new StringBuffer();
+-
+-
+-            // loop through the required options
+-            while (iter.hasNext())
+-            {
+-                buff.append(iter.next());
++    // processed
++    if (requiredOptions.size() > 0) {
++        // create a list of missing options
++        List<String> missingOptions = new ArrayList<String>();
++        for (String requiredOption : requiredOptions) {
++            if (processedOptions.containsKey(requiredOption)) {
++                missingOptions.add(requiredOption);
++            }
+         }
+ 
+-            throw new MissingOptionException(buff.toString());
++        // throw a MissingOptionException if there are missing options
++        if (missingOptions.size() > 0) {
++            throw new MissingOptionException(String.join(", ", missingOptions));
++        }
+     }
+ }
+\ No newline at end of file

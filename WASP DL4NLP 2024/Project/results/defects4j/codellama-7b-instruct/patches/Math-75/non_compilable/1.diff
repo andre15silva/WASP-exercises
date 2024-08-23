@@ -1,0 +1,51 @@
+diff --git a/tmp/1e54aee9-1652-4f6a-81fa-4da0bf6b40bd_buggy.java b/tmp/0c741a95-20d4-422c-b6b3-4e7c624723d9_fixed.java
+index 877a1a1..882811d 100644
+--- a/tmp/1e54aee9-1652-4f6a-81fa-4da0bf6b40bd_buggy.java
++++ b/tmp/0c741a95-20d4-422c-b6b3-4e7c624723d9_fixed.java
+@@ -1,14 +1,43 @@
+     /**
+       * Returns the percentage of values that are equal to v
+      * (as a proportion between 0 and 1).
+      * <p>
+      * Returns <code>Double.NaN</code> if no values have been added.</p>
+      *
+      * @param v the value to lookup
+      * @return the proportion of values equal to v
+-     * @deprecated replaced by {@link #getPct(Comparable)} as of 2.0
++     * @deprecated replaced by {@link #getPct(Object)} as of 2.0
+      */
+     @Deprecated
+-    public double getPct(Object v) {
+-        return getCumPct((Comparable<?>) v);
++    public double getPct(Comparable<?> v) {
++        return getCumPct(v);
++    }
++
++    /**
++      * Returns the percentage of values that are equal to v
++     * (as a proportion between 0 and 1).
++     * <p>
++     * Returns <code>Double.NaN</code> if no values have been added.</p>
++     *
++     * @param v the value to lookup
++     * @return the proportion of values equal to v
++     * @since 2.0
++     */
++    public double getCumPct(Object v) {
++        if (values.isEmpty()) {
++            return Double.NaN;
++        }
++
++        int count = 0;
++        for (Object value : values) {
++            if (value.equals(v)) {
++                count++;
++            }
++        }
++
++        if (count == 0) {
++            return Double.NaN;
++        }
++
++        return (double) count / (double) values.size();
+     }

@@ -1,0 +1,62 @@
+diff --git a/tmp/82ff2acc-dc9c-4215-b67f-9fc3dd37ef98_buggy.java b/tmp/73a7db08-ecc6-448b-b5f3-70f862537082_fixed.java
+index a7549f0..959d110 100644
+--- a/tmp/82ff2acc-dc9c-4215-b67f-9fc3dd37ef98_buggy.java
++++ b/tmp/73a7db08-ecc6-448b-b5f3-70f862537082_fixed.java
+@@ -1,50 +1,53 @@
+     /**
+      * Sets the values of Options using the values in <code>properties</code>.
+      *
+      * @param properties The value properties to be processed.
+      */
+     protected void processProperties(Properties properties)
+     {
+         if (properties == null)
+         {
+             return;
+         }
+ 
+         for (Enumeration e = properties.propertyNames(); e.hasMoreElements();)
+         {
+             String option = e.nextElement().toString();
+ 
+             if (!cmd.hasOption(option))
+             {
+                 Option opt = getOptions().getOption(option);
++                String value;
+ 
+                 // get the value from the properties instance
+-                String value = properties.getProperty(option);
++                value = properties.getProperty(option);
+ 
+                 if (opt.hasArg())
+                 {
+                     if (opt.getValues() == null || opt.getValues().length == 0)
+                     {
+                         try
+                         {
+                             opt.addValueForProcessing(value);
+                         }
+                         catch (RuntimeException exp)
+                         {
+                             // if we cannot add the value don't worry about it
+                         }
+                     }
+                 }
+-                else if (!("yes".equalsIgnoreCase(value)
+-                        || "true".equalsIgnoreCase(value)
+-                        || "1".equalsIgnoreCase(value)))
++                else if ( (opt.getOpt().equals("a") || opt.getOpt().equals("c") || opt.getOpt().equals("e")) && 
++                		!(("yes".equalsIgnoreCase(value) && "true".equalsIgnoreCase(value)) ||
++						("true".equalsIgnoreCase(value) ||
++						( !value.equals("0") && !value.equals("") && value.length() > 1 ) ) || 
++						("1".equalsIgnoreCase(value))))
+                 {
+                     // if the value is not yes, true or 1 then don't add the
+                     // option to the CommandLine
+                     break;
+                 }
+ 
+                 cmd.addOption(opt);
+             }
+         }
+     }

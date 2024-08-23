@@ -1,0 +1,192 @@
+diff --git a/tmp/b4ba74bb-3950-480c-8abf-a884f4b74c55_buggy.java b/tmp/82b66fc0-8ea8-40fc-aebc-1cd96ee74590_fixed.java
+index be9c8a3..ad2a373 100644
+--- a/tmp/b4ba74bb-3950-480c-8abf-a884f4b74c55_buggy.java
++++ b/tmp/82b66fc0-8ea8-40fc-aebc-1cd96ee74590_fixed.java
+@@ -1,94 +1,184 @@
+     /**
+      * Counts the number of direct (full) references to an object.
+      * Specifically we check for references of the following type:
+      * <pre>
+      *   x;
+      *   x.fn();
+      * </pre>
+      */
+     private boolean isInlinableObject(List<Reference> refs) {
+       boolean ret = false;
+       for (Reference ref : refs) {
+         Node name = ref.getNode();
+         Node parent = ref.getParent();
+         Node gramps = ref.getGrandparent();
+ 
+         // Ignore indirect references, like x.y (except x.y(), since
+         // the function referenced by y might reference 'this').
+         //
+         if (parent.isGetProp()) {
+           Preconditions.checkState(parent.getFirstChild() == name);
+           // A call target maybe using the object as a 'this' value.
+           if (gramps.isCall()
+               && gramps.getFirstChild() == parent) {
++            // We're assigning an array literal to a property that is a
++            // function. IE does something unexpected here, if the
++            // property is an array and we're accessing an element of it.
+             return false;
+           }
+ 
+           // NOTE(nicksantos): This pass's object-splitting algorithm has
+           // a blind spot. It assumes that if a property isn't defined on an
+           // object, then the value is undefined. This is not true, because
+           // Object.prototype can have arbitrary properties on it.
+           //
+           // We short-circuit this problem by bailing out if we see a reference
+-          // to a property that isn't defined on the object literal. This
+-          // isn't a perfect algorithm, but it should catch most cases.
++          // to a property that isn't defined on the object literal.
++          Node jsdocAstNode = null;
++          jsdocAstNode = ref.getJsDocAstNode();
++
++          if (jsdocAstNode != null && jsdocAstNode.isLateBound()) {
++            // This is an element that does not have a JSDoc comment. If it
++            // is defined on a late-bound object, do nothing special.
+             continue;
+           }
+ 
++          if (jsdocAstNode != null && jsdocAstNode.isLateBound()
++              && jsdocAstNode.getObjectType() != null) {
++            // If the LATE_BOUND_OBJECT_KEY is defined on an ObjectLiteral
++            // Node, and either it is late-bound or we think it is
++            // late-bound (via JsDoc), then we need to make sure to
++            // use ES5's object literal semantics. This is so the
++            // property won't be ignored during a later pass such as
++            // PeepholeFoldsConstants.
++            if (jsdocAstNode.getObjectType().isStructuralInterface()) {
++              // In this case, we just want to use structural-type-checking
++              // semantics.  If the key is defined on an interface in ES5,
++              // then we don't want to inline the object literal into a
++              // constant, e.g., "var x = { a : 1 }";
++              // var x = { a : 2 };"
++              return false;
++            } else {
++              // Otherwise, it is defined on a class. We need to inline
++              // into constants, e.g., "var x = { a : 1 }";
++              // var x = { a : 2 }";
++            }
++          }
++
++          // NOTE(cduvall): There are several scenarios where we want to avoid
++          // inlining this object literal that are related to the use of the
++          // result of this assignment in a FOR-IN loop. Consider the following
++          // examples:
++          //
++          // 1) A variable "object" is assigned to an object literal with no
++          //    side effect.
++          // var object = {b: 'a'};
++          // for (var p in object) {
++          //   alert(object.b);
++          // }
++          //
++          //  this should be inlined as
++          // var object = {a:1, b:'a'};
++          // for (var p in object) {
++          //   alert(object.b);
++          // }
++          //
++          // 2) A variable "object" is assigned to an object literal with a
++          //    side effect.
++          // var object = {};
++          // for (var p in object) {
++          //   alert(object.b);
++          // }
++          //
++          //   ...etc: The for loop uses the results of the assignment to the
++          //   object literal, because the loop depends on the side effects
++          //   of the assignment.
++          //
++          // This pass is intended only to capture object literals in which
++          // no reordering will occur, e.g., {foo: 1, bar: 2}
++          // If an object literal is assigned to the left hand side of a
++          // FOR-IN loop, it will be inlined by PeepholeFoldsConstants.
++
++          // There are three options to deal with this:
++          //   1) If the current pass does NOT create side effects, then the FOR-IN
++          //      pass shouldn't inline for INITIALIZING.
++          //   2) If the current pass DOES create side effects, and reordering will
++          //      occur, then the FOR-IN pass should inline. This requires knowing
++          //      if the inlineable-object pass creates side effects.
++          //   3) If the FOR-IN pass is INITIALIZING inlineable-object objects,
++          //      those two should always be inlined.
++          //
++          // There isn't a particular way to detect if an object literal
++          // will produce side effects. Because this pass has changed the
++          // side effect status of statements during a previous pass,
++          // the compiler may reorder them. Therefore, we need to know if
++          // there are any changes to side effects (by calling
++          // NodeTraversal.traversePostOrder) between this pass and the
++          // FOR-IN pass. Because of this, we only inline for-in INITIALIZING
++          // inlineable-object assignments.
++          boolean inForIn = ref.getScope().isForInInitializing();
++          forINMode_ = inForIn;
++
++          if(!inForIn) {
++            // If the inlineable-object pass creates no side effects,
++            // then the FOR-IN pass can inline it.
++            continue;
++          }
++        }
++
+         // Only rewrite VAR declarations or simple assignment statements
+         if (!isVarOrAssignExprLhs(name)) {
+            return false;
+         }
+ 
+         Node val = ref.getAssignedValue();
+         if (val == null) {
+           // A var with no assignment.
+           continue;
+         }
+ 
+         // We're looking for object literal assignments only.
+         if (!val.isObjectLit()) {
+           return false;
+         }
+ 
+         // Make sure that the value is not self-refential. IOW,
+         // disallow things like x = {b: x.a}.
+         //
+         // TODO: Only exclude unorderable self-referential
+         // assignments. i.e. x = {a: x.b, b: x.a} is not orderable,
+         // but x = {a: 1, b: x.a} is.
+         //
+         // Also, ES5 getters/setters aren't handled by this pass.
+         for (Node child = val.getFirstChild(); child != null;
+              child = child.getNext()) {
+           if (child.isGetterDef() ||
+               child.isSetterDef()) {
+             // ES5 get/set not supported.
+             return false;
+           }
+ 
+-
+           Node childVal = child.getFirstChild();
+           // Check if childVal is the parent of any of the passed in
+           // references, as that is how self-referential assignments
+           // will happen.
+           for (Reference t : refs) {
+             Node refNode = t.getParent();
+             while (!NodeUtil.isStatementBlock(refNode)) {
+               if (refNode == childVal) {
+                 // There's a self-referential assignment
+                 return false;
+               }
+               refNode = refNode.getParent();
+             }
+           }
+         }
+ 
+ 
+         // We have found an acceptable object literal assignment. As
+         // long as there are no other assignments that mess things up,
+         // we can inline.
+         ret = true;
+       }
+       return ret;
+     }

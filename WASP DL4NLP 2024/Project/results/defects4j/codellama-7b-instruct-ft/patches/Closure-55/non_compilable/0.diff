@@ -1,0 +1,9 @@
+diff --git a/tmp/a1945946-a8bb-480c-bb4e-75f34d42d8af_buggy.java b/tmp/e52791cf-1d40-49c7-93c8-ae9c58f0e19a_fixed.java
+index 43937f5..f8039d7 100644
+--- a/tmp/a1945946-a8bb-480c-bb4e-75f34d42d8af_buggy.java
++++ b/tmp/e52791cf-1d40-49c7-93c8-ae9c58f0e19a_fixed.java
+@@ -1,3 +1,3 @@
+   private static boolean isReduceableFunctionExpression(Node n) {
+-    return NodeUtil.isFunctionExpression(n);
++    return n.isCall() && n.getSecondChild().isNumber() && NodeUtil.isConstructor(n.getFirstChild());
+   }

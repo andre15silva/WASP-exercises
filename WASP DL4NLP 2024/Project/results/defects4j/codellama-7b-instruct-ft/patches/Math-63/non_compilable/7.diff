@@ -1,0 +1,44 @@
+diff --git a/tmp/d5af4288-f98e-482d-b818-70f07ee42669_buggy.java b/tmp/aa4849da-c063-4e3b-9d53-13937d617cbf_fixed.java
+index 9033e1c..4068f82 100644
+--- a/tmp/d5af4288-f98e-482d-b818-70f07ee42669_buggy.java
++++ b/tmp/aa4849da-c063-4e3b-9d53-13937d617cbf_fixed.java
+@@ -1,11 +1,34 @@
+     /**
+      * Returns true iff they are equal as defined by
+-     * {@link #equals(double,double,int) equals(x, y, 1)}.
++     * {@link #equals(double,double,int) equals(x, y, 1)}.  If
++     * either vector is null, null must be one of the arguments.  Note:
++     * uses {@code ==} comparisons on Double objects, which are only
++     * defined for references to objects that are statically or
++     * dynamically allocated at the same run time. That is, {@code 1.0}
++     * and {@code 1.0} are not considered to be equal even if they
++     * are allocated at the same time.
+      *
+-     * @param x first value
+-     * @param y second value
++     * @param  x the first vector
++     * @param  y the other vector
+      * @return {@code true} if the values are equal.
++     * @deprecated To be removed in release 3.0.  Use {@link #equalsIncludingNaN(double)},
++     *             {@link #equalsIncludingNaN(float)}, {@link #equalsIncludingNaN(byte)},
++     *             {@link #equalsExactIncludingNaN(byte)}, {@link #equalsIncludingNaN(short)},
++     *             {@link #equalsExactIncludingNaN(short)}, {@link #equalsExactIncludingNaN(char)},
++     *             {@link #equalsIncludingNaN(long)}, and {@link #equalsExactIncludingNaN(long)}
++     *             instead.
+      */
+-    public static boolean equals(double x, double y) {
+-        return (Double.isNaN(x) && Double.isNaN(y)) || x == y;
++    public static boolean equals(double[] x, double[] y) {
++        if (x == null || y == null) {
++            return x == y;
++        }
++        if (x.length != y.length) {
++            return false;
++        }
++        for (int i = 0, max = x.length; i < max; i++) {
++            if (equals(x[i], y[i]) == false) {
++                return false;
++            }
++        }
++        return true;
+     }

@@ -1,0 +1,35 @@
+diff --git a/tmp/9527cb01-eff6-476b-a55b-fd80c83ee960_buggy.java b/tmp/5f59ffc7-e39a-460e-8739-ec2d5fab3393_fixed.java
+index abd3198..128a808 100644
+--- a/tmp/9527cb01-eff6-476b-a55b-fd80c83ee960_buggy.java
++++ b/tmp/5f59ffc7-e39a-460e-8739-ec2d5fab3393_fixed.java
+@@ -1,28 +1,30 @@
+     @Override
+     protected Object encodeCommand(Command command) {
+ 
+         ByteBuf content = Unpooled.buffer();
+ 
+         switch (command.getType()) {
+             case Command.TYPE_POSITION_SINGLE:
+                 return encodeContent(command.getDeviceId(), GatorProtocolDecoder.MSG_POSITION_REQUEST, content);
+             case Command.TYPE_ENGINE_STOP:
+                 return encodeContent(command.getDeviceId(), GatorProtocolDecoder.MSG_CLOSE_THE_OIL_DUCT, content);
+             case Command.TYPE_ENGINE_RESUME:
+                 return encodeContent(command.getDeviceId(), GatorProtocolDecoder.MSG_RESTORES_THE_OIL_DUCT, content);
+             case Command.TYPE_SET_SPEED_LIMIT:
+                 content.writeByte(command.getInteger(Command.KEY_DATA));
+                 return encodeContent(command.getDeviceId(), GatorProtocolDecoder.MSG_SET_SPEED_LIMIT, content);
+             case Command.TYPE_SET_ODOMETER:
+                 content.writeShort(command.getInteger(Command.KEY_DATA));
+                 return encodeContent(command.getDeviceId(), GatorProtocolDecoder.MSG_SET_ODOMETER, content);
+             case Command.TYPE_POSITION_PERIODIC:
+                 String[] data = command.getString(Command.KEY_FREQUENCY).split(";");
+                 content.writeShort(Integer.valueOf(data[0]));
+                 content.writeShort(Integer.valueOf(data[1]));
+                 content.writeShort(Integer.valueOf(data[2]));
++                content.writeBytes(
++                        getUniqueId(command.getDeviceId()).getBytes(Command.ASCII));
+                 return encodeContent(command.getDeviceId(), GatorProtocolDecoder.MSG_POSITION_PERIODIC, content);
+             default:
+                 return null;
+         }
+     }

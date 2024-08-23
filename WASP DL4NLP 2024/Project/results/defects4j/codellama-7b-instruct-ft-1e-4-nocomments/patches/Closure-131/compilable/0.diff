@@ -1,0 +1,36 @@
+diff --git a/tmp/873c4dc6-7db7-40d8-bc74-0bc94b1ed6d5_buggy.java b/tmp/05276644-b5e7-4290-b0e2-a46bf8d2c48c_fixed.java
+index 19fe1b4..8f16666 100644
+--- a/tmp/873c4dc6-7db7-40d8-bc74-0bc94b1ed6d5_buggy.java
++++ b/tmp/05276644-b5e7-4290-b0e2-a46bf8d2c48c_fixed.java
+@@ -1,17 +1,23 @@
+     public static boolean isJSIdentifier(String s) {
+       int length = s.length();
+-
+-      if (length == 0 ||
+-          !Character.isJavaIdentifierStart(s.charAt(0))) {
++      if (length == 0) {
++        return false;
++      }
++      char c = s.charAt(0);
++      if (c == '/' || c == '\\') {
++        return s.equals("/") || s.equals("\\");
++      }
++      if (!Character.isJavaIdentifierStart(c)) {
+         return false;
+       }
+-
+       for (int i = 1; i < length; i++) {
+-        if (
+-            !Character.isJavaIdentifierPart(s.charAt(i))) {
++        char c1 = s.charAt(i);
++        if (c1 == '/' || c1 == '\\') {
++          return false;
++        }
++        if (!Character.isJavaIdentifierPart(c1)) {
+           return false;
+         }
+       }
+-
+       return true;
+     }
+\ No newline at end of file

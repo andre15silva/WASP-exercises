@@ -1,0 +1,36 @@
+diff --git a/tmp/52136a52-15b2-48c0-b87a-8f1bc5937f4b_buggy.java b/tmp/e450d73f-bad9-4f13-a935-0e67a417b1ee_fixed.java
+index e69de29..7b88155 100644
+--- a/tmp/52136a52-15b2-48c0-b87a-8f1bc5937f4b_buggy.java
++++ b/tmp/e450d73f-bad9-4f13-a935-0e67a417b1ee_fixed.java
+@@ -0,0 +1,30 @@
++public SortedMap<String, Integer> prefixMap(String prefix) {
++    SortedMap<String, Integer> result = new TreeMap<>();
++    Node node = findNode(prefix);
++    if (node != null) {
++        collectAll(node, prefix, result);
++    }
++    return result;
++}
++
++private void collectAll(Node node, String prefix, SortedMap<String, Integer> result) {
++    if (node.isEnd) {
++        result.put(prefix, node.value);
++    }
++    for (Map.Entry<Character, Node> entry : node.children.entrySet()) {
++        collectAll(entry.getValue(), prefix + entry.getKey(), result);
++    }
++}
++
++private Node findNode(String prefix) {
++    // Implementation of this function should traverse the trie
++    // and return the node that corresponds to the end of the prefix.
++    Node current = root;
++    for (char ch : prefix.toCharArray()) {
++        current = current.children.get(ch);
++        if (current == null) {
++            return null;
++        }
++    }
++    return current;
++}
+\ No newline at end of file

@@ -1,0 +1,16 @@
+diff --git a/tmp/e7211d6a-2577-4b17-a671-5667f506c1c2_buggy.java b/tmp/0115ae2a-613c-4a46-89ca-524c65cb118a_fixed.java
+index d68a69c..7532a71 100644
+--- a/tmp/e7211d6a-2577-4b17-a671-5667f506c1c2_buggy.java
++++ b/tmp/0115ae2a-613c-4a46-89ca-524c65cb118a_fixed.java
+@@ -1,9 +1,9 @@
+     public void captureArgumentsFrom(Invocation i) {
+         int k = 0;
+         for (Matcher m : matchers) {
+-            if (m instanceof CapturesArguments) {
++            if (m instanceof CapturesArguments || m instanceof AnyVararg) {
+                 ((CapturesArguments) m).captureFrom(i.getArguments()[k]);
+             }
+             k++;
+         }
+     }
+\ No newline at end of file

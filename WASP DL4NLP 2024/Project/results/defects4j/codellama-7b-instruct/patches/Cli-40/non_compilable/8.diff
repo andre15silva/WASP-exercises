@@ -1,0 +1,93 @@
+diff --git a/tmp/ce7a7392-687e-4dd3-b0d7-9bbec06135b9_buggy.java b/tmp/5e9d1ca7-4571-4f52-8ced-a2a378a150db_fixed.java
+index a7d0787..cfdb6d4 100644
+--- a/tmp/ce7a7392-687e-4dd3-b0d7-9bbec06135b9_buggy.java
++++ b/tmp/5e9d1ca7-4571-4f52-8ced-a2a378a150db_fixed.java
+@@ -1,54 +1,69 @@
+     /**
+      * Returns the <code>Object</code> of type <code>clazz</code>
+      * with the value of <code>str</code>.
+      *
+      * @param str the command line value
+      * @param clazz the type of argument
+      * @return The instance of <code>clazz</code> initialised with
+      * the value of <code>str</code>.
+      * @throws ParseException if the value creation for the given class failed
+      */
+     @SuppressWarnings("unchecked") // returned value will have type T because it is fixed by clazz
+     public static <T> T createValue(final String str, final Class<T> clazz) throws ParseException
+     {
+-        if (PatternOptionBuilder.STRING_VALUE == clazz)
++        if (clazz.isPrimitive())
+         {
+-            return (T) str;
++            return (T) getPrimitiveValue(str, clazz);
+         }
+-        else if (PatternOptionBuilder.OBJECT_VALUE == clazz)
++        else
++        {
++            try
++            {
++                return (T) clazz.getDeclaredConstructor(String.class).newInstance(str);
++            }
++            catch (InstantiationException | IllegalAccessException | InvocationTargetException | NoSuchMethodException e)
++            {
++                throw new ParseException("Failed to create value: " + str, e);
++            }
++        }
++    }
++
++    private static Object getPrimitiveValue(final String str, final Class<?> clazz)
++    {
++        if ( clazz == Integer.TYPE )
+         {
+-            return (T) createObject(str);
++            return Integer.parseInt(str);
+         }
+-        else if (PatternOptionBuilder.NUMBER_VALUE == clazz)
++        else if ( clazz == Double.TYPE )
+         {
+-            return (T) createNumber(str);
++            return Double.parseDouble(str);
+         }
+-        else if (PatternOptionBuilder.DATE_VALUE == clazz)
++        else if ( clazz == Float.TYPE )
+         {
+-            return (T) createDate(str);
++            return Float.parseFloat(str);
+         }
+-        else if (PatternOptionBuilder.CLASS_VALUE == clazz)
++        else if ( clazz == Character.TYPE )
+         {
+-            return (T) createClass(str);
++            return str.charAt(0);
+         }
+-        else if (PatternOptionBuilder.FILE_VALUE == clazz)
++        else if ( clazz == Boolean.TYPE )
+         {
+-            return (T) createFile(str);
++            return Boolean.parseBoolean(str);
+         }
+-        else if (PatternOptionBuilder.EXISTING_FILE_VALUE == clazz)
++        else if ( clazz == Byte.TYPE )
+         {
+-            return (T) openFile(str);
++            return Byte.parseByte(str);
+         }
+-        else if (PatternOptionBuilder.FILES_VALUE == clazz)
++        else if ( clazz == Short.TYPE )
+         {
+-            return (T) createFiles(str);
++            return Short.parseShort(str);
+         }
+-        else if (PatternOptionBuilder.URL_VALUE == clazz)
++        else if ( clazz == Long.TYPE )
+         {
+-            return (T) createURL(str);
++            return Long.parseLong(str);
+         }
+         else
+         {
+-            return null;
++            throw new IllegalArgumentException("Unsupported primitive type: " + clazz);
+         }
+     }

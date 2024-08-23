@@ -1,0 +1,10 @@
+diff --git a/tmp/683792f3-ec5f-4e3f-9b2a-7044676e729f_buggy.java b/tmp/38dfefe6-3034-4fa1-975a-7035d8892dae_fixed.java
+index fc49bcd..ff84b88 100644
+--- a/tmp/683792f3-ec5f-4e3f-9b2a-7044676e729f_buggy.java
++++ b/tmp/38dfefe6-3034-4fa1-975a-7035d8892dae_fixed.java
+@@ -1,4 +1,4 @@
+     @Override
+     public DefaultPrettyPrinter createInstance() {
+-        return new DefaultPrettyPrinter(this);
++        return new DefaultPrettyPrinter(this, false);
+     }

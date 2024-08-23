@@ -1,0 +1,31 @@
+diff --git a/tmp/059c0c37-907b-4492-a807-a68d621e3849_buggy.java b/tmp/a0f6a8cd-ddd7-4a30-9935-f3a7ad74551e_fixed.java
+index 2d36d6e..c055cbe 100644
+--- a/tmp/059c0c37-907b-4492-a807-a68d621e3849_buggy.java
++++ b/tmp/a0f6a8cd-ddd7-4a30-9935-f3a7ad74551e_fixed.java
+@@ -1,4 +1,25 @@
+-    public void joinAsSpectator(MemberId memberId) {
++public class Ensemble {
++    private Set<Integer> membersWhoAccepted = new HashSet<>();
++    private Set<Integer> membersAsSpectators = new HashSet<>();
++
++    public void accept(Integer memberId) {
++        membersWhoAccepted.add(memberId);
++    }
++
++    public void decline(Integer memberId) {
++        membersWhoAccepted.remove(memberId);
++    }
++
++    public void joinAsSpectator(Integer memberId) {
+         membersAsSpectators.add(memberId);
+         membersWhoAccepted.remove(memberId);
+     }
++
++    public Set<Integer> spectators() {
++        return membersAsSpectators;
++    }
++
++    public Set<Integer> declinedMembers() {
++        return membersWhoAccepted;
++    }
++}

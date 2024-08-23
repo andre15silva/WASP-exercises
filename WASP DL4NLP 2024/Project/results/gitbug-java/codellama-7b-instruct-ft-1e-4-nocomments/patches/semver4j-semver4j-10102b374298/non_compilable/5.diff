@@ -1,0 +1,14 @@
+diff --git a/tmp/ae2a1cec-42c7-4703-ad66-00c170e32195_buggy.java b/tmp/1407f779-ce56-4ab6-bb3c-19c1082c2e5c_fixed.java
+index 593602f..ddf2ddb 100644
+--- a/tmp/ae2a1cec-42c7-4703-ad66-00c170e32195_buggy.java
++++ b/tmp/1407f779-ce56-4ab6-bb3c-19c1082c2e5c_fixed.java
+@@ -1,6 +1,7 @@
+     @Override
+     public String toString() {
+         return rangesList.stream()
+             .map(RangesList::formatRanges)
+-            .collect(joining(OR_JOINER));
++            .collect(joining(OR_JOINER))
++            .replaceAll("\\(.*\\)", "");
+     }
+\ No newline at end of file

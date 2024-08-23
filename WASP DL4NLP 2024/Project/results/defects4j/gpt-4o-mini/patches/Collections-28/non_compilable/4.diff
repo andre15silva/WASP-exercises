@@ -1,0 +1,12 @@
+diff --git a/tmp/1d1dd0dd-0601-4ffa-93b9-905d3c2ffbd0_buggy.java b/tmp/f6c78db9-11b4-4c70-a435-0b7e97bf9b64_fixed.java
+index e69de29..9167f4f 100644
+--- a/tmp/1d1dd0dd-0601-4ffa-93b9-905d3c2ffbd0_buggy.java
++++ b/tmp/f6c78db9-11b4-4c70-a435-0b7e97bf9b64_fixed.java
+@@ -0,0 +1,6 @@
++@Override
++public void clear() {
++    for (String key : this.keySet()) {
++        remove(key);
++    }
++}
+\ No newline at end of file

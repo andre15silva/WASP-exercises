@@ -1,0 +1,20 @@
+diff --git a/tmp/99783765-cef0-41d5-b148-1be3b837733a_buggy.java b/tmp/aadc9d4c-791e-4257-9b76-06a7345d38c2_fixed.java
+index 3002587..3c2b3d2 100644
+--- a/tmp/99783765-cef0-41d5-b148-1be3b837733a_buggy.java
++++ b/tmp/aadc9d4c-791e-4257-9b76-06a7345d38c2_fixed.java
+@@ -1,10 +1,15 @@
+     /**
+      * Fits a Gaussian function to the observed points.
+      *
+      * @return the parameters of the Gaussian function that best fits the
+      * observed points (in the same order as above).
+      */
+     public double[] fit() {
+         final double[] guess = (new ParameterGuesser(getObservations())).guess();
+         return fit(new Gaussian.Parametric(), guess);
+     }
++
++    @Override
++    protected void doCheck() throws NotStrictlyPositiveException {
++        super.doCheck();
++    }

@@ -1,0 +1,23 @@
+diff --git a/tmp/f82788c9-d3a9-491c-ac77-00b8e0c496d4_buggy.java b/tmp/a2b371a2-c0be-4494-8de4-7524b9e73c13_fixed.java
+index b775870..11295d8 100644
+--- a/tmp/f82788c9-d3a9-491c-ac77-00b8e0c496d4_buggy.java
++++ b/tmp/a2b371a2-c0be-4494-8de4-7524b9e73c13_fixed.java
+@@ -1,10 +1,16 @@
+     /**
+      * Sets the given lines for the provided path, overriding any previously existing comments for the path.
+      * An entry that is a sole new-line (i.e. "\n") will result in an empty line without any comment marker.
+      *
+      * @param path the path to register the comment lines for
+      * @param commentLines the comment lines to set for the path
+      */
+     public void setComment(@NotNull String path, @NotNull String... commentLines) {
+-        comments.put(path, Collections.unmodifiableList(Arrays.asList(commentLines)));
++        List<String> lines = new ArrayList<String>();
++        for (String commentLine : commentLines) {
++            if (!commentLine.trim().isEmpty()) {
++                lines.add(commentLine.trim());
++            }
++        }
++        comments.put(path, lines);
+     }
+\ No newline at end of file

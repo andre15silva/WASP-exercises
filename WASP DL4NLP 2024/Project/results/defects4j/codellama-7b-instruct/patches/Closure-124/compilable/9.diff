@@ -1,0 +1,31 @@
+diff --git a/tmp/3ab69f79-e981-46a2-b7c8-0f9ab08941b3_buggy.java b/tmp/57516203-f86d-456b-b3f4-3e12266fed20_fixed.java
+index 2573d30..761b0e5 100644
+--- a/tmp/3ab69f79-e981-46a2-b7c8-0f9ab08941b3_buggy.java
++++ b/tmp/57516203-f86d-456b-b3f4-3e12266fed20_fixed.java
+@@ -1,20 +1,11 @@
+-  /**
+-   * Checks name referenced in node to determine if it might have
+-   * changed.
+-   * @return Whether the replacement can be made.
+-   */
+ private boolean isSafeReplacement(Node node, Node replacement) {
+-    // No checks are needed for simple names.
+-    if (node.isName()) {
+-      return true;
+-    }
+   Preconditions.checkArgument(node.isGetProp());
+-
+-      node = node.getFirstChild();
+-    if (node.isName()
+-        && isNameAssignedTo(node.getString(), replacement)) {
++  Node firstChild = node.getFirstChild();
++  if (firstChild.isName() && isNameAssignedTo(firstChild.getString(), replacement)) {
++    return false;
++  }
++  if (firstChild.isName() && firstChild.getNext().isAssign()) {
+     return false;
+   }
+-
+   return true;
+ }
+\ No newline at end of file

@@ -1,0 +1,41 @@
+diff --git a/tmp/2336dab3-de00-4977-88de-818edaae0196_buggy.java b/tmp/9c303364-c39a-4cbf-a72f-5263489c0ca5_fixed.java
+index abd3198..1d84263 100644
+--- a/tmp/2336dab3-de00-4977-88de-818edaae0196_buggy.java
++++ b/tmp/9c303364-c39a-4cbf-a72f-5263489c0ca5_fixed.java
+@@ -1,28 +1,33 @@
+     @Override
+     protected Object encodeCommand(Command command) {
+-
+         ByteBuf content = Unpooled.buffer();
+-
+         switch (command.getType()) {
+             case Command.TYPE_POSITION_SINGLE:
+                 return encodeContent(command.getDeviceId(), GatorProtocolDecoder.MSG_POSITION_REQUEST, content);
+             case Command.TYPE_ENGINE_STOP:
+                 return encodeContent(command.getDeviceId(), GatorProtocolDecoder.MSG_CLOSE_THE_OIL_DUCT, content);
+             case Command.TYPE_ENGINE_RESUME:
+                 return encodeContent(command.getDeviceId(), GatorProtocolDecoder.MSG_RESTORES_THE_OIL_DUCT, content);
+             case Command.TYPE_SET_SPEED_LIMIT:
+                 content.writeByte(command.getInteger(Command.KEY_DATA));
+                 return encodeContent(command.getDeviceId(), GatorProtocolDecoder.MSG_SET_SPEED_LIMIT, content);
+             case Command.TYPE_SET_ODOMETER:
+                 content.writeShort(command.getInteger(Command.KEY_DATA));
+                 return encodeContent(command.getDeviceId(), GatorProtocolDecoder.MSG_SET_ODOMETER, content);
+             case Command.TYPE_POSITION_PERIODIC:
++                if (command.getString(Command.KEY_FREQUENCY).equals("0000000001")) {
++                    content.writeShort(Integer.valueOf(command.getString(Command.KEY_FREQUENCY)));
++                    return encodeContent(command.getDeviceId(), GatorProtocolDecoder.MSG_POSITION_PERIODIC, content);
++                } else {
+                     String[] data = command.getString(Command.KEY_FREQUENCY).split(";");
+                     content.writeShort(Integer.valueOf(data[0]));
+                     content.writeShort(Integer.valueOf(data[1]));
+                     content.writeShort(Integer.valueOf(data[2]));
+                     return encodeContent(command.getDeviceId(), GatorProtocolDecoder.MSG_POSITION_PERIODIC, content);
++                }
++            case Command.TYPE_REBOOT:
++                return encodeContent(command.getDeviceId(), GatorProtocolDecoder.MSG_REBOOT, content);
+             default:
+                 return null;
+         }
+     }
+\ No newline at end of file

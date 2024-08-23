@@ -1,0 +1,178 @@
+diff --git a/tmp/0fb62094-91f0-40b5-9183-255d31ae986d_buggy.java b/tmp/848cf5b0-d5a8-47ac-ba93-3ee5807d0289_fixed.java
+index 2955e62..98a8682 100644
+--- a/tmp/0fb62094-91f0-40b5-9183-255d31ae986d_buggy.java
++++ b/tmp/848cf5b0-d5a8-47ac-ba93-3ee5807d0289_fixed.java
+@@ -1,66 +1,141 @@
+-    /**
+-     * @return true if the provided reference and declaration can be safely
+-     *         inlined according to our criteria
+-     */
+     private boolean canInline(
+         Reference declaration,
+         Reference initialization,
+         Reference reference) {
+       if (!isValidDeclaration(declaration)
+           || !isValidInitialization(initialization)
+           || !isValidReference(reference)) {
+         return false;
+       }
+-
+-      // If the value is read more than once, skip it.
+-      // VAR declarations and EXPR_RESULT don't need the value, but other
+-      // ASSIGN expressions parents do.
+       if (declaration != initialization &&
+           !initialization.getGrandparent().isExprResult()) {
+         return false;
+       }
+-
+-      // Be very conservative and do no cross control structures or
+-      // scope boundaries
+       if (declaration.getBasicBlock() != initialization.getBasicBlock()
+           || declaration.getBasicBlock() != reference.getBasicBlock()) {
+         return false;
+       }
+-
+-      // Do not inline into a call node. This would change
+-      // the context in which it was being called. For example,
+-      //   var a = b.c;
+-      //   a();
+-      // should not be inlined, because it calls a in the context of b
+-      // rather than the context of the window.
+-      //   var a = b.c;
+-      //   f(a)
+-      // is ok.
+       Node value = initialization.getAssignedValue();
+       Preconditions.checkState(value != null);
+       if (value.isGetProp()
+           && reference.getParent().isCall()
+           && reference.getParent().getFirstChild() == reference.getNode()) {
+         return false;
+       }
+-
++      Node callNodeParent = reference.getParent();
+       if (value.isFunction()) {
+-        Node callNode = reference.getParent();
+-        if (reference.getParent().isCall()) {
++        if (callNodeParent.isCall()) {
+           CodingConvention convention = compiler.getCodingConvention();
+-          // Bug 2388531: Don't inline subclass definitions into class defining
+-          // calls as this confused class removing logic.
+           SubclassRelationship relationship =
+-              convention.getClassesDefinedByCall(callNode);
++              convention.getClassesDefinedByCall(callNodeParent);
+           if (relationship != null) {
+             return false;
+           }
+-
+-          // issue 668: Don't inline singleton getter methods
+-          // calls as this confused class removing logic.
++        } else {
++          StaticSourceFile sourceFile = declaration.getSourceFile();
++          String code = null;
++          if (sourceFile != null) {
++            code = sourceFile.getCode();
++          } else {
++            Preconditions.checkState(declaration.sourcePosition != null,
++                "declaration has no source info?");
++            code = Preconditions.checkNotNull(
++                declaration.sourcePosition.getSourceCode(),
++                "declaration has no source code?");
++          }
++          Node valueParent = value.getParent();
++          int valueIndex = valueParent.getIndexOfChild(value);
++          Node parent = valueParent.getParent();
++          if (parent.isObjectLit()) {
++            Node prop = parent.getLastChild().getNext();
++            if (prop != null && prop.isComputedProp()
++                && valueIndex == prop.getLastChild().getInt()) {
++              if (valueIndex == 0) {
++                Node objLit = valueParent.getParent();
++                if (objLit.isFirstChildOf(
++                    objLit.getParent().getClosestClinicalCallAncestor())) {
++                  return false;
++                }
++              }
++              Node callParent = reference.getParent().getParent();
++              if (callParent.isCall()
++                  && convention.getClassesDefinedByCall(callParent) != null) {
++                return false;
++              }
++            }
++          }
++          Node getSingletonProp = valueParent.getSecondChild();
++          String maybeSingletonName = null;
++          if (getSingletonProp.isGetProp()) {
++            maybeSingletonName = getSingletonProp.getLastChild().getString();
++          } else {
++            Preconditions.checkState(getSingletonProp.isGetElem());
++            maybeSingletonName = getSingletonProp.getLastChild().getNext()
++                .getString();
++          }
++          if (maybeSingletonName != null && maybeSingletonName.endsWith(
++              ".getInstance")) {
++            try {
++              Node gopn = valueParent.getParent();
++              Preconditions.checkState(gopn.isGetProp());
++              if (!gopn.getNext().isFunction() && !gopn.getGrandparent()
++                  .isFunction()) {
++                return false;
++              }
++              String className = declaration.getName();
++              if (getSingletonProp.getNext().isCall()
++                  && gopn.getNext().getNext().isEmpty()
++                  && gopn.getNext().getLastChild().isName()
++                  && gopn.getNext().getLastChild().getString().contains(".")) {
++                String s = gopn.getNext().getLastChild()
++                    .substringAfterLast(".");
++                s = s.substring(0, s.length() - 1);
++                if (!s.contains(".") && s.equals(className)
++                    && (gopn.getNext().getLastChild().isQualifiedName()
++                        || (value.isFunction()
++                            && value.getFirstChild().isQualifiedName()))) {
++                  return false;
++                }
++                return false;
++              }
++            } catch (Exception ex) {
++              ex.printStackTrace();
++            }
++            Node getSingletonCall = valueParent.getNext();
++            if (getSingletonCall.isCall()) {
++              return false;
++            }
++          }
++          if (callNodeParent.isCall()) {
++            CodingConvention convention = compiler.getCodingConvention();
++            SubclassRelationship relationship =
++                convention.getClassesDefinedByCall(callNodeParent);
++            if (relationship != null) {
++              return false;
++            }
++          }
++          String name = reference.getName();
++          if (name.endsWith(".getInstance")) {
++            int lastDotIndex = name.lastIndexOf('.');
++            String s = name.substring(0, lastDotIndex) + name.substring(lastDotIndex + 1);
++            Node callNodeGrandParent = reference.getGrandparent();
++            if ((declNodeParent.isMemberFunctionDef() ?
++                callNodeGrandParent.getLastChild() : reference.getParent()) == value
++                && !declaration.getName().contains(".")) {
++              return false;
++            }
++            if (sourceFile != null
++                && sourceFile.hasClosureTypes()
++                && !convention.isCompileTimeConstant(name, sourceFile)) {
++              return false;
++            }
++          } else if (name.contains("Singleton") && sourceFile != null
++              && sourceFile.hasClosureTypes()
++              && !convention.isCompileTimeConstant(name, sourceFile)) {
++            return false;
++          }
+         }
+       }
+-
+       return canMoveAggressively(value) ||
+           canMoveModerately(initialization, reference);
+     }
+\ No newline at end of file

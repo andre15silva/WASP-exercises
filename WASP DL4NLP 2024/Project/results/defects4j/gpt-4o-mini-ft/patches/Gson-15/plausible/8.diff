@@ -1,0 +1,31 @@
+diff --git a/tmp/a47cabb5-4be3-4fa9-b90b-80e1c7a9e82f_buggy.java b/tmp/f309f593-9640-40d2-9691-0cc2af276392_fixed.java
+index 4685979..0244b0e 100644
+--- a/tmp/a47cabb5-4be3-4fa9-b90b-80e1c7a9e82f_buggy.java
++++ b/tmp/f309f593-9640-40d2-9691-0cc2af276392_fixed.java
+@@ -1,16 +1,24 @@
+   /**
+    * Encodes {@code value}.
+    *
+    * @param value a finite value. May not be {@link Double#isNaN() NaNs} or
+-   *     {@link Double#isInfinite() infinities}.
++   *     {@link Double#isInfinite() infinities}. This is not valid in strict
++   *     mode, but if "lenient" mode is enabled, it will write the value as
++   *     a string.
+    * @return this writer.
+    */
+   public JsonWriter value(double value) throws IOException {
+     writeDeferredName();
+     if (Double.isNaN(value) || Double.isInfinite(value)) {
+-      throw new IllegalArgumentException("Numeric values must be finite, but was " + value);
++      if (lenient) {
++        beforeValue();
++        out.append(Double.toString(value));
++        return this;
++      }
++      String message = "Numeric values must be finite, but was " + value;
++      throw new IllegalArgumentException(message);
+     }
+     beforeValue();
+     out.append(Double.toString(value));
+     return this;
+   }

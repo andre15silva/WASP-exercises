@@ -1,0 +1,44 @@
+diff --git a/tmp/4e106c89-0501-487e-8866-40f07c943a22_buggy.java b/tmp/653f04f1-b290-43f1-82b0-23f36b2e9f10_fixed.java
+index be2af16..2cfe33b 100644
+--- a/tmp/4e106c89-0501-487e-8866-40f07c943a22_buggy.java
++++ b/tmp/653f04f1-b290-43f1-82b0-23f36b2e9f10_fixed.java
+@@ -1,29 +1,38 @@
+ public long getDateTimeMillis(int year, int monthOfYear, int dayOfMonth,
+                               int hourOfDay, int minuteOfHour,
+                               int secondOfMinute, int millisOfSecond)
+     throws IllegalArgumentException
+ {
+     Chronology base;
+     if ((base = getBase()) != null) {
+         return base.getDateTimeMillis
+             (year, monthOfYear, dayOfMonth,
+              hourOfDay, minuteOfHour, secondOfMinute, millisOfSecond);
+     }
+ 
+     // Assume date is Gregorian.
+     long instant;
+     instant = iGregorianChronology.getDateTimeMillis
+         (year, monthOfYear, dayOfMonth,
+          hourOfDay, minuteOfHour, secondOfMinute, millisOfSecond);
+     if (instant < iCutoverMillis) {
+         // Maybe it's Julian.
+         instant = iJulianChronology.getDateTimeMillis
+             (year, monthOfYear, dayOfMonth,
+              hourOfDay, minuteOfHour, secondOfMinute, millisOfSecond);
+         if (instant >= iCutoverMillis) {
+             // Okay, it's in the illegal cutover gap.
+             throw new IllegalArgumentException("Specified date does not exist");
+         }
+     }
++    
++    // Validate the dayOfMonth based on the Julian calendar rules.
++    if (year < 1582 && monthOfYear == 2 && dayOfMonth == 29) {
++        // All years divisible by 4 are leap years in Julian calendar
++        if (year % 4 != 0) {
++            throw new IllegalArgumentException("Year " + year + " is not a leap year in the Julian calendar");
++        }
++    }
++    
+     return instant;
+ }
+\ No newline at end of file

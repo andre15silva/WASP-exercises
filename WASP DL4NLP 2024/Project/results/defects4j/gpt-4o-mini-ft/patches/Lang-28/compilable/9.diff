@@ -1,0 +1,50 @@
+diff --git a/tmp/c331d148-7e09-46be-b611-9c0cde8a1caf_buggy.java b/tmp/4c0d3912-83f8-411e-9330-edf760a8d6f8_fixed.java
+index 4bbd561..ec950f6 100644
+--- a/tmp/c331d148-7e09-46be-b611-9c0cde8a1caf_buggy.java
++++ b/tmp/4c0d3912-83f8-411e-9330-edf760a8d6f8_fixed.java
+@@ -1,37 +1,44 @@
+     /**
+      * {@inheritDoc}
+      */
+     @Override
+     public int translate(CharSequence input, int index, Writer out) throws IOException {
+-        // TODO: Protect from ArrayIndexOutOfBounds
++        // TODO: Risk of ArrayIndexOutOfBounds exception
+         if(input.charAt(index) == '&' && input.charAt(index + 1) == '#') {
+             int start = index + 2;
+             boolean isHex = false;
+ 
+             char firstChar = input.charAt(start);
+             if(firstChar == 'x' || firstChar == 'X') {
+                 start++;
+                 isHex = true;
+             }
+ 
+             int end = start;
+             while(input.charAt(end) != ';') {
+                 end++;
+             }
+ 
+             int entityValue;
+             try {
+                 if(isHex) {
+                     entityValue = Integer.parseInt(input.subSequence(start, end).toString(), 16);
+                 } else {
+                     entityValue = Integer.parseInt(input.subSequence(start, end).toString(), 10);
+                 }
+             } catch(NumberFormatException nfe) {
+                 return 0;
+             }
+ 
++            // Check for a supplementary character (Unicode range D800-DBFF or DC00-DFFF).
++            // If so, we convert to UTF-16 without encrypting as a single code point.
++            if(entityValue >= 0xD800 && entityValue <= 0xDBFF || entityValue >= 0xDC00 && entityValue <= 0xDFFF) {
++                out.write((char) ((entityValue - 0xDC00) + 0xD800));
++            }
++            else {
+                 out.write(entityValue);
++            }
+             return 2 + (end - start) + (isHex ? 1 : 0) + 1;
+         }
+         return 0;
+     }

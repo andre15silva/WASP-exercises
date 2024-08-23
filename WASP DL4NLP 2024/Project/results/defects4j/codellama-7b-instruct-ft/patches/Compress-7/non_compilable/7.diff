@@ -1,0 +1,39 @@
+diff --git a/tmp/57c8cbf7-b997-4f67-ae43-89c4d9ca7d30_buggy.java b/tmp/a164d8d0-0910-49c6-b53f-147d48e28ae4_fixed.java
+index d6662c7..6060e51 100644
+--- a/tmp/57c8cbf7-b997-4f67-ae43-89c4d9ca7d30_buggy.java
++++ b/tmp/a164d8d0-0910-49c6-b53f-147d48e28ae4_fixed.java
+@@ -1,23 +1,33 @@
+     /**
+      * Parse an entry name from a buffer.
+      * Parsing stops when a NUL is found
+      * or the buffer length is reached.
+      *
+      * @param buffer The buffer from which to parse.
+      * @param offset The offset into the buffer from which to parse.
+      * @param length The maximum number of bytes to parse.
+      * @return The entry name.
+      */
+     public static String parseName(byte[] buffer, final int offset, final int length) {
+         StringBuffer result = new StringBuffer(length);
+         int          end = offset + length;
+ 
+         for (int i = offset; i < end; ++i) {
+             if (buffer[i] == 0) {
+                 break;
+             }
+             result.append((char) buffer[i]);
+         }
+ 
+-        return result.toString();
++        final byte[] name_temp = result.toString().getBytes();
++        final String real_name;
++        try {
++            real_name = new String(name_temp, "ISO-8859-1");
++        } catch (UnsupportedEncodingException e) {
++            throw new IllegalSystemPropertyTypeException(e.toString());
++        }
++        if (!real_name.equals(result.toString())) {
++            System.err.println(String.format("%s -> %s", result.toString(), real_name));
++        }
++        return real_name;
+     }

@@ -1,0 +1,43 @@
+diff --git a/tmp/596daeb2-c114-4fb2-aa21-58c68ef5c0a4_buggy.java b/tmp/bfaac2ec-3b34-4068-a805-e123e8d7f949_fixed.java
+index 939f49b..b93ce92 100644
+--- a/tmp/596daeb2-c114-4fb2-aa21-58c68ef5c0a4_buggy.java
++++ b/tmp/bfaac2ec-3b34-4068-a805-e123e8d7f949_fixed.java
+@@ -1,21 +1,38 @@
+     private boolean isPrototypePropertyAssign(Node assign) {
+       Node n = assign.getFirstChild();
+       if (n != null && NodeUtil.isVarOrSimpleAssignLhs(n, assign)
+           && n.getType() == Token.GETPROP
+           ) {
+         // We want to exclude the assignment itself from the usage list
+         boolean isChainedProperty =
+             n.getFirstChild().getType() == Token.GETPROP;
+ 
+         if (isChainedProperty) {
+           Node child = n.getFirstChild().getFirstChild().getNext();
+ 
+           if (child.getType() == Token.STRING &&
+               child.getString().equals("prototype")) {
+             return true;
+           }
+         }
++      } else if (assign.getParent().getType() == Token.EXPR_RESULT) {
++        // An exported alias must be preserved. Aliasing is used
++        // as a replacement to "namespace" and must preserve type.
++        // Otherwise aliasing the type might loose the methods
++        // defined inside it.
++        Node parent = assign.getParent();
++        while (parent.getType() == Token.EXPR_RESULT) {
++          parent = parent.getParent();
++        }
++        if (parent.getType() == Token.EXPORT
++            && parent.getFirstChild().getType() == Token.ALIAS
++            && NodeUtil.isCall(parent.getFirstChild())) {
++          Node firstParam = parent.getFirstChild().getFirstChild();
++          if (NodeUtil.isGetter(firstParam)) {
++            return true;
++          }
++        }
+       }
+ 
+       return false;
+     }

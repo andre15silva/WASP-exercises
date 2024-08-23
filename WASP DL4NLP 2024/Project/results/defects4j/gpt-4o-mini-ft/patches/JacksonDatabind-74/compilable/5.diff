@@ -1,0 +1,37 @@
+diff --git a/tmp/99ebc9b2-8822-41b3-bf84-c98fbb2e8008_buggy.java b/tmp/0bdd9dc7-fb34-4cfb-833c-b99f4726b1c9_fixed.java
+index 658036e..08d4745 100644
+--- a/tmp/99ebc9b2-8822-41b3-bf84-c98fbb2e8008_buggy.java
++++ b/tmp/0bdd9dc7-fb34-4cfb-833c-b99f4726b1c9_fixed.java
+@@ -1,29 +1,29 @@
+     // off-lined to keep main method lean and mean...
+     @SuppressWarnings("resource")
+     protected Object _deserializeTypedUsingDefaultImpl(JsonParser p, DeserializationContext ctxt,
+             TokenBuffer tb) throws IOException
+     {
+         // As per [JACKSON-614], may have default implementation to use
+         JsonDeserializer<Object> deser = _findDefaultImplDeserializer(ctxt);
+         if (deser != null) {
+             if (tb != null) {
+                 tb.writeEndObject();
+                 p = tb.asParser(p);
+                 // must move to point to the first token:
+                 p.nextToken();
+             }
+             return deser.deserialize(p, ctxt);
+         }
+-        // or, perhaps we just bumped into a "natural" value (boolean/int/double/String)?
+-        Object result = TypeDeserializer.deserializeIfNatural(p, ctxt, _baseType);
+-        if (result != null) {
++        Object result;
++        // [Issue#1535]: if empty string, may well just mean null
++        if ((result = TypeDeserializer.deserializeIfNatural(p, ctxt, _baseType)) != null) {
+             return result;
+         }
+         // or, something for which "as-property" won't work, changed into "wrapper-array" type:
+         if (p.getCurrentToken() == JsonToken.START_ARRAY) {
+             return super.deserializeTypedFromAny(p, ctxt);
+         }
+         ctxt.reportWrongTokenException(p, JsonToken.FIELD_NAME,
+                 "missing property '"+_typePropertyName+"' that is to contain type id  (for class "+baseTypeName()+")");
+         return null;
+     }

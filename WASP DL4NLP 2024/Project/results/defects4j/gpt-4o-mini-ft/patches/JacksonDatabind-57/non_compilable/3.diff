@@ -1,0 +1,27 @@
+diff --git a/tmp/582954f8-654a-4a52-8286-b36b3ed0e4e9_buggy.java b/tmp/a70bc867-1b0f-4044-bf2d-86b6feae63ff_fixed.java
+index 08a41cf..28a272d 100644
+--- a/tmp/582954f8-654a-4a52-8286-b36b3ed0e4e9_buggy.java
++++ b/tmp/a70bc867-1b0f-4044-bf2d-86b6feae63ff_fixed.java
+@@ -1,12 +1,20 @@
+     /**
+      * Overloaded version of {@link #readValue(InputStream)}.
+      */
+     public <T> MappingIterator<T> readValues(byte[] src, int offset, int length)
+         throws IOException, JsonProcessingException
+     {
+         if (_dataFormatReaders != null) {
+             return _detectBindAndReadValues(_dataFormatReaders.findFormat(src, offset, length), false);
+         }
+-        return _bindAndReadValues(_considerFilter(_parserFactory.createParser(src),
+-                true));
++        JsonParser jp = _parserFactory.createParser(src);
++        if (_ignoreUnknown == true) {
++            jp.configure(JsonParser.Feature.IGNORE_UNDEFINED, true);
++        }
++        MappingIterator<T> iter = _bindAndReadValues(jp, true);
++        ObjectCodec oc = jp.getCodec();
++        if (oc instanceof ObjectMapper) {
++            _configureCodec((ObjectMapper) oc);
++        }
++        return iter;
+     }

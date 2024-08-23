@@ -1,0 +1,53 @@
+diff --git a/tmp/881fcc21-41ee-429e-99b0-0e56ec5996f1_buggy.java b/tmp/d85fe944-d08f-4c44-a291-509f9a1cb854_fixed.java
+index be2af16..d8ed0cc 100644
+--- a/tmp/881fcc21-41ee-429e-99b0-0e56ec5996f1_buggy.java
++++ b/tmp/d85fe944-d08f-4c44-a291-509f9a1cb854_fixed.java
+@@ -1,29 +1,48 @@
+     public long getDateTimeMillis(int year, int monthOfYear, int dayOfMonth,
+                                   int hourOfDay, int minuteOfHour,
+                                   int secondOfMinute, int millisOfSecond)
+         throws IllegalArgumentException
+     {
+         Chronology base;
+         if ((base = getBase()) != null) {
+             return base.getDateTimeMillis
+                 (year, monthOfYear, dayOfMonth,
+                  hourOfDay, minuteOfHour, secondOfMinute, millisOfSecond);
+         }
+ 
+         // Assume date is Gregorian.
+         long instant;
+             instant = iGregorianChronology.getDateTimeMillis
+                 (year, monthOfYear, dayOfMonth,
+                  hourOfDay, minuteOfHour, secondOfMinute, millisOfSecond);
+         if (instant < iCutoverMillis) {
+             // Maybe it's Julian.
++            try {
+                 instant = iJulianChronology.getDateTimeMillis
+                     (year, monthOfYear, dayOfMonth,
+                      hourOfDay, minuteOfHour, secondOfMinute, millisOfSecond);
++            }
++            catch (IllegalFieldValueException ex) {
++                // This date does not exist in Julian, but the 15th century
++                // does not observe Julian leap year rules.
++                if ((year >= 1500) && (monthOfYear == 2) && (dayOfMonth == 29)) {
++                    instant = iGregorianChronology.getDateTimeMillis
++                        (year, 2, 28, hourOfDay, minuteOfHour, secondOfMinute,
++                         millisOfSecond);
++                    instant += 24l * 60l * 60 * 1000;   // Add a day
++                    dayOfMonth = 1;
++                    instant = iJulianChronology.getDateTimeMillis
++                        (year, monthOfYear, dayOfMonth,
++                         hourOfDay, minuteOfHour, secondOfMinute, millisOfSecond);
++                }
++                else {
++                    throw ex;
++                }
++            }
+             if (instant >= iCutoverMillis) {
+                 // Okay, it's in the illegal cutover gap.
+                 throw new IllegalArgumentException("Specified date does not exist");
+             }
+         }
+         return instant;
+     }

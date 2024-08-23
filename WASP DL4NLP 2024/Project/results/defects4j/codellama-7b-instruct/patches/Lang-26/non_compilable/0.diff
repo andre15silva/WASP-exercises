@@ -1,0 +1,28 @@
+diff --git a/tmp/ced19734-c3d3-43c4-86a4-2760a2953676_buggy.java b/tmp/9da86808-b5e6-4855-aabc-03bd682a1ab8_fixed.java
+index d56e399..d7a2a3b 100644
+--- a/tmp/ced19734-c3d3-43c4-86a4-2760a2953676_buggy.java
++++ b/tmp/9da86808-b5e6-4855-aabc-03bd682a1ab8_fixed.java
+@@ -1,11 +1,17 @@
+-    /**
+-     * <p>Formats a <code>Date</code> object.</p>
+-     * 
+-     * @param date  the date to format
+-     * @return the formatted string
+-     */
++    private int mMaxLengthEstimate;
++
++    // ...
++
+     public String format(Date date) {
+         Calendar c = new GregorianCalendar(mTimeZone);
+         c.setTime(date);
+         return applyRules(c, new StringBuffer(mMaxLengthEstimate)).toString();
+     }
++
++    protected StringBuffer applyRules(Calendar calendar, StringBuffer toAppendTo) {
++        // Code for applying formatting rules goes here
++        // ...
++
++        // Return the resulting string
++        return toAppendTo;
++    }

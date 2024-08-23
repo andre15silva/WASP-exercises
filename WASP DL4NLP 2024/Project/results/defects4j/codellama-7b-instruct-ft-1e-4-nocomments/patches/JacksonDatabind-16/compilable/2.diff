@@ -1,0 +1,16 @@
+diff --git a/tmp/23280569-e3f7-48b0-bf9e-627a6a94aadc_buggy.java b/tmp/bdc7f13f-288e-4249-8427-785aaa2ff5b7_fixed.java
+index 27520a0..40717a6 100644
+--- a/tmp/23280569-e3f7-48b0-bf9e-627a6a94aadc_buggy.java
++++ b/tmp/bdc7f13f-288e-4249-8427-785aaa2ff5b7_fixed.java
+@@ -1,7 +1,10 @@
+     protected final boolean _add(Annotation ann) {
+         if (_annotations == null) {
+             _annotations = new HashMap<Class<? extends Annotation>,Annotation>();
+         }
+         Annotation previous = _annotations.put(ann.annotationType(), ann);
++        if (previous != null && !previous.equals(ann)) {
++            System.out.println();
++        }
+         return (previous != null) && previous.equals(ann);
+     }
+\ No newline at end of file

@@ -1,0 +1,21 @@
+diff --git a/tmp/1971a173-a3e6-4167-9afd-73dc0355d549_buggy.java b/tmp/6651a764-f034-4d89-bbf7-f0b9a855c742_fixed.java
+index f7bc541..4264e30 100644
+--- a/tmp/1971a173-a3e6-4167-9afd-73dc0355d549_buggy.java
++++ b/tmp/6651a764-f034-4d89-bbf7-f0b9a855c742_fixed.java
+@@ -1,14 +1,16 @@
+     /**
+      Creates a new, clean document, from the original dirty document, containing only elements allowed by the whitelist.
+      The original document is not modified. Only elements from the dirt document's <code>body</code> are used.
+      @param dirtyDocument Untrusted base document to clean.
+      @return cleaned document.
+      */
+     public Document clean(Document dirtyDocument) {
+         Validate.notNull(dirtyDocument);
+ 
++        if (dirtyDocument.body() !=null)
++            document.put(org.jsoup.nodes.Entities.EscapeMode.base, org.jsoup.nodes.Entities.EscapeMode.extended);
+         Document clean = Document.createShell(dirtyDocument.baseUri());
+             copySafeNodes(dirtyDocument.body(), clean.body());
+ 
+         return clean;
+     }

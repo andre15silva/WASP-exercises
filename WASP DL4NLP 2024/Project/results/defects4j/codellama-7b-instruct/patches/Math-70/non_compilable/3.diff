@@ -1,0 +1,35 @@
+diff --git a/tmp/c46dea4f-7587-4cb7-afdd-7b5bc4ddda39_buggy.java b/tmp/1d251dad-c425-438f-a547-6f14877e4f53_fixed.java
+index d931bce..553016f 100644
+--- a/tmp/c46dea4f-7587-4cb7-afdd-7b5bc4ddda39_buggy.java
++++ b/tmp/1d251dad-c425-438f-a547-6f14877e4f53_fixed.java
+@@ -1,5 +1,28 @@
+-    /** {@inheritDoc} */
++    /** New documentation. */
+     public double solve(final UnivariateRealFunction f, double min, double max, double initial)
+         throws MaxIterationsExceededException, FunctionEvaluationException {
+-        return solve(min, max);
++        return solve(f, min, max);
++    }
++
++    /** New documentation. */
++    public double solve(final UnivariateRealFunction f, double min, double max)
++        throws MaxIterationsExceededException, FunctionEvaluationException {
++        // Implement solve using the Bisection method
++        // Take the midpoint of the current range and evaluate the function
++        // If the function is positive at the midpoint, set the range to the left of the midpoint
++        // Otherwise, set the range to the right of the midpoint
++        // If the range is small enough, return the midpoint
++        // Otherwise, repeat the process
++        double minval = Double.POSITIVE_INFINITY;
++        double maxval = Double.NEGATIVE_INFINITY;
++        double current = (max - min) / 2.0;
++        while (Math.abs(max - min) > this.getAbsoluteAccuracy()) {
++            if (f.value(current) > 0) {
++                min = current;
++            } else {
++                max = current;
++            }
++            current = (max - min) / 2.0;
++        }
++        return current;
+     }

@@ -1,0 +1,56 @@
+diff --git a/tmp/9f0105b8-e303-433a-b6e6-1ebb8daf1682_buggy.java b/tmp/0ae72cc7-ea3f-4df4-966c-f7a18d383fc9_fixed.java
+index 31c6a4b..9fca34a 100644
+--- a/tmp/9f0105b8-e303-433a-b6e6-1ebb8daf1682_buggy.java
++++ b/tmp/0ae72cc7-ea3f-4df4-966c-f7a18d383fc9_fixed.java
+@@ -1,11 +1,50 @@
+     /**
+      * Encodes binary data using the base64 algorithm into 76 character blocks separated by CRLF.
+      *
+      * @param binaryData
+      *            binary data to encode
+      * @return String containing Base64 characters.
+      * @since 1.4
+      */    
+-    public static String encodeBase64String(byte[] binaryData) {
++    public static String byteToString(byte[] binaryData) {
+         return StringUtils.newStringUtf8(encodeBase64(binaryData, true));
+     }
++    public static String byteToString(byte[] binaryData, boolean doPadding) {
++        return StringUtils.newStringUtf8(encodeBase64(binaryData, doPadding));
++    }
++
++    /**
++     ** Encodes binary data using the base64 algorithm into 76 character blocks separated by CRLF.
++     *
++     * @param binaryData
++     *            binary data to encode
++     * @return String containing Base64 characters.
++     * @since 1.4
++     */    
++    public static String byteToString(byte[] binaryData, boolean doPadding, boolean urlSafe) {
++        return StringUtils.newStringUtf8(encodeBase64(binaryData, urlSafe));
++    }
++
++    /**
++     * Encodes binary data using the base64 algorithm; does not separate lines.
++     *
++     * @param binaryData
++     *            binary data to encode
++     * @return String containing Base64 characters.
++     * @since 1.4
++     */    
++    public static String encodeBase64String(byte[] binaryData) {
++        return StringUtils.newStringUtf8(encodeBase64(binaryData, false));
++    }
++
++    /**
++     ** Encodes binary data using the base64 algorithm; does not separate lines.
++     *
++     * @param binaryData
++     *            binary data to encode
++     * @return String containing Base64 characters.
++     * @since 1.4
++     */    
++    public static String encodeBase64String(byte[] binaryData, boolean urlSafe) {
++        return StringUtils.newStringUtf8(encodeBase64(binaryData, urlSafe));
++    }

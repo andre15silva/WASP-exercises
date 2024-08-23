@@ -1,0 +1,55 @@
+diff --git a/tmp/0e1a30fd-797e-42f8-a4b8-dea590a66f66_buggy.java b/tmp/b4d3978f-b4c4-48bf-a393-28c807e11ebf_fixed.java
+index f650982..4233c16 100644
+--- a/tmp/0e1a30fd-797e-42f8-a4b8-dea590a66f66_buggy.java
++++ b/tmp/b4d3978f-b4c4-48bf-a393-28c807e11ebf_fixed.java
+@@ -1,42 +1,22 @@
+-    /**
+-     * Compares two values
+-     */
+-    protected boolean equal(
+-        EvalContext context,
+-        Expression left,
+-        Expression right) 
+-    {
++    protected boolean equal(EvalContext context, Expression left, Expression right) {
+         Object l = left.compute(context);
+         Object r = right.compute(context);
+ 
+ //        System.err.println("COMPARING: " +
+ //            (l == null ? "null" : l.getClass().getName()) + " " +
+ //            (r == null ? "null" : r.getClass().getName()));
+ 
+-        if (l instanceof InitialContext || l instanceof SelfContext) {
++        if (l instanceof InitialContext || l instanceof SelfContext || l instanceof Collection) {
+             l = ((EvalContext) l).getSingleNodePointer();
+         }
+ 
+-        if (r instanceof InitialContext || r instanceof SelfContext) {
++        if (r instanceof InitialContext || r instanceof SelfContext || r instanceof Collection) {
+             r = ((EvalContext) r).getSingleNodePointer();
+         }
+ 
+-        if (l instanceof Collection) {
+-            l = ((Collection) l).iterator();
++        if (l == null || r == null) {
++            return l == r;
++        } else {
++            return l.equals(r);
+         }
+-
+-        if (r instanceof Collection) {
+-            r = ((Collection) r).iterator();
+-        }
+-
+-        if ((l instanceof Iterator) && !(r instanceof Iterator)) {
+-            return contains((Iterator) l, r);
+-        }
+-        if (!(l instanceof Iterator) && (r instanceof Iterator)) {
+-            return contains((Iterator) r, l);
+-        }
+-        if (l instanceof Iterator && r instanceof Iterator) {
+-            return findMatch((Iterator) l, (Iterator) r);
+-        }
+-        return equal(l, r);
+     }
+\ No newline at end of file

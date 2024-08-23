@@ -1,0 +1,42 @@
+diff --git a/tmp/bb3a1c9e-5fb6-4f68-b75e-30828f37bfec_buggy.java b/tmp/ab7a3119-7cb3-4fd8-b9c2-0f2757803ec5_fixed.java
+index 939f49b..1e72d5f 100644
+--- a/tmp/bb3a1c9e-5fb6-4f68-b75e-30828f37bfec_buggy.java
++++ b/tmp/ab7a3119-7cb3-4fd8-b9c2-0f2757803ec5_fixed.java
+@@ -1,21 +1,37 @@
+     private boolean isPrototypePropertyAssign(Node assign) {
+       Node n = assign.getFirstChild();
+       if (n != null && NodeUtil.isVarOrSimpleAssignLhs(n, assign)
+           && n.getType() == Token.GETPROP
+           ) {
+         // We want to exclude the assignment itself from the usage list
+         boolean isChainedProperty =
+             n.getFirstChild().getType() == Token.GETPROP;
+ 
+         if (isChainedProperty) {
+           Node child = n.getFirstChild().getFirstChild().getNext();
+ 
+           if (child.getType() == Token.STRING &&
+               child.getString().equals("prototype")) {
+             return true;
+           }
+         }
++      } else if (NodeUtil.isExportedToScopeRoot(assign)) {
++        Node fnObj = n.getFirstFirstChild().getNext().getLastChild();
++        if (NodeUtil.isFunction(fnObj)) {
++          Node body = fnObj.getLastChild();
++          if (body.hasTwoChildren() &&
++              body.getFirstChild().getType() == Token.THIS &&
++              body.getLastChild().getType() == Token.RETURN) {
++            for (Node node = body.getFirstChild(); node != null;
++                node = node.getNext()) {
++              Node stringLiteral = NodeUtil.getFirstChildValue(node);
++              if (NodeUtil.isConstantStringValue(stringLiteral, "prototype")) {
++                return true;
++              }
++            }
++          }
++        }
+       }
+ 
+       return false;
+     }

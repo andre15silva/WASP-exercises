@@ -1,0 +1,12 @@
+diff --git a/tmp/7d7460fa-b9c8-4709-88fc-6ec4d5c1ed25_buggy.java b/tmp/764493e9-f82c-4b95-b091-2cfba381608f_fixed.java
+index e69de29..380e8e6 100644
+--- a/tmp/7d7460fa-b9c8-4709-88fc-6ec4d5c1ed25_buggy.java
++++ b/tmp/764493e9-f82c-4b95-b091-2cfba381608f_fixed.java
+@@ -0,0 +1,7 @@
++    @Override
++    public JavaType getSuperClass() {
++    	if (_referencedType != null) {
++    		return _referencedType.getSuperClass();
++    	}
++    	return super.getSuperClass();
++    }

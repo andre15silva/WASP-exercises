@@ -1,0 +1,93 @@
+diff --git a/tmp/8a04eec7-1f97-4441-9262-f628136b2d3a_buggy.java b/tmp/ef7d95b4-4c85-4a6d-8159-621f463044f1_fixed.java
+index 670114d..fe60a98 100644
+--- a/tmp/8a04eec7-1f97-4441-9262-f628136b2d3a_buggy.java
++++ b/tmp/ef7d95b4-4c85-4a6d-8159-621f463044f1_fixed.java
+@@ -1,48 +1,82 @@
++
++/**
++ * Traverses the AST structure and records global and local variables, as well
++ * as assignments and call sites.
++ */
++abstract class AbstractNameTracker extends NodeTraversal.AbstractPostOrderCallback {
++
++  private final NameInformation nameinfo;
++
++  /**
++   * Constructs a NameTracker.
++   *
++   * @param nameinfo the NameInformation object to use
++   */
++  AbstractNameTracker(NameInformation nameinfo) {
++    this.nameinfo = nameinfo;
++  }
++
++  /**
++   * Records a global variable or function declaration.
++   *
++   * @param t the NodeTraversal object
++   * @param n the current node being traversed
++   * @param parent the parent node of the current node
++   */
+   @Override
+   public void visit(NodeTraversal t, Node n, Node parent) {
+ 
+     // Record global variable and function declarations
+     if (t.inGlobalScope()) {
+       if (NodeUtil.isVarDeclaration(n)) {
+         NameInformation ns = createNameInformation(t, n, parent);
+         Preconditions.checkNotNull(ns);
+-          recordSet(ns.name, n);
++        recordGlobalSet(ns.name, n);
+       } else if (NodeUtil.isFunctionDeclaration(n)) {
+         Node nameNode = n.getFirstChild();
+         NameInformation ns = createNameInformation(t, nameNode, n);
+         if (ns != null) {
+-            JsName nameInfo = getName(nameNode.getString(), true);
+-            recordSet(nameInfo.name, nameNode);
++          recordGlobalSet(ns.name, nameNode);
+         }
+       } else if (NodeUtil.isObjectLitKey(n, parent)) {
+         NameInformation ns = createNameInformation(t, n, parent);
+         if (ns != null) {
+-            recordSet(ns.name, n);
++          recordGlobalSet(ns.name, n);
+         }
+       }
+     }
+ 
+     // Record assignments and call sites
+     if (n.isAssign()) {
+       Node nameNode = n.getFirstChild();
+ 
+       NameInformation ns = createNameInformation(t, nameNode, n);
+       if (ns != null) {
+         if (ns.isPrototype) {
+           recordPrototypeSet(ns.prototypeClass, ns.prototypeProperty, n);
+         } else {
+-            recordSet(ns.name, nameNode);
++          recordGlobalSet(ns.name, nameNode);
+         }
+       }
+     } else if (n.isCall()) {
+       Node nameNode = n.getFirstChild();
+       NameInformation ns = createNameInformation(t, nameNode, n);
+       if (ns != null && ns.onlyAffectsClassDef) {
+         JsName name = getName(ns.name, false);
+         if (name != null) {
+           refNodes.add(new ClassDefiningFunctionNode(
+               name, n, parent, parent.getParent()));
+         }
+       }
+     }
+   }
++
++  /**
++   * Records a global variable or function set.
++   *
++   * @param name the name of the variable or function
++   * @param node the AST node representing the set
++   */
++  abstract void recordGlobalSet(String name, Node node);
++
++}
+\ No newline at end of file

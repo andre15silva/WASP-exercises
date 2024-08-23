@@ -1,0 +1,77 @@
+diff --git a/tmp/1c281f6d-9e6f-4cf9-8ed8-91f5f2ac2734_buggy.java b/tmp/a32f1c8b-6775-4b7d-892d-c47a2f568b0a_fixed.java
+index 85e6a42..ce8f9e8 100644
+--- a/tmp/1c281f6d-9e6f-4cf9-8ed8-91f5f2ac2734_buggy.java
++++ b/tmp/a32f1c8b-6775-4b7d-892d-c47a2f568b0a_fixed.java
+@@ -1,50 +1,72 @@
+     /**
+      * Walks through all recorded entries and adds the data available
+      * from the local file header.
+      *
+      * <p>Also records the offsets for the data to read from the
+      * entries.</p>
+      */
+     private void resolveLocalFileHeaderData(Map<ZipArchiveEntry, NameAndComment>
+                                             entriesWithoutUTF8Flag)
+         throws IOException {
+         // changing the name of a ZipArchiveEntry is going to change
+         // the hashcode - see COMPRESS-164
+         // Map needs to be reconstructed in order to keep central
+         // directory order
+         for (ZipArchiveEntry ze : entries.keySet()) {
+             OffsetEntry offsetEntry = entries.get(ze);
+             long offset = offsetEntry.headerOffset;
+             archive.seek(offset + LFH_OFFSET_FOR_FILENAME_LENGTH);
+             byte[] b = new byte[SHORT];
+             archive.readFully(b);
+             int fileNameLen = ZipShort.getValue(b);
+             archive.readFully(b);
+             int extraFieldLen = ZipShort.getValue(b);
+             int lenToSkip = fileNameLen;
+             while (lenToSkip > 0) {
+                 int skipped = archive.skipBytes(lenToSkip);
+                 if (skipped <= 0) {
+                     throw new RuntimeException("failed to skip file name in"
+                                                + " local file header");
+                 }
+                 lenToSkip -= skipped;
+             }
+             byte[] localExtraData = new byte[extraFieldLen];
+             archive.readFully(localExtraData);
+             ze.setExtra(localExtraData);
+             offsetEntry.dataOffset = offset + LFH_OFFSET_FOR_FILENAME_LENGTH
+                 + SHORT + SHORT + fileNameLen + extraFieldLen;
+ 
+             if (entriesWithoutUTF8Flag.containsKey(ze)) {
+                 String orig = ze.getName();
+                 NameAndComment nc = entriesWithoutUTF8Flag.get(ze);
+                 ZipUtil.setNameAndCommentFromExtraFields(ze, nc.name,
+                                                          nc.comment);
+                 if (!orig.equals(ze.getName())) {
+                     nameMap.remove(orig);
+                     nameMap.put(ze.getName(), ze);
+                 }
+             }
+         }
++        // Read the data descriptor signature that contains a crc value.
++        // In winzip archives, this info is available only if the entry
++        // contains unicode extra fields (in the central directory).
++        for (OffsetEntry offsetEntry : entries.values()) {
++            long offset = offsetEntry.headerOffset;
++            ZipArchiveEntry origZe = offsetEntry.zipArchiveEntry;
++            Set<String> entryNames = archives.get(archive).keySet();
++            for (ZipArchiveEntry ze : entryNames) {
++                if (ze.equals(origZe)) {
++                    byte[] b = new byte[SHORT];
++                    archive.seek(offset + LFH_OFFSET_FOR_LAST_MOD);
++                    archive.readFully(b);
++                    if (ZipShort.getValue(b)
++                        != ZipArchiveOutputStream.EXTDescriptor.FILENAME_DATA
++                        != ZipArchiveOutputStream.EXTDescriptor.EXTRA
++                        != ZipArchiveOutputStream.EXTDescriptor.EXTRA_2) {
++                        ze.setDataDescriptor(true);
++                    }
++                    break;
++                }
++            }
++        }
+     }

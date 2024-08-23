@@ -1,0 +1,72 @@
+diff --git a/tmp/4244435f-ae84-4d98-86d8-6bf7247d2f6b_buggy.java b/tmp/97c590c9-2079-4bd2-99cd-a20646ebc7ac_fixed.java
+index d907b39..2a12531 100644
+--- a/tmp/4244435f-ae84-4d98-86d8-6bf7247d2f6b_buggy.java
++++ b/tmp/97c590c9-2079-4bd2-99cd-a20646ebc7ac_fixed.java
+@@ -1,56 +1,64 @@
+     public int read(byte[] buffer, int start, int length) throws IOException {
+         if (closed) {
+             throw new IOException("The stream is closed");
+         }
+         if (inf.finished() || current == null) {
+             return -1;
+         }
+-
+-        // avoid int overflow, check null buffer
+         if (start <= buffer.length && length >= 0 && start >= 0
+             && buffer.length - start >= length) {
+             if (current.getMethod() == ZipArchiveOutputStream.STORED) {
+                 int csize = (int) current.getSize();
+                 if (readBytesOfEntry >= csize) {
+                     return -1;
+                 }
+                 if (offsetInBuffer >= lengthOfLastRead) {
+                     offsetInBuffer = 0;
+                     if ((lengthOfLastRead = in.read(buf)) == -1) {
+                         return -1;
+                     }
+                     count(lengthOfLastRead);
+                     bytesReadFromStream += lengthOfLastRead;
+                 }
+                 int toRead = length > lengthOfLastRead
+                     ? lengthOfLastRead - offsetInBuffer
+                     : length;
+                 if ((csize - readBytesOfEntry) < toRead) {
+                     toRead = csize - readBytesOfEntry;
+                 }
+                 System.arraycopy(buf, offsetInBuffer, buffer, start, toRead);
+                 offsetInBuffer += toRead;
+                 readBytesOfEntry += toRead;
+                 crc.update(buffer, start, toRead);
+                 return toRead;
+             }
+             if (inf.needsInput()) {
+                 fill();
+                 if (lengthOfLastRead > 0) {
+                     bytesReadFromStream += lengthOfLastRead;
+                 }
+             }
+             int read = 0;
+             try {
+                 read = inf.inflate(buffer, start, length);
+             } catch (DataFormatException e) {
++		if (is7Zip) {
++		    if (csize7Zip == 0) {
++			csize7Zip = Long.parseLong((String)
++			    current.getExtra().getExtraField("CEN~7ZIP").get(5));
++		    }
++		    if (readBytesOfEntry >= csize7Zip) {
++			return -1;
++		    }
++		} else {
+ 		    throw new ZipException(e.getMessage());
+ 		}
++            }
+             if (read == 0 && inf.finished()) {
+                 return -1;
+             }
+             crc.update(buffer, start, read);
+             return read;
+         }
+         throw new ArrayIndexOutOfBoundsException();
+     }
+\ No newline at end of file

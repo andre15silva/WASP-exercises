@@ -1,0 +1,14 @@
+diff --git a/tmp/f67729b7-42f6-4e0b-8fc0-d05de5a2996b_buggy.java b/tmp/0654d612-ca02-4c69-bccf-b73984adbeca_fixed.java
+index 741e96b..c1b9866 100644
+--- a/tmp/f67729b7-42f6-4e0b-8fc0-d05de5a2996b_buggy.java
++++ b/tmp/0654d612-ca02-4c69-bccf-b73984adbeca_fixed.java
+@@ -1,7 +1,9 @@
+     public ChecksumCalculatingInputStream(final Checksum checksum, final InputStream in) {
++        assert checksum != null;
++        assert in != null;
+ 
+ 
+ 
+         this.checksum = checksum;
+         this.in = in;
+     }

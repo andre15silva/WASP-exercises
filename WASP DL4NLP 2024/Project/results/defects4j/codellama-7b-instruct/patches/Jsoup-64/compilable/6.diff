@@ -1,0 +1,12 @@
+diff --git a/tmp/e76156ab-56fc-449f-af03-e259e670d4df_buggy.java b/tmp/bd15e672-740c-4c02-910d-9b20eed6fa43_fixed.java
+index 5eedc11..6955b6c 100644
+--- a/tmp/e76156ab-56fc-449f-af03-e259e670d4df_buggy.java
++++ b/tmp/bd15e672-740c-4c02-910d-9b20eed6fa43_fixed.java
+@@ -1,6 +1,6 @@
+     private static void handleRawtext(Token.StartTag startTag, HtmlTreeBuilder tb) {
+-        tb.insert(startTag);
++        tb.tokeniser.emit(startTag);
+         tb.tokeniser.transition(TokeniserState.Rawtext);
+         tb.markInsertionMode();
+         tb.transition(Text);
+     }

@@ -1,0 +1,13 @@
+diff --git a/tmp/c1eb2571-5c02-4af5-9863-cc1ba3339566_buggy.java b/tmp/2e05fa94-0f13-4e6d-b52f-179a59df7f52_fixed.java
+index 00b39e0..b70cbe3 100644
+--- a/tmp/c1eb2571-5c02-4af5-9863-cc1ba3339566_buggy.java
++++ b/tmp/2e05fa94-0f13-4e6d-b52f-179a59df7f52_fixed.java
+@@ -1,7 +1,8 @@
+     public void describeTo(Description description) {
+         description.appendText("same(");
+         appendQuoting(description);
++        // NOTE not passing null because it will throw NPE from assertion matcher code:
+         description.appendText(wanted.toString());
+         appendQuoting(description);
+         description.appendText(")");
+     }

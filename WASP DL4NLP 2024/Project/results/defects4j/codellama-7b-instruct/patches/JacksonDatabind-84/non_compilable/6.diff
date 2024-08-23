@@ -1,0 +1,30 @@
+diff --git a/tmp/0caf2212-3159-4ba4-8796-e11c2947de9a_buggy.java b/tmp/0bac9441-063d-458d-ac19-f4324ec11d94_fixed.java
+index e69de29..a1c2ca4 100644
+--- a/tmp/0caf2212-3159-4ba4-8796-e11c2947de9a_buggy.java
++++ b/tmp/0bac9441-063d-458d-ac19-f4324ec11d94_fixed.java
+@@ -0,0 +1,24 @@
++    @JsonTypeInfo(use = JsonTypeInfo.Id.NAME, property = "type")
++    @JsonSubTypes({
++        @JsonSubTypes.Type(name = "base", value = Base.class),
++        @JsonSubTypes.Type(name = "sub", value = Sub.class)
++    })
++    private static class Base {
++        @JsonProperty("base")
++        private int field = 1;
++    }
++
++    private static class Sub extends Base {
++        @JsonProperty("sub")
++        private int field = 2;
++    }
++
++    @Test
++    public void testBasePropertiesIncludedWhenSerializingSubWhenSubTypeLoadedAfterBaseType() throws IOException {
++        TypeFactory tf = TypeFactory.defaultInstance();
++        tf.constructType(Base.class);
++        tf.constructType(Sub.class);
++        Sub sub = new Sub();
++        String serialized = objectMapper().writeValueAsString(sub);
++        assertEquals("{\"base\":1,\"sub\":2}", serialized);
++    }
+\ No newline at end of file

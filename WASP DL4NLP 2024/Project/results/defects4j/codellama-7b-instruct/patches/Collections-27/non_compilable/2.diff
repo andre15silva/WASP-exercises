@@ -1,0 +1,19 @@
+diff --git a/tmp/eedcf3ed-dc7c-4eac-8153-8c5dfae92fd4_buggy.java b/tmp/0b13a997-b4d0-45d1-b41d-458ae6dabfc0_fixed.java
+index e69de29..dfb497e 100644
+--- a/tmp/eedcf3ed-dc7c-4eac-8153-8c5dfae92fd4_buggy.java
++++ b/tmp/0b13a997-b4d0-45d1-b41d-458ae6dabfc0_fixed.java
+@@ -0,0 +1,13 @@
++public static Object deserialize(byte[] bytes) throws IOException, ClassNotFoundException {
++    try (ByteArrayInputStream bais = new ByteArrayInputStream(bytes); 
++            ObjectInputStream ois = new ObjectInputStream(bais)) {
++        Object object = ois.readObject();
++        if (object instanceof MultiValueMap) {
++            MultiValueMap map = (MultiValueMap) object;
++            if (!map.getClazz().equals(HashMap.class)) {
++                throw new UnsupportedOperationException("unsafe clazz accepted when de-serializing MultiValueMap");
++            }
++        }
++        return object;
++    }
++}
+\ No newline at end of file

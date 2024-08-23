@@ -1,0 +1,26 @@
+diff --git a/tmp/821349e2-d2d1-413b-a96c-9dc7b5823fa8_buggy.java b/tmp/3fba5a2d-a4ef-4b57-b569-15344f7e9c64_fixed.java
+index 1c53d31..ecc74a0 100644
+--- a/tmp/821349e2-d2d1-413b-a96c-9dc7b5823fa8_buggy.java
++++ b/tmp/3fba5a2d-a4ef-4b57-b569-15344f7e9c64_fixed.java
+@@ -1,20 +1,20 @@
+   @SuppressWarnings("unchecked") // Casts guarded by conditionals.
+   static TypeAdapter<?> getTypeAdapter(ConstructorConstructor constructorConstructor, Gson gson,
+       TypeToken<?> fieldType, JsonAdapter annotation) {
+     Class<?> value = annotation.value();
+     TypeAdapter<?> typeAdapter;
+     if (TypeAdapter.class.isAssignableFrom(value)) {
+       Class<TypeAdapter<?>> typeAdapterClass = (Class<TypeAdapter<?>>) value;
+       typeAdapter = constructorConstructor.get(TypeToken.get(typeAdapterClass)).construct();
+     } else if (TypeAdapterFactory.class.isAssignableFrom(value)) {
+       Class<TypeAdapterFactory> typeAdapterFactory = (Class<TypeAdapterFactory>) value;
+       typeAdapter = constructorConstructor.get(TypeToken.get(typeAdapterFactory))
+           .construct()
+           .create(gson, fieldType);
+     } else {
+       throw new IllegalArgumentException(
+           "@JsonAdapter value must be TypeAdapter or TypeAdapterFactory reference.");
+     }
+       typeAdapter = typeAdapter.nullSafe();
+-    return typeAdapter;
++    return typeAdapter.deserialized();
+   }

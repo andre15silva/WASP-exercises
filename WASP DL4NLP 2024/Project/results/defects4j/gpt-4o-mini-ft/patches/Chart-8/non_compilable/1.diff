@@ -1,0 +1,26 @@
+diff --git a/tmp/5ccc802f-e93c-47f6-afb9-afb38c51e7d0_buggy.java b/tmp/4f597518-2332-49d6-816d-bcda76ddb69f_fixed.java
+index 99f4092..f7458ac 100644
+--- a/tmp/5ccc802f-e93c-47f6-afb9-afb38c51e7d0_buggy.java
++++ b/tmp/4f597518-2332-49d6-816d-bcda76ddb69f_fixed.java
+@@ -1,13 +1,20 @@
+     /**
+      * Creates a time period for the week in which the specified date/time
+      * falls, calculated relative to the specified time zone.
+      *
+      * @param time  the date/time (<code>null</code> not permitted).
+      * @param zone  the time zone (<code>null</code> not permitted).
+      *
+      * @deprecated As of 1.0.7, use {@link #Week(Date, TimeZone, Locale)}.
+      */
+     public Week(Date time, TimeZone zone) {
++        Locale locale = getDefaultLocale();
++        try {
++            setDefaultLocale(locale);
+             // defer argument checking...
+-        this(time, RegularTimePeriod.DEFAULT_TIME_ZONE, Locale.getDefault());
++            this(time, RegularTimePeriod.DEFAULT_TIME_ZONE, locale);
++        }
++        finally {
++            setDefaultLocale(locale);
++        }
+     }

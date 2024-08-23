@@ -1,0 +1,15 @@
+diff --git a/tmp/40ef1458-3baf-4b1a-b12b-f3776d6af898_buggy.java b/tmp/33d5dfbb-01d3-4a4b-96f5-fe5edb61afcc_fixed.java
+index 1648a8d..4eaf1a2 100644
+--- a/tmp/40ef1458-3baf-4b1a-b12b-f3776d6af898_buggy.java
++++ b/tmp/33d5dfbb-01d3-4a4b-96f5-fe5edb61afcc_fixed.java
+@@ -1,9 +1,3 @@
+-    /**
+-     * Returns an iterator over the unmodifiable list of chromosomes.
+-     * <p>Any call to {@link Iterator#remove()} will result in a {@link UnsupportedOperationException}.</p>
+-     *
+-     * @return chromosome iterator
+-     */
+     public Iterator<Chromosome> iterator() {
+-        return chromosomes.iterator();
++        return ListPopulation.this.chromosomes.iterator();
+     }

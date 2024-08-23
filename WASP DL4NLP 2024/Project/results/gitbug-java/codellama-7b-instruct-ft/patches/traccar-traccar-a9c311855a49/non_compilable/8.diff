@@ -1,0 +1,45 @@
+diff --git a/tmp/0120bd4c-2287-4f29-b512-f87db69ddc08_buggy.java b/tmp/a5a5ac0c-a792-4482-9543-17713b7748b2_fixed.java
+index ff397b6..260794a 100644
+--- a/tmp/0120bd4c-2287-4f29-b512-f87db69ddc08_buggy.java
++++ b/tmp/a5a5ac0c-a792-4482-9543-17713b7748b2_fixed.java
+@@ -1,35 +1,36 @@
+     @Override
+     protected Object decode(DeviceSession deviceSession, MqttPublishMessage message) throws Exception {
+ 
+-        JsonObject json;
+-        try (ByteBufferInputStream inputStream = new ByteBufferInputStream(message.payload().nioBuffer())) {
+-            json = Json.createReader(inputStream).readObject();
+-        }
++        ByteBuffer bytes = message.payload();
++        int i;
++        long m;
++        JsonObject json = parse(new ByteBufferInputStream(bytes), 0, bytes.get(0), bytes.remaining() - 1,
++                (b, s) -> m = Long.parseLong(new String(bytes.array(), s, Math.min(b.remaining(), 9), StandardCharsets.UTF_8), 36), (b, s) -> i = s);
+ 
+         String type = json.getString("rpt");
+         switch (type) {
+             case "hf":
+             case "loc":
+                 Position position = new Position(getProtocolName());
+                 position.setDeviceId(deviceSession.getDeviceId());
+ 
+                 position.setValid(true);
+ 
+                 DateFormat dateFormat = new SimpleDateFormat("yyyyMMdd'T'HHmmss.SSS'Z'");
+                 position.setTime(dateFormat.parse(json.getString("ts")));
+ 
+                 JsonObject location = json.getJsonObject("location");
+                 position.setLatitude(location.getJsonNumber("lat").doubleValue());
+                 position.setLongitude(location.getJsonNumber("lon").doubleValue());
+ 
+                 position.setCourse(json.getInt("bear"));
+                 position.setSpeed(UnitsConverter.knotsFromCps(json.getInt("spd")));
+ 
+                 position.set(Position.KEY_IGNITION, json.getString("ign").equals("on"));
+ 
+                 return position;
+ 
+             default:
+                 return null;
+         }
+     }

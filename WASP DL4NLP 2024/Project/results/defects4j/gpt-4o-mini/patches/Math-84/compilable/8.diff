@@ -1,0 +1,60 @@
+diff --git a/tmp/f3f8c88f-e706-4bac-af20-df1dc0219264_buggy.java b/tmp/4725697c-98cb-4323-8dbc-ef426067e486_fixed.java
+index 5f1dcf2..c49be7c 100644
+--- a/tmp/f3f8c88f-e706-4bac-af20-df1dc0219264_buggy.java
++++ b/tmp/4725697c-98cb-4323-8dbc-ef426067e486_fixed.java
+@@ -1,41 +1,46 @@
+ /** {@inheritDoc} */
+ @Override
+ protected void iterateSimplex(final Comparator<RealPointValuePair> comparator)
+     throws FunctionEvaluationException, OptimizationException, IllegalArgumentException {
+ 
+     while (true) {
+ 
+         incrementIterationsCounter();
+ 
+         // save the original vertex
+         final RealPointValuePair[] original = simplex;
+         final RealPointValuePair best = original[0];
+ 
+         // perform a reflection step
+         final RealPointValuePair reflected = evaluateNewSimplex(original, 1.0, comparator);
+         if (comparator.compare(reflected, best) < 0) {
+-
+             // compute the expanded simplex
+-                final RealPointValuePair[] reflectedSimplex = simplex;
+             final RealPointValuePair expanded = evaluateNewSimplex(original, khi, comparator);
+             if (comparator.compare(reflected, expanded) <= 0) {
+                 // accept the reflected simplex
+-                    simplex = reflectedSimplex;
++                simplex = new RealPointValuePair[] { reflected };
++            } else {
++                simplex = new RealPointValuePair[] { expanded };
+             }
+-
+             return;
+-
+         }
+ 
+         // compute the contracted simplex
+         final RealPointValuePair contracted = evaluateNewSimplex(original, gamma, comparator);
+         if (comparator.compare(contracted, best) < 0) {
+-                // accept the contracted simplex
+-
+-            // check convergence
++            simplex = new RealPointValuePair[] { contracted };
+             return;
+         }
+ 
++        // reduce the simplex
++        final RealPointValuePair[] reduced = new RealPointValuePair[original.length];
++        for (int i = 0; i < original.length; i++) {
++            reduced[i] = new RealPointValuePair(original[i].getPoint(), original[i].getValue());
++            for (int j = 0; j < reduced[i].getPoint().length; j++) {
++                reduced[i].getPoint()[j] = original[0].getPoint()[j] + (original[i].getPoint()[j] - original[0].getPoint()[j]) * 0.5;
++            }
++        }
++        simplex = reduced;
+     }
+ 
+ }
+\ No newline at end of file

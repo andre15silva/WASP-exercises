@@ -1,0 +1,24 @@
+diff --git a/tmp/b0283842-9525-439e-a79c-424737c2d44c_buggy.java b/tmp/35315a5a-5978-48ab-912d-7ecd84b587fc_fixed.java
+index f7bc541..3b43ebc 100644
+--- a/tmp/b0283842-9525-439e-a79c-424737c2d44c_buggy.java
++++ b/tmp/35315a5a-5978-48ab-912d-7ecd84b587fc_fixed.java
+@@ -1,14 +1,12 @@
+-    /**
+-     Creates a new, clean document, from the original dirty document, containing only elements allowed by the whitelist.
+-     The original document is not modified. Only elements from the dirt document's <code>body</code> are used.
+-     @param dirtyDocument Untrusted base document to clean.
+-     @return cleaned document.
+-     */
+ public Document clean(Document dirtyDocument) {
+     Validate.notNull(dirtyDocument);
+ 
+     Document clean = Document.createShell(dirtyDocument.baseUri());
++    
++    // Check if the body is not null before copying safe nodes
++    if (dirtyDocument.body() != null) {
+         copySafeNodes(dirtyDocument.body(), clean.body());
++    }
+ 
+     return clean;
+ }
+\ No newline at end of file

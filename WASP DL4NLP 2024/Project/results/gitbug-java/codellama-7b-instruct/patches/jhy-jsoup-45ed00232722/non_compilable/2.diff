@@ -1,0 +1,29 @@
+diff --git a/tmp/f2fc6360-2556-4eba-9f7b-57a1759e138a_buggy.java b/tmp/60e8cfbd-ed9e-40f5-b074-3902671049f1_fixed.java
+index 855afa5..808a094 100644
+--- a/tmp/f2fc6360-2556-4eba-9f7b-57a1759e138a_buggy.java
++++ b/tmp/60e8cfbd-ed9e-40f5-b074-3902671049f1_fixed.java
+@@ -1,13 +1,13 @@
+-    static URL encodeUrl(URL u) {
+-	    u = punyUrl(u);
++URL punyUrl(URL u) {
++    String host = u.getHost();
++    String idnHost = HostNameUtils.toUnicode(host);
++    if (!idnHost.equals(host)) {
+         try {
+-            //  odd way to encode urls, but it works!
+-            String urlS = u.toExternalForm(); // URL external form may have spaces which is illegal in new URL() (odd asymmetry)
+-            urlS = urlS.replace(" ", "%20");
+-            final URI uri = new URI(urlS);
+-            return new URL(uri.toASCIIString());
+-        } catch (URISyntaxException | MalformedURLException e) {
+-            // give up and return the original input
++            URL punyURL = new URL(u.getProtocol() + "://" + idnHost + u.getPath());
++            return punyURL;
++        } catch (MalformedURLException e) {
++            e.printStackTrace();
++        }
++    }
+     return u;
+ }
+\ No newline at end of file
+-    }

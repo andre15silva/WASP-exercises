@@ -1,0 +1,35 @@
+diff --git a/tmp/0fafa87b-fad1-4e0c-a553-a1779d5911ed_buggy.java b/tmp/a4c14ad3-d4e1-4e51-840e-0fae21457431_fixed.java
+index 39c4220..6e39361 100644
+--- a/tmp/0fafa87b-fad1-4e0c-a553-a1779d5911ed_buggy.java
++++ b/tmp/a4c14ad3-d4e1-4e51-840e-0fae21457431_fixed.java
+@@ -1,21 +1,20 @@
++class Foo {
+   private final static int _parseIndex(String str) {
++    // [Issue#133]: improve parsing of super long indexes
+     final int len = str.length();
+-        // [Issue#133]: beware of super long indexes; assume we never
+-        // have arrays over 2 billion entries so ints are fine.
+     if (len == 0 || len > 10) {
+       return -1;
+     }
+-        for (int i = 0; i < len; ++i) {
+-            char c = str.charAt(i++);
+-            if (c > '9' || c < '0') {
+-                return -1;
+-            }
+-        }
+-        if (len == 10) {
++    // [Issue#137]: use try-catch to avoid NumberFormatException
++    try {
+       long l = NumberInput.parseLong(str);
+       if (l > Integer.MAX_VALUE) {
+         return -1;
+       }
++    } catch (NumberFormatException e) {
++      // [Issue#134]: improve error handling
++      throw new IllegalArgumentException("Invalid index: " + str, e);
+     }
+     return NumberInput.parseInt(str);
+   }
++}
+\ No newline at end of file

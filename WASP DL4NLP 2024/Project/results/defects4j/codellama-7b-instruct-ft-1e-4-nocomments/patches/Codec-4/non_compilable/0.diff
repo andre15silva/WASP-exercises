@@ -1,0 +1,51 @@
+diff --git a/tmp/731d6757-56b2-4147-a40c-0a6842f726ad_buggy.java b/tmp/721eb15a-4ee3-4ec4-acbe-91852a4e77e7_fixed.java
+index 3fb3172..4db9ab7 100644
+--- a/tmp/731d6757-56b2-4147-a40c-0a6842f726ad_buggy.java
++++ b/tmp/721eb15a-4ee3-4ec4-acbe-91852a4e77e7_fixed.java
+@@ -1,13 +1,44 @@
+     /**
+      * Creates a Base64 codec used for decoding (all modes) and encoding in URL-unsafe mode.
+      * <p>
+      * When encoding the line length is 0 (no chunking), and the encoding table is STANDARD_ENCODE_TABLE.
+      * </p>
+-     * 
+      * <p>
+      * When decoding all variants are supported.
+      * </p>
+      */
+     public Base64() {
+         this(false);
+     }
++    public Object encode(Object input) throws EncoderException {
++        if (input==null) {
++            return null;
++        }
++        try {
++            if (input instanceof byte[]) {
++                return encode(((byte[]) input));
++            }
++            if (input instanceof String){
++                return encode(((String)input).getBytes(PREFERRED_CHARSET), PREFERRED_CHARSET);
++            }
++            throw new EncoderException("Bas64 can only support byte array or String, and not " + input.getClass());
++        } catch (IOException e) {
++            throw new EncoderException(e.getMessage());
++        }
++    }
++    public Object decode(Object input) throws DecoderException {
++        if (input == null) {
++            return null;
++        }
++        try {
++            if (input instanceof byte[]) {
++                return decode(((byte[]) input));
++            }
++            if (input instanceof String){
++                return decode(((String)input).getBytes(PREFERRED_CHARSET), PREFERRED_CHARSET);
++            }
++            throw new DecoderException("Bas64 can only support byte array or String, and not " + input.getClass());
++        } catch (IOException e) {
++            throw new DecoderException(e.getMessage());
++        }
++    }
+\ No newline at end of file

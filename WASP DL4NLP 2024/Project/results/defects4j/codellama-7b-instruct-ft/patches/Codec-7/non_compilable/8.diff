@@ -1,0 +1,65 @@
+diff --git a/tmp/e7238207-9523-49a5-ab92-ed3eda51b2f1_buggy.java b/tmp/535ff491-0e9f-4e0f-9d95-7e612801667f_fixed.java
+index 31c6a4b..2e68665 100644
+--- a/tmp/e7238207-9523-49a5-ab92-ed3eda51b2f1_buggy.java
++++ b/tmp/535ff491-0e9f-4e0f-9d95-7e612801667f_fixed.java
+@@ -1,11 +1,60 @@
+     /**
+      * Encodes binary data using the base64 algorithm into 76 character blocks separated by CRLF.
+      *
+      * @param binaryData
+      *            binary data to encode
+      * @return String containing Base64 characters.
+      * @since 1.4
+      */    
+     public static String encodeBase64String(byte[] binaryData) {
+         return StringUtils.newStringUtf8(encodeBase64(binaryData, true));
+     }
++
++    /**
++     * Gets the base64 alphabet and returns it in its encrypted string representation. The
++     * returned array of <tt>char</tt>s is a <i>shareable</i> resource.
++     *
++     * @return the base64 alphabet in its encrypted form
++     * @see Base64#getBase64Alphabet()
++     */
++    public static String getBase64EncodedAlphabet() {
++        char[] alphabet = new char[getBase64Alphabet().length];
++        System.arraycopy(getBase64Alphabet(), 0, alphabet, 0, alphabet.length);
++        return new String(alphabet);
++    }
++
++    /**
++     * Encodes a byte array into a base64-coded String. NoBlanks. Line sizes of 76 characters.
++     *
++     * @param binaryData
++     *            binary data to encode
++     * @return String containing Base64 encoded data
++     * @see #encodeBase64String(byte[])
++     */
++    public static String encodeBase64StringNoBlanks(byte[] binaryData) {
++        return StringUtils.newStringUtf8(encodeBase64(binaryData, true));
++    }
++
++    /**
++     * Encodes a byte array into a base64-coded String. Line sizes of 76 characters.
++     *
++     * @param binaryData
++     *            binary data to encode
++     * @return String containing Base64 encoded data
++     * @see #encodeBase64String(byte[])
++     */
++    public static String encodeBase64String(byte[] binaryData) {
++        return StringUtils.newStringUtf8(byteToString(binaryData));
++    }
++
++    /**
++     * Encodes a byte array into a base64 url-safe-coded String. Line sizes of 76 characters.
++     *
++     * @param binaryData
++     *            binary data to encode
++     * @return String containing Base64 encoded data
++     * @see #encodeBase64String(byte[])
++     */
++    public static String encodeBase64URLSafeString(byte[] binaryData) {
++        return StringUtils.newStringUtf8(encodeBase64(binaryData, true), StringUtils.ISO_8859_1);
++    }

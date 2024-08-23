@@ -1,0 +1,36 @@
+diff --git a/tmp/39bc7989-84db-4a7b-b507-3a5f190a5f81_buggy.java b/tmp/cc26ff45-6713-412c-847a-f2c06aa1b79a_fixed.java
+index 6cfa79b..ce25691 100644
+--- a/tmp/39bc7989-84db-4a7b-b507-3a5f190a5f81_buggy.java
++++ b/tmp/cc26ff45-6713-412c-847a-f2c06aa1b79a_fixed.java
+@@ -1,12 +1,21 @@
+     /**
+-     * For this disbution, X, this method returns P(X &lt; <code>x</code>).
+-     * @param x the value at which the CDF is evaluated.
+-     * @return CDF evaluted at <code>x</code>. 
+-     * @throws MathException if the algorithm fails to converge; unless
+-     * x is more than 20 standard deviations from the mean, in which case the
+-     * convergence exception is caught and 0 or 1 is returned.
++     * Check to make sure top-coding of extreme values works correctly.
++     * Verifies fix for JIRA MATH-167
+      */
+-    public double cumulativeProbability(double x) throws MathException {
+-            return 0.5 * (1.0 + Erf.erf((x - mean) /
+-                    (standardDeviation * Math.sqrt(2.0))));
++    public void testExtremeValues() throws Exception {
++        NormalDistribution distribution = (NormalDistribution) getDistribution();
++        distribution.setMean(0);
++        distribution.setStandardDeviation(1);
++        for (int i = 0; i < 100; i+=5) { // make sure no convergence exception
++            double lowerTail = distribution.getCumulativeProbability((double)-i);
++            double upperTail = distribution.getCumulativeProbability((double) i);
++            if (i < 10) { // make sure not top-coded
++                assertTrue(lowerTail > 0.0d);
++                assertTrue(upperTail < 1.0d);
++            }
++            else { // make sure top coding not reversed
++                assertTrue(lowerTail < 0.00001);
++                assertTrue(upperTail > 0.99999);
++            }
++        }
+     }
+\ No newline at end of file

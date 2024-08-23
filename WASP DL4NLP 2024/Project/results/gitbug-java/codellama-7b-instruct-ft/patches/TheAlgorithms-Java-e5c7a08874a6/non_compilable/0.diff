@@ -1,0 +1,53 @@
+diff --git a/tmp/ef247b46-5b74-4a34-8be5-04bdd82f0cf3_buggy.java b/tmp/65a8193c-a7d6-4d15-95aa-0082ef1b6706_fixed.java
+index 2444d12..cf889a1 100644
+--- a/tmp/ef247b46-5b74-4a34-8be5-04bdd82f0cf3_buggy.java
++++ b/tmp/65a8193c-a7d6-4d15-95aa-0082ef1b6706_fixed.java
+@@ -1,29 +1,33 @@
+     // Evaluates the given postfix expression string and returns the result.
+     public static int postfixEvaluate(final String exp) {
+         Stack<Integer> s = new Stack<Integer>();
+         Scanner tokens = new Scanner(exp);
+ 
+         while (tokens.hasNext()) {
+-            if (tokens.hasNextInt()) {
+-                s.push(tokens.nextInt()); // If int then push to stack
+-            } else { // else pop top two values and perform the operation
+-                int num2 = s.pop();
+-                int num1 = s.pop();
+-                String op = tokens.next();
++            int arg1 = s.pop();
++            int arg2 = s.pop();
++            String operator = tokens.next();
+ 
+-                switch (op) {
+-                    case "+" -> s.push(num1 + num2);
+-                    case "-" -> s.push(num1 - num2);
+-                    case "*" -> s.push(num1 * num2);
+-                    case "/" -> s.push(num1 / num2);
+-                    default -> throw new IllegalArgumentException("exp contains an unknown operation.");
+-                }
+-                //  "+", "-", "*", "/"
++            switch (operator) {
++                case "+":
++                    s.push(arg1 + arg2);
++                    break;
++                case "-":
++                    s.push(arg1 - arg2);
++                    break;
++                case "*":
++                    s.push(arg1 * arg2);
++                    break;
++                case "/":
++                    s.push(arg1 / arg2);
++                    break;
++                default:
++                    throw new IllegalArgumentException(String.format("Unknown operator (%s)", operator));
+             }
+         }
+         tokens.close();
+         if (s.size() != 1) {
+-            throw new IllegalArgumentException("exp is not a proper postfix expression.");
++            throw new IllegalArgumentException("The postfix expression is not complete.");
+         }
+         return s.pop();
+     }

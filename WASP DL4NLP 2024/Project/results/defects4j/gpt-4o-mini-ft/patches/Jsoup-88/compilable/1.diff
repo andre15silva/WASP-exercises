@@ -1,0 +1,15 @@
+diff --git a/tmp/0cdb38af-e727-48cc-9a8e-e179c268aac5_buggy.java b/tmp/696d9f37-af8a-4431-84a6-29198f8475f8_fixed.java
+index a68ccd7..195a2c2 100644
+--- a/tmp/0cdb38af-e727-48cc-9a8e-e179c268aac5_buggy.java
++++ b/tmp/696d9f37-af8a-4431-84a6-29198f8475f8_fixed.java
+@@ -1,7 +1,10 @@
+     /**
+      Get the attribute value.
+      @return the attribute value
+      */
+     public String getValue() {
++        if (val == null && key.matches(".*\\b(?:readonly|disabled)\\b.*")) {
++            val = "";
++        }
+         return val;
+     }

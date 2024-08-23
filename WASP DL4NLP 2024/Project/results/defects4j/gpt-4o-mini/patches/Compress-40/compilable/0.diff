@@ -1,0 +1,54 @@
+diff --git a/tmp/c863dd93-4875-4e6a-b803-e92220c85146_buggy.java b/tmp/de613871-8586-4bdf-81e7-32344f5c7784_fixed.java
+index 7116384..7938457 100644
+--- a/tmp/c863dd93-4875-4e6a-b803-e92220c85146_buggy.java
++++ b/tmp/de613871-8586-4bdf-81e7-32344f5c7784_fixed.java
+@@ -1,39 +1,30 @@
+-    /**
+-     * Returns at most 63 bits read from the underlying stream.
+-     *
+-     * @param count the number of bits to read, must be a positive
+-     * number not bigger than 63.
+-     * @return the bits concatenated as a long using the stream's byte order.
+-     *         -1 if the end of the underlying stream has been reached before reading
+-     *         the requested number of bits
+-     * @throws IOException on error
+-     */
+ public long readBits(final int count) throws IOException {
+-        if (count < 0 || count > MAXIMUM_CACHE_SIZE) {
+-            throw new IllegalArgumentException("count must not be negative or greater than " + MAXIMUM_CACHE_SIZE);
++    if (count <= 0 || count > MAXIMUM_CACHE_SIZE) {
++        throw new IllegalArgumentException("count must be a positive number not bigger than " + MAXIMUM_CACHE_SIZE);
+     }
+     while (bitsCachedSize < count) {
+         final long nextByte = in.read();
+         if (nextByte < 0) {
+-                return nextByte;
++            return -1; // Return -1 when the end of stream is reached
+         }
+         if (byteOrder == ByteOrder.LITTLE_ENDIAN) {
+             bitsCached |= (nextByte << bitsCachedSize);
+         } else {
+-                bitsCached <<= 8;
+-                bitsCached |= nextByte;
++            bitsCached = (bitsCached << 8) | nextByte; // Combine properly for big-endian
+         }
+         bitsCachedSize += 8;
+     }
+-            // bitsCachedSize >= 57 and left-shifting it 8 bits would cause an overflow
+ 
+     final long bitsOut;
+     if (byteOrder == ByteOrder.LITTLE_ENDIAN) {
+-                bitsOut = (bitsCached & MASKS[count]);
+-                bitsCached >>>= count;
++        bitsOut = bitsCached & MASKS[count];
++        bitsCached >>>= count; // Use unsigned right shift for little-endian
+     } else {
+         bitsOut = (bitsCached >> (bitsCachedSize - count)) & MASKS[count];
++        bitsCachedSize -= count;
++        bitsCached = bitsCached & MASKS[bitsCachedSize]; // Adjust bitsCached as necessary
+     }
++    
+     bitsCachedSize -= count;
+     return bitsOut;
+ }
+\ No newline at end of file

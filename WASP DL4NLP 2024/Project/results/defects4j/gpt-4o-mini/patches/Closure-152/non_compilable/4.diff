@@ -1,0 +1,49 @@
+diff --git a/tmp/82136e4d-3f8d-438b-bccc-a0166797020b_buggy.java b/tmp/80632cc7-f6b8-47e5-b260-89aa2f038eb2_fixed.java
+index 58a1651..b131ea2 100644
+--- a/tmp/82136e4d-3f8d-438b-bccc-a0166797020b_buggy.java
++++ b/tmp/80632cc7-f6b8-47e5-b260-89aa2f038eb2_fixed.java
+@@ -1,32 +1,41 @@
+ @Override
+ JSType resolveInternal(ErrorReporter t, StaticScope<JSType> scope) {
+     setResolvedTypeInternal(this);
+ 
+     call = (ArrowType) safeResolve(call, t, scope);
+     prototype = (FunctionPrototypeType) safeResolve(prototype, t, scope);
+ 
+     // Warning about typeOfThis if it doesn't resolve to an ObjectType
+     // is handled further upstream.
+-    // TODO(nicksantos): Handle this correctly if we have a UnionType.
+-    typeOfThis = (ObjectType) safeResolve(typeOfThis, t, scope);
++    JSType resolvedTypeOfThis = safeResolve(typeOfThis, t, scope);
++    if (resolvedTypeOfThis instanceof ObjectType) {
++        typeOfThis = (ObjectType) resolvedTypeOfThis;
++    } else if (resolvedTypeOfThis instanceof UnionType) {
++        // Handle UnionTypes correctly; we may want to raise a warning here
++        typeOfThis = null; // or some default ObjectType, depending on the context
++        t.report(/* appropriate warning for union type */);
++    } else {
++        // If it's neither, we can throw an error or handle it differently
++        t.report(/* appropriate error for unexpected type */);
++    }
+ 
+     boolean changed = false;
+     ImmutableList.Builder<ObjectType> resolvedInterfaces =
+         ImmutableList.builder();
+     for (ObjectType iface : implementedInterfaces) {
+         ObjectType resolvedIface = (ObjectType) iface.resolve(t, scope);
+         resolvedInterfaces.add(resolvedIface);
+         changed |= (resolvedIface != iface);
+     }
+     if (changed) {
+         implementedInterfaces = resolvedInterfaces.build();
+     }
+ 
+     if (subTypes != null) {
+         for (int i = 0; i < subTypes.size(); i++) {
+             subTypes.set(i, (FunctionType) subTypes.get(i).resolve(t, scope));
+         }
+     }
+ 
+     return super.resolveInternal(t, scope);
+ }
+\ No newline at end of file

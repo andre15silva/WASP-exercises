@@ -1,0 +1,44 @@
+diff --git a/tmp/53d93ca6-e559-4010-a404-66e25be22095_buggy.java b/tmp/10294c81-cda7-45aa-b6b9-cb263410bd16_fixed.java
+index fa42cd9..b947b43 100644
+--- a/tmp/53d93ca6-e559-4010-a404-66e25be22095_buggy.java
++++ b/tmp/10294c81-cda7-45aa-b6b9-cb263410bd16_fixed.java
+@@ -1,27 +1,32 @@
+   /**
+    * Declares a refined type in {@code scope} for the name represented by
+    * {@code node}. It must be possible to refine the type of the given node in
+    * the given scope, as determined by {@link #getTypeIfRefinable}.
+    */
+   protected void declareNameInScope(FlowScope scope, Node node, JSType type) {
+     switch (node.getType()) {
+       case Token.NAME:
+         scope.inferSlotType(node.getString(), type);
+         break;
+ 
+       case Token.GETPROP:
+-        String qualifiedName = node.getQualifiedName();
+-        Preconditions.checkNotNull(qualifiedName);
+-
+-        JSType origType = node.getJSType();
+-        origType = origType == null ? getNativeType(UNKNOWN_TYPE) : origType;
+-        scope.inferQualifiedSlot(node, qualifiedName, origType, type);
++        // "this" references are inferred differently, and this case is handled elsewhere
+         break;
+ 
+-        // "this" references aren't currently modeled in the CFG.
++      case Token.THIS:
++        // In a nested function, we don't know the type of this when we compile the function,
++        // so don't infer it here. (We do know the type when we use analyze to build a full
++        // analysis data structure.)
++         // Note: this is now always null in optimized code.
++        JSType thisType = getDeclaredThisType();
++        if (thisType != null) {
++          thisType = nullableVoidableToNullOrUndefined(thisType);
++          scope.inferQualifiedSlot(node, "this", thisType, thisType);
++        }
++        break;
+ 
+       default:
+         throw new IllegalArgumentException("Node cannot be refined. \n" +
+             node.toStringTree());
+     }
+   }

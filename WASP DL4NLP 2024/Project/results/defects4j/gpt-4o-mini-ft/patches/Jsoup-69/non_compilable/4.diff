@@ -1,0 +1,25 @@
+diff --git a/tmp/6cb7959c-9206-45f8-afee-386a1128f231_buggy.java b/tmp/6a5ff3c2-1444-44fe-948e-3ca16d615b5b_fixed.java
+index e69de29..35712a0 100644
+--- a/tmp/6cb7959c-9206-45f8-afee-386a1128f231_buggy.java
++++ b/tmp/6a5ff3c2-1444-44fe-948e-3ca16d615b5b_fixed.java
+@@ -0,0 +1,19 @@
++public List<Connection.KeyVal> formData() {
++    List<Connection.KeyVal> data = new ArrayList<Connection.KeyVal>();
++    // Following code is based on http://www.w3.org/TR/html401/interact/forms.html#form-elements
++    // Issues with the following block: http://www.w3.org/TR/html401/interact/forms.html#h-4.3.4.2
++    // It is unclear depending on source tree whether the "text" element supports enctype="multipart/form-data",
++    // for the following reason:
++    // [Mozilla bug 974708](https://bugzilla.mozilla.org/show_bug.cgi?id=974708) added "support" for
++    // xwwwform: content on Browser payload API, which definitely should have done the same for text as it does
++    // for everything else.  The w3 form data spec is currently out-of-date:
++    // https://fetch.spec.whatwg.org/#form-data-set
++    // So just use XMLHttpRequest for console developers speed.
++    FormElement firstContext = formParent;
++    while (!firstContext.tag.getName().equals("form")) {
++        firstContext = (FormElement)firstContext.parent;
++    }
++    String action = firstContext.attr("action");
++    String method = firstContext.attr("method");
++    return data;
++}
+\ No newline at end of file

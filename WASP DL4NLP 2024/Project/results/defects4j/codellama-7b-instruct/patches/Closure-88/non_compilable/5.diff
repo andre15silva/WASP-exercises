@@ -1,0 +1,36 @@
+diff --git a/tmp/b6f353b5-c3e0-44aa-9be5-549f0119a23e_buggy.java b/tmp/11d67cf4-f785-434e-a88f-4db2484289ba_fixed.java
+index 9353941..3e425bb 100644
+--- a/tmp/b6f353b5-c3e0-44aa-9be5-549f0119a23e_buggy.java
++++ b/tmp/11d67cf4-f785-434e-a88f-4db2484289ba_fixed.java
+@@ -1,30 +1,9 @@
+-  /**
+-   * Give an expression and a variable. It returns READ, if the first
+-   * reference of that variable is a read. It returns KILL, if the first
+-   * reference of that variable is an assignment. It returns MAY_LIVE otherwise.
+-   */
+-  private VariableLiveness isVariableReadBeforeKill(
+-      Node n, String variable) {
+-    if (NodeUtil.isName(n) && variable.equals(n.getString())) {
+-      if (NodeUtil.isLhs(n, n.getParent())) {
+-        // The expression to which the assignment is made is evaluated before
+-        // the RHS is evaluated (normal left to right evaluation) but the KILL
+-        // occurs after the RHS is evaluated.
+-        return VariableLiveness.KILL;
+-      } else {
+-        return VariableLiveness.READ;
+-      }
+-    }
+-
+-    // Expressions are evaluated left-right, depth first.
+ for (Node child = n.getFirstChild();
+         child != null; child = child.getNext()) {
+       if (!ControlFlowGraph.isEnteringNewCfgNode(child)) { // Not a FUNCTION
+         VariableLiveness state = isVariableReadBeforeKill(child, variable);
+         if (state != VariableLiveness.MAYBE_LIVE) {
+           return state;
+         }
+       }
+     }
+\ No newline at end of file
+-    return VariableLiveness.MAYBE_LIVE;
+-  }

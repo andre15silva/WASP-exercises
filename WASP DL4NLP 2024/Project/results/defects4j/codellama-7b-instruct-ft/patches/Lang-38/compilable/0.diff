@@ -1,0 +1,51 @@
+diff --git a/tmp/0ae091a5-cdf5-46ef-84a0-bbcfe78e45b8_buggy.java b/tmp/e2888d93-7e79-4d4a-b471-9ce2937f1658_fixed.java
+index c1f30a5..5b2f650 100644
+--- a/tmp/0ae091a5-cdf5-46ef-84a0-bbcfe78e45b8_buggy.java
++++ b/tmp/e2888d93-7e79-4d4a-b471-9ce2937f1658_fixed.java
+@@ -1,15 +1,45 @@
+     /**
+      * <p>Formats a <code>Calendar</code> object into the
+      * supplied <code>StringBuffer</code>.</p>
+      * 
+      * @param calendar  the calendar to format
+      * @param buf  the buffer to format into
+      * @return the specified string buffer
+      */
+     public StringBuffer format(Calendar calendar, StringBuffer buf) {
+         if (mTimeZoneForced) {
+             calendar = (Calendar) calendar.clone();
+             calendar.setTimeZone(mTimeZone);
+         }
+-        return applyRules(calendar, buf);
++        // NB: Calendar.set(DateTimeField, int) is broken in the 1.4.2 release
++        // so we have to set the date elements directly
++        int year = calendar.get(Calendar.YEAR);
++        int month = calendar.get(Calendar.MONTH) + 1;
++        int dayOfMonth = calendar.get(Calendar.DAY_OF_MONTH);
++        int hourOfDay = calendar.get(Calendar.HOUR_OF_DAY);
++        int minute = calendar.get(Calendar.MINUTE);
++        int second = calendar.get(Calendar.SECOND);
++        int millis = calendar.get(Calendar.MILLISECOND);
++        buf.append(year);
++        buf.append('-');
++        buf.append(month < 10 ? "0" : "");
++        buf.append(month);
++        buf.append('-');
++        buf.append(dayOfMonth < 10 ? "0" : "");
++        buf.append(dayOfMonth);
++        buf.append('T');
++        buf.append(hourOfDay < 10 ? "0" : "");
++        buf.append(hourOfDay);
++        buf.append(':');
++        buf.append(minute < 10 ? "0" : "");
++        buf.append(minute);
++        buf.append(':');
++        buf.append(second < 10 ? "0" : "");
++        buf.append(second);
++        buf.append('.');
++        buf.append((millis / 100));
++        buf.append('.');
++        buf.append(millis % 100);
++        buf.append("Z");
++        return buf;
+     }

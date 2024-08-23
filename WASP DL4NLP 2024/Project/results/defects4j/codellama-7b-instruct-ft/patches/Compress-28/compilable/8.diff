@@ -1,0 +1,47 @@
+diff --git a/tmp/7ad4f602-0453-4fbc-9fd3-28d7e6b807a8_buggy.java b/tmp/ee9dc4fa-9b9f-4d23-a9d2-97f928d0b81f_fixed.java
+index 0f439b3..f1e227c 100644
+--- a/tmp/7ad4f602-0453-4fbc-9fd3-28d7e6b807a8_buggy.java
++++ b/tmp/ee9dc4fa-9b9f-4d23-a9d2-97f928d0b81f_fixed.java
+@@ -1,38 +1,41 @@
+     /**
+      * Reads bytes from the current tar archive entry.
+      *
+      * This method is aware of the boundaries of the current
+      * entry in the archive and will deal with them as if they
+      * were this stream's start and EOF.
+      *
+      * @param buf The buffer into which to place bytes read.
+      * @param offset The offset at which to place bytes read.
+      * @param numToRead The number of bytes to read.
+      * @return The number of bytes read, or -1 at EOF.
+      * @throws IOException on error
+      */
+     @Override
+     public int read(byte[] buf, int offset, int numToRead) throws IOException {
+     	int totalRead = 0;
+ 
+         if (hasHitEOF || entryOffset >= entrySize) {
+             return -1;
+         }
+ 
+         if (currEntry == null) {
+             throw new IllegalStateException("No current tar entry");
+         }
+ 
+         numToRead = Math.min(numToRead, available());
+         
+         totalRead = is.read(buf, offset, numToRead);
+         count(totalRead);
+         
+         if (totalRead == -1) {
+             hasHitEOF = true;
+         } else {
+-            entryOffset += totalRead;
++            if (totalRead != entrySize)
++                throw new IOException("Current TarArchiveInputStream "
++                        + "entry size is " + entrySize
++                        + " but only " + totalRead + " byte(s) seen.");
+         }
+ 
+         return totalRead;
+     }

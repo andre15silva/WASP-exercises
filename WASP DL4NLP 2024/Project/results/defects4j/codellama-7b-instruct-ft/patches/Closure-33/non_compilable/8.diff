@@ -1,0 +1,43 @@
+diff --git a/tmp/365f454a-a01b-4655-9a82-f0a949347abe_buggy.java b/tmp/e64bbb10-4ced-433b-b64d-61d42c659c02_fixed.java
+index fb2b020..4bdbd6b 100644
+--- a/tmp/365f454a-a01b-4655-9a82-f0a949347abe_buggy.java
++++ b/tmp/e64bbb10-4ced-433b-b64d-61d42c659c02_fixed.java
+@@ -1,27 +1,38 @@
+   @Override
+   public void matchConstraint(ObjectType constraintObj) {
+     // We only want to match contraints on anonymous types.
+ 
+     // Handle the case where the constraint object is a record type.
+     //
+     // param constraintObj {{prop: (number|undefined)}}
+     // function f(constraintObj) {}
+     // f({});
+     //
+     // We want to modify the object literal to match the constraint, by
+     // taking any each property on the record and trying to match
+     // properties on this object.
+     if (constraintObj.isRecordType()) {
+       for (String prop : constraintObj.getOwnPropertyNames()) {
+         JSType propType = constraintObj.getPropertyType(prop);
+         if (!isPropertyTypeDeclared(prop)) {
+           JSType typeToInfer = propType;
+           if (!hasProperty(prop)) {
+             typeToInfer = getNativeType(JSTypeNative.VOID_TYPE)
+                 .getLeastSupertype(propType);
+           }
+           defineInferredProperty(prop, typeToInfer, null);
++        } else if (propType.isUnionType()) {
++          // Do not annotate types with @notypecheck.
++          Node functionNode = NodeUtil.getEnclosingFunction(this.lastNode);
++          if (!NodeUtil.isPrototypeMethod(functionNode)) {
++            String errorMsg = "The type of an object literal property "
++                + "cannot be null when the object is assigned or passed as a"
++                + " function parameter. (We can't tell when "
++                + this.lastNode.toStringTree()
++                + " is called)";
++            this.warning(this.lastNode, errorMsg);
++          }
+         }
+       }
+     }
+   }

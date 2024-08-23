@@ -1,0 +1,41 @@
+diff --git a/tmp/6a111562-b8e4-4617-b47e-6f5445c0a12b_buggy.java b/tmp/fa461087-d080-4db2-bfc9-4519116160b8_fixed.java
+index 9033e1c..be31b9d 100644
+--- a/tmp/6a111562-b8e4-4617-b47e-6f5445c0a12b_buggy.java
++++ b/tmp/fa461087-d080-4db2-bfc9-4519116160b8_fixed.java
+@@ -1,11 +1,30 @@
+     /**
+-     * Returns true iff they are equal as defined by
+-     * {@link #equals(double,double,int) equals(x, y, 1)}.
++     * Returns true iff they are equal, taking into account infinity, NaN and
++     * multiple possible representations of zero.
+      *
+-     * @param x first value
+-     * @param y second value
++     * @param x first array
++     * @param y second array
+      * @return {@code true} if the values are equal.
+      */
+-    public static boolean equals(double x, double y) {
+-        return (Double.isNaN(x) && Double.isNaN(y)) || x == y;
++    public static boolean equals(double[] x, double[] y) {
++        if ((x == null) ^ (y == null)) {
++            return false;
++        }
++        if (x == null) {
++            return true;
++        }
++        if (x.length != y.length) {
++            return false;
++        }
++        for (int i = 0; i < x.length; i++) {
++            if (Double.isNaN(x[i]) || Double.isInfinite(x[i])) {
++                break;
++            }
++        }
++        for (int i = 0; i < x.length; i++) {
++            if (! MathUtils.equals(x[i], y[i])) {
++                return false;
++            }
++        }
++        return true;
+     }

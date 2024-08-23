@@ -1,0 +1,12 @@
+diff --git a/tmp/288319d5-1287-4301-8dcc-821fa2538310_buggy.java b/tmp/5a7dceff-77dc-4e0a-8392-194d412b70e7_fixed.java
+index db60019..02ecc3a 100644
+--- a/tmp/288319d5-1287-4301-8dcc-821fa2538310_buggy.java
++++ b/tmp/5a7dceff-77dc-4e0a-8392-194d412b70e7_fixed.java
+@@ -1,3 +1,6 @@
+ private boolean toStringEquals(Matcher m, Object arg) {
++    if (arg == null) {
++        return false;
++    }
+     return StringDescription.toString(m).equals(arg.toString());
+ }
+\ No newline at end of file

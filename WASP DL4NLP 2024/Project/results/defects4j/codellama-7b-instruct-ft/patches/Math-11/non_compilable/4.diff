@@ -1,0 +1,32 @@
+diff --git a/tmp/1cb4a32a-7fc0-4c53-8c5b-6caa9fee2db6_buggy.java b/tmp/5814bd1c-8742-4670-b3c4-aaf67534c01a_fixed.java
+index 51a0115..b048b42 100644
+--- a/tmp/1cb4a32a-7fc0-4c53-8c5b-6caa9fee2db6_buggy.java
++++ b/tmp/5814bd1c-8742-4670-b3c4-aaf67534c01a_fixed.java
+@@ -1,11 +1,18 @@
+-    /** {@inheritDoc} */
+-    public double density(final double[] vals) throws DimensionMismatchException {
+-        final int dim = getDimension();
+-        if (vals.length != dim) {
+-            throw new DimensionMismatchException(vals.length, dim);
+-        }
++    /**
++     * {@inheritDoc}
++     *
++     * Note: This method has been implemented in terms of
++     * {@link #logDensity(double[])} and is not strictly correct for distributions
++     * with more than one variable, but may be an acceptable approximation for most
++     * purposes. This approximation is not guaranteed to be consistent across all
++     * values.
++     *
++     */
++    public double density(final double[] vals)
++        throws NumberIsTooLargeException, DimensionMismatchException {
+ 
+-        return FastMath.pow(2 * FastMath.PI, -dim / 2) *
+-            FastMath.pow(covarianceMatrixDeterminant, -0.5) *
+-            getExponentTerm(vals);
++        if (vals.length != 1) {
++            throw new DimensionMismatchException(1, vals.length);
++        }
++        return densities[0].density(vals[0]);
+     }

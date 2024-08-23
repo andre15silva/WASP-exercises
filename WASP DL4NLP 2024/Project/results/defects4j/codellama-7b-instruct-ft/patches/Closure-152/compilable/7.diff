@@ -1,0 +1,48 @@
+diff --git a/tmp/bd717455-19c5-4514-895a-08e5942d87a6_buggy.java b/tmp/7a8a842e-8396-4283-8e86-47f5107f5bdd_fixed.java
+index 58a1651..7a34ce4 100644
+--- a/tmp/bd717455-19c5-4514-895a-08e5942d87a6_buggy.java
++++ b/tmp/7a8a842e-8396-4283-8e86-47f5107f5bdd_fixed.java
+@@ -1,32 +1,42 @@
+   @Override
+   JSType resolveInternal(ErrorReporter t, StaticScope<JSType> scope) {
+     setResolvedTypeInternal(this);
+ 
+     call = (ArrowType) safeResolve(call, t, scope);
+     prototype = (FunctionPrototypeType) safeResolve(prototype, t, scope);
+ 
+     // Warning about typeOfThis if it doesn't resolve to an ObjectType
+     // is handled further upstream.
+-    // TODO(nicksantos): Handle this correctly if we have a UnionType.
++    if (typeOfThis != null) {
++      // TODO(lharkes): For backwards-compatibility of typedefs we actually
++      // warn the user that "@this Foo" will act as "@this {Foo}" instead of
++      // "@this unknown" but will report at best-of-compilation.
++      // We want to allow:
++      //  /** @this {MyTypedef} */ function f() {}
++      //  /** @typedef {string} */ var MyTypedef;
++      // But we don't allow:
++      //  /** @this {MyTypedef} */ function f() {}
++      //  /** @typedef {number} */ var MyTypedef
+       typeOfThis = (ObjectType) safeResolve(typeOfThis, t, scope);
++    }
+ 
+     boolean changed = false;
+     ImmutableList.Builder<ObjectType> resolvedInterfaces =
+         ImmutableList.builder();
+     for (ObjectType iface : implementedInterfaces) {
+       ObjectType resolvedIface = (ObjectType) iface.resolve(t, scope);
+       resolvedInterfaces.add(resolvedIface);
+       changed |= (resolvedIface != iface);
+     }
+     if (changed) {
+       implementedInterfaces = resolvedInterfaces.build();
+     }
+ 
+     if (subTypes != null) {
+       for (int i = 0; i < subTypes.size(); i++) {
+         subTypes.set(i, (FunctionType) subTypes.get(i).resolve(t, scope));
+       }
+     }
+ 
+     return super.resolveInternal(t, scope);
+   }

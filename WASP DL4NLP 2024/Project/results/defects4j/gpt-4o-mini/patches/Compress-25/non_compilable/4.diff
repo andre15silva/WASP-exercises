@@ -1,0 +1,36 @@
+diff --git a/tmp/f3327a61-7f45-4042-bd5f-7889c80d2d51_buggy.java b/tmp/1891b808-f242-4ba2-aa45-5bf126fd7c92_fixed.java
+index 6c0aa19..3cf4670 100644
+--- a/tmp/f3327a61-7f45-4042-bd5f-7889c80d2d51_buggy.java
++++ b/tmp/1891b808-f242-4ba2-aa45-5bf126fd7c92_fixed.java
+@@ -1,20 +1,17 @@
+-    /**
+-     * @param encoding the encoding to use for file names, use null
+-     * for the platform's default encoding
+-     * @param useUnicodeExtraFields whether to use InfoZIP Unicode
+-     * Extra Fields (if present) to set the file names.
+-     * @param allowStoredEntriesWithDataDescriptor whether the stream
+-     * will try to read STORED entries that use a data descriptor
+-     * @since 1.1
+-     */
+ public ZipArchiveInputStream(InputStream inputStream,
+                              String encoding,
+                              boolean useUnicodeExtraFields,
+-                                 boolean allowStoredEntriesWithDataDescriptor) {
++                             boolean allowStoredEntriesWithDataDescriptor) throws IOException {
+     zipEncoding = ZipEncodingHelper.getZipEncoding(encoding);
+     this.useUnicodeExtraFields = useUnicodeExtraFields;
+     in = new PushbackInputStream(inputStream, buf.capacity());
+-        this.allowStoredEntriesWithDataDescriptor =
+-            allowStoredEntriesWithDataDescriptor;
+-        // haven't read anything so far
++    this.allowStoredEntriesWithDataDescriptor = allowStoredEntriesWithDataDescriptor;
++
++    // Initialize reading state
++    readNextEntry();
++}
++
++private void readNextEntry() throws IOException {
++    // Logic to read the next zip entry and set up the stream for reading data
++    // Make sure to correctly read and process the entry data here
+ }
+\ No newline at end of file

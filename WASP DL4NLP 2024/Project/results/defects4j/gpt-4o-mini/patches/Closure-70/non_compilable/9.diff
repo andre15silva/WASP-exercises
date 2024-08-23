@@ -1,0 +1,43 @@
+diff --git a/tmp/17732077-6151-4892-86dd-9c7d47805bd4_buggy.java b/tmp/9fd9911d-9911-4dad-8057-c5ab6c8373e4_fixed.java
+index 1530b34..14935a9 100644
+--- a/tmp/17732077-6151-4892-86dd-9c7d47805bd4_buggy.java
++++ b/tmp/9fd9911d-9911-4dad-8057-c5ab6c8373e4_fixed.java
+@@ -1,23 +1,36 @@
+     /**
+      * Declares all of a function's arguments.
+      */
+     private void declareArguments(Node functionNode) {
+       Node astParameters = functionNode.getFirstChild().getNext();
+       Node body = astParameters.getNext();
+       FunctionType functionType = (FunctionType) functionNode.getJSType();
+       if (functionType != null) {
+         Node jsDocParameters = functionType.getParametersNode();
+         if (jsDocParameters != null) {
+           Node jsDocParameter = jsDocParameters.getFirstChild();
++          Set<String> declaredParameters = new HashSet<>(); // Track declared parameter names
+           for (Node astParameter : astParameters.children()) {
++            String paramName = astParameter.getString();
++            if (declaredParameters.contains(paramName)) {
++              // Handle redefinition
++              reportDuplicateParameter(paramName, functionNode);
++            }
++            declaredParameters.add(paramName); // Mark this parameter as declared
+             if (jsDocParameter != null) {
+               defineSlot(astParameter, functionNode,
+                   jsDocParameter.getJSType(), true);
+               jsDocParameter = jsDocParameter.getNext();
+             } else {
+               defineSlot(astParameter, functionNode, null, true);
+             }
+           }
+         }
+       }
+-    } // end declareArguments
++    }
++
++    private void reportDuplicateParameter(String paramName, Node functionNode) {
++      // This method should handle the logic to report the duplicate parameter warning
++      // For example, you can log or throw an exception depending on your reporting mechanism
++      System.err.println("Duplicate parameter: " + paramName + " in function at " + functionNode);
++    }
+\ No newline at end of file

@@ -1,0 +1,26 @@
+diff --git a/tmp/33214789-afaa-4483-95d9-470104d8ecb7_buggy.java b/tmp/9d8d38dd-954e-414b-b036-f9085b7bfda9_fixed.java
+index 1ed78d0..17e79b6 100644
+--- a/tmp/33214789-afaa-4483-95d9-470104d8ecb7_buggy.java
++++ b/tmp/9d8d38dd-954e-414b-b036-f9085b7bfda9_fixed.java
+@@ -1,9 +1,12 @@
+-    /**
+-     * @since 2.8.9
+-     */
+-    protected XmlSerializerProvider(XmlSerializerProvider src) {
+-        super(src);
+-        // 21-May-2018, tatu: As per [dataformat-xml#282], should NOT really copy
+-        //    root name lookup as that may link back to diff version, configuration
+-        _rootNameLookup = src._rootNameLookup;
++    public class Pojo282 {
++        @JacksonXmlProperty(isAttribute = true)
++        public int a = 3;
++    }
++
++    public class AnnotatedName {
++        @JacksonXmlProperty(localName = "a")
++        public int a = 4;
++
++        @JacksonXmlProperty(localName = "b")
++        public int b = 5;
+     }
+\ No newline at end of file

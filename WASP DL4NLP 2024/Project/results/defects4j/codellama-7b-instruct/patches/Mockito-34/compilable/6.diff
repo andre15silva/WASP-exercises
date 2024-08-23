@@ -1,0 +1,20 @@
+diff --git a/tmp/47a2deea-a878-4ae2-915d-8baed4a96e01_buggy.java b/tmp/6ad1e3fb-2390-4aad-a388-c9516f339763_fixed.java
+index d68a69c..9efd413 100644
+--- a/tmp/47a2deea-a878-4ae2-915d-8baed4a96e01_buggy.java
++++ b/tmp/6ad1e3fb-2390-4aad-a388-c9516f339763_fixed.java
+@@ -1,9 +1,14 @@
+     public void captureArgumentsFrom(Invocation i) {
++        // Handle the case where the argument count does not match
++        if (i.getArguments().length != matchers.size()) {
++            throw new IllegalArgumentException("The number of arguments in the invocation does not match the number of matchers");
++        }
++
+         int k = 0;
+         for (Matcher m : matchers) {
+             if (m instanceof CapturesArguments) {
+                 ((CapturesArguments) m).captureFrom(i.getArguments()[k]);
+             }
+             k++;
+         }
+     }
+\ No newline at end of file

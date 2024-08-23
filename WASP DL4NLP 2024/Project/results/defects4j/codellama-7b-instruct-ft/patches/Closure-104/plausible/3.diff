@@ -1,0 +1,35 @@
+diff --git a/tmp/f7457441-9018-4625-94ed-0bd41e358eba_buggy.java b/tmp/6f423ce3-a48c-4a9b-ab23-3d46ba61ac37_fixed.java
+index b36b2a9..ccd6764 100644
+--- a/tmp/f7457441-9018-4625-94ed-0bd41e358eba_buggy.java
++++ b/tmp/6f423ce3-a48c-4a9b-ab23-3d46ba61ac37_fixed.java
+@@ -1,26 +1,28 @@
+   JSType meet(JSType that) {
+     UnionTypeBuilder builder = new UnionTypeBuilder(registry);
+     for (JSType alternate : alternates) {
+       if (alternate.isSubtype(that)) {
+         builder.addAlternate(alternate);
+       }
+     }
+ 
+     if (that instanceof UnionType) {
+       for (JSType otherAlternate : ((UnionType) that).alternates) {
+         if (otherAlternate.isSubtype(this)) {
+           builder.addAlternate(otherAlternate);
+         }
+       }
+     } else if (that.isSubtype(this)) {
+       builder.addAlternate(that);
++    } else {
++      if (this.isObject() && that.isObject()) {
++        builder.addAlternate(getNativeType(JSTypeNative.NO_OBJECT_TYPE));
++      }
+     }
+     JSType result = builder.build();
+     if (result != null) {
+       return result;
+-    } else if (this.isObject() && that.isObject()) {
+-      return getNativeType(JSTypeNative.NO_OBJECT_TYPE);
+     } else {
+       return getNativeType(JSTypeNative.NO_TYPE);
+     }
+   }

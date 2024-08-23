@@ -1,0 +1,35 @@
+diff --git a/tmp/8c2a113b-2da0-4542-addf-b9ae93776f3d_buggy.java b/tmp/5ebf0b53-b79d-4848-b02f-e848453cbdfc_fixed.java
+index abd3198..9c7ea08 100644
+--- a/tmp/8c2a113b-2da0-4542-addf-b9ae93776f3d_buggy.java
++++ b/tmp/5ebf0b53-b79d-4848-b02f-e848453cbdfc_fixed.java
+@@ -1,28 +1,26 @@
+     @Override
+     protected Object encodeCommand(Command command) {
+-
+         ByteBuf content = Unpooled.buffer();
+-
+         switch (command.getType()) {
+             case Command.TYPE_POSITION_SINGLE:
+                 return encodeContent(command.getDeviceId(), GatorProtocolDecoder.MSG_POSITION_REQUEST, content);
+             case Command.TYPE_ENGINE_STOP:
+                 return encodeContent(command.getDeviceId(), GatorProtocolDecoder.MSG_CLOSE_THE_OIL_DUCT, content);
+             case Command.TYPE_ENGINE_RESUME:
+                 return encodeContent(command.getDeviceId(), GatorProtocolDecoder.MSG_RESTORES_THE_OIL_DUCT, content);
+             case Command.TYPE_SET_SPEED_LIMIT:
+                 content.writeByte(command.getInteger(Command.KEY_DATA));
+                 return encodeContent(command.getDeviceId(), GatorProtocolDecoder.MSG_SET_SPEED_LIMIT, content);
+             case Command.TYPE_SET_ODOMETER:
+                 content.writeShort(command.getInteger(Command.KEY_DATA));
+                 return encodeContent(command.getDeviceId(), GatorProtocolDecoder.MSG_SET_ODOMETER, content);
+             case Command.TYPE_POSITION_PERIODIC:
+                 String[] data = command.getString(Command.KEY_FREQUENCY).split(";");
+                 content.writeShort(Integer.valueOf(data[0]));
+-                content.writeShort(Integer.valueOf(data[1]));
++                content.writeShort(Integer.valueOf(data[1])+120);
+                 content.writeShort(Integer.valueOf(data[2]));
+                 return encodeContent(command.getDeviceId(), GatorProtocolDecoder.MSG_POSITION_PERIODIC, content);
+             default:
+                 return null;
+         }
+     }
+\ No newline at end of file

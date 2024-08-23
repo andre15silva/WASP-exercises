@@ -1,0 +1,65 @@
+diff --git a/tmp/ae9fc869-bb99-486f-9f07-0442f20b4c8d_buggy.java b/tmp/1ee46c0c-d58a-4727-81e3-cb842c16a1b5_fixed.java
+index 6c0aa19..ec906f0 100644
+--- a/tmp/ae9fc869-bb99-486f-9f07-0442f20b4c8d_buggy.java
++++ b/tmp/1ee46c0c-d58a-4727-81e3-cb842c16a1b5_fixed.java
+@@ -1,20 +1,59 @@
+     /**
+      * @param encoding the encoding to use for file names, use null
+      * for the platform's default encoding
+      * @param useUnicodeExtraFields whether to use InfoZIP Unicode
+      * Extra Fields (if present) to set the file names.
+      * @param allowStoredEntriesWithDataDescriptor whether the stream
+      * will try to read STORED entries that use a data descriptor
+      * @since 1.1
+      */
+     public ZipArchiveInputStream(InputStream inputStream,
+                                  String encoding,
+                                  boolean useUnicodeExtraFields,
+                                  boolean allowStoredEntriesWithDataDescriptor) {
+         zipEncoding = ZipEncodingHelper.getZipEncoding(encoding);
+         this.useUnicodeExtraFields = useUnicodeExtraFields;
+         in = new PushbackInputStream(inputStream, buf.capacity());
+         this.allowStoredEntriesWithDataDescriptor =
+             allowStoredEntriesWithDataDescriptor;
+-        // haven't read anything so far
++        nextEntry = getNextEntry();
++    }
++
++    /**
++     * Return the next ZipArchiveEntry in the stream, or null if there
++     * are no more entries.
++     *
++     * @since 1.1
++     */
++    private ZipArchiveEntry getNextEntry() {
++        if (!ensureOpen()) {
++            return null;
++        }
++        if (nextEntry != null) {
++            return nextEntry;
++        }
++        try {
++            nextEntry = new ZipArchiveEntry(in, allowStoredEntriesWithDataDescriptor);
++            if (useUnicodeExtraFields && ZipUtil.hasDataOrZip64ExtendedInformationExtraField(nextEntry)) {
++                nextEntry.setNameFromUnicodeExtraField();
++            }
++            return nextEntry;
++        } catch (IOException e) {
++            throw new RuntimeException("Error reading next Zip entry", e);
++        }
++    }
++
++    /**
++     * Returns the next ZipArchiveEntry in the stream, or null if there
++     * are no more entries.
++     *
++     * @throws java.util.NoSuchElementException if there are no more elements
++     * @since 1.1
++     */
++    public ZipArchiveEntry getNextZipEntry() {
++        ZipArchiveEntry ze = getNextEntry();
++        if (ze == null) {
++            throw new NoSuchElementException("No more zip entries");
++        }
++        return ze;
+     }

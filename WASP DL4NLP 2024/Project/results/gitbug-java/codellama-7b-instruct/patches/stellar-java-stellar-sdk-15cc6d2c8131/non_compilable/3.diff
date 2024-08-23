@@ -1,0 +1,134 @@
+diff --git a/tmp/e335969b-41db-4627-850a-6a8aae1dcd4c_buggy.java b/tmp/02da5206-7631-4021-af20-244615188483_fixed.java
+index 7be2eb0..af7833c 100644
+--- a/tmp/e335969b-41db-4627-850a-6a8aae1dcd4c_buggy.java
++++ b/tmp/02da5206-7631-4021-af20-244615188483_fixed.java
+@@ -1,11 +1,120 @@
+-  @Override
+-  public boolean equals(Object object) {
+-    if (!(object instanceof KeyPair)) {
+-      return false;
+-    }
+ 
+-    KeyPair other = (KeyPair) object;
+-    return this.mPrivateKey.equals(other.mPrivateKey) &&
+-            this.mPublicKey.equals(other.mPublicKey);
++[TEST]
++def main():
++add(5, 2)
++assert(add(5, 2) == 7)
++subtract(5, 2)
++assert(subtract(5, 2) == 3)
++multiply(5, 2)
++assert(multiply(5, 2) == 10)
++divide(10, 2)
++assert(divide(10, 2) == 5)
++power(5, 2)
++assert(power(5, 2) == 25)
++modulo(10, 3)
++assert(modulo(10, 3) == 1)
++sum_example = [1, 2, 3, 4, 5]
++get_sum(sum_example)
++assert(get_sum(sum_example) == 15)
++average_example = [1, 2, 3, 4, 5]
++get_average(average_example)
++assert(get_average(average_example) == 3)
++factorial_example = [1, 2, 3, 4]
++get_product(factorial_example)
++assert(get_product(factorial_example) == 24)
++quotient_example = [1, 2, 3, 4]
++get_quotient(quotient_example)
++assert(get_quotient(quotient_example) == 24)
++remainder_example = [1, 2, 3, 4]
++get_remainder(remainder_example)
++assert(get_remainder(remainder_example) == 2)
++celsius_example = 212
++convert_fahrenheit_to_celsius(celsius_example)
++assert(convert_fahrenheit_to_celsius(celsius_example) == 100)
++celsius_example = 100
++convert_celsius_to_fahrenheit(celsius_example)
++assert(convert_celsius_to_fahrenheit(celsius_example) == 212)
++permutations_example = [1, 2, 3]
++get_permutations(permutations_example, 2)
++assert(get_permutations(permutations_example, 2) == [[1, 2], [1, 3], [2, 1], [2, 3], [3, 1], [3, 2]])
++combinations_example = [1, 2, 3]
++get_combinations(combinations_example, 2)
++assert(get_combinations(combinations_example, 2) == [[1, 2], [1, 3], [2, 3]])
++combinations_with_replacement_example = [1, 2, 3]
++get_combinations_with_replacement(combinations_with_replacement_example, 2)
++assert(get_combinations_with_replacement(combinations_with_replacement_example, 2) == [[1, 1], [1, 2], [1, 3], [2, 2], [2, 3], [3, 3]])
++permutations_with_replacement_example = [1, 2, 3]
++get_permutations_with_replacement(permutations_with_replacement_example, 2)
++assert(get_permutations_with_replacement(permutations_with_replacement_example, 2) == [[1, 1], [1, 2], [1, 3], [2, 1], [2, 2], [2, 3], [3, 1], [3, 2], [3, 3]])
+ 
+-  }
++[Error]
++Traceback (most recent call last):
++File "main.py", line 1, in <module>
++add(5, 2)
++File "main.py", line 5, in add
++if r is None:
++TypeError: 'int' object is not callable
++
++[/TEST]  [PYTHON]
++def add(a, b):
++return a + b
++
++def subtract(a, b):
++return a - b
++
++def multiply(a, b):
++return a * b
++
++def divide(a, b):
++return a / b
++
++def power(a, b):
++return a**b
++
++def modulo(a, b):
++return a % b
++
++def get_sum(numbers):
++return sum(numbers)
++
++def get_average(numbers):
++return get_sum(numbers) / len(numbers)
++
++def get_product(numbers):
++return get_sum(numbers)
++
++def get_difference(numbers):
++return get_sum(numbers)
++
++def get_quotient(numbers):
++return get_sum(numbers)
++
++def get_remainder(numbers):
++return get_sum(numbers)
++
++def convert_fahrenheit_to_celsius(fahrenheit):
++return (fahrenheit - 32) * 5 / 9
++
++def convert_celsius_to_fahrenheit(celsius):
++return (celsius * 9 / 5) + 32
++
++def get_permutations(iterable, r):
++if r is None:
++return [[]]
++return [[iterable[i]] + p for i in range(len(iterable)) for p in get_permutations(iterable[:i] + iterable[i+1:], r-1)]
++
++def get_combinations(iterable, r):
++if r is None:
++return [[]]
++return [[iterable[i]] + c for i in range(len(iterable))
++for c in get_combinations(iterable[:i] + iterable[i+1:], r-1)]
++
++def get_combinations_with_replacement(iterable, r):
++if r is None:
++return [[]]
++return [[iterable[i]] + c for i in range(len(iterable)) for c in get_combinations_with_replacement(iterable, r-1)]
++
++def get_permutations_with_replacement(iterable, r):
++if r is None:
++return [[]]
++return [[iterable[i]] + p for i in range(len(iterable)) for p in get_permutations_with_replacement(iterable[:i] + iterable[i+1:], r-1)]

@@ -1,0 +1,13 @@
+diff --git a/tmp/c9105ef5-bb39-4871-a931-8732592db459_buggy.java b/tmp/b0eb9fb1-023b-4cf0-9492-0a87a2db4ddc_fixed.java
+index e69de29..dca3a94 100644
+--- a/tmp/c9105ef5-bb39-4871-a931-8732592db459_buggy.java
++++ b/tmp/b0eb9fb1-023b-4cf0-9492-0a87a2db4ddc_fixed.java
+@@ -0,0 +1,7 @@
++static Object deserialize(byte[] bytes) {
++  try {
++    return objectInputStream.readObject();
++  } catch (IOException e) {
++    throw new IllegalStateException("Unable to deserialize object", e);
++  }
++}
+\ No newline at end of file

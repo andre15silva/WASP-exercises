@@ -1,0 +1,33 @@
+diff --git a/tmp/694bf2ce-d514-4303-8d37-b444a12924a9_buggy.java b/tmp/9165e78d-0706-41a6-906a-464e9b0e386a_fixed.java
+index 9033e1c..acf44ff 100644
+--- a/tmp/694bf2ce-d514-4303-8d37-b444a12924a9_buggy.java
++++ b/tmp/9165e78d-0706-41a6-906a-464e9b0e386a_fixed.java
+@@ -1,11 +1,17 @@
+-    /**
+-     * Returns true iff they are equal as defined by
+-     * {@link #equals(double,double,int) equals(x, y, 1)}.
+-     *
+-     * @param x first value
+-     * @param y second value
+-     * @return {@code true} if the values are equal.
+-     */
+-    public static boolean equals(double x, double y) {
+-        return (Double.isNaN(x) && Double.isNaN(y)) || x == y;
++public static boolean equals(double[] x, double[] y) {
++    if (x == null || y == null) {
++        return x == null && y == null;
++    }
++    if (x.length != y.length) {
++        return false;
++    }
++    for (int i = 0; i < x.length; i++) {
++        if (Double.isNaN(x[i]) && Double.isNaN(y[i])) {
++            continue;
++        }
++        if (x[i] != y[i]) {
++            return false;
++        }
++    }
++    return true;
+ }
+\ No newline at end of file

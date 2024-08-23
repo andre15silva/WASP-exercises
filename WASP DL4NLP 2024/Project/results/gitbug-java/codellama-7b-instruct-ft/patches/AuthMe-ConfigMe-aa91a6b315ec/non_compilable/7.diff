@@ -1,0 +1,24 @@
+diff --git a/tmp/caad0b8e-a3a9-4a5e-8d89-81146aafe35f_buggy.java b/tmp/b94da43b-78a5-4b6a-9edc-3aed2af4ac78_fixed.java
+index b775870..48f649f 100644
+--- a/tmp/caad0b8e-a3a9-4a5e-8d89-81146aafe35f_buggy.java
++++ b/tmp/b94da43b-78a5-4b6a-9edc-3aed2af4ac78_fixed.java
+@@ -1,10 +1,18 @@
+     /**
+      * Sets the given lines for the provided path, overriding any previously existing comments for the path.
+      * An entry that is a sole new-line (i.e. "\n") will result in an empty line without any comment marker.
+      *
+      * @param path the path to register the comment lines for
+      * @param commentLines the comment lines to set for the path
+      */
+     public void setComment(@NotNull String path, @NotNull String... commentLines) {
+-        comments.put(path, Collections.unmodifiableList(Arrays.asList(commentLines)));
++        List<String> list = new ArrayList<String>();
++        for (String s : commentLines) {
++            if (s.length() == 1 && s.charAt(0) == '\n') {
++                list.add("");
++            } else {
++                list.add(s);
++            }
++        }
++        comments.put(path, Collections.unmodifiableList(list));
+     }

@@ -1,0 +1,42 @@
+diff --git a/tmp/d65b06ab-2b2d-42a4-a29f-94674ed7a884_buggy.java b/tmp/25cf698b-697a-499d-8c82-0d85a9f0c3a3_fixed.java
+index 3c69e10..f2bafb9 100644
+--- a/tmp/d65b06ab-2b2d-42a4-a29f-94674ed7a884_buggy.java
++++ b/tmp/25cf698b-697a-499d-8c82-0d85a9f0c3a3_fixed.java
+@@ -1,27 +1,37 @@
+     /**
+      * @param Umin smallest Mann-Whitney U value
+      * @param n1 number of subjects in first sample
+      * @param n2 number of subjects in second sample
+      * @return two-sided asymptotic p-value
+      * @throws ConvergenceException if the p-value can not be computed
+      * due to a convergence error
+      * @throws MaxCountExceededException if the maximum number of
+      * iterations is exceeded
+      */
+     private double calculateAsymptoticPValue(final double Umin,
+                                              final int n1,
+                                              final int n2)
+         throws ConvergenceException, MaxCountExceededException {
+ 
+         final int n1n2prod = n1 * n2;
+ 
+         // http://en.wikipedia.org/wiki/Mann%E2%80%93Whitney_U#Normal_approximation
+         final double EU = n1n2prod / 2.0;
+         final double VarU = n1n2prod * (n1 + n2 + 1) / 12.0;
+ 
+         final double z = (Umin - EU) / FastMath.sqrt(VarU);
+ 
++        // If the sample sizes are big, we can switch to Gamma-based
++        // approximation by Rice and Wilson, 1986. See D12.3 of:
++        // http://www.ats.ucla.edu/stat/sas/applications/gap/
++        // http://en.wikipedia.org/wiki/Mann%E2%80%93Whitney_U#Normal_approximation
++        final double normDelta = 250.0;
++        if ((n1 > normDelta && n2 > normDelta) ||
++            (n1 > normDelta && n1 < 2 * n2) ||
++            (n2 > normDelta && n2 < 2 * n1)) {
++            return 2 * gammaApproximation(Umin, EU, VarU, z);
++        }
+         final NormalDistribution standardNormal = new NormalDistribution(0, 1);
+ 
+         return 2 * standardNormal.cumulativeProbability(z);
+     }

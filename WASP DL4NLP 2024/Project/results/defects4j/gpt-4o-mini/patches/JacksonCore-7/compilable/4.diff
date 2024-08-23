@@ -1,0 +1,29 @@
+diff --git a/tmp/b255048a-43bc-4212-8e04-deb982ce3f4b_buggy.java b/tmp/07e6f673-64b5-40f6-b5ad-111ca3ddd6d8_fixed.java
+index 9529ba6..5c075ff 100644
+--- a/tmp/b255048a-43bc-4212-8e04-deb982ce3f4b_buggy.java
++++ b/tmp/07e6f673-64b5-40f6-b5ad-111ca3ddd6d8_fixed.java
+@@ -1,20 +1,23 @@
+ public int writeValue() {
+     // Most likely, object:
+     if (_type == TYPE_OBJECT) {
++        if (_gotName) {
++            return STATUS_OK_AFTER_COMMA; // We are already in an object context and need a comma
++        }
+         _gotName = false;
+         ++_index;
+         return STATUS_OK_AFTER_COLON;
+     }
+ 
+     // Ok, array?
+     if (_type == TYPE_ARRAY) {
+         int ix = _index;
+         ++_index;
+         return (ix < 0) ? STATUS_OK_AS_IS : STATUS_OK_AFTER_COMMA;
+     }
+     
+     // Nope, root context
+     // No commas within root context, but need space
+     ++_index;
+     return (_index == 0) ? STATUS_OK_AS_IS : STATUS_OK_AFTER_SPACE;
+ }
+\ No newline at end of file

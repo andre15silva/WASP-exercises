@@ -1,0 +1,37 @@
+diff --git a/tmp/7ee69a86-07f4-492f-9758-c37707d825ce_buggy.java b/tmp/b2c6738d-1364-492e-a298-a8d5efa8f530_fixed.java
+index 562001a..8658122 100644
+--- a/tmp/7ee69a86-07f4-492f-9758-c37707d825ce_buggy.java
++++ b/tmp/b2c6738d-1364-492e-a298-a8d5efa8f530_fixed.java
+@@ -1,29 +1,7 @@
+-    /**
+-     * <p>Checks if String contains a search String irrespective of case,
+-     * handling <code>null</code>. Case-insensitivity is defined as by
+-     * {@link String#equalsIgnoreCase(String)}.
+-     *
+-     * <p>A <code>null</code> String will return <code>false</code>.</p>
+-     *
+-     * <pre>
+-     * StringUtils.contains(null, *) = false
+-     * StringUtils.contains(*, null) = false
+-     * StringUtils.contains("", "") = true
+-     * StringUtils.contains("abc", "") = true
+-     * StringUtils.contains("abc", "a") = true
+-     * StringUtils.contains("abc", "z") = false
+-     * StringUtils.contains("abc", "A") = true
+-     * StringUtils.contains("abc", "Z") = false
+-     * </pre>
+-     *
+-     * @param str  the String to check, may be null
+-     * @param searchStr  the String to find, may be null
+-     * @return true if the String contains the search String irrespective of
+-     * case or false if not or <code>null</code> string input
+-     */
+ public static boolean containsIgnoreCase(String str, String searchStr) {
+     if (str == null || searchStr == null) {
+         return false;
+     }
+-        return contains(str.toUpperCase(), searchStr.toUpperCase());
++    // Use locale-specific case conversion for case-insensitive comparison
++    return str.toUpperCase(Locale.ROOT).contains(searchStr.toUpperCase(Locale.ROOT));
+ }
+\ No newline at end of file

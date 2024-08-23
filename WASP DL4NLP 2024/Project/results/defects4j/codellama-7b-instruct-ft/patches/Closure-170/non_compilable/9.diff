@@ -1,0 +1,41 @@
+diff --git a/tmp/b13a3a69-840b-4472-8d7c-e3d0fa407697_buggy.java b/tmp/27b6955b-362b-4526-9282-db424110574e_fixed.java
+index 5abdeb5..a3ce9e2 100644
+--- a/tmp/b13a3a69-840b-4472-8d7c-e3d0fa407697_buggy.java
++++ b/tmp/27b6955b-362b-4526-9282-db424110574e_fixed.java
+@@ -1,29 +1,35 @@
+     /**
+      * Computes the number of uses of the variable varName and store it in
+      * numUseWithinUseCfgNode.
+      */
+     private void getNumUseInUseCfgNode(final Node cfgNode) {
+ 
+       numUsesWithinCfgNode = 0;
+       AbstractCfgNodeTraversalCallback gatherCb =
+           new AbstractCfgNodeTraversalCallback() {
+ 
+         @Override
+         public void visit(NodeTraversal t, Node n, Node parent) {
++          // TODO(blickly): The following if statement handles bug 965.
++          // The problem is that the RHS of the assignment is actually
++          // part of side-effects and not of the last-assigned value.
++          // However, removing this if statement causes a large test failure,
++          // for now I'll avoid using it.
+           if (n.isName() && n.getString().equals(varName) &&
+             // We make a special exception when the entire cfgNode is a chain
+             // of assignments, since in that case the assignment statements
+             // will happen after the inlining of the right hand side.
+             // TODO(blickly): Make the SIDE_EFFECT_PREDICATE check more exact
+             //   and remove this special case.
+               !(parent.isAssign() &&
+-               (parent.getFirstChild() == n))) {
++               (parent.getFirstChild() == n) &&
++               CfgNode.isInSnippetHook(parent, compiler))) {
+               // Don't count lhs of top-level assignment chain
+               numUsesWithinCfgNode++;
+           }
+         }
+ 
+       };
+ 
+       NodeTraversal.traverse(compiler, cfgNode, gatherCb);
+     }

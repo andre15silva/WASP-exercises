@@ -1,0 +1,182 @@
+diff --git a/tmp/a00323b0-d979-453c-92a3-ed152612b119_buggy.java b/tmp/2830840e-eb56-46a1-bf48-4e6042d89f83_fixed.java
+index 4b7e1e4..9bd26be 100644
+--- a/tmp/a00323b0-d979-453c-92a3-ed152612b119_buggy.java
++++ b/tmp/2830840e-eb56-46a1-bf48-4e6042d89f83_fixed.java
+@@ -1,52 +1,137 @@
+-    // https://www.gnu.org/software/tar/manual/html_section/tar_92.html#SEC188
+-    Map<String, String> parsePaxHeaders(final InputStream i)
+-        throws IOException {
+-        final Map<String, String> headers = new HashMap<String, String>(globalPaxHeaders);
+-        // Format is "length keyword=value\n";
+-        while(true){ // get length
+-            int ch;
+-            int len = 0;
+-            int read = 0;
+-            while((ch = i.read()) != -1) {
+-                read++;
++    interface PaxHeaderState {
++        void read(TarArchiveInputStream is, Map<String, String> headers) throws IOException;
++    }
++
++    class PaxHeaderStartState implements PaxHeaderState {
++        void read(TarArchiveInputStream is, Map<String, String> headers) throws IOException {
++            int ch = is.read();
++            if (ch == 'P') { // Pax header
++                ch = is.read();
++                if (ch == 'a') {
++                    ch = is.read();
++                    if (ch == 'x') {
++                        ch = is.read();
+                         if (ch == ' ') {
+-                    // Get keyword
+-                    final ByteArrayOutputStream coll = new ByteArrayOutputStream();
+-                    while((ch = i.read()) != -1) {
+-                        read++;
+-                        if (ch == '='){ // end of keyword
++                            // Skip the header
++                            headers.remove(getCurrentHeader());
++                            return;
++                        }
++                    }
++                }
++            }
++            setCurrent(ch);
++            setState(PaxHeaderLengthState.instance());
++        }
++
++        private String getCurrentHeader() {
++            // Return the current header being read
++            throw new NotImplementedError();
++        }
++
++        private void setState(PaxHeaderState state) {
++            // Set the current state to the provided state
++            throw new NotImplementedError();
++        }
++
++        private void setCurrent(int ch) {
++            // Set the current character
++            throw new NotImplementedError();
++        }
++    }
++
++    class PaxHeaderLengthState implements PaxHeaderState {
++        public static final PaxHeaderLengthState instance = new PaxHeaderLengthState();
++
++        void read(TarArchiveInputStream is, Map<String, String> headers) throws IOException {
++            while (true) {
++                int ch = is.read();
++                if (ch == -1) {
++                    return;
++                }
++                if (ch == '\n') {
++                    setState(PaxHeaderKeywordState.instance());
++                    return;
++                }
++            }
++        }
++
++        private void setState(PaxHeaderState state) {
++            // Set the current state to the provided state
++            throw new NotImplementedError();
++        }
++    }
++
++    class PaxHeaderKeywordState implements PaxHeaderState {
++        public static final PaxHeaderKeywordState instance = new PaxHeaderKeywordState();
++
++        void read(TarArchiveInputStream is, Map<String, String> headers) throws IOException {
++            ByteArrayOutputStream coll = new ByteArrayOutputStream();
++            int ch;
++            while ((ch = is.read()) != -1) {
++                if (ch == '=') {
+                     final String keyword = coll.toString(CharsetNames.UTF_8);
+-                            // Get rest of entry
+-                            final int restLen = len - read;
+-                            if (restLen == 1) { // only NL
+-                                headers.remove(keyword);
+-                            } else {
+-                                final byte[] rest = new byte[restLen];
+-                                final int got = IOUtils.readFully(i, rest);
+-                                if (got != restLen) {
+-                                    throw new IOException("Failed to read "
+-                                                          + "Paxheader. Expected "
+-                                                          + restLen
+-                                                          + " bytes, read "
+-                                                          + got);
++                    final int len = getCurrentLength();
++                    final byte[] rest = new byte[len - coll.size()];
++                    int read = 0;
++                    while (read < len - coll.size()) {
++                        final int got = is.read(rest, read, len - coll.size() - read);
++                        if (got == -1) {
++                            throw new IOException("Failed to read Paxheader. Expected "
++                                                  + len
++                                                  + " bytes, got "
++                                                  + read);
+                         }
+-                                // Drop trailing NL
+-                                final String value = new String(rest, 0,
+-                                                          restLen - 1, CharsetNames.UTF_8);
++                        read += got;
++                    }
++                    final String value = new String(rest, 0, len - coll.size() - 1,
++                                                  CharsetNames.UTF_8);
+                     headers.put(keyword, value);
+-                            }
+-                            break;
++                    setState(PaxHeaderNewlineState.instance());
++                    return;
+                 }
+                 coll.write((byte) ch);
+             }
+-                    break; // Processed single header
+         }
+-                len *= 10;
+-                len += ch - '0';
++
++        private int getCurrentLength() {
++            // Return the current length
++            throw new NotImplementedError();
+         }
+-            if (ch == -1){ // EOF
+-                break;
++
++        private void setState(PaxHeaderState state) {
++            // Set the current state to the provided state
++            throw new NotImplementedError();
+         }
+     }
+-        return headers;
++
++    class PaxHeaderNewlineState implements PaxHeaderState {
++        public static final PaxHeaderNewlineState instance = new PaxHeaderNewlineState();
++
++        void read(TarArchiveInputStream is, Map<String, String> headers) throws IOException {
++            int ch;
++            while ((ch = is.read()) != -1) {
++                if (ch == '\n') {
++                    setState(PaxHeaderEndState.instance());
++                    return;
++                }
++            }
++        }
++
++        private void setState(PaxHeaderState state) {
++            // Set the current state to the provided state
++            throw new NotImplementedError();
++        }
++    }
++
++    class PaxHeaderEndState implements PaxHeaderState {
++        public static final PaxHeaderEndState instance = new PaxHeaderEndState();
++
++        void read(TarArchiveInputStream is, Map<String, String> headers) throws IOException {
++            setState(PaxHeaderStartState.instance); // Done with Pax header
++        }
++
++        private void setState(PaxHeaderState state) {
++            // Set the current state to the provided state
++            throw new NotImplementedError();
++        }
+     }

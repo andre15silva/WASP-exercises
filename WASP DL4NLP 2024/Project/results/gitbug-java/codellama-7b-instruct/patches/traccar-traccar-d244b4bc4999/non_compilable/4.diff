@@ -1,0 +1,38 @@
+diff --git a/tmp/3fa5b366-5ef1-4cc2-910f-d413e27cc459_buggy.java b/tmp/4b33e496-b170-46cf-98f9-fba4fecbc88f_fixed.java
+index 5a7ae71..e32c29c 100644
+--- a/tmp/3fa5b366-5ef1-4cc2-910f-d413e27cc459_buggy.java
++++ b/tmp/4b33e496-b170-46cf-98f9-fba4fecbc88f_fixed.java
+@@ -1,8 +1,26 @@
+-    public String getString(String key, String defaultValue) {
+-        if (attributes.containsKey(key)) {
+-            Object value = attributes.containsKey(key);
+-            return value != null ? value.toString() : null;
+-        } else {
+-            return defaultValue;
++    public byte[] encode(Command command) {
++        if (command == null) {
++            throw new IllegalArgumentException("command cannot be null");
+         }
++
++        var buffer = new ByteArrayOutputStream();
++
++        // Add device id
++        buffer.write(command.getDeviceId());
++
++        // Add command type
++        buffer.write(command.getType());
++
++        // Add command attributes
++        for (var entry : command.getAttributes().entrySet()) {
++            var key = entry.getKey();
++            var value = entry.getValue();
++            var keyIndex = key.getIndex();
++            var valueIndex = keyIndex + 1;
++            buffer.write(keyIndex);
++            buffer.write(valueIndex);
++            buffer.write(value != null ? value.toString().getBytes(Charset.forName("ISO-8859-1")) : null);
++        }
++
++        return buffer.toByteArray();
+     }
+\ No newline at end of file

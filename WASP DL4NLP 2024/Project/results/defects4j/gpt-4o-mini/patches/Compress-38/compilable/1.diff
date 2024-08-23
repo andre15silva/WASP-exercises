@@ -1,0 +1,31 @@
+diff --git a/tmp/9eab460e-f7de-48cb-9807-2b4f62a95d19_buggy.java b/tmp/2927b617-aa70-47a1-9eb4-4181581267c6_fixed.java
+index 192e83d..9036f99 100644
+--- a/tmp/9eab460e-f7de-48cb-9807-2b4f62a95d19_buggy.java
++++ b/tmp/2927b617-aa70-47a1-9eb4-4181581267c6_fixed.java
+@@ -1,21 +1,18 @@
+-    /**
+-     * Return whether or not this entry represents a directory.
+-     *
+-     * @return True if this entry is a directory.
+-     */
+ @Override
+ public boolean isDirectory() {
+     if (file != null) {
+         return file.isDirectory();
+     }
+ 
+-        if (linkFlag == LF_DIR) {
++    // Added a safety check for linkFlag to ensure it is indeed for symbolic links
++    if (linkFlag == LF_DIR || linkFlag == LF_SYMLINK) {
+         return true;
+     }
+ 
+-        if (getName().endsWith("/")) {
++    // Check if the name ends with a slash
++    if (getName() != null && getName().endsWith("/")) {
+         return true;
+     }
+ 
+     return false;
+ }
+\ No newline at end of file

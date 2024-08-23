@@ -1,0 +1,50 @@
+diff --git a/tmp/8e48f59f-c1ce-480e-ac73-09c5cc827329_buggy.java b/tmp/87de0104-073c-45b7-84d9-5eaa36a77739_fixed.java
+index 4bbd561..500a40e 100644
+--- a/tmp/8e48f59f-c1ce-480e-ac73-09c5cc827329_buggy.java
++++ b/tmp/87de0104-073c-45b7-84d9-5eaa36a77739_fixed.java
+@@ -1,37 +1,40 @@
+-    /**
+-     * {@inheritDoc}
+-     */
+ @Override
+ public int translate(CharSequence input, int index, Writer out) throws IOException {
+-        // TODO: Protect from ArrayIndexOutOfBounds
++    // Check for supplementary characters
++    if (input.charAt(index) >= '\uD800' && input.charAt(index) <= '\uDFFF') {
++        // Skip over the two characters in the supplementary character
++        return 2;
++    }
++
++    // Parse numeric entity
+     if(input.charAt(index) == '&' && input.charAt(index + 1) == '#') {
+         int start = index + 2;
+         boolean isHex = false;
+ 
+         char firstChar = input.charAt(start);
+         if(firstChar == 'x' || firstChar == 'X') {
+             start++;
+             isHex = true;
+         }
+ 
+         int end = start;
+         while(input.charAt(end) != ';') {
+             end++;
+         }
+ 
+         int entityValue;
+         try {
+             if(isHex) {
+                 entityValue = Integer.parseInt(input.subSequence(start, end).toString(), 16);
+             } else {
+                 entityValue = Integer.parseInt(input.subSequence(start, end).toString(), 10);
+             }
+         } catch(NumberFormatException nfe) {
+             return 0;
+         }
+ 
+         out.write(entityValue);
+         return 2 + (end - start) + (isHex ? 1 : 0) + 1;
+     }
+     return 0;
+ }
+\ No newline at end of file

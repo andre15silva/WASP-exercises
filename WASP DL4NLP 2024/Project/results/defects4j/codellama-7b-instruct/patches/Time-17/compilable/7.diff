@@ -1,0 +1,47 @@
+diff --git a/tmp/4836c74f-1177-4cb2-8b75-8c41e6e43ec5_buggy.java b/tmp/eca90929-c267-4782-ad04-a456d997ae6a_fixed.java
+index 03b03d7..dfd0149 100644
+--- a/tmp/4836c74f-1177-4cb2-8b75-8c41e6e43ec5_buggy.java
++++ b/tmp/eca90929-c267-4782-ad04-a456d997ae6a_fixed.java
+@@ -1,25 +1,37 @@
+     /**
+      * Adjusts the offset to be the earlier or later one during an overlap.
+      * 
+      * @param instant  the instant to adjust
+      * @param earlierOrLater  false for earlier, true for later
+      * @return the adjusted instant millis
+      */
+     public long adjustOffset(long instant, boolean earlierOrLater) {
+         // a bit messy, but will work in all non-pathological cases
+         
+         // evaluate 3 hours before and after to work out if anything is happening
+-        long instantBefore = convertUTCToLocal(instant - 3 * DateTimeConstants.MILLIS_PER_HOUR);
+-        long instantAfter = convertUTCToLocal(instant + 3 * DateTimeConstants.MILLIS_PER_HOUR);
++        long instantBefore = instant - 3 * DateTimeConstants.MILLIS_PER_HOUR;
++        long instantAfter = instant + 3 * DateTimeConstants.MILLIS_PER_HOUR;
+         if (instantBefore == instantAfter) {
+             return instant;  // not an overlap (less than is a gap, equal is normal case)
+         }
+         
+         // work out range of instants that have duplicate local times
+-        long local = convertUTCToLocal(instant);
+-        return convertLocalToUTC(local, false, earlierOrLater ? instantAfter : instantBefore);
++        long local = instant;  // assume local time is same as instant
++        if (earlierOrLater) {  // try later first
++            if (instantBefore > local) {  // instantBefore has duplicate local time
++                return local;  // use earliest duplicate
++            } else {  // instantAfter has duplicate local time
++                return instantBefore;  // use latest duplicate
++            }
++        } else {  // try earlier first
++            if (instantAfter > local) {  // instantAfter has duplicate local time
++                return instantAfter;  // use latest duplicate
++            } else {  // instantBefore has duplicate local time
++                return local;  // use earliest duplicate
++            }
++        }
+         
+         // calculate result
+           // currently in later offset
+           // currently in earlier offset
+     }
+\ No newline at end of file

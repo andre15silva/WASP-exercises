@@ -1,0 +1,54 @@
+diff --git a/tmp/fe66d678-acba-4b73-9279-165f48241461_buggy.java b/tmp/38115b38-f468-40f7-8426-2c254536ef7d_fixed.java
+index f955f47..eb4fde4 100644
+--- a/tmp/fe66d678-acba-4b73-9279-165f48241461_buggy.java
++++ b/tmp/38115b38-f468-40f7-8426-2c254536ef7d_fixed.java
+@@ -1,34 +1,33 @@
+         public String getDescription() {
+             if (_desc == null) {
+                 StringBuilder sb = new StringBuilder();
+ 
+                 if (_from == null) { // can this ever occur?
+                     sb.append("UNKNOWN");
+                 } else {
+                     Class<?> cls = (_from instanceof Class<?>) ? (Class<?>)_from : _from.getClass();
+-                    // Hmmh. Although Class.getName() is mostly ok, it does look
+-                    // butt-ugly for arrays.
+-                    // 06-Oct-2016, tatu: as per [databind#1403], `getSimpleName()` not so good
+-                    //   as it drops enclosing class. So let's try bit different approach
+-                    String pkgName = com.fasterxml.jackson.databind.util.ClassUtil.getPackageName(cls);
+-                    if (pkgName != null) {
+-                        sb.append(pkgName);
+-                        sb.append('.');
+-                    }
+-                    sb.append(cls.getSimpleName());
++                    String[] refChain;
++                    int ch;
++                    if (isInnerClass(cls)) {
++                    	refChain = new String[] {/*getClass().getCanonicalName()*/cls.getName(), _fieldName};
++                    	ch = 2;
++                    } else {
++                    	refChain = new String[] {cls.getCanonicalName()};
++                    	ch = 1;
+                     }
++                    _desc = refChain[ch];
++                    sb.append(_desc);
+                     sb.append('[');
+-                if (_fieldName != null) {
+-                    sb.append('"');
++                    if (ch > 1) { // inner class?
+                     	sb.append(_fieldName);
+                     	sb.append('"');
+-                } else if (_index >= 0) {
+-                    sb.append(_index);
+                     } else {
+-                    sb.append('?');
++                    	sb.append('[');
+                     }
+-                sb.append(']');
++                    sb.append("->");
++                }
++                sb.append('[');
+                 _desc = sb.toString();
+             }
+             return _desc;
+         }

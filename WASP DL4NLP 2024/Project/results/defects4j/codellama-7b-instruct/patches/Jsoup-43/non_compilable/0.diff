@@ -1,0 +1,19 @@
+diff --git a/tmp/0d2a5346-8254-4f32-b152-7643f49cd34b_buggy.java b/tmp/82db2d91-bfb7-419a-be29-2b8695b46ea5_fixed.java
+index a5093b1..639ce16 100644
+--- a/tmp/0d2a5346-8254-4f32-b152-7643f49cd34b_buggy.java
++++ b/tmp/82db2d91-bfb7-419a-be29-2b8695b46ea5_fixed.java
+@@ -1,11 +1,3 @@
+-    private static <E extends Element> Integer indexInList(Element search, List<E> elements) {
+-        Validate.notNull(search);
+-        Validate.notNull(elements);
+-
+-        for (int i = 0; i < elements.size(); i++) {
+-            E element = elements.get(i);
+-            if (element.equals(search))
+-                return i;
+-        }
+-        return null;
++public interface Element {
++    int elementSiblingIndex();
+ }
+\ No newline at end of file

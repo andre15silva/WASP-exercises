@@ -1,0 +1,47 @@
+diff --git a/tmp/d0f1dd24-57a3-4f33-a3d8-a82b638ea920_buggy.java b/tmp/610b77b0-0a0f-4800-aca2-6dbbb12a51d0_fixed.java
+index 6ea5795..9646c22 100644
+--- a/tmp/d0f1dd24-57a3-4f33-a3d8-a82b638ea920_buggy.java
++++ b/tmp/610b77b0-0a0f-4800-aca2-6dbbb12a51d0_fixed.java
+@@ -1,37 +1,29 @@
+-    /**
+-     * Appends the usage clause for an Option to a StringBuffer.  
+-     *
+-     * @param buff the StringBuffer to append to
+-     * @param option the Option to append
+-     * @param required whether the Option is required or not
+-     */
+     private static void appendOption(final StringBuffer buff, 
+                                      final Option option, 
+                                      final boolean required)
+     {
+         if (!required)
+         {
+             buff.append("[");
+         }
+-
+         if (option.getOpt() != null)
+         {
+             buff.append("-").append(option.getOpt());
+         }
+         else
+         {
+             buff.append("--").append(option.getLongOpt());
+         }
+-
+-        // if the Option has a value
+         if (option.hasArg() && (option.getArgName() != null))
++        {
++            if (!""
++                    .equals(option.getArgName()))
+             {
+                 buff.append(" <").append(option.getArgName()).append(">");
+             }
+-
+-        // if the Option is not a required option
++        }
+         if (!required)
+         {
+             buff.append("]");
+         }
+     }
+\ No newline at end of file

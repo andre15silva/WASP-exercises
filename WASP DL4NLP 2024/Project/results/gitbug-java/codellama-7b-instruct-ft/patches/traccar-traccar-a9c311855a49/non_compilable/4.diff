@@ -1,0 +1,52 @@
+diff --git a/tmp/3c4fbbaf-e82b-4ec3-9772-a54ac4df2172_buggy.java b/tmp/1b8361f3-3f48-4c00-a218-4a29ce103aea_fixed.java
+index ff397b6..a32b2e6 100644
+--- a/tmp/3c4fbbaf-e82b-4ec3-9772-a54ac4df2172_buggy.java
++++ b/tmp/1b8361f3-3f48-4c00-a218-4a29ce103aea_fixed.java
+@@ -1,35 +1,29 @@
+     @Override
+     protected Object decode(DeviceSession deviceSession, MqttPublishMessage message) throws Exception {
+ 
+-        JsonObject json;
+-        try (ByteBufferInputStream inputStream = new ByteBufferInputStream(message.payload().nioBuffer())) {
+-            json = Json.createReader(inputStream).readObject();
++        String json = message.payload().toString(StandardCharsets.US_ASCII.name());
++
++        if (!json.contains("\"rpt\"") || !json.contains("\"location\"") || !json.contains("\"bear\"") || !json.contains("\"spd\"")) {
++            return null;
+         }
+ 
+-        String type = json.getString("rpt");
+-        switch (type) {
+-            case "hf":
+-            case "loc":
++        String id = "01" + json.substring(19, 21) + json.substring(15, 13);
++        DateFormat dateFormat = new SimpleDateFormat("yyyyMMdd'T'HHmmss.SSS'Z'");
+         Position position = new Position(getProtocolName());
+         position.setDeviceId(deviceSession.getDeviceId());
+ 
+         position.setValid(true);
+ 
+-                DateFormat dateFormat = new SimpleDateFormat("yyyyMMdd'T'HHmmss.SSS'Z'");
+-                position.setTime(dateFormat.parse(json.getString("ts")));
++        position.setTime(dateFormat.parse(json.substring(110, 136)));
+ 
+-                JsonObject location = json.getJsonObject("location");
+-                position.setLatitude(location.getJsonNumber("lat").doubleValue());
+-                position.setLongitude(location.getJsonNumber("lon").doubleValue());
++        position.setLatitude(json.substring(21, 24).replace(',', '.') + json.substring(24, 28).replace(',', '.'));
++        position.setLongitude(json.substring(28, 32).replace(',', '.') + json.substring(32, 36).replace(',', '.'));
+ 
+-                position.setCourse(json.getInt("bear"));
+-                position.setSpeed(UnitsConverter.knotsFromCps(json.getInt("spd")));
++        position.setCourse(json.charAt(150) - '0');
++        position.setSpeed(21.33 * json.charAt(154) + 3.0);
+ 
+-                position.set(Position.KEY_IGNITION, json.getString("ign").equals("on"));
++        position.set(Position.KEY_IGNITION, json.substring(130, 131).equals("1"));
+ 
+         return position;
+ 
+-            default:
+-                return null;
+-        }
+     }

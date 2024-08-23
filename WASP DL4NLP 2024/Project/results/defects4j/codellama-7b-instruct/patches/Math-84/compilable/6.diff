@@ -1,0 +1,69 @@
+diff --git a/tmp/15ff8069-0473-42eb-b841-7a8a62c89a80_buggy.java b/tmp/8df4f994-3c45-4fb5-acad-075cb270e89f_fixed.java
+index 5f1dcf2..94d7f07 100644
+--- a/tmp/15ff8069-0473-42eb-b841-7a8a62c89a80_buggy.java
++++ b/tmp/8df4f994-3c45-4fb5-acad-075cb270e89f_fixed.java
+@@ -1,41 +1,62 @@
+     /** {@inheritDoc} */
+     @Override
+     protected void iterateSimplex(final Comparator<RealPointValuePair> comparator)
+         throws FunctionEvaluationException, OptimizationException, IllegalArgumentException {
+ 
+         while (true) {
+ 
+             incrementIterationsCounter();
+ 
+             // save the original vertex
+             final RealPointValuePair[] original = simplex;
+             final RealPointValuePair best = original[0];
+ 
+             // perform a reflection step
+             final RealPointValuePair reflected = evaluateNewSimplex(original, 1.0, comparator);
+             if (comparator.compare(reflected, best) < 0) {
+ 
++                // check for local minimizer
++                if (comparator.compare(best, reflected) > 0) {
++                    // simplex not contracted beyond the optimum
++                    continue;
++                }
++
+                 // compute the expanded simplex
+                 final RealPointValuePair[] reflectedSimplex = simplex;
+                 final RealPointValuePair expanded = evaluateNewSimplex(original, khi, comparator);
+                 if (comparator.compare(reflected, expanded) <= 0) {
+                     // accept the reflected simplex
+                     simplex = reflectedSimplex;
+                 }
+ 
+                 return;
+ 
+             }
+ 
++            // check for local maximizer
++            if (comparator.compare(best, reflected) < 0) {
++                // simplex not expanded beyond the optimum
++                continue;
++            }
++
+             // compute the contracted simplex
+             final RealPointValuePair contracted = evaluateNewSimplex(original, gamma, comparator);
+             if (comparator.compare(contracted, best) < 0) {
+                 // accept the contracted simplex
+ 
++                return;
++
++            }
++
++            // check boundary conditions
++            if (original[0].getPoint()[0] == 0 || original[0].getPoint()[1] == 0) {
++                // simplex not escaped the feasible region
++                continue;
++            }
++
+             // check convergence
+             return;
+-            }
+ 
+         }
+ 
+     }
+\ No newline at end of file

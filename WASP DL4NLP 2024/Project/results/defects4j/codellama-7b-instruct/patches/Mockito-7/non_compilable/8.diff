@@ -1,0 +1,32 @@
+diff --git a/tmp/c20ff898-1f10-4913-a7b3-b1fd3ea205d3_buggy.java b/tmp/553cf0e2-ba08-464b-a71c-ee54b2a4aba3_fixed.java
+index 91b7957..2e59b4c 100644
+--- a/tmp/c20ff898-1f10-4913-a7b3-b1fd3ea205d3_buggy.java
++++ b/tmp/553cf0e2-ba08-464b-a71c-ee54b2a4aba3_fixed.java
+@@ -1,6 +1,26 @@
++class MyMockitoExample {
++
++    private final TypeVariable<?> typeVariable;
++    private final Class<?> clazz;
++
++    public MyMockitoExample(TypeVariable<?> typeVariable, Class<?> clazz) {
++        this.typeVariable = typeVariable;
++        this.clazz = clazz;
++    }
++
++    private int getActualTypeArgumentFor(TypeVariable<?> typeDefinition) {
++        if (typeDefinition == typeVariable) {
++            return 0;
++        } else {
++            return -1;
++        }
++    }
++
+     private void readTypeVariables() {
+         for (Type type : typeVariable.getBounds()) {
+             registerTypeVariablesOn(type);
+         }
+         registerTypeVariablesOn(getActualTypeArgumentFor(typeVariable));
+     }
++
++}
+\ No newline at end of file

@@ -1,0 +1,69 @@
+diff --git a/tmp/dcc4b61b-c49e-4db8-9aef-39a394a87748_buggy.java b/tmp/7f0614cd-cfcf-452b-82b7-d010950ecdc2_fixed.java
+index 904dba7..aab970b 100644
+--- a/tmp/dcc4b61b-c49e-4db8-9aef-39a394a87748_buggy.java
++++ b/tmp/7f0614cd-cfcf-452b-82b7-d010950ecdc2_fixed.java
+@@ -1,46 +1,50 @@
+   private String format(JSError error, boolean warning) {
+-    // extract source excerpt
+     SourceExcerptProvider source = getSource();
+     String sourceExcerpt = source == null ? null :
+         excerpt.get(
+             source, error.sourceName, error.lineNumber, excerptFormatter);
+-
+-    // formatting the message
+     StringBuilder b = new StringBuilder();
+     if (error.sourceName != null) {
+       b.append(error.sourceName);
+       if (error.lineNumber > 0) {
+         b.append(':');
+         b.append(error.lineNumber);
+       }
+-      b.append(": ");
++      b.append('\t');
+     }
+-
+     b.append(getLevelName(warning ? CheckLevel.WARNING : CheckLevel.ERROR));
+     b.append(" - ");
+-
+     b.append(error.description);
+     b.append('\n');
+     if (sourceExcerpt != null) {
+       b.append(sourceExcerpt);
+       b.append('\n');
+-      int charno = error.getCharno();
+-
+-      // padding equal to the excerpt and arrow at the end
+-      // charno == sourceExpert.length() means something is missing
+-      // at the end of the line
++      int charno = error.getCharno() - 1;
+       if (excerpt.equals(LINE)
+-          && 0 <= charno && charno < sourceExcerpt.length()) {
++          && sourceExcerpt.length() > charno) {
+         for (int i = 0; i < charno; i++) {
+           char c = sourceExcerpt.charAt(i);
+           if (Character.isWhitespace(c)) {
+             b.append(c);
+           } else {
+             b.append(' ');
+           }
+         }
+-        b.append("^\n");
++        b.append('^');
++        b.append(' '); 
++        int excerptEnd = excerpt.equals(LINE) ? sourceExcerpt.length()
++            : Math.max(sourceExcerpt.length() - 1,
++                excerpt.equals(LINE_EOL) ? 0 : 1); 
++        for (int i = charno + 1; i < excerptEnd; i++) {
++          char c = sourceExcerpt.charAt(i);
++          if (Character.isWhitespace(c)) {
++            b.append(c);
++          } else {
++            b.append(' ');
++          }
++        }
++        b.append('\n');
+       }
+     }
+     return b.toString();
+   }
+\ No newline at end of file

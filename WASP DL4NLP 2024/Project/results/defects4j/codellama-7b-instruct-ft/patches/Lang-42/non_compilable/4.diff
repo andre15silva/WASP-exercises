@@ -1,0 +1,63 @@
+diff --git a/tmp/0181b8e3-816d-46fe-a453-e9f7d3c3344b_buggy.java b/tmp/ce139147-92af-4028-9066-7b58a7dadc03_fixed.java
+index 822447c..1fb82ca 100644
+--- a/tmp/0181b8e3-816d-46fe-a453-e9f7d3c3344b_buggy.java
++++ b/tmp/ce139147-92af-4028-9066-7b58a7dadc03_fixed.java
+@@ -1,37 +1,55 @@
+     /**
+      * <p>
+      * Escapes the characters in the <code>String</code> passed and writes the result to the <code>Writer</code>
+      * passed.
+      * </p>
+      * 
+      * @param writer
+      *            The <code>Writer</code> to write the results of the escaping to. Assumed to be a non-null value.
+      * @param str
+      *            The <code>String</code> to escape. Assumed to be a non-null value.
+      * @throws IOException
+-     *             when <code>Writer</code> passed throws the exception from calls to the {@link Writer#write(int)}
+-     *             methods.
++     *             when <code>Writer</code> passed throws the exception from the {@link Writer#write(int)} method.
+      * 
+      * @see #escape(String)
+      * @see Writer
+      */
+     public void escape(Writer writer, String str) throws IOException {
+         int len = str.length();
+         for (int i = 0; i < len; i++) {
+             char c = str.charAt(i);
+             String entityName = this.entityName(c);
+             if (entityName == null) {
+-                if (c > 0x7F) {
++                if (Character.isHighSurrogate(c)) {
++                    i++;
++                    int c2 = str.charAt(i);
++                    String name = new String(new char[] { c, c2 });
++                    entityName = this.entityName(name);
++                    if (entityName == null) {
++                        writer.write("&#");
++                        writer.write(Integer.toString(c, 10));
++                        writer.write(';');
++                        writer.write('&');
++                        writer.write(Integer.toString(c2, 10));
++                        writer.write(';');
++                    } else {
++                        writer.write(entityName);
++                    }
++                } else if (Character.isLowSurrogate(c)) {
++                    writer.write("&#");
++                    writer.write(Integer.toString(c, 10));
++                    writer.write(';');
++                } else if (c > 0x7F) {
+                     writer.write("&#");
+                     writer.write(Integer.toString(c, 10));
+                     writer.write(';');
+                 } else {
+                     writer.write(c);
+                 }
+             } else {
+                 writer.write('&');
+                 writer.write(entityName);
+                 writer.write(';');
+             }
+         }
+     }

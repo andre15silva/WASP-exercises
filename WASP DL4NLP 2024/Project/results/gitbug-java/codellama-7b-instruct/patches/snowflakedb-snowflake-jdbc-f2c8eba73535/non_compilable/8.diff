@@ -1,0 +1,18 @@
+diff --git a/tmp/30baeabc-56bf-42be-98e8-41d4d4f53b58_buggy.java b/tmp/4f0f1d10-ddcd-4416-97f9-21c751e57238_fixed.java
+index bdde834..0d54c5e 100644
+--- a/tmp/30baeabc-56bf-42be-98e8-41d4d4f53b58_buggy.java
++++ b/tmp/4f0f1d10-ddcd-4416-97f9-21c751e57238_fixed.java
+@@ -1,10 +1,2 @@
+-  static boolean isNonRetryableHTTPCode(CloseableHttpResponse response, boolean retryHTTP403) {
+-    return response != null
+-        && (response.getStatusLine().getStatusCode() < 500
+-            || // service unavailable
+-            response.getStatusLine().getStatusCode() >= 600)
+-        && // gateway timeout
+-        response.getStatusLine().getStatusCode() != 408
+-        && // request timeout
+-        (!retryHTTP403 || response.getStatusLine().getStatusCode() != 403);
+-  }
++
++Here's a possible implementation:
+\ No newline at end of file

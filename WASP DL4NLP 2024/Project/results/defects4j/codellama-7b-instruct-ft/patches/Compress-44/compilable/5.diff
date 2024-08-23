@@ -1,0 +1,13 @@
+diff --git a/tmp/01f400fd-5733-4102-b361-77b6b9feef8d_buggy.java b/tmp/e2e63b50-9c19-40ff-9ac6-6ca3c78ca190_fixed.java
+index 741e96b..3af2496 100644
+--- a/tmp/01f400fd-5733-4102-b361-77b6b9feef8d_buggy.java
++++ b/tmp/e2e63b50-9c19-40ff-9ac6-6ca3c78ca190_fixed.java
+@@ -1,7 +1,8 @@
+     public ChecksumCalculatingInputStream(final Checksum checksum, final InputStream in) {
+ 
++        super();
+ 
+ 
+         this.checksum = checksum;
+         this.in = in;
+     }

@@ -1,0 +1,50 @@
+diff --git a/tmp/dea4b1df-ca6a-4eb1-95b3-a6457f9e2e1a_buggy.java b/tmp/39413709-7b02-492e-b2a3-60c8c81d57cb_fixed.java
+index bc80637..7fd816d 100644
+--- a/tmp/dea4b1df-ca6a-4eb1-95b3-a6457f9e2e1a_buggy.java
++++ b/tmp/39413709-7b02-492e-b2a3-60c8c81d57cb_fixed.java
+@@ -1,33 +1,44 @@
+ @Override
+ public KeyDeserializer createKeyDeserializer(DeserializationContext ctxt,
+         JavaType type)
+     throws JsonMappingException
+ {
+     final DeserializationConfig config = ctxt.getConfig();
+     KeyDeserializer deser = null;
+     if (_factoryConfig.hasKeyDeserializers()) {
+         BeanDescription beanDesc = config.introspectClassAnnotations(type.getRawClass());
+         for (KeyDeserializers d  : _factoryConfig.keyDeserializers()) {
+             deser = d.findKeyDeserializer(type, config, beanDesc);
+             if (deser != null) {
+                 break;
+             }
+         }
+     }
+     // the only non-standard thing is this:
+     if (deser == null) {
+         if (type.isEnumType()) {
+             return _createEnumKeyDeserializer(ctxt, type);
+         }
+         deser = StdKeyDeserializers.findStringBasedKeyDeserializer(config, type);
+     }
+     // and then post-processing
+     if (deser != null) {
+         if (_factoryConfig.hasDeserializerModifiers()) {
+             for (BeanDeserializerModifier mod : _factoryConfig.deserializerModifiers()) {
+                 deser = mod.modifyKeyDeserializer(config, type, deser);
+             }
+         }
+     }
++    // Fix: Ensure the KeyDeserializer can handle case-insensitivity for enum keys
++    if (type.isEnumType()) {
++        return new KeyDeserializer() {
++            @Override
++            public Object deserializeKey(String key, DeserializationContext ctxt) throws IOException {
++                Class<? extends Enum<?>> rawClass = (Class<? extends Enum<?>>) type.getRawClass();
++                String normalizedKey = key.toUpperCase(); // Ensure normalization to uppercase
++                return Enum.valueOf(rawClass, normalizedKey);
++            }
++        };
++    }
+     return deser;
+ }
+\ No newline at end of file

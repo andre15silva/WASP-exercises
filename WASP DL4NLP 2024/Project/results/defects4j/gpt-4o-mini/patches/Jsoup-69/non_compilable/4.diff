@@ -1,0 +1,19 @@
+diff --git a/tmp/eeb74506-72a7-4b10-8876-fb01cf3bb2ac_buggy.java b/tmp/c14161d3-f198-4638-9c4d-ffabcda89d2e_fixed.java
+index e69de29..333a41c 100644
+--- a/tmp/eeb74506-72a7-4b10-8876-fb01cf3bb2ac_buggy.java
++++ b/tmp/c14161d3-f198-4638-9c4d-ffabcda89d2e_fixed.java
+@@ -0,0 +1,13 @@
++public List<Connection.KeyVal> formData() {
++    List<Connection.KeyVal> data = new ArrayList<>();
++    for (Element input : select("input")) {
++        if (!input.hasAttr("disabled") && !"submit".equals(input.attr("type"))) {
++            String key = input.attr("name");
++            String value = input.val();
++            if (!key.isEmpty()) {
++                data.add(new Connection.KeyValImpl(key, value));
++            }
++        }
++    }
++    return data;
++}
+\ No newline at end of file

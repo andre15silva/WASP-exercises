@@ -1,0 +1,57 @@
+diff --git a/tmp/8f646fc3-6b05-42a0-b570-7e7516d7335f_buggy.java b/tmp/22237979-06d1-4dcd-90fe-19da96564dd9_fixed.java
+index 5f1dcf2..b807d0a 100644
+--- a/tmp/8f646fc3-6b05-42a0-b570-7e7516d7335f_buggy.java
++++ b/tmp/22237979-06d1-4dcd-90fe-19da96564dd9_fixed.java
+@@ -1,41 +1,46 @@
+     /** {@inheritDoc} */
+     @Override
+     protected void iterateSimplex(final Comparator<RealPointValuePair> comparator)
+         throws FunctionEvaluationException, OptimizationException, IllegalArgumentException {
+ 
+         while (true) {
+ 
+             incrementIterationsCounter();
+ 
+             // save the original vertex
+             final RealPointValuePair[] original = simplex;
+             final RealPointValuePair best = original[0];
+ 
+             // perform a reflection step
+             final RealPointValuePair reflected = evaluateNewSimplex(original, 1.0, comparator);
+             if (comparator.compare(reflected, best) < 0) {
+ 
+                 // compute the expanded simplex
+-                final RealPointValuePair[] reflectedSimplex = simplex;
+                 final RealPointValuePair expanded = evaluateNewSimplex(original, khi, comparator);
+                 if (comparator.compare(reflected, expanded) <= 0) {
+                     // accept the reflected simplex
+-                    simplex = reflectedSimplex;
++                    simplex = new RealPointValuePair[] { reflected }; // Update simplex with reflected point
++                } else {
++                    // Accept the expanded point if it's better than the reflected
++                    simplex = new RealPointValuePair[] { expanded }; 
+                 }
+-
+                 return;
+ 
+             }
+ 
+             // compute the contracted simplex
+             final RealPointValuePair contracted = evaluateNewSimplex(original, gamma, comparator);
+             if (comparator.compare(contracted, best) < 0) {
+                 // accept the contracted simplex
+-
+-            // check convergence
++                simplex = new RealPointValuePair[] { contracted }; 
+                 return;
+             }
+ 
++            // shrink the simplex towards the best point
++            for (int i = 1; i < original.length; i++) {
++                simplex[i] = evaluateNewSimplex(original, 0.5, comparator);
++            }
++
+         }
+ 
+     }
+\ No newline at end of file

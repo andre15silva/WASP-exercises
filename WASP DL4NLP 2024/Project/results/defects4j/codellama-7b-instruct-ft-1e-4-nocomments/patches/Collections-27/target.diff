@@ -1,0 +1,12 @@
+diff --git a/tmp/c634fb14-9ac9-40ad-adcb-3dfc1659f4f2_buggy.java b/tmp/6101356d-830d-4a80-bea5-1e18b1d70f8b_fixed.java
+index e69de29..fd351f5 100644
+--- a/tmp/c634fb14-9ac9-40ad-adcb-3dfc1659f4f2_buggy.java
++++ b/tmp/6101356d-830d-4a80-bea5-1e18b1d70f8b_fixed.java
+@@ -0,0 +1,7 @@
++        private void readObject(ObjectInputStream is) throws IOException, ClassNotFoundException {
++            is.defaultReadObject();
++            // ensure that the de-serialized class is a Collection, COLLECTIONS-580
++            if (clazz != null && !Collection.class.isAssignableFrom(clazz)) {
++                throw new UnsupportedOperationException();
++            }
++        }

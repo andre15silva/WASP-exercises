@@ -1,0 +1,329 @@
+diff --git a/tmp/35038bc8-a12b-425e-ad8d-d04b0bc821a4_buggy.java b/tmp/db4d19d6-7f56-4be4-a76f-d12ace7a5941_fixed.java
+index d64eec3..a0a4639 100644
+--- a/tmp/35038bc8-a12b-425e-ad8d-d04b0bc821a4_buggy.java
++++ b/tmp/db4d19d6-7f56-4be4-a76f-d12ace7a5941_fixed.java
+@@ -1,122 +1,203 @@
+-    /**
+-     * Draws the axis label.
+-     *
+-     * @param label  the label text.
+-     * @param g2  the graphics device.
+-     * @param plotArea  the plot area.
+-     * @param dataArea  the area inside the axes.
+-     * @param edge  the location of the axis.
+-     * @param state  the axis state (<code>null</code> not permitted).
+-     * @param plotState  the plot state (<code>null</code> permitted).
+-     *
+-     * @return Information about the axis.
+-     */
+-    protected AxisState drawLabel(String label, Graphics2D g2, 
+-            Rectangle2D plotArea, Rectangle2D dataArea, RectangleEdge edge, 
+-            AxisState state, PlotRenderingInfo plotState) {
+-
+-        // it is unlikely that 'state' will be null, but check anyway...
+-        if (state == null) {
+-            throw new IllegalArgumentException("Null 'state' argument.");
+-        }
+-        
+-        if ((label == null) || (label.equals(""))) {
+-            return state;
+-        }
+-
+-        Font font = getLabelFont();
+-        RectangleInsets insets = getLabelInsets();
+-        g2.setFont(font);
+-        g2.setPaint(getLabelPaint());
+-        FontMetrics fm = g2.getFontMetrics();
+-        Rectangle2D labelBounds = TextUtilities.getTextBounds(label, g2, fm);
+-        Shape hotspot = null;
+-        
+-        if (edge == RectangleEdge.TOP) {
+-            AffineTransform t = AffineTransform.getRotateInstance(
+-                    getLabelAngle(), labelBounds.getCenterX(), 
+-                    labelBounds.getCenterY());
+-            Shape rotatedLabelBounds = t.createTransformedShape(labelBounds);
+-            labelBounds = rotatedLabelBounds.getBounds2D();
+-            float w = (float) labelBounds.getWidth();
+-            float h = (float) labelBounds.getHeight();
+-            float labelx = (float) dataArea.getCenterX();
+-            float labely = (float) (state.getCursor() - insets.getBottom() 
+-                    - h / 2.0);
+-            TextUtilities.drawRotatedString(label, g2, labelx, labely, 
+-                    TextAnchor.CENTER, getLabelAngle(), TextAnchor.CENTER);
+-            hotspot = new Rectangle2D.Float(labelx - w / 2.0f, 
+-                    labely - h / 2.0f, w, h);
+-            state.cursorUp(insets.getTop() + labelBounds.getHeight() 
+-                    + insets.getBottom());
+-        }
+-        else if (edge == RectangleEdge.BOTTOM) {
+-            AffineTransform t = AffineTransform.getRotateInstance(
+-                    getLabelAngle(), labelBounds.getCenterX(), 
+-                    labelBounds.getCenterY());
+-            Shape rotatedLabelBounds = t.createTransformedShape(labelBounds);
+-            labelBounds = rotatedLabelBounds.getBounds2D();
+-            float w = (float) labelBounds.getWidth();
+-            float h = (float) labelBounds.getHeight();
+-            float labelx = (float) dataArea.getCenterX();
+-            float labely = (float) (state.getCursor() + insets.getTop() 
+-                    + h / 2.0);
+-            TextUtilities.drawRotatedString(label, g2, labelx, labely, 
+-                    TextAnchor.CENTER, getLabelAngle(), TextAnchor.CENTER);
+-            hotspot = new Rectangle2D.Float(labelx - w / 2.0f, 
+-                    labely - h / 2.0f, w, h);
+-            state.cursorDown(insets.getTop() + labelBounds.getHeight() 
+-                    + insets.getBottom());
+-        }
+-        else if (edge == RectangleEdge.LEFT) {
+-            AffineTransform t = AffineTransform.getRotateInstance(
+-                    getLabelAngle() - Math.PI / 2.0, labelBounds.getCenterX(), 
+-                    labelBounds.getCenterY());
+-            Shape rotatedLabelBounds = t.createTransformedShape(labelBounds);
+-            labelBounds = rotatedLabelBounds.getBounds2D();
+-            float w = (float) labelBounds.getWidth();
+-            float h = (float) labelBounds.getHeight();
+-            float labelx = (float) (state.getCursor() - insets.getRight() 
+-                    - w / 2.0);
+-            float labely = (float) dataArea.getCenterY();
+-            TextUtilities.drawRotatedString(label, g2, labelx, labely, 
+-                    TextAnchor.CENTER, getLabelAngle() - Math.PI / 2.0, 
+-                    TextAnchor.CENTER);
+-            hotspot = new Rectangle2D.Float(labelx - w / 2.0f, 
+-                    labely - h / 2.0f, w, h);
+-            state.cursorLeft(insets.getLeft() + labelBounds.getWidth() 
+-                    + insets.getRight());
+-        }
+-        else if (edge == RectangleEdge.RIGHT) {
+-
+-            AffineTransform t = AffineTransform.getRotateInstance(
+-                    getLabelAngle() + Math.PI / 2.0, 
+-                    labelBounds.getCenterX(), labelBounds.getCenterY());
+-            Shape rotatedLabelBounds = t.createTransformedShape(labelBounds);
+-            labelBounds = rotatedLabelBounds.getBounds2D();
+-            float w = (float) labelBounds.getWidth();
+-            float h = (float) labelBounds.getHeight();
+-            float labelx = (float) (state.getCursor() 
+-                            + insets.getLeft() + w / 2.0);
+-            float labely = (float) (dataArea.getY() + dataArea.getHeight() 
+-                    / 2.0);
+-            TextUtilities.drawRotatedString(label, g2, labelx, labely, 
+-                    TextAnchor.CENTER, getLabelAngle() + Math.PI / 2.0, 
+-                    TextAnchor.CENTER);
+-            hotspot = new Rectangle2D.Float(labelx - w / 2.0f, 
+-                    labely - h / 2.0f, w, h);
+-            state.cursorRight(insets.getLeft() + labelBounds.getWidth() 
+-                    + insets.getRight());
+-
+-        }
+-        if (plotState != null && hotspot != null) {
+-            ChartRenderingInfo owner = plotState.getOwner();
+-                EntityCollection entities = owner.getEntityCollection();
+-                if (entities != null) {
+-                    entities.add(new AxisLabelEntity(this, hotspot, 
+-                            this.labelToolTip, this.labelURL));
+-                }
+-        }
+-        return state;
++import java.util.*;
+ 
++public class BST<T> {
++    private Node root;
++
++    public BST() {
++        root = null;
++    }
++
++    public BST(T item) {
++        root = new Node(item);
++    }
++
++    public BST(T[] items) {
++        for (T item : items) {
++            add(item);
++        }
++    }
++
++    public void add(T item) {
++        if (root == null) {
++            root = new Node(item);
++        } else {
++            root.add(item);
++        }
++    }
++
++    public T remove(T item) {
++        Node oldNode = root.remove(item);
++        if (oldNode == null) {
++            return null;
++        } else {
++            return oldNode.data;
++        }
++    }
++
++    public boolean contains(T item) {
++        return root.contains(item);
++    }
++
++    public T first() {
++        return root.data;
++    }
++
++    public T last() {
++        if (root.left != null) {
++            return last(root.left);
++        }
++        return root.data;
++    }
++
++    public T next(T item) {
++        Node node = root.next(item);
++        if (node == null) {
++            return null;
++        } else {
++            return node.data;
++        }
++    }
++
++    public T prev(T item) {
++        Node node = root.prev(item);
++        if (node == null) {
++            return null;
++        } else {
++            return node.data;
++        }
++    }
++
++    private T last(Node node) {
++        if (node.right != null) {
++            return last(node.right);
++        } else {
++            return node.data;
++        }
++    }
++
++    private T next(T item) {
++        Node node = root.next(item);
++        if (node == null) {
++            return null;
++        } else {
++            return node.data;
++        }
++    }
++
++    private T prev(T item) {
++        Node node = root.prev(item);
++        if (node == null) {
++            return null;
++        } else {
++            return node.data;
++        }
++    }
++
++    private class Node {
++        T data;
++        Node left;
++        Node right;
++
++        Node(T data) {
++            this.data = data;
++            this.left = null;
++            this.right = null;
++        }
++
++        public boolean compare(T item) {
++            return item != null && data != null && item.compareTo(data) < 0;
++        }
++
++        public void add(T item) {
++            if (item == null) {
++                return;
++            } else if (compare(item)) {
++                if (left == null) {
++                    left = new Node(item);
++                } else {
++                    left.add(item);
++                }
++            } else {
++                if (right == null) {
++                    right = new Node(item);
++                } else {
++                    right.add(item);
++                }
++            }
++        }
++
++        public Node remove(T item) {
++            if (item == null || data == null || item.compareTo(data) > 0) {
++                return null;
++            } else if (left == null) return root;
++            else if (item.compareTo(data) < 0) {
++                Node delNode = this.left.remove(item);
++                if (delNode != null) {
++                    this.left = delNode;
++                } else {
++                    if (this.left.data.compareTo(item) == 0) {
++                        this.left = null;
++                    }
++                }
++            } else {
++                Node delNode = this.right.remove(item);
++                if (delNode != null) {
++                    this.right = delNode;
++                } else {
++                    if (this.right.data.compareTo(item) == 0) {
++                        this.right = null;
++                    }
++                }
++            }
++            return null;
++        }
++
++        public boolean contains(T item) {
++            if (item == null || data == null) {
++                return false;
++            } else if (item.compareTo(data) < 0) {
++                return left.contains(item);
++            } else if (item.compareTo(data) > 0) {
++                return right.contains(item);
++            } else {
++                return true;
++            }
++        }
++
++        public Node next(T item) {
++            Node node = null;
++            if (item == null || data == null) {
++                return null;
++            } else if (item.compareTo(data) <= 0) {
++                node = left.next(item);
++                if (node == null) {
++                    node = data;
++                }
++            } else if (item.compareTo(data) >= 0) {
++                node = right.next(item);
++                if (node != null) {
++                    node = node.data;
++                }
++            }
++            return node;
++        }
++
++        public Node prev(T item) {
++            Node node = null;
++            if (item == null || data == null) {
++                return null;
++            } else if (item.compareTo(data) >= 0) {
++                node = left.prev(item);
++                if (node == null) {
++                    node = data;
++                }
++            } else if (item.compareTo(data) <= 0) {
++                node = right.prev(item);
++                if (node != null) {
++                    node = node.data;
++                }
++            }
++            return node;
++        }
++    }
+ }
+\ No newline at end of file

@@ -1,0 +1,10 @@
+diff --git a/tmp/39c90cbc-7500-4c63-a1c5-018d3521c79d_buggy.java b/tmp/2802de9f-ad43-4724-a45f-6f921467e3ba_fixed.java
+index 43937f5..59374be 100644
+--- a/tmp/39c90cbc-7500-4c63-a1c5-018d3521c79d_buggy.java
++++ b/tmp/2802de9f-ad43-4724-a45f-6f921467e3ba_fixed.java
+@@ -1,3 +1,4 @@
+   private static boolean isReduceableFunctionExpression(Node n) {
+-    return NodeUtil.isFunctionExpression(n);
++    // Only call nodes are reducable right now (not expression nodes)
++    return n.isCall();
+   }

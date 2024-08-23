@@ -1,0 +1,91 @@
+diff --git a/tmp/b37583b4-54b1-4d1e-9bd7-bdacbb56fb9c_buggy.java b/tmp/5c623275-b7f7-4ae2-b283-020ad24e7f30_fixed.java
+index 98d89dc..9231829 100644
+--- a/tmp/b37583b4-54b1-4d1e-9bd7-bdacbb56fb9c_buggy.java
++++ b/tmp/5c623275-b7f7-4ae2-b283-020ad24e7f30_fixed.java
+@@ -1,23 +1,86 @@
++import java.util.Iterator;
++
++public class Test {
+     private boolean compute(Object left, Object right) {
+         left = reduce(left);
+         right = reduce(right);
+ 
+         if (left instanceof InitialContext) {
+             ((InitialContext) left).reset();
+         }
+         if (right instanceof InitialContext) {
+             ((InitialContext) right).reset();
+         }
+         if (left instanceof Iterator && right instanceof Iterator) {
+             return findMatch((Iterator) left, (Iterator) right);
+         }
+         if (left instanceof Iterator) {
+             return containsMatch((Iterator) left, right);
+         }
+         if (right instanceof Iterator) {
+             return containsMatch((Iterator) right, left);
+         }
+         double ld = InfoSetUtil.doubleValue(left);
+         double rd = InfoSetUtil.doubleValue(right);
+         return evaluateCompare(ld == rd ? 0 : ld < rd ? -1 : 1);
+     }
++
++    private static int evaluateCompare(int i) {
++        return i;
++    }
++
++    private Object reduce(Object object) {
++        return object;
++    }
++
++    private InitialContext getInitialContext() {
++        return new InitialContext();
++    }
++
++    private static boolean containsMatch(Iterator<Double> iterator, Object object) {
++        return containsMatch(iterator, InfoSetUtil.doubleValue(object));
++    }
++
++    private static boolean containsMatch(Iterator<Double> iterator, double value) {
++        while (iterator.hasNext()) {
++            if (iterator.next().compareTo(value) == 0) {
++                return true;
++            }
++        }
++        return false;
++    }
++
++    private static boolean findMatch(Iterator<Double> left, Iterator<Double> right) {
++        while (left.hasNext() && right.hasNext()) {
++            if (left.next().compareTo(right.next()) == 0) {
++                return true;
++            }
++        }
++        return false;
++    }
++
++    private class InitialContext {
++        private boolean initialized = false;
++
++        public void reset() {
++            initialized = false;
++        }
++
++    }
++
++    public static void main(String[] args) {
++        Test test = new Test();
++
++        Object nan = Double.NaN;
++
++        test.assertXPathValue(test.getInitialContext(), "$nan > $nan", Boolean.FALSE, Boolean.class);
++        test.assertXPathValue(Test.this.getInitialContext(), "$nan < $nan", Boolean.FALSE, Boolean.class);
++        test.assertXPathValue(Test.this.getInitialContext(), "$nan = $nan", Boolean.TRUE, Boolean.class);
++        test.assertXPathValue(Test.this.getInitialContext(), "$nan > 0", Boolean.FALSE, Boolean.class);
++        test.assertXPathValue(Test.this.getInitialContext(), "$nan < 0", Boolean.FALSE, Boolean.class);
++        test.assertXPathValue(Test.this.getInitialContext(), "$nan = 0", Boolean.FALSE, Boolean.class);
++        test.assertXPathValue(Test.this.getInitialContext(), "$nan > 1", Boolean.FALSE, Boolean.class);
++        test.assertXPathValue(Test.this.getInitialContext(), "$nan < 1", Boolean.FALSE, Boolean.class);
++        test.assertXPathValue(Test.this.getInitialContext(), "$nan = 1", Boolean.FALSE, Boolean.class);
++    }
++}

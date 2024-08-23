@@ -1,0 +1,85 @@
+diff --git a/tmp/89979d19-c6c5-46e5-8183-4374a5f327f2_buggy.java b/tmp/8768b756-477f-4943-aa0e-c609cc0f66c2_fixed.java
+index be2af16..64d6d56 100644
+--- a/tmp/89979d19-c6c5-46e5-8183-4374a5f327f2_buggy.java
++++ b/tmp/8768b756-477f-4943-aa0e-c609cc0f66c2_fixed.java
+@@ -1,29 +1,68 @@
+     public long getDateTimeMillis(int year, int monthOfYear, int dayOfMonth,
+                                   int hourOfDay, int minuteOfHour,
+                                   int secondOfMinute, int millisOfSecond)
+         throws IllegalArgumentException
+     {
+-        Chronology base;
+-        if ((base = getBase()) != null) {
++        Chronology base = getBase();
++        if (base != null) {
+             return base.getDateTimeMillis
+                 (year, monthOfYear, dayOfMonth,
+                  hourOfDay, minuteOfHour, secondOfMinute, millisOfSecond);
+         }
+-
+-        // Assume date is Gregorian.
+         long instant;
+-            instant = iGregorianChronology.getDateTimeMillis
+-                (year, monthOfYear, dayOfMonth,
+-                 hourOfDay, minuteOfHour, secondOfMinute, millisOfSecond);
+-        if (instant < iCutoverMillis) {
+-            // Maybe it's Julian.
++        boolean testCutover = true;
++        CalendarDate startOfCutover = iCutover;
++        while (testCutover) {
++            startOfCutover = startOfCutover.minusYears(1);
++            if (startOfCutover.getYear() > year) {
++                startOfCutover = null; 
++                testCutover = false;
++            } else {
+                 instant = iJulianChronology.getDateTimeMillis
++                    (startOfCutover.getYear(), startOfCutover.getMonthOfYear(),
++                     startOfCutover.getDayOfMonth(),
++                     hourOfDay, minuteOfHour, secondOfMinute, millisOfSecond);
++                if (iChronoType == ChronologyType.PROLEPTIC_GREGORIAN) {
++                    if (startOfCutover.get(CalendarDate.DAY_OF_MONTH) > 12) {
++                        instant += 3484454L; 
++                    } else if (startOfCutover.get(CalendarDate.DAY_OF_MONTH) == 12) {
++                        instant += 3499013L; 
++                    } else {
++                        instant += 3499012L; 
++                    }
++                }
++                if ((instant >= iCutoverMillis) && (startOfCutover.get(CalendarDate.DAY_OF_MONTH) == 29)
++                     && (startOfCutover.getMonthOfYear() == 2)) {
++                    testCutover = false; 
++                }
++            }
++        }
++        if (instant < iCutoverMillis) {
++            instant = iGregorianChronology.getDateTimeMillis
+                 (year, monthOfYear, dayOfMonth,
+                  hourOfDay, minuteOfHour, secondOfMinute, millisOfSecond);
+             if (instant >= iCutoverMillis) {
+-                // Okay, it's in the illegal cutover gap.
+-                throw new IllegalArgumentException("Specified date does not exist");
++                if (iChronoType == ChronologyType.PROLEPTIC_GREGORIAN) {
++                    if (monthOfYear > 2) {
++                        instant += 31*3 + (monthOfYear-3)*30;
++                    } else {
++                        instant += 31+28+31+ (monthOfYear-1)*28;
++                    }
++                    if (dayOfMonth > 12) {
++                        instant += 12;
++                    } else {
++                        if (dayOfMonth > 2) {
++                            if (monthOfYear == 2) {
++                                if (dayOfMonth > 12) {
++                                    instant += (dayOfMonth-1) - ((year % 4 == 0) ? 11 : 1);
++                                }
++                            } else {
++                                instant += (dayOfMonth-1);
++                            }
++                        }
++                    }
++                }
+             }
+         }
+         return instant;
+     }
+\ No newline at end of file

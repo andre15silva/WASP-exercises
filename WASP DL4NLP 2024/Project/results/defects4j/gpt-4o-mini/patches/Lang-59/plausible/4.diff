@@ -1,0 +1,39 @@
+diff --git a/tmp/aa4bba94-c1e2-4f67-a4b8-41c8acc5ae8d_buggy.java b/tmp/f04ce5b5-c2b4-4080-a5a8-ba496ece5640_fixed.java
+index 735a993..ad44e4a 100644
+--- a/tmp/aa4bba94-c1e2-4f67-a4b8-41c8acc5ae8d_buggy.java
++++ b/tmp/f04ce5b5-c2b4-4080-a5a8-ba496ece5640_fixed.java
+@@ -1,29 +1,19 @@
+-    /**
+-     * Appends an object to the builder padding on the right to a fixed length.
+-     * The <code>toString</code> of the object is used.
+-     * If the object is larger than the length, the right hand side is lost.
+-     * If the object is null, null text value is used.
+-     * 
+-     * @param obj  the object to append, null uses null text
+-     * @param width  the fixed field width, zero or negative has no effect
+-     * @param padChar  the pad character to use
+-     * @return this, to enable chaining
+-     */
+ public StrBuilder appendFixedWidthPadRight(Object obj, int width, char padChar) {
+     if (width > 0) {
+         ensureCapacity(size + width);
+         String str = (obj == null ? getNullText() : obj.toString());
+         int strLen = str.length();
+-            if (strLen >= width) {
++        if (strLen > width) {
++            strLen = width; // Adjust strLen to width if it's longer
++        }
+         str.getChars(0, strLen, buffer, size);
+-            } else {
++        if (strLen < width) {
+             int padLen = width - strLen;
+-                str.getChars(0, strLen, buffer, size);
+             for (int i = 0; i < padLen; i++) {
+                 buffer[size + strLen + i] = padChar;
+             }
+         }
+         size += width;
+     }
+     return this;
+ }
+\ No newline at end of file

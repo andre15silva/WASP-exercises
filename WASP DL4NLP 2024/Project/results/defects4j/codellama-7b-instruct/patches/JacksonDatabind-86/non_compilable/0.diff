@@ -1,0 +1,11 @@
+diff --git a/tmp/f67ac48f-3766-4e08-80c9-feefc0e74f8a_buggy.java b/tmp/7d0ac614-728b-4f35-a701-c448ee0a48ff_fixed.java
+index e69de29..65e2be6 100644
+--- a/tmp/f67ac48f-3766-4e08-80c9-feefc0e74f8a_buggy.java
++++ b/tmp/7d0ac614-728b-4f35-a701-c448ee0a48ff_fixed.java
+@@ -0,0 +1,5 @@
++public JavaType getSuperClass() {
++    TypeFactory typeFactory = objectMapper().getTypeFactory();
++    JavaType baseType = typeFactory. constructType(Base.class);
++    return baseType.getSuperClass();
++}
+\ No newline at end of file

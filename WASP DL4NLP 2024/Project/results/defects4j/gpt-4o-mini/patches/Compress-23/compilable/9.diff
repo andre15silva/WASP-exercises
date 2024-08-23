@@ -1,0 +1,22 @@
+diff --git a/tmp/b5400e76-810c-4abe-bda3-ba5c965a9461_buggy.java b/tmp/9ca0f698-91d7-4686-bee4-8c6fc8d68697_fixed.java
+index 0e18f59..9be2e66 100644
+--- a/tmp/b5400e76-810c-4abe-bda3-ba5c965a9461_buggy.java
++++ b/tmp/9ca0f698-91d7-4686-bee4-8c6fc8d68697_fixed.java
+@@ -1,13 +1,12 @@
+ @Override
+-        InputStream decode(final InputStream in, final Coder coder,
+-                byte[] password) throws IOException {
++InputStream decode(final InputStream in, final Coder coder, byte[] password) throws IOException {
+     byte propsByte = coder.properties[0];
+     long dictSize = coder.properties[1];
+     for (int i = 1; i < 4; i++) {
+-                dictSize |= (coder.properties[i + 1] << (8 * i));
++        dictSize |= (coder.properties[i + 1] & 0xFFL) << (8 * i); // Use & 0xFFL to avoid negative values
+     }
+     if (dictSize > LZMAInputStream.DICT_SIZE_MAX) {
+         throw new IOException("Dictionary larger than 4GiB maximum size");
+     }
+-            return new LZMAInputStream(in, -1, propsByte, (int) dictSize);
++    return new LZMAInputStream(in, -1, propsByte, (int) Math.min(dictSize, Integer.MAX_VALUE)); // Ensure dictSize fits in an int
+ }
+\ No newline at end of file

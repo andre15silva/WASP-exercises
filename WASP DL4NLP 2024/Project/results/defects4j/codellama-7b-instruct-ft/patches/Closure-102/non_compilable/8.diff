@@ -1,0 +1,21 @@
+diff --git a/tmp/b4cdb500-efdf-472b-9fc5-fb616756bf05_buggy.java b/tmp/28d3e2fd-cc76-48e5-a22c-3ecb6d83df29_fixed.java
+index f47d784..13575a6 100644
+--- a/tmp/b4cdb500-efdf-472b-9fc5-fb616756bf05_buggy.java
++++ b/tmp/28d3e2fd-cc76-48e5-a22c-3ecb6d83df29_fixed.java
+@@ -1,12 +1,16 @@
+   @Override
+   public void process(Node externs, Node root) {
+     NodeTraversal.traverse(compiler, root, this);
+     if (MAKE_LOCAL_NAMES_UNIQUE) {
+       MakeDeclaredNamesUnique renamer = new MakeDeclaredNamesUnique();
+       NodeTraversal t = new NodeTraversal(compiler, renamer);
+       t.traverseRoots(externs, root);
+     }
+     removeDuplicateDeclarations(root);
++    // TODO(kaspero): Can this be generalized at a more fine-grain level?
++    // (See issue 115)
++    if (compilationLevel.getIntLevel() >= CompilationLevel.SIMPLE_OPTIMIZATIONS.intLevel) {
+       new PropogateConstantAnnotations(compiler, assertOnChange)
+           .process(externs, root);
+     }
++  }

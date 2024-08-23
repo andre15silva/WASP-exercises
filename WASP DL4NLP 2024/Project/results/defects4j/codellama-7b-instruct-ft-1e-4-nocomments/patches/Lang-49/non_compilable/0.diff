@@ -1,0 +1,45 @@
+diff --git a/tmp/a784ba69-b204-46f1-96fa-02c7368cd8ef_buggy.java b/tmp/1bc902a4-57f2-495f-b54d-235372552591_fixed.java
+index 08e51e4..0e8641b 100644
+--- a/tmp/a784ba69-b204-46f1-96fa-02c7368cd8ef_buggy.java
++++ b/tmp/1bc902a4-57f2-495f-b54d-235372552591_fixed.java
+@@ -1,16 +1,29 @@
+-    /**
+-     * <p>Reduce the fraction to the smallest values for the numerator and
+-     * denominator, returning the result.</p>
+-     * 
+-     * <p>For example, if this fraction represents 2/4, then the result
+-     * will be 1/2.</p>
+-     *
+-     * @return a new reduced fraction instance, or this if no simplification possible
+-     */
+     public Fraction reduce() {
++        if (denominator == 0 || numerator == 0) {
++            Fraction result = Fraction.getFraction(0, 1);
++            result.setNumerator(numerator / greatestCommonDivisor(numerator, denominator));
++            result.setDenominator(denominator / greatestCommonDivisor(numerator, denominator));
++            if (isNegative()) {
++                result = result.negate();
++            }
++            if (result == Fraction.ZERO) {
++                return result;
++            }
++            if (Math.abs(result.getDenominator()) != 1) {
++                return result.reduce();
++            }
++            return result;
++        }
+         int gcd = greatestCommonDivisor(Math.abs(numerator), denominator);
+         if (gcd == 1) {
+             return this;
+         }
+-        return Fraction.getFraction(numerator / gcd, denominator / gcd);
++        Fraction result = Fraction.getFraction(numerator / gcd, denominator / gcd);
++        if (isNegative()) {
++            result = result.negate();
++        }
++        if (Math.abs(result.getDenominator()) != 1) {
++            return result.reduce();
++        }
++        return result;
+     }
+\ No newline at end of file

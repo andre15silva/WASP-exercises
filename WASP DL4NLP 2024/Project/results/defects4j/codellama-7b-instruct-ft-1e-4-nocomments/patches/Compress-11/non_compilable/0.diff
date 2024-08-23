@@ -1,0 +1,103 @@
+diff --git a/tmp/6fbb13af-4b09-4e26-81e0-ae70888520f1_buggy.java b/tmp/c7c45c02-9591-4cbe-82ab-752a02dc7196_fixed.java
+index 6b160ef..27e9d84 100644
+--- a/tmp/6fbb13af-4b09-4e26-81e0-ae70888520f1_buggy.java
++++ b/tmp/c7c45c02-9591-4cbe-82ab-752a02dc7196_fixed.java
+@@ -1,68 +1,84 @@
+     /**
+      * Create an archive input stream from an input stream, autodetecting
+      * the archive type from the first few bytes of the stream. The InputStream
+      * must support marks, like BufferedInputStream.
+-     * 
+      * @param in the input stream
+      * @return the archive input stream
+      * @throws ArchiveException if the archiver name is not known
+      * @throws IllegalArgumentException if the stream is null or does not support mark
+      */
+     public ArchiveInputStream createArchiveInputStream(final InputStream in)
+             throws ArchiveException {
+         if (in == null) {
+             throw new IllegalArgumentException("Stream must not be null.");
+         }
+-
+         if (!in.markSupported()) {
+             throw new IllegalArgumentException("Mark is not supported.");
+         }
+-
+         final byte[] signature = new byte[12];
+         in.mark(signature.length);
+         try {
+             int signatureLength = in.read(signature);
+             in.reset();
+             if (ZipArchiveInputStream.matches(signature, signatureLength)) {
+                 return new ZipArchiveInputStream(in);
+             } else if (JarArchiveInputStream.matches(signature, signatureLength)) {
+                 return new JarArchiveInputStream(in);
+             } else if (ArArchiveInputStream.matches(signature, signatureLength)) {
+                 return new ArArchiveInputStream(in);
+             } else if (CpioArchiveInputStream.matches(signature, signatureLength)) {
+                 return new CpioArchiveInputStream(in);
++            } else if (DumpArchiveInputStream.matches(signature, signatureLength)) {
++                return new DumpArchiveInputStream(in);
++            } else if (signatureLength >= 2 && signature[signature.length - 2] == '\r' && signature[signature.length - 1] == '\n' && signature[0] < 100) {
++                throw new ArchiveException("Signature contains a line feed, which is no 7z signature.");
+             }
+-
+-            // Dump needs a bigger buffer to check the signature;
+             final byte[] dumpsig = new byte[32];
+             in.mark(dumpsig.length);
+             signatureLength = in.read(dumpsig);
+             in.reset();
+             if (DumpArchiveInputStream.matches(dumpsig, signatureLength)) {
+                 return new DumpArchiveInputStream(in);
+             }
+-
+-            // Tar needs an even bigger buffer to check the signature; read the first block
+             final byte[] tarheader = new byte[512];
+             in.mark(tarheader.length);
+             signatureLength = in.read(tarheader);
+             in.reset();
+             if (TarArchiveInputStream.matches(tarheader, signatureLength)) {
++                try {
++                    String name = new String(tarheader, 257, 100, "UTF-8");
++                    if (name.length() < 3) {
++                        throw new IOException();
++                    }
++                } catch (Exception e) {
++                }
+                 return new TarArchiveInputStream(in);
+             }
+-            // COMPRESS-117 - improve auto-recognition
+             try {
+                 TarArchiveInputStream tais = new TarArchiveInputStream(new ByteArrayInputStream(tarheader));
+                 tais.getNextEntry();
+                 return new TarArchiveInputStream(in);
+-            } catch (Exception e) { // NOPMD
+-                // can generate IllegalArgumentException as well as IOException
+-                // autodetection, simply not a TAR
+-                // ignored
++            } catch (Exception e) { 
++            }
++            if (signatureLength > 10 && signature[2] == 'd' && signature[3] == 's' && signature[4] == 'k') {
++                try {
++                    String name = new String(tarheader, 257, 100, "UTF-8");
++                    if (name.length() < 3) {
++                        throw new IOException();
++                    }
++                } catch (Exception e) {
++                }
++                return new TarArchiveInputStream(in);
++            }
++            final byte[] isodir = new byte[20];
++            in.mark(isodir.length);
++            signatureLength = in.read(isodir);
++            in.reset();
++            if (ISO9660ArchiveInputStream.matches(isodir)) {
++                return new ISO9660ArchiveInputStream(in);
+             }
+         } catch (IOException e) {
+             throw new ArchiveException("Could not use reset and mark operations.", e);
+         }
+-
+         throw new ArchiveException("No Archiver found for the stream signature");
+     }
+\ No newline at end of file

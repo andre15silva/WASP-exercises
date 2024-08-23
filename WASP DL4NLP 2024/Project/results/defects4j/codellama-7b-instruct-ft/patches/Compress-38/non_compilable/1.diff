@@ -1,0 +1,39 @@
+diff --git a/tmp/bf51b3f4-8e94-4ecd-868f-63dea4cbc541_buggy.java b/tmp/721ce6a7-a54c-46ae-a5d1-972009a6fcba_fixed.java
+index 192e83d..6cdeba8 100644
+--- a/tmp/bf51b3f4-8e94-4ecd-868f-63dea4cbc541_buggy.java
++++ b/tmp/721ce6a7-a54c-46ae-a5d1-972009a6fcba_fixed.java
+@@ -1,21 +1,34 @@
+     /**
+      * Return whether or not this entry represents a directory.
+      *
+      * @return True if this entry is a directory.
+      */
+     @Override
+     public boolean isDirectory() {
+         if (file != null) {
+             return file.isDirectory();
+         }
+ 
+         if (linkFlag == LF_DIR) {
+             return true;
+         }
+ 
+         if (getName().endsWith("/")) {
++            switch (linkFlag) {
++            case LF_PAX_GLOBAL_EXTRA_HEADER:
++            case LF_PAX_EXTENDED_HEADER:
++            case LF_PAX_EXTENDED_OLD_GLOBAL_EXTRA:
++            case LF_PAX_GLOBAL_EXTENDED_HEADER:
++            case LF_PAX_CRCO:
++            case LF_PAX_INTERCHANGE_FORMAT:
++            case LF_PAX_NEW_COMMON_EXTENDED_HEADER:
++            case LF_PAX_NEW_GLOBAL_EXTENDED_HEADER:
++            case LF_PAX_SINGLE_GLOBAL_EXTRA_XHDR:
++            case LF_GNUTYPE_X_SKIP_TRAIL:
++            case LF_GNUTYPE_X_SKIP:
+                 return true;
+             }
++        }
+ 
+         return false;
+     }

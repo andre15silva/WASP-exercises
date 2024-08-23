@@ -1,0 +1,47 @@
+diff --git a/tmp/5e280ee1-1e00-4756-97d6-345383249da4_buggy.java b/tmp/ca52eb8b-8a23-46b9-8152-68732afde7c0_fixed.java
+index 658036e..5792371 100644
+--- a/tmp/5e280ee1-1e00-4756-97d6-345383249da4_buggy.java
++++ b/tmp/ca52eb8b-8a23-46b9-8152-68732afde7c0_fixed.java
+@@ -1,29 +1,40 @@
+     // off-lined to keep main method lean and mean...
+-    @SuppressWarnings("resource")
+     protected Object _deserializeTypedUsingDefaultImpl(JsonParser p, DeserializationContext ctxt,
+             TokenBuffer tb) throws IOException
+     {
+         // As per [JACKSON-614], may have default implementation to use
+-        JsonDeserializer<Object> deser = _findDefaultImplDeserializer(ctxt);
++        JsonDeserializer<Object> deser;
++        deser = _findDefaultImplDeserializer(ctxt);
+         if (deser != null) {
+             if (tb != null) {
+                 tb.writeEndObject();
+                 p = tb.asParser(p);
+                 // must move to point to the first token:
+                 p.nextToken();
+             }
+             return deser.deserialize(p, ctxt);
+         }
+         // or, perhaps we just bumped into a "natural" value (boolean/int/double/String)?
+         Object result = TypeDeserializer.deserializeIfNatural(p, ctxt, _baseType);
+         if (result != null) {
+             return result;
+         }
+         // or, something for which "as-property" won't work, changed into "wrapper-array" type:
+         if (p.getCurrentToken() == JsonToken.START_ARRAY) {
+             return super.deserializeTypedFromAny(p, ctxt);
+         }
++        // [JACKSON-256]
++        if (p.getCurrentToken() == JsonToken.VALUE_STRING && ctxt.hasTextualNull()) {
++            JsonToken token = p.getCurrentToken();
++            if (token == JsonToken.VALUE_STRING
++                    && ("null".equals(JsonParser.NumberType.name())
++                            || "".equals(JsonParser.NumberType.name()))) {
++                ctxt.useDefaultResponseStatus();
++                oF = new AsPropertyWrapper(_config);
++            }
++            buffer = null;
++        }
+         ctxt.reportWrongTokenException(p, JsonToken.FIELD_NAME,
+                 "missing property '"+_typePropertyName+"' that is to contain type id  (for class "+baseTypeName()+")");
+         return null;
+     }

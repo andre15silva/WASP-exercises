@@ -1,0 +1,69 @@
+diff --git a/tmp/ef334379-d71e-4c13-a6ec-ed91d3e423e9_buggy.java b/tmp/14b0db61-27a7-44c7-95ba-0c3276dc57f4_fixed.java
+index 670114d..c47977b 100644
+--- a/tmp/ef334379-d71e-4c13-a6ec-ed91d3e423e9_buggy.java
++++ b/tmp/14b0db61-27a7-44c7-95ba-0c3276dc57f4_fixed.java
+@@ -1,48 +1,64 @@
+     @Override
+     public void visit(NodeTraversal t, Node n, Node parent) {
+ 
+       // Record global variable and function declarations
+       if (t.inGlobalScope()) {
+         if (NodeUtil.isVarDeclaration(n)) {
+           NameInformation ns = createNameInformation(t, n, parent);
+           Preconditions.checkNotNull(ns);
+           recordSet(ns.name, n);
+         } else if (NodeUtil.isFunctionDeclaration(n)) {
+           Node nameNode = n.getFirstChild();
+           NameInformation ns = createNameInformation(t, nameNode, n);
+           if (ns != null) {
+             JsName nameInfo = getName(nameNode.getString(), true);
+             recordSet(nameInfo.name, nameNode);
+           }
+         } else if (NodeUtil.isObjectLitKey(n, parent)) {
+           NameInformation ns = createNameInformation(t, n, parent);
+           if (ns != null) {
+             recordSet(ns.name, n);
+           }
+         }
+       }
+ 
+       // Record assignments and call sites
+       if (n.isAssign()) {
+         Node nameNode = n.getFirstChild();
+ 
+         NameInformation ns = createNameInformation(t, nameNode, n);
+         if (ns != null) {
+           if (ns.isPrototype) {
+             recordPrototypeSet(ns.prototypeClass, ns.prototypeProperty, n);
+           } else {
+             recordSet(ns.name, nameNode);
+           }
+         }
+       } else if (n.isCall()) {
+         Node nameNode = n.getFirstChild();
+         NameInformation ns = createNameInformation(t, nameNode, n);
+         if (ns != null && ns.onlyAffectsClassDef) {
+           JsName name = getName(ns.name, false);
+           if (name != null) {
+           refNodes.add(new ClassDefiningFunctionNode(
+               name, n, parent, parent.getParent()));
+           }
+         }
+       }
++      // Make sure that inherits is recognized as a
++      // function declared in the global scope.
++      if (n instanceof CallNode) {
++        Node target = NodeUtil.getTarget(n);
++        JsName targetName = target != null ? getName(target.getQualifiedName(), true) : null;
++        if (NodeUtil.isCallNode(target) && targetName != null
++            && "goog.inherits".equals(targetName.name)
++            && (NodeUtil.getEnclosingScript(target) == NodeUtil.getEnclosingScript(n))
++            && options.smartNameRemoval) {
++          Node newNs = n.removeFirstChild();
++          newNs.copyInformationFrom(n);
++          reportCodeChange();
++          n.replaceWith(newNs);
++          n = newNs;
++        }
++      }
+     }

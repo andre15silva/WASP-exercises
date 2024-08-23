@@ -1,0 +1,11 @@
+diff --git a/tmp/31a9079f-2e5b-4963-a1d9-a4d6b1fbe3b5_buggy.java b/tmp/c8ffe66c-8415-4ffc-9868-ec9cd9a8d3ff_fixed.java
+index f1d02c1..dcf25c1 100644
+--- a/tmp/31a9079f-2e5b-4963-a1d9-a4d6b1fbe3b5_buggy.java
++++ b/tmp/c8ffe66c-8415-4ffc-9868-ec9cd9a8d3ff_fixed.java
+@@ -1,4 +1,5 @@
+         @Override
+         protected JSType caseTopType(JSType topType) {
+-          return topType;
++          return topType.isAllType() ?
++              getNativeType(ARRAY_TYPE) : topType;
+         }

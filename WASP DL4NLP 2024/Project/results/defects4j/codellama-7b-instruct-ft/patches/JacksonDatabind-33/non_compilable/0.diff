@@ -1,0 +1,37 @@
+diff --git a/tmp/471cb09e-bb02-4726-8dc9-1a49644d8dda_buggy.java b/tmp/92e05b0a-c3c3-4bf2-b731-3ccc60532681_fixed.java
+index 3cb9232..861a602 100644
+--- a/tmp/471cb09e-bb02-4726-8dc9-1a49644d8dda_buggy.java
++++ b/tmp/92e05b0a-c3c3-4bf2-b731-3ccc60532681_fixed.java
+@@ -1,26 +1,32 @@
+     @Override
+     public PropertyName findNameForSerialization(Annotated a)
+     {
+         String name = null;
+ 
+         JsonGetter jg = _findAnnotation(a, JsonGetter.class);
+         if (jg != null) {
+             name = jg.value();
+         } else {
+             JsonProperty pann = _findAnnotation(a, JsonProperty.class);
+             if (pann != null) {
+                 name = pann.value();
+                 /* 22-Apr-2014, tatu: Should figure out a better way to do this, but
+                  *   it's actually bit tricky to do it more efficiently (meta-annotations
+                  *   add more lookups; AnnotationMap costs etc)
+                  */
+             } else if (_hasAnnotation(a, JsonSerialize.class)
+                     || _hasAnnotation(a, JsonView.class)
+                     || _hasAnnotation(a, JsonRawValue.class)) {
+                 name = "";
++            } else if (_hasAnnotatedForWrapped(a)) {
++                /* 02-May-2015, tatu: Need to ensure that we do not strip
++                 *   'inner' marker if using unwrapper. So, this needs an annotation
++                 *   just to indicate that the property is to be exposed directly
++                 */
++                name = "";
+             } else {
+                 return null;
+             }
+         }
+         return PropertyName.construct(name);
+     }

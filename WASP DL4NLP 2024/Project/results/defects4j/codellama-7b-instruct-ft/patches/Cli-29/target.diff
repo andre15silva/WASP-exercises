@@ -1,0 +1,30 @@
+diff --git a/tmp/9a8caa1f-ca80-4c8c-98e8-5598a9308b28_buggy.java b/tmp/eb1666a6-aa95-43e5-82a2-3afe59d53145_fixed.java
+index 0fc103a..f5da104 100644
+--- a/tmp/9a8caa1f-ca80-4c8c-98e8-5598a9308b28_buggy.java
++++ b/tmp/eb1666a6-aa95-43e5-82a2-3afe59d53145_fixed.java
+@@ -1,23 +1,19 @@
+     /**
+      * Remove the leading and trailing quotes from <code>str</code>.
+      * E.g. if str is '"one two"', then 'one two' is returned.
+      *
+      * @param str The string from which the leading and trailing quotes
+      * should be removed.
+      *
+      * @return The string without the leading and trailing quotes.
+      */
+     static String stripLeadingAndTrailingQuotes(String str)
+     {
+-        if (str.startsWith("\""))
+-        {
+-            str = str.substring(1, str.length());
+-        }
+         int length = str.length();
+-        if (str.endsWith("\""))
++        if (length > 1 && str.startsWith("\"") && str.endsWith("\"") && str.substring(1, length - 1).indexOf('"') == -1)
+         {
+-            str = str.substring(0, length - 1);
++            str = str.substring(1, length - 1);
+         }
+         
+         return str;
+     }

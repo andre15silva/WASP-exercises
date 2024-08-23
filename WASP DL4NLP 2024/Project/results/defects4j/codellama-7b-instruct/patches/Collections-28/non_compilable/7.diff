@@ -1,0 +1,11 @@
+diff --git a/tmp/485836d3-9745-4ec2-b10a-644015ecd260_buggy.java b/tmp/258caeb4-92cd-4572-b527-3e7e941776b5_fixed.java
+index e69de29..5fabefc 100644
+--- a/tmp/485836d3-9745-4ec2-b10a-644015ecd260_buggy.java
++++ b/tmp/258caeb4-92cd-4572-b527-3e7e941776b5_fixed.java
+@@ -0,0 +1,5 @@
++public void clear() {
++  for (Entry<K, V> entry : entrySet()) {
++    entry.setValue(null);
++  }
++}
+\ No newline at end of file

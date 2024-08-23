@@ -1,0 +1,26 @@
+diff --git a/tmp/38d1b083-3334-4f54-833b-1888130d70d7_buggy.java b/tmp/4dc4bc33-368e-4590-a310-2ee29895c6ee_fixed.java
+index 98b456f..3ed8455 100644
+--- a/tmp/38d1b083-3334-4f54-833b-1888130d70d7_buggy.java
++++ b/tmp/4dc4bc33-368e-4590-a310-2ee29895c6ee_fixed.java
+@@ -1,17 +1,21 @@
+     final void html(final Appendable accum, final Document.OutputSettings out) throws IOException {
+         final int sz = size;
+         for (int i = 0; i < sz; i++) {
+             // inlined from Attribute.html()
+             final String key = keys[i];
+             final String val = vals[i];
+             accum.append(' ').append(key);
+ 
+             // collapse checked=null, checked="", checked=checked; write out others
+             if (!(out.syntax() == Document.OutputSettings.Syntax.html
+                 && (val == null || val.equals(key) && Attribute.isBooleanAttribute(key)))) {
+                 accum.append("=\"");
+                 Entities.escape(accum, val == null ? EmptyString : val, out, true, false, false);
+                 accum.append('"');
++            } else {
++                // don't use equalsIgnoreCase as attrib might have case on purpose, eg html5 'required' /
++                // html4 'checked' / 'readonly'
++                accum.append('=');
+             }
+         }
+     }

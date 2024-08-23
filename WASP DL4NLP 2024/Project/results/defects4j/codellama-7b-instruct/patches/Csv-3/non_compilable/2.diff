@@ -1,0 +1,56 @@
+diff --git a/tmp/fad73309-22f8-4cc8-93bf-491626dcee7e_buggy.java b/tmp/9beae6ae-b031-466d-a9c9-4bcc7a9fb8a6_fixed.java
+index 1ad070d..5155012 100644
+--- a/tmp/fad73309-22f8-4cc8-93bf-491626dcee7e_buggy.java
++++ b/tmp/9beae6ae-b031-466d-a9c9-4bcc7a9fb8a6_fixed.java
+@@ -1,38 +1,15 @@
+-    /**
+-     * Handle an escape sequence.
+-     * The current character must be the escape character.
+-     * On return, the next character is available by calling {@link ExtendedBufferedReader#getLastChar()}
+-     * on the input stream.
+-     * 
+-     * @return the unescaped character (as an int) or {@link END_OF_STREAM} if char following the escape is invalid. 
+-     * @throws IOException if there is a problem reading the stream or the end of stream is detected: 
+-     * the escape character is not allowed at end of strem
+-     */
+-    int readEscape() throws IOException {
+-        // the escape char has just been read (normally a backslash)
+-        final int c = in.read();
+-        switch (c) {
+-        case 'r':
+-            return CR;
+-        case 'n':
+-            return LF;
+-        case 't':
+-            return TAB;
+-        case 'b':
+-            return BACKSPACE;
+-        case 'f':
+-            return FF;
+-        case CR:
+-        case LF:
+-        case FF: // TODO is this correct?
+-        case TAB: // TODO is this correct? Do tabs need to be escaped?
+-        case BACKSPACE: // TODO is this correct?
+-            return c;
+-        case END_OF_STREAM:
+-            throw new IOException("EOF whilst processing escape sequence");
+-        default:
+-            // Now check for meta-characters
+-                return c;
+-            // indicate unexpected char - available from in.getLastChar()
++public class CsvParserTest {
++    public void testBackslashEscaping() throws Exception {
++        try {
++            new CsvParser().parse("\"text,with,backslash\\\\Escaped,sequence\"")
++        } catch (MalformedCsvException ex) {
++            Assert.fail(); // incorrect test case
++        }
++        try {
++            new CsvParser().parse("\"text,with,backslash\\Escaped,sequence\"")
++        } catch (IOException ex) {
++            ex.printStackTrace();
++            Assert.fail(ex.getMessage()); // incorrect test case
++        }
+     }
+ }

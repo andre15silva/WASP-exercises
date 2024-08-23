@@ -1,0 +1,154 @@
+diff --git a/tmp/1bf2318d-98d2-41b5-859f-d43202f755c0_buggy.java b/tmp/24cade11-626d-4685-97a1-350c5f71e9af_fixed.java
+index d8b0158..f145b47 100644
+--- a/tmp/1bf2318d-98d2-41b5-859f-d43202f755c0_buggy.java
++++ b/tmp/24cade11-626d-4685-97a1-350c5f71e9af_fixed.java
+@@ -1,113 +1,55 @@
+   /**
+    * Try to fold an array join: ['a', 'b', 'c'].join('') -> 'abc';
+    */
+-  private Node tryFoldArrayJoin(Node n) {
+-    Node callTarget = n.getFirstChild();
+-
+-    if (callTarget == null || !NodeUtil.isGetProp(callTarget)) {
+-      return n;
+-    }
+-
+-    Node right = callTarget.getNext();
+-    if (right != null) {
+-      if (!NodeUtil.isImmutableValue(right)) {
+-        return n;
+-      }
+-    }
+-
++  private Node tryFoldArrayJoin(Node callTarget) {
+     Node arrayNode = callTarget.getFirstChild();
+     Node functionName = arrayNode.getNext();
+ 
+-    if ((arrayNode.getType() != Token.ARRAYLIT) ||
++    if (arrayNode.getType() != Token.ARRAYLIT ||
+         !functionName.getString().equals("join")) {
+-      return n;
++      return callTarget;
+     }
+ 
+-      // "," is the default, it doesn't need to be explicit
++    Node right = callTarget.getChildAtIndex(2);
++    if (NodeUtil.isImmutableValue(right)
++        && !NodeUtil.isSideEffectsFreeString(right)) {
++      // This will produce a foldable string even if the Node
++      // is not completely foldable. For example the Node for x
++      // in ["x" + y, "x"].join() may be foldable because it
++      // includes the side effect of y.
++      return callTarget;
++    }
+ 
+-    String joinString = (right == null) ? "," : NodeUtil.getStringValue(right);
+-    List<Node> arrayFoldedChildren = Lists.newLinkedList();
+-    StringBuilder sb = null;
+-    int foldedSize = 0;
+-    Node prev = null;
+-    Node elem = arrayNode.getFirstChild();
+-    // Merges adjacent String nodes.
+-    while (elem != null) {
+-      if (NodeUtil.isImmutableValue(elem) || elem.getType() == Token.EMPTY) {
+-        if (sb == null) {
+-          sb = new StringBuilder();
+-        } else {
+-          sb.append(joinString);
++    Node n = arrayNode.getFirstChild();
++    Node prevN = n;
++    while (n != null) {
++      if (NodeUtil.isImmutableValue(n) || n.getType() == Token.EMPTY
++          || (!n.isAdd() && !NodeUtil.mayBeSideEffecting(n))) {
++        // It's possible to join strings that aren't compile-time constants.
++        return callTarget;
+       }
+-        sb.append(NodeUtil.getArrayElementStringValue(elem));
+-      } else {
+-        if (sb != null) {
+-          Preconditions.checkNotNull(prev);
+-          // + 2 for the quotes.
+-          foldedSize += sb.length() + 2;
+-          arrayFoldedChildren.add(
+-              Node.newString(sb.toString()).copyInformationFrom(prev));
+-          sb = null;
++      if (n.isAdd()) {
++        if (n.getChildAtIndex(1).getType() != Token.STRING
++            && NodeUtil.mayBeSideEffecting(n.getChildAtIndex(1))) {
++          return callTarget;
+         }
+-        foldedSize += InlineCostEstimator.getCost(elem);
+-        arrayFoldedChildren.add(elem);
++      } else if (n.getType() == Token.STRING) {
++        if (NodeUtil.mayBeSideEffecting(n)) {
++          return callTarget;
+         }
+-      prev = elem;
+-      elem = elem.getNext();
+       }
+-
+-    if (sb != null) {
+-      Preconditions.checkNotNull(prev);
+-      // + 2 for the quotes.
+-      foldedSize += sb.length() + 2;
+-      arrayFoldedChildren.add(
+-          Node.newString(sb.toString()).copyInformationFrom(prev));
++      n = n.getNext();
+     }
+-    // one for each comma.
+-    foldedSize += arrayFoldedChildren.size() - 1;
+ 
+-    int originalSize = InlineCostEstimator.getCost(n);
+-    switch (arrayFoldedChildren.size()) {
+-      case 0:
+-        Node emptyStringNode = Node.newString("");
+-        n.getParent().replaceChild(n, emptyStringNode);
+-        reportCodeChange();
+-        return emptyStringNode;
+-      case 1:
+-        Node foldedStringNode = arrayFoldedChildren.remove(0);
+-        if (foldedSize > originalSize) {
+-          return n;
+-        }
+-        arrayNode.detachChildren();
+-        if (foldedStringNode.getType() != Token.STRING) {
+-          // If the Node is not a string literal, ensure that
+-          // it is coerced to a string.
+     Node replacement = new Node(Token.ADD,
+-              Node.newString("").copyInformationFrom(n),
+-              foldedStringNode);
+-          foldedStringNode = replacement;
+-        }
+-        n.getParent().replaceChild(n, foldedStringNode);
+-        reportCodeChange();
+-        return foldedStringNode;
+-      default:
+-        // No folding could actually be performed.
+-        if (arrayFoldedChildren.size() == arrayNode.getChildCount()) {
+-          return n;
+-        }
+-        int kJoinOverhead = "[].join()".length();
+-        foldedSize += kJoinOverhead;
+-        foldedSize += (right != null) ? InlineCostEstimator.getCost(right) : 0;
+-        if (foldedSize > originalSize) {
+-          return n;
+-        }
+-        arrayNode.detachChildren();
+-        for (Node node : arrayFoldedChildren) {
+-          arrayNode.addChildToBack(node);
+-        }
++        new Node(Token.STRING, "\""),
++        NodeUtil.cloneNode(arrayNode.getFirstChild()),
++        new Node(Token.STRING, "\""));
++    NodeUtil.markAsSideEffectNotTagged(replacement);
++    Node joinNode = NodeUtil.newScriptCallNode(arrayNode.getJSTypeInexact(),
++        "Array.prototype.join", right != null ? right : new Node(Token.STRING, ","));
++    joinNode.addChildToBack(replacement);
++    prevN.getParent().replaceChild(prevN, joinNode);
+     reportCodeChange();
+-        break;
+-    }
+-
+-    return n;
++    return callTarget;
+   }

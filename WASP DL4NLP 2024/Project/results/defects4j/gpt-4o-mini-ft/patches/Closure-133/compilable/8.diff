@@ -1,0 +1,22 @@
+diff --git a/tmp/5a920d06-65a9-4886-83fb-c9938d0eb1c9_buggy.java b/tmp/092adb2e-67f6-46a8-ac36-7c834bd373e1_fixed.java
+index 42d4174..84c40a2 100644
+--- a/tmp/5a920d06-65a9-4886-83fb-c9938d0eb1c9_buggy.java
++++ b/tmp/092adb2e-67f6-46a8-ac36-7c834bd373e1_fixed.java
+@@ -1,7 +1,17 @@
+   /**
+    * Returns the remainder of the line.
+    */
+   private String getRemainingJSDocLine() {
+     String result = stream.getRemainingJSDocLine();
++    if (result != null) {
++        if (result.startsWith("return ")) {
++          result = result.substring("return ".length());
++        }
++        if (result.indexOf("})") >= 0) {
++          return result;
++        } else {
++          return (result + stream.getRemainingJSDocLine());
++        }
++      }
+       return result;
+   }

@@ -1,0 +1,66 @@
+diff --git a/tmp/8d89b4b3-8788-4eb5-85c2-986e0d6f59e3_buggy.java b/tmp/b7a92055-47be-49c8-896c-29d4a37c799c_fixed.java
+index 388771b..237a47e 100644
+--- a/tmp/8d89b4b3-8788-4eb5-85c2-986e0d6f59e3_buggy.java
++++ b/tmp/b7a92055-47be-49c8-896c-29d4a37c799c_fixed.java
+@@ -1,37 +1,43 @@
+-    /**
+-     * Creates a new timeseries by copying a subset of the data in this time
+-     * series.
+-     *
+-     * @param start  the index of the first time period to copy.
+-     * @param end  the index of the last time period to copy.
+-     *
+-     * @return A series containing a copy of this times series from start until
+-     *         end.
+-     *
+-     * @throws CloneNotSupportedException if there is a cloning problem.
+-     */
+ public TimeSeries createCopy(int start, int end)
+         throws CloneNotSupportedException {
+     if (start < 0) {
+         throw new IllegalArgumentException("Requires start >= 0.");
+     }
+     if (end < start) {
+         throw new IllegalArgumentException("Requires start <= end.");
+     }
+     TimeSeries copy = (TimeSeries) super.clone();
+     copy.data = new java.util.ArrayList();
+     if (this.data.size() > 0) {
+         for (int index = start; index <= end; index++) {
+             TimeSeriesDataItem item
+                     = (TimeSeriesDataItem) this.data.get(index);
+             TimeSeriesDataItem clone = (TimeSeriesDataItem) item.clone();
+-                try {
+             copy.add(clone);
+         }
+-                catch (SeriesException e) {
+-                    e.printStackTrace();
+-                }
+-            }
+     }
++    // Update min and max Y values after adding the copied items.
++    copy.updateMinMax();
+     return copy;
+ }
++
++// This method should be implemented in the TimeSeries class to
++// recalculate min and max Y values based on the items in the data list.
++private void updateMinMax() {
++    if (data.isEmpty()) {
++        minY = Double.NaN; // or some appropriate value
++        maxY = Double.NaN; // or some appropriate value
++    } else {
++        minY = Double.MAX_VALUE;
++        maxY = Double.MIN_VALUE;
++        for (TimeSeriesDataItem item : data) {
++            double value = item.getValue();
++            if (value < minY) {
++                minY = value;
++            }
++            if (value > maxY) {
++                maxY = value;
++            }
++        }
++    }
++}
+\ No newline at end of file

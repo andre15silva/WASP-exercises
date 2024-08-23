@@ -1,0 +1,23 @@
+diff --git a/tmp/76020fe8-02e5-4431-a9ff-3b5df286dc86_buggy.java b/tmp/9d2d39e7-a7fe-4b67-ad3d-399aba80534d_fixed.java
+index bada2b6..f353cfa 100644
+--- a/tmp/76020fe8-02e5-4431-a9ff-3b5df286dc86_buggy.java
++++ b/tmp/9d2d39e7-a7fe-4b67-ad3d-399aba80534d_fixed.java
+@@ -1,16 +1,16 @@
+     /**
+      * Finds the generic type (parametrized type) of the field. If the field is not generic it returns Object.class. 
+      * 
+      * @param field
+      * @return
+      */
+     public Class getGenericType(Field field) {        
+         Type generic = field.getGenericType();
+         if (generic != null && generic instanceof ParameterizedType) {
+             Type actual = ((ParameterizedType) generic).getActualTypeArguments()[0];
+-                return (Class) actual;
+-                //in case of nested generics we don't go deep
++                return (Class) ((ParameterizedType) actual).getRawType();
++                //in case of nested generics we only take the first one
+         }
+         
+         return Object.class;
+     }

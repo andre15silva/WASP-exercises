@@ -1,0 +1,59 @@
+diff --git a/tmp/0548018a-3971-437a-b1da-661d171d0b60_buggy.java b/tmp/fce55ba3-a3ed-43ad-a61f-da87b476fd02_fixed.java
+index 9353941..b9a1107 100644
+--- a/tmp/0548018a-3971-437a-b1da-661d171d0b60_buggy.java
++++ b/tmp/fce55ba3-a3ed-43ad-a61f-da87b476fd02_fixed.java
+@@ -1,30 +1,42 @@
+-  /**
+-   * Give an expression and a variable. It returns READ, if the first
+-   * reference of that variable is a read. It returns KILL, if the first
+-   * reference of that variable is an assignment. It returns MAY_LIVE otherwise.
+-   */
+   private VariableLiveness isVariableReadBeforeKill(
+       Node n, String variable) {
+     if (NodeUtil.isName(n) && variable.equals(n.getString())) {
+       if (NodeUtil.isLhs(n, n.getParent())) {
+-        // The expression to which the assignment is made is evaluated before
+-        // the RHS is evaluated (normal left to right evaluation) but the KILL
+-        // occurs after the RHS is evaluated.
+         return VariableLiveness.KILL;
+       } else {
+         return VariableLiveness.READ;
+       }
+     }
+-
+-    // Expressions are evaluated left-right, depth first.
+     for (Node child = n.getFirstChild();
+         child != null; child = child.getNext()) {
+-      if (!ControlFlowGraph.isEnteringNewCfgNode(child)) { // Not a FUNCTION
++      if (!ControlFlowGraph.isEnteringNewCfgNode(child)) { 
++        if (compiler.getOptions().getCompilationLevel()
++            .equals(CompilationLevel.SIMPLE_OPTIMIZATIONS)) {
++          if (NodeUtil.isAssign(child)) {
++            String lValue = child.getFirstChild().getNext()
++                .getFirstFirstChild().getString();
++            if (lValue.equals(variable)) {
++              return VariableLiveness.KILL;
++            }
++          } else if (NodeUtil.isAnd(child)) {
++            String lValue = child.getFirstFirstChild().getNext()
++                .getFirstFirstChild().getString();
++            if (lValue.equals(variable)) {
++              return VariableLiveness.KILL;
++            }
++          } else if (NodeUtil.isOr(child)) {
++            String lValue = child.getFirstFirstChild().getNext()
++                .getFirstFirstChild().getString();
++            if (lValue.equals(variable)) {
++              return VariableLiveness.KILL;
++            }
++          }
++        }
+         VariableLiveness state = isVariableReadBeforeKill(child, variable);
+         if (state != VariableLiveness.MAYBE_LIVE) {
+           return state;
+         }
+       }
+     }
+     return VariableLiveness.MAYBE_LIVE;
+   }
+\ No newline at end of file

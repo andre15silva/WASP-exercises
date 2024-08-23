@@ -1,0 +1,39 @@
+diff --git a/tmp/b2b34885-2836-4b11-929d-67a59e9d8711_buggy.java b/tmp/f3842cde-56b7-4257-b367-6a0b155bb8e0_fixed.java
+index 6e45f80..e62fc2f 100644
+--- a/tmp/b2b34885-2836-4b11-929d-67a59e9d8711_buggy.java
++++ b/tmp/f3842cde-56b7-4257-b367-6a0b155bb8e0_fixed.java
+@@ -1,21 +1,28 @@
+-  /**
+-   * Returns a factory for all subtypes of {@code typeAdapter}. We do a runtime check to confirm
+-   * that the deserialized type matches the type requested.
+-   */
+   public static <T1> TypeAdapterFactory newTypeHierarchyFactory(
+       final Class<T1> clazz, final TypeAdapter<T1> typeAdapter) {
+     return new TypeAdapterFactory() {
+       @SuppressWarnings("unchecked")
+       public <T2> TypeAdapter<T2> create(Gson gson, TypeToken<T2> typeToken) {
+         final Class<? super T2> requestedType = typeToken.getRawType();
+         if (!clazz.isAssignableFrom(requestedType)) {
+           return null;
+         }
++        try {
++          final T1 instance = typeAdapter.read(gson.newJsonReader(new StringReader("null")));
++          Object target = gson.toJsonTree(instance);
++          while (target instanceof JsonArray || target instanceof JsonObject) {
++            target = ((JsonElement) target).getAsJsonObject();
++          }
++          if (target == null || clazz.isInstance(target)) {
+             return (TypeAdapter<T2>) typeAdapter;
+-
++          }
++        } catch (IOException e) {
++          throw new RuntimeException(e);
++        }
++        return null;
+       }
+       @Override public String toString() {
+         return "Factory[typeHierarchy=" + clazz.getName() + ",adapter=" + typeAdapter + "]";
+       }
+     };
+   }
+\ No newline at end of file

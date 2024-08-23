@@ -1,0 +1,47 @@
+diff --git a/tmp/2216df9e-105a-46de-a18f-9bacc80b4a79_buggy.java b/tmp/0027c621-80a6-4461-a771-7bc7931b365a_fixed.java
+index bc80637..982023b 100644
+--- a/tmp/2216df9e-105a-46de-a18f-9bacc80b4a79_buggy.java
++++ b/tmp/0027c621-80a6-4461-a771-7bc7931b365a_fixed.java
+@@ -1,33 +1,8 @@
+-    @Override
+-    public KeyDeserializer createKeyDeserializer(DeserializationContext ctxt,
+-            JavaType type)
+-        throws JsonMappingException
+-    {
+-        final DeserializationConfig config = ctxt.getConfig();
+-        KeyDeserializer deser = null;
+-        if (_factoryConfig.hasKeyDeserializers()) {
+-            BeanDescription beanDesc = config.introspectClassAnnotations(type.getRawClass());
+-            for (KeyDeserializers d  : _factoryConfig.keyDeserializers()) {
+-                deser = d.findKeyDeserializer(type, config, beanDesc);
+-                if (deser != null) {
+-                    break;
+-                }
+-            }
+-        }
+-        // the only non-standard thing is this:
+-        if (deser == null) {
+-            if (type.isEnumType()) {
+-                return _createEnumKeyDeserializer(ctxt, type);
+-            }
+-            deser = StdKeyDeserializers.findStringBasedKeyDeserializer(config, type);
+-        }
+-        // and then post-processing
+-        if (deser != null) {
+-            if (_factoryConfig.hasDeserializerModifiers()) {
+-                for (BeanDeserializerModifier mod : _factoryConfig.deserializerModifiers()) {
+-                    deser = mod.modifyKeyDeserializer(config, type, deser);
+-                }
+-            }
+-        }
+-        return deser;
+-    }
++// First, enum value as is
++        assertSame(KeyEnum.replacements, mapper.readValue(
++                quote(KeyEnum.replacements.name().toUpperCase()),
++                KeyEnum.class));
++
++        // and then as key
++        assertEquals(1, map.size());
++        assertSame(KeyEnum.replacements, map.keySet().iterator().next());
+\ No newline at end of file

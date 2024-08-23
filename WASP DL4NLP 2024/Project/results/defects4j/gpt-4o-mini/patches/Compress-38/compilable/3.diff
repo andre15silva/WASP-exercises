@@ -1,0 +1,33 @@
+diff --git a/tmp/574032fd-b4b1-4cd2-bd4d-7bf90575d240_buggy.java b/tmp/85929daa-6f1c-47c2-8e66-2a63aa2e43a2_fixed.java
+index 192e83d..ade00ba 100644
+--- a/tmp/574032fd-b4b1-4cd2-bd4d-7bf90575d240_buggy.java
++++ b/tmp/85929daa-6f1c-47c2-8e66-2a63aa2e43a2_fixed.java
+@@ -1,21 +1,20 @@
+     /**
+      * Return whether or not this entry represents a directory.
+      *
+      * @return True if this entry is a directory.
+      */
+     @Override
+     public boolean isDirectory() {
+-        if (file != null) {
+-            return file.isDirectory();
++        // Check if the file object is not null and if it is a directory
++        if (file != null && file.isDirectory()) {
++            return true;
+         }
+ 
++        // Check for the link flag indicating it's a directory
+         if (linkFlag == LF_DIR) {
+             return true;
+         }
+ 
+-        if (getName().endsWith("/")) {
+-            return true;
+-        }
+-
+-        return false;
++        // Check if the entry's name ends with a slash
++        return getName().endsWith("/");
+     }
+\ No newline at end of file

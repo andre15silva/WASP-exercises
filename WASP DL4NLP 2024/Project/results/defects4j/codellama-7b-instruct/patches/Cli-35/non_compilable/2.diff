@@ -1,0 +1,111 @@
+diff --git a/tmp/5aae06c1-60cc-4737-b9ab-a5ceab672f33_buggy.java b/tmp/1c0314a9-735a-4291-beae-e448205aa223_fixed.java
+index c6b65da..b8e9dc6 100644
+--- a/tmp/5aae06c1-60cc-4737-b9ab-a5ceab672f33_buggy.java
++++ b/tmp/1c0314a9-735a-4291-beae-e448205aa223_fixed.java
+@@ -1,25 +1,87 @@
+-    /**
+-     * Returns the options with a long name starting with the name specified.
+-     * 
+-     * @param opt the partial name of the option
+-     * @return the options matching the partial name specified, or an empty list if none matches
+-     * @since 1.3
+-     */
+-    public List<String> getMatchingOptions(String opt)
+-    {
+-        opt = Util.stripLeadingHyphens(opt);
++import org.apache.commons.cli.BasicParser;
++import org.apache.commons.cli.CommandLine;
++import org.apache.commons.cli.CommandLineParser;
++import org.apache.commons.cli.HelpFormatter;
++import org.apache.commons.cli.Option;
++import org.apache.commons.cli.OptionBuilder;
++import org.apache.commons.cli.Options;
++import org.apache.commons.cli.ParseException;
+ 
++import java.io.ByteArrayInputStream;
++import java.io.ByteArrayOutputStream;
++import java.io.PrintStream;
++import java.util.ArrayList;
++import java.util.Collections;
++import java.util.List;
++import java.util.Map;
++import java.util.Set;
++
++public class MyCLI {
++    public static final String LONG_HELP = "longHelp";
++    public static final String SHORT_HELP = "help";
++    protected Options options;
++    private List<String> args;
++
++    MyCLI(List<String> arguments) {
++        args = arguments;
++        options = new Options();
++        options.addOption(SHORT_HELP, SHORT_HELP, false, "Show help");
++        options.addOption(LONG_HELP, LONG_HELP, false, "Show long help");
++    }
++
++    public MyCLI parseOptions() {
++        CommandLineParser parser = new BasicParser();
++        CommandLine line;
++        try {
++            line = parser.parse(options, args);
++        } catch (ParseException e) {
++            printUsage();
++            throw new RuntimeException("Could not parse options", e);
++        }
++
++        if (line.hasOption(SHORT_HELP)) {
++            printShortHelp();
++        } else if (line.hasOption(LONG_HELP)) {
++            printLongHelp();
++        }
++
++        return this;
++    }
++
++    private void printUsage() {
++        PrintStream out = System.out;
++        out.println("Usage: java -jar mycli.jar [options]");
++        HelpFormatter formatter = new HelpFormatter();
++        formatter.printHelp(out, formatter.getWidth(), "mycli", null, options, formatter.getLeftPadding(), formatter.getDescPadding(), null);
++    }
++
++
++    private void printShortHelp() {
++        PrintStream out = System.out;
++        out.println("Short help");
++    }
++
++    private void printLongHelp() {
++        PrintStream out = System.out;
++        out.println("Long help");
++    }
++
++    public List<String> getMatchingOptions(String opt) {
+         List<String> matchingOpts = new ArrayList<String>();
+-
+-        // for a perfect match return the single option only
+-
+-        for (String longOpt : longOpts.keySet())
+-        {
+-            if (longOpt.startsWith(opt))
+-            {
++        for (String longOpt : longOpts.keySet()) {
++            if (longOpt.startsWith(opt)) {
+                 matchingOpts.add(longOpt);
+             }
+         }
+-        
+         return matchingOpts;
+     }
++
++    public boolean hasMatchingOption(String opt) {
++        for (Map.Entry<String, Option> entry : options.getOptions().entrySet()) {
++            if (Opt.match(entry.getValue(), opt)) {
++                return true;
++            }
++        }
++        return false;
++    }
++}
+\ No newline at end of file

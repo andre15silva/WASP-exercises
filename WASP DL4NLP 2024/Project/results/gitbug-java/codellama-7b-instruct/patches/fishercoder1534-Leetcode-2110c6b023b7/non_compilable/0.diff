@@ -1,0 +1,29 @@
+diff --git a/tmp/054f26c1-8917-474d-bd4c-7ca45218cf6b_buggy.java b/tmp/eab7a337-e2bb-48a8-87f7-86e373a83261_fixed.java
+index dd3b100..e62b54c 100644
+--- a/tmp/054f26c1-8917-474d-bd4c-7ca45218cf6b_buggy.java
++++ b/tmp/eab7a337-e2bb-48a8-87f7-86e373a83261_fixed.java
+@@ -1,12 +1,11 @@
+-        public TreeNode lowestCommonAncestor(TreeNode root, TreeNode p, TreeNode q) {
+-            if (root == null || p == root || q == root) {
+-                return root;
+-            }
+-            if ((root.val - p.val) * (root.val - q.val) > 0) {
+-                if (root.val - p.val > 0) {
+-                    return lowestCommonAncestor(root.left, p, q);
+-                }
+-                return lowestCommonAncestor(root.right, p, q);
+-            }
+-            return root;
+-        }
++    TreeNode root = TreeUtils.constructBinaryTree(Arrays.asList(0, 1, 2, 3, 4, 5, 6, 7));
++    TreeUtils.printBinaryTree(root);
++
++    TreeNode p = TreeUtils.constructBinaryTree(Arrays.asList(2, 3));
++    TreeUtils.printBinaryTree(p);
++
++    TreeNode q = TreeUtils.constructBinaryTree(Arrays.asList(4, 5));
++    TreeUtils.printBinaryTree(q);
++
++    assertEquals(TreeUtils.constructBinaryTree(Arrays.asList(0, 3, 2)),
++                 solution1.lowestCommonAncestor(root, p, q));
+\ No newline at end of file

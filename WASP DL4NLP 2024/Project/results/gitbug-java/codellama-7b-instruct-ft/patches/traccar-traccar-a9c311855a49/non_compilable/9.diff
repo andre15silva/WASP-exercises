@@ -1,0 +1,48 @@
+diff --git a/tmp/7e3d6f16-46f9-4c62-97b7-43a3ee560f5e_buggy.java b/tmp/667a666a-e730-410e-bcd3-ddb135d9e279_fixed.java
+index ff397b6..d5331e5 100644
+--- a/tmp/7e3d6f16-46f9-4c62-97b7-43a3ee560f5e_buggy.java
++++ b/tmp/667a666a-e730-410e-bcd3-ddb135d9e279_fixed.java
+@@ -1,35 +1,42 @@
+     @Override
+     protected Object decode(DeviceSession deviceSession, MqttPublishMessage message) throws Exception {
+ 
++        String strId = message.payload().toString().replace(" ", "");
++        String text = message.payload().toString();
++        String deviceId = strId.substring(0,5) + "-" + // IMEI
++                strId.substring(5,8) + "-" + // IMEI
++                strId.substring(8,10) + "-" + // ICCID
++                strId.substring(10,12); // ICCID
++        DeviceSession realSession = getDeviceSession(deviceSession.getDeviceId(), deviceId);
+         JsonObject json;
+         try (ByteBufferInputStream inputStream = new ByteBufferInputStream(message.payload().nioBuffer())) {
+             json = Json.createReader(inputStream).readObject();
+         }
+ 
+         String type = json.getString("rpt");
+         switch (type) {
+             case "hf":
+             case "loc":
+                 Position position = new Position(getProtocolName());
+-                position.setDeviceId(deviceSession.getDeviceId());
++                position.setDeviceId(realSession.getDeviceId());
+ 
+                 position.setValid(true);
+ 
+                 DateFormat dateFormat = new SimpleDateFormat("yyyyMMdd'T'HHmmss.SSS'Z'");
+                 position.setTime(dateFormat.parse(json.getString("ts")));
+ 
+                 JsonObject location = json.getJsonObject("location");
+                 position.setLatitude(location.getJsonNumber("lat").doubleValue());
+                 position.setLongitude(location.getJsonNumber("lon").doubleValue());
+ 
+                 position.setCourse(json.getInt("bear"));
+                 position.setSpeed(UnitsConverter.knotsFromCps(json.getInt("spd")));
+ 
+                 position.set(Position.KEY_IGNITION, json.getString("ign").equals("on"));
+ 
+                 return position;
+ 
+             default:
+                 return null;
+         }
+     }

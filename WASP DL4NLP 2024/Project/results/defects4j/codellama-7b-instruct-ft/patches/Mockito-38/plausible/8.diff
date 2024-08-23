@@ -1,0 +1,9 @@
+diff --git a/tmp/3ee481f8-615f-4334-84d2-304d307cbed6_buggy.java b/tmp/d3ca5716-17fb-408d-9820-a4220a6b5f01_fixed.java
+index db60019..965904e 100644
+--- a/tmp/3ee481f8-615f-4334-84d2-304d307cbed6_buggy.java
++++ b/tmp/d3ca5716-17fb-408d-9820-a4220a6b5f01_fixed.java
+@@ -1,3 +1,3 @@
+     private boolean toStringEquals(Matcher m, Object arg) {
+-        return StringDescription.toString(m).equals(arg.toString());
++        return StringDescription.toString(m).equals(arg == null ? null : arg.toString());
+     }

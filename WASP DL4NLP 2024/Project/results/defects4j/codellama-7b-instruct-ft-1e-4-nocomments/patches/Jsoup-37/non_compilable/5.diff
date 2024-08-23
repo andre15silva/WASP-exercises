@@ -1,0 +1,23 @@
+diff --git a/tmp/de69c02c-68b2-43f7-9992-38c9affae0a9_buggy.java b/tmp/9c5b293e-0615-48a4-b87b-2542b6bf29d5_fixed.java
+index 7498011..9333bb8 100644
+--- a/tmp/de69c02c-68b2-43f7-9992-38c9affae0a9_buggy.java
++++ b/tmp/9c5b293e-0615-48a4-b87b-2542b6bf29d5_fixed.java
+@@ -1,12 +1,13 @@
+     /**
+-     * Retrieves the element's inner HTML. E.g. on a {@code <div>} with one empty {@code <p>}, would return
++     * Retrieves the element's inner HTML, plain text. E.g. on a {@code <div>} with one empty {@code <p>}, would return
+      * {@code <p></p>}. (Whereas {@link #outerHtml()} would return {@code <div><p></p></div>}.)
+-     * 
++     * <p/>
++     * <p/>Note that when working with HTML5, {@code <html>} and {@code <body>} tags are not included by default.
+      * @return String of HTML.
+-     * @see #outerHtml()
++     * @see #html()
+      */
+     public String html() {
+         StringBuilder accum = new StringBuilder();
+-        html(accum);
++        html(accum, new Document.OutputSettings().prettyXml(false));
+         return accum.toString().trim();
+     }
+\ No newline at end of file

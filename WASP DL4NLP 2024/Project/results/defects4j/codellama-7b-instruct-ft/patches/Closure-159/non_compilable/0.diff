@@ -1,0 +1,37 @@
+diff --git a/tmp/864b0ba0-fe49-42dc-bcf5-4ea1dc59fb8a_buggy.java b/tmp/ec1f4197-fab5-4305-af46-0f6e2f2f7af2_fixed.java
+index de9af32..91e6df8 100644
+--- a/tmp/864b0ba0-fe49-42dc-bcf5-4ea1dc59fb8a_buggy.java
++++ b/tmp/ec1f4197-fab5-4305-af46-0f6e2f2f7af2_fixed.java
+@@ -1,18 +1,32 @@
+   /**
+    * @see #findCalledFunctions(Node)
+    */
+   private void findCalledFunctions(
+       Node node, Set<String> changed) {
+     Preconditions.checkArgument(changed != null);
+     // For each referenced function, add a new reference
+     if (node.getType() == Token.CALL) {
+       Node child = node.getFirstChild();
+       if (child.getType() == Token.NAME) {
+         changed.add(child.getString());
+       }
++    } else if (node.getType() == Token.NAME && node.getString().equals("$")) {
++      Node parent = node.getParent();
++      Preconditions.checkState(parent.getFirstChild() == node);
++      Preconditions.checkState(parent.getType() == Token.FORMAL_PARAMETER_LIST);
++      Preconditions.checkState(parent.getNext() != null);
++      Preconditions.checkState(parent.getNext().getType() == Token.FUNCTION_BODY);
++      Node fnBody = parent.getNext();
++      for (Node c = fnBody.getFirstChild(); c != null; c = c.getNext()) {
++        if (c.getType() == Token.VAR && c.getFirstChild().getType() == Token.NAME) {
++          // For each referenced function, add a new reference
++          String fnname = c.getFirstChild().getString();
++          changed.add(fnname);
++        }
++      }
+     }
+ 
+     for (Node c = node.getFirstChild(); c != null; c = c.getNext()) {
+       findCalledFunctions(c, changed);
+     }
+   }

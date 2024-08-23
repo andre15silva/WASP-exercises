@@ -1,0 +1,15 @@
+diff --git a/tmp/0b1dd465-a39a-4f40-9b36-41ae5d3b0362_buggy.java b/tmp/c86ef36e-69c8-4896-aaf7-854313b46abe_fixed.java
+index 741e96b..42e4e2a 100644
+--- a/tmp/0b1dd465-a39a-4f40-9b36-41ae5d3b0362_buggy.java
++++ b/tmp/c86ef36e-69c8-4896-aaf7-854313b46abe_fixed.java
+@@ -1,7 +1,6 @@
+     public ChecksumCalculatingInputStream(final Checksum checksum, final InputStream in) {
+ 
+-
+-
+-        this.checksum = checksum;
++        // Initialize the checksum object
++        this.checksum = checksum != null ? checksum : CHECKSUM_POLICY.DEFAULT.newChecksum();
+         this.in = in;
+     }
+\ No newline at end of file

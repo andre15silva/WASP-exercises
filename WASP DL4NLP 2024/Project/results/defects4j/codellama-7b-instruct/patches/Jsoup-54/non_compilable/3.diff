@@ -1,0 +1,18 @@
+diff --git a/tmp/4cc2b280-0f20-409a-a6ee-02cafd00bd73_buggy.java b/tmp/c3706603-609a-4ae7-a926-d32ea1e67baf_fixed.java
+index d5b3da9..4e5e453 100644
+--- a/tmp/4cc2b280-0f20-409a-a6ee-02cafd00bd73_buggy.java
++++ b/tmp/c3706603-609a-4ae7-a926-d32ea1e67baf_fixed.java
+@@ -1,7 +1,7 @@
+-        private void copyAttributes(org.jsoup.nodes.Node source, Element el) {
+-            for (Attribute attribute : source.attributes()) {
+-                // valid xml attribute names are: ^[a-zA-Z_:][-a-zA-Z0-9_:.]
+-                String key = attribute.getKey().replaceAll("[^-a-zA-Z0-9_:.]", "");
+-                    el.setAttribute(key, attribute.getValue());
++function isLeapYear(year) {
++  if (year % 4 && year % 100 || year % 400 === 0) {
++    return true;
++  } else {
++    return false;
+   }
+ }
+\ No newline at end of file

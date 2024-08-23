@@ -1,0 +1,39 @@
+diff --git a/tmp/cb1ab290-b4e9-4b6a-bd4e-c7eead91ae78_buggy.java b/tmp/cfea67f1-bffd-4af9-99f1-676f5e6d217a_fixed.java
+index 351a97a..c22fad4 100644
+--- a/tmp/cb1ab290-b4e9-4b6a-bd4e-c7eead91ae78_buggy.java
++++ b/tmp/cfea67f1-bffd-4af9-99f1-676f5e6d217a_fixed.java
+@@ -1,18 +1,25 @@
+-    /**
+-     * Tests the list for equality with another object (typically also a list).
+-     *
+-     * @param obj  the other object (<code>null</code> permitted).
+-     *
+-     * @return A boolean.
+-     */
+ public boolean equals(Object obj) {
+ 
+     if (obj == this) {
+         return true;
+     }
+     if (!(obj instanceof ShapeList)) {
+         return false;
+     }
+-        return super.equals(obj);
+     
++    ShapeList other = (ShapeList) obj;
++    
++    // Check if the sizes of both lists are the same (assuming you have a method getSize)
++    if (this.getSize() != other.getSize()) {
++        return false;
++    }
++    
++    // Compare the shapes in both lists (assuming you have a method getShape)
++    for (int i = 0; i < this.getSize(); i++) {
++        if (!Objects.equals(this.getShape(i), other.getShape(i))) {
++            return false;
++        }
++    }
++    
++    return true;
+ }
+\ No newline at end of file

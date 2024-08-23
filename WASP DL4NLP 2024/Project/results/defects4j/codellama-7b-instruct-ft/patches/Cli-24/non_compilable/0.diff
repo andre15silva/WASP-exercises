@@ -1,0 +1,84 @@
+diff --git a/tmp/626c46d4-67c6-4cf6-ac5e-8c1907491760_buggy.java b/tmp/e8fb6df1-f820-4191-af92-abfdb9f52687_fixed.java
+index 229b3e7..a001620 100644
+--- a/tmp/626c46d4-67c6-4cf6-ac5e-8c1907491760_buggy.java
++++ b/tmp/e8fb6df1-f820-4191-af92-abfdb9f52687_fixed.java
+@@ -1,55 +1,72 @@
+     /**
+      * Render the specified text and return the rendered Options
+      * in a StringBuffer.
+      *
+      * @param sb The StringBuffer to place the rendered text into.
+      * @param width The number of characters to display per line
+      * @param nextLineTabStop The position on the next line for the first tab.
+      * @param text The text to be rendered.
+      *
+      * @return the StringBuffer with the rendered Options contents.
+      */
+     protected StringBuffer renderWrappedText(StringBuffer sb, int width, 
+                                              int nextLineTabStop, String text)
+     {
+         int pos = findWrapPos(text, width, 0);
+ 
+         if (pos == -1)
+         {
+             sb.append(rtrim(text));
+ 
+             return sb;
+         }
+         sb.append(rtrim(text.substring(0, pos))).append(defaultNewLine);
+ 
+         if (nextLineTabStop >= width)
+         {
+             // stops infinite loop happening
+             throw new IllegalStateException("Total width is less than the width of the argument and indent " +
+                                             "- no room for the description");
+         }
+ 
+         // all following lines must be padded with nextLineTabStop space 
+         // characters
+         final String padding = createPadding(nextLineTabStop);
+ 
+         while ( true )
++        {
++        	// find a newline if we were asked to wrap an extremely long option
++        	// the next line may be padded with nextLineTabStop spaces
++        	int nextLinePos = findNextNewLine(text, pos);
++        	
++        	// split long option into shorter lines using padding
++        	if ( !isBlankLine(nextLinePos) )
+         	{
+ 	            text = padding + text.substring(pos).trim();
+ 	            pos = findWrapPos(text, width, 0);
++        	}
+         	
++        	// split line into separate lines if it's too long to fit on one line
+         	if ( pos == -1 ) 
+         	{
+-                sb.append(text);
+-
+-                return sb;
++	            sb.append(rtrim(text.substring(0, nextLinePos))).append(defaultNewLine);
++	            int offset = text.length() - nextLinePos;
++	            text = text.substring(offset);
++	            pos = findWrapPos(text, width, 0);
+         	}
+         	
+-            if ( (text.length() > width) && (pos == nextLineTabStop - 1) ) 
++        	// render text
++        	if ( !isBlankLine(nextLinePos) && pos != -1 ) 
+         	{
+-                pos = width;
+-            }
+-
+             	sb.append(rtrim(text.substring(0, pos))).append(defaultNewLine);
++            	text = text.substring(pos).trim();
+         	}
++        				
++        	if (isEndOfLine(text) || isBlankLine(text)) {
++                break;
++            }
++            pos = findWrapPos(text, width, 0);
++        }
++
++        return sb;
+     }

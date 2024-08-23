@@ -1,0 +1,108 @@
+diff --git a/tmp/e8741cb9-d0df-4ae1-bc2d-8f0a7f197836_buggy.java b/tmp/fe852fca-3408-488a-b253-e876c3165498_fixed.java
+index b278cd0..62811d5 100644
+--- a/tmp/e8741cb9-d0df-4ae1-bc2d-8f0a7f197836_buggy.java
++++ b/tmp/fe852fca-3408-488a-b253-e876c3165498_fixed.java
+@@ -1,9 +1,102 @@
+     /**
+      * <p>Checks if the locale specified is in the list of available locales.</p>
+      *
+      * @param locale the Locale object to check if it is available
+      * @return true if the locale is a known locale
+      */
+     public static boolean isAvailableLocale(Locale locale) {
+         return cAvailableLocaleSet.contains(locale);
+     }
++    private static void addLocale(Locale locale) {
++        cAvailableLocaleSet.add(locale);
++        cAvailableLocaleList.add( locale);
++    }
++    private static void setAvailableLocales() {
++        for (int i=0; i<Locale.getAvailableLocales().length; i++) {
++            addLocale(Locale.getAvailableLocales()[i]);
++        }
++    }
++    private static void addUnavailableLocales() {
++        for (int i=0; i<aUnavailableLocales.length; i++) {
++            Locale locale = new Locale(aUnavailableLocales[i][0], aUnavailableLocales[i][1]);
++            addLocale(locale);
++        }
++    }
++    private static final Locale[][] aUnavailableLocales = {
++        { "a","A" },
++        { "b","B" },
++        { "c","C" },
++        { "d","D" },
++        { "e","E" },
++        { "f","F" },
++        { "g","G" },
++        { "h","H" },
++        { "i","I" },
++        { "j","J" },
++        { "k","K" },
++        { "l","L" },
++        { "m","M" },
++        { "n","N" },
++        { "o","O" },
++        { "p","P" },
++        { "q","Q" },
++        { "r","R" },
++        { "s","S" },
++        { "t","T" },
++        { "u","U" },
++        { "v","V" },
++        { "w","W" },
++        { "x","X" },
++        { "y","Y" },
++        { "z","Z" },
++        { "aa","AA" },
++        { "ae","AE" },
++        { "ai","AI" },
++        { "ak","AO" },
++        { "cw","AZ" },
++        { "de","CU" },
++        { "dv","DV" },
++        { "dy","EH" },
++        { "es","ESD" },
++        { "et","EEE" },
++        { "ga","GH" },
++        { "gb","GBS" },
++        { "gl","GMM" },
++        { "gt","GUW" },
++        { "hr","HRO" },
++        { "hy","IWW" },
++        { "im","IMH" },
++        { "iq","JGD" },
++        { "ja","JJJ" },
++        { "jw","JRW" },
++        { "ki","KKK" },
++        { "lt","LTR" },
++        { "li","LMB" },
++        { "mg","MAR" },
++        { "mr","MET" },
++        { "my","MYN" },
++        { "np","NPI" },
++        { "om","OUH" },
++        { "pt","PTV" },
++        { "ro","ROF" },
++        { "ru","RUB" },
++        { "sv","SVE" },
++        { "sh","SRB" },
++        { "ss","SSS" },
++        { "st","SST" },
++        { "sw","SWS" },
++        { "ta","TAM" },
++        { "tt","TGH" },
++        { "ug","UHU" },
++        { "uk","UKL" },
++        { "ve","VEU" },
++        { "zh","ZHH" },
++    };
++    private static Set cAvailableLocaleSet = null;
++    private static List cAvailableLocaleList = null;
++    static {
++        cAvailableLocaleSet = Collections.unmodifiableSet(new HashSet());
++        cAvailableLocaleList = Collections.unmodifiableList(new ArrayList());
++        addUnavailableLocales();
++        setAvailableLocales();
++    }
+\ No newline at end of file

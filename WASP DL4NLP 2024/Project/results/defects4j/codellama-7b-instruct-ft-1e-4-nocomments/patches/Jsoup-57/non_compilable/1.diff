@@ -1,0 +1,26 @@
+diff --git a/tmp/a20b4c87-2802-48e8-aa0b-bc7c12a2b358_buggy.java b/tmp/f4dca33a-33e6-43b6-bf85-09155ca03077_fixed.java
+index ae3784d..7f2a13c 100644
+--- a/tmp/a20b4c87-2802-48e8-aa0b-bc7c12a2b358_buggy.java
++++ b/tmp/f4dca33a-33e6-43b6-bf85-09155ca03077_fixed.java
+@@ -1,14 +1,17 @@
+     /**
+      Remove an attribute by key. <b>Case insensitive.</b>
+      @param key attribute key to remove
+      */
+-    public void removeIgnoreCase(String key) {
++    public Element removeAttr(String key) {
+         Validate.notEmpty(key);
+         if (attributes == null)
+-            return;
++            return this;
+         for (Iterator<String> it = attributes.keySet().iterator(); it.hasNext(); ) {
+             String attrKey = it.next();
+-            if (attrKey.equalsIgnoreCase(key))
++            if (attrKey.equalsIgnoreCase(key)) {
+                 attributes.remove(attrKey);
++                it.remove();
+             }
+         }
++        return this;
++    }
+\ No newline at end of file

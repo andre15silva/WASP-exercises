@@ -1,0 +1,18 @@
+diff --git a/tmp/0cd8c25c-9526-4034-9086-e239981fd5d2_buggy.java b/tmp/d7629ecb-b5a9-47db-a776-9c1e47b27733_fixed.java
+index 490e9f7..c324b97 100644
+--- a/tmp/0cd8c25c-9526-4034-9086-e239981fd5d2_buggy.java
++++ b/tmp/d7629ecb-b5a9-47db-a776-9c1e47b27733_fixed.java
+@@ -1,11 +1,11 @@
+     /**
+      * <p>
+      * Gets the fraction percentage as a <tt>double</tt>. This calculates the
+      * fraction as the numerator divided by denominator multiplied by 100.
+      * </p>
+      *
+      * @return the fraction percentage as a <tt>double</tt>.
+      */
+     public double percentageValue() {
+-        return multiply(100).doubleValue();
++        return 100D * ((double) numer) / denom;
+     }
+\ No newline at end of file

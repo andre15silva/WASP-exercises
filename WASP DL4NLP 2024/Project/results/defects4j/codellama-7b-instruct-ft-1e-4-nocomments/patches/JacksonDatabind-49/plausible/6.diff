@@ -1,0 +1,14 @@
+diff --git a/tmp/3db945cc-36f8-44a4-928c-b1d11bc2bf65_buggy.java b/tmp/c521c8eb-7c53-4a38-b45d-9217e94d7117_fixed.java
+index c222270..0741b0a 100644
+--- a/tmp/3db945cc-36f8-44a4-928c-b1d11bc2bf65_buggy.java
++++ b/tmp/c521c8eb-7c53-4a38-b45d-9217e94d7117_fixed.java
+@@ -1,7 +1,4 @@
+     public Object generateId(Object forPojo) {
+-        // 04-Jun-2016, tatu: As per [databind#1255], need to consider possibility of
+-        //    id being generated for "alwaysAsId", but not being written as POJO; regardless,
+-        //    need to use existing id if there is one:
+-            id = generator.generateId(forPojo);
++            id = id == null ? generator.generateId(forPojo) : id;
+         return id;
+     }
+\ No newline at end of file

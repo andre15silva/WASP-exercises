@@ -1,0 +1,13 @@
+diff --git a/tmp/6c892649-7b12-4ba6-b72a-fd8829e08025_buggy.java b/tmp/2f706709-bafb-4752-86a3-1e363bcd0d90_fixed.java
+index 10da689..df32d62 100644
+--- a/tmp/6c892649-7b12-4ba6-b72a-fd8829e08025_buggy.java
++++ b/tmp/2f706709-bafb-4752-86a3-1e363bcd0d90_fixed.java
+@@ -1,7 +1,7 @@
+     /** Multiply this by a single digit x.
+      * @param x multiplicand
+      * @return product of this and x
+      */
+-    public Dfp multiply(final int x) {
++    public Dfp multiply(final Dfp x) {
+         return multiplyFast(x);
+     }

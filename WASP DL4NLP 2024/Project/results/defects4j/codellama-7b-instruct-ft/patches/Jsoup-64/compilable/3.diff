@@ -1,0 +1,12 @@
+diff --git a/tmp/314699d5-826f-424f-8500-c0ce4b7f89a5_buggy.java b/tmp/de8c34ec-0980-4e9a-bb33-ccfa3a25ce04_fixed.java
+index 5eedc11..90c2f96 100644
+--- a/tmp/314699d5-826f-424f-8500-c0ce4b7f89a5_buggy.java
++++ b/tmp/de8c34ec-0980-4e9a-bb33-ccfa3a25ce04_fixed.java
+@@ -1,6 +1,7 @@
+     private static void handleRawtext(Token.StartTag startTag, HtmlTreeBuilder tb) {
+         tb.insert(startTag);
+         tb.tokeniser.transition(TokeniserState.Rawtext);
+         tb.markInsertionMode();
+         tb.transition(Text);
++        tb.markInsertionMode(); // because <head> gets completed first, then process_closed_head
+     }

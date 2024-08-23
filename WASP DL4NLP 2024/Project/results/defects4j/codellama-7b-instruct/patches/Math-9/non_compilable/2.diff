@@ -1,0 +1,57 @@
+diff --git a/tmp/538b3a2a-c37f-4bef-9bcf-b3b8e4f3bae7_buggy.java b/tmp/caa063df-24f1-42cc-a5d3-e8fae1cec80a_fixed.java
+index 50f3e2e..8fd65b8 100644
+--- a/tmp/538b3a2a-c37f-4bef-9bcf-b3b8e4f3bae7_buggy.java
++++ b/tmp/caa063df-24f1-42cc-a5d3-e8fae1cec80a_fixed.java
+@@ -1,7 +1,46 @@
+-    /** Get a line with reversed direction.
+-     * @return a new instance, with reversed direction
++    private double x, y, z;
++
++    /**
++     * Construct a new 3D vector with the given x, y, and z values
+      */
+-    public Line revert() {
+-        final Line reverted = new Line(zero, zero.subtract(direction));
+-        return reverted;
++    public Vector3D(double x, double y, double z) {
++        this.x = x;
++        this.y = y;
++        this.z = z;
++    }
++
++    /**
++     * get the x coordinate
++     */
++    public double getX() {
++        return x;
++    }
++
++    /**
++     * get the y coordinate
++     */
++    public double getY() {
++        return y;
++    }
++
++    /**
++     * get the z coordinate
++     */
++    public double getZ() {
++        return z;
++    }
++
++    /**
++     * Return the coordinate wise sum of this vector with another
++     */
++    public Vector3D add(Vector3D other) {
++        return new Vector3D(x + other.x, y + other.y, z + other.z);
++    }
++
++    /**
++     * Return the coordinate wise difference of this vector with another
++     */
++    public Vector3D subtract(Vector3D other) {
++        return new Vector3D(x - other.x, y - other.y, z - other.z);
++    }
+ }
+\ No newline at end of file

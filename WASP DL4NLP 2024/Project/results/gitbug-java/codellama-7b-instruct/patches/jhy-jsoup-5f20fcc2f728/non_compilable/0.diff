@@ -1,0 +1,21 @@
+diff --git a/tmp/0df2ac9e-a957-48db-a1d8-c8e9d1c0f0be_buggy.java b/tmp/3e56a5f4-8a00-43f5-a317-c1f78f99d0cf_fixed.java
+index 7030ef0..2c1c426 100644
+--- a/tmp/0df2ac9e-a957-48db-a1d8-c8e9d1c0f0be_buggy.java
++++ b/tmp/3e56a5f4-8a00-43f5-a317-c1f78f99d0cf_fixed.java
+@@ -1,15 +1,10 @@
+-    /**
+-     Add a list of allowed elements to a safelist. (If a tag is not allowed, it will be removed from the HTML.)
+-
+-     @param tags tag names to allow
+-     @return this (for chaining)
+-     */
+     public Safelist addTags(String... tags) {
+         Validate.notNull(tags);
+ 
+         for (String tagName : tags) {
+             Validate.notEmpty(tagName);
++            TagName.valueOf(tagName);
+             tagNames.add(TagName.valueOf(tagName));
+         }
+         return this;
+     }

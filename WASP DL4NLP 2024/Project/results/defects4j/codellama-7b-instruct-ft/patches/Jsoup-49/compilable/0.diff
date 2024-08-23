@@ -1,0 +1,19 @@
+diff --git a/tmp/2eb4d5b1-162a-47ac-8ef7-97d330d50b48_buggy.java b/tmp/8c355e4f-b1ac-4415-9ec6-9c95464fad37_fixed.java
+index a37dc7a..c1e07a2 100644
+--- a/tmp/2eb4d5b1-162a-47ac-8ef7-97d330d50b48_buggy.java
++++ b/tmp/8c355e4f-b1ac-4415-9ec6-9c95464fad37_fixed.java
+@@ -1,10 +1,14 @@
+     protected void addChildren(int index, Node... children) {
+         Validate.noNullElements(children);
+         ensureChildNodes();
+         for (int i = children.length - 1; i >= 0; i--) {
+             Node in = children[i];
+             reparentChild(in);
+             childNodes.add(index, in);
++            if (in instanceof Element && ((Element)in).parent() != this) {
++                // if this is a fragment, or any of its children have moved into another element, we need to re-index children
++                break;
++            }
+         }
+         reindexChildren(index);
+     }

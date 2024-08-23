@@ -1,0 +1,25 @@
+diff --git a/tmp/3b319d83-35e8-4fa5-88e7-fcffc2655c79_buggy.java b/tmp/9edc8d9f-5a27-41bb-85e1-bf8a714c2101_fixed.java
+index 7e43c1c..0cda736 100644
+--- a/tmp/3b319d83-35e8-4fa5-88e7-fcffc2655c79_buggy.java
++++ b/tmp/9edc8d9f-5a27-41bb-85e1-bf8a714c2101_fixed.java
+@@ -1,19 +1,16 @@
+   /**
+    * Visits a NEW node.
+    */
+   private void visitNew(NodeTraversal t, Node n) {
+     Node constructor = n.getFirstChild();
+     JSType type = getJSType(constructor).restrictByNotNullOrUndefined();
+     if (type.isConstructor() || type.isEmptyType() || type.isUnknownType()) {
+       FunctionType fnType = type.toMaybeFunctionType();
+       if (fnType != null) {
+         visitParameterList(t, n, fnType);
+-        ensureTyped(t, n, fnType.getInstanceType());
+-      } else {
+-        ensureTyped(t, n);
+       }
++      ensureTyped(t, n, ensureNotNull(type));
+     } else {
+       report(t, n, NOT_A_CONSTRUCTOR);
+-      ensureTyped(t, n);
+     }
+   }

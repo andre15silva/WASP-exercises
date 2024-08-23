@@ -1,0 +1,30 @@
+diff --git a/tmp/738befc3-0c06-412d-a21b-325fd8aca443_buggy.java b/tmp/6cefa29e-054a-48fc-a70c-41636c1c2f12_fixed.java
+index 9529ba6..2f50c96 100644
+--- a/tmp/738befc3-0c06-412d-a21b-325fd8aca443_buggy.java
++++ b/tmp/6cefa29e-054a-48fc-a70c-41636c1c2f12_fixed.java
+@@ -1,20 +1,24 @@
+     public int writeValue() {
+         // Most likely, object:
+         if (_type == TYPE_OBJECT) {
+             _gotName = false;
+             ++_index;
+             return STATUS_OK_AFTER_COLON;
+         }
+ 
+         // Ok, array?
+         if (_type == TYPE_ARRAY) {
+             int ix = _index;
+             ++_index;
+             return (ix < 0) ? STATUS_OK_AS_IS : STATUS_OK_AFTER_COMMA;
+         }
+         
+         // Nope, root context
+         // No commas within root context, but need space
++        // [Issue#376] check for writeFieldName() as a way to distinguish false positives
++        if (_index == 0) {
++            return (_isWritingFieldName) ? STATUS_OK_AFTER_SPACE : STATUS_OK_AS_IS;
++        }
+         ++_index;
+-        return (_index == 0) ? STATUS_OK_AS_IS : STATUS_OK_AFTER_SPACE;
++        return STATUS_OK_AS_IS;
+     }

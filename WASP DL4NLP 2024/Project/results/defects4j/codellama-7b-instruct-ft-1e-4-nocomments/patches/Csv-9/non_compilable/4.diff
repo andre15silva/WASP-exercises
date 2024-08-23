@@ -1,0 +1,23 @@
+diff --git a/tmp/2b77e372-cf9e-4a0c-b069-317faf5bb53b_buggy.java b/tmp/11f9d3b2-912e-412b-bf6b-8d92e67e167d_fixed.java
+index 826e9ae..3997cc8 100644
+--- a/tmp/2b77e372-cf9e-4a0c-b069-317faf5bb53b_buggy.java
++++ b/tmp/11f9d3b2-912e-412b-bf6b-8d92e67e167d_fixed.java
+@@ -1,15 +1,11 @@
+-    /**
+-     * Puts all values of this record into the given Map.
+-     *
+-     * @param map The Map to populate.
+-     * @return the given map.
+-     */
+     <M extends Map<String, String>> M putIn(final M map) {
++        if (!parser.getHeaderMap().isEmpty()) {
+             for (final Entry<String, Integer> entry : mapping.entrySet()) {
+                 final int col = entry.getValue().intValue();
+                 if (col < values.length) {
+                     map.put(entry.getKey(), values[col]);
+                 }
+             }
++        }
+         return map;
+     }
+\ No newline at end of file

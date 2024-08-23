@@ -1,0 +1,42 @@
+diff --git a/tmp/095cdb1c-f540-4c87-812a-0b03070938f5_buggy.java b/tmp/4df6bccb-a949-4b6c-b15f-a49dc594a9a1_fixed.java
+index cae5e03..e7be56d 100644
+--- a/tmp/095cdb1c-f540-4c87-812a-0b03070938f5_buggy.java
++++ b/tmp/4df6bccb-a949-4b6c-b15f-a49dc594a9a1_fixed.java
+@@ -1,33 +1,4 @@
+-    /*
+-     * (non-Javadoc)
+-     * 
+-     * @see java.io.InputStream#read(byte[], int, int)
+-     */
+-    @Override
+-    public int read(final byte[] dest, final int offs, final int len)
+-        throws IOException {
+-        if (offs < 0) {
+-            throw new IndexOutOfBoundsException("offs(" + offs + ") < 0.");
+-        }
+-        if (len < 0) {
+-            throw new IndexOutOfBoundsException("len(" + len + ") < 0.");
+-        }
+-        if (offs + len > dest.length) {
+-            throw new IndexOutOfBoundsException("offs(" + offs + ") + len("
+-                                                + len + ") > dest.length(" + dest.length + ").");
+-        }
+-        if (this.in == null) {
+-            throw new IOException("stream closed");
+-        }
+-
+-        final int hi = offs + len;
+-        int destOffs = offs;
+-        int b;
+-        while (destOffs < hi && ((b = read0()) >= 0)) {
+-            dest[destOffs++] = (byte) b;
+-            count(1);
+-        }
+-
+-        int c = (destOffs == offs) ? -1 : (destOffs - offs);
+-        return c;
++    private void repairCode(String buggyCode) {
++        String fixedCode = buggyCode.replace("offs + len > dest.length", "offs + len < dest.length");
++        System.out.println(fixedCode);
+     }
+\ No newline at end of file

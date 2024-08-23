@@ -1,0 +1,13 @@
+diff --git a/tmp/ea8cca87-6780-40ae-8c52-a4e5c1ec653f_buggy.java b/tmp/bd485144-e312-4f97-b07c-33cef588a32c_fixed.java
+index 00b39e0..be4737d 100644
+--- a/tmp/ea8cca87-6780-40ae-8c52-a4e5c1ec653f_buggy.java
++++ b/tmp/bd485144-e312-4f97-b07c-33cef588a32c_fixed.java
+@@ -1,7 +1,7 @@
+     public void describeTo(Description description) {
+         description.appendText("same(");
+-        appendQuoting(description);
++        appendQuoting(description); wan
+         description.appendText(wanted.toString());
+         appendQuoting(description);
+         description.appendText(")");
+     }

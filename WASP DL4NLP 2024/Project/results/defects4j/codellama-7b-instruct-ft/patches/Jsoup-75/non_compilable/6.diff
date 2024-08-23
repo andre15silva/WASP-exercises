@@ -1,0 +1,26 @@
+diff --git a/tmp/fc18ba1a-482b-49b3-a056-4704cff57eea_buggy.java b/tmp/6ef1ba64-db5f-4818-879c-b02038ac416e_fixed.java
+index 98b456f..e5512b5 100644
+--- a/tmp/fc18ba1a-482b-49b3-a056-4704cff57eea_buggy.java
++++ b/tmp/6ef1ba64-db5f-4818-879c-b02038ac416e_fixed.java
+@@ -1,17 +1,19 @@
+     final void html(final Appendable accum, final Document.OutputSettings out) throws IOException {
+         final int sz = size;
+         for (int i = 0; i < sz; i++) {
+             // inlined from Attribute.html()
+             final String key = keys[i];
+             final String val = vals[i];
+             accum.append(' ').append(key);
+ 
+             // collapse checked=null, checked="", checked=checked; write out others
+             if (!(out.syntax() == Document.OutputSettings.Syntax.html
+-                && (val == null || val.equals(key) && Attribute.isBooleanAttribute(key)))) {
+-                accum.append("=\"");
++                && (val == null || val.equals(key) && Attribute.isBooleanAttribute(key))
++                && !Attribute.Key.CHECKED.toString().equals(key))) {
++                accum.append('=');
++                accum.append('"');
+                 Entities.escape(accum, val == null ? EmptyString : val, out, true, false, false);
+                 accum.append('"');
+             }
+         }
+     }

@@ -1,0 +1,15 @@
+diff --git a/tmp/a5d16b32-4cdc-420a-96ce-63e927963bc0_buggy.java b/tmp/137e83ef-82e2-470e-8767-d1d7253876d9_fixed.java
+index 5a7ae71..e507eb6 100644
+--- a/tmp/a5d16b32-4cdc-420a-96ce-63e927963bc0_buggy.java
++++ b/tmp/137e83ef-82e2-470e-8767-d1d7253876d9_fixed.java
+@@ -1,8 +1,8 @@
+     public String getString(String key, String defaultValue) {
+         if (attributes.containsKey(key)) {
+             Object value = attributes.containsKey(key);
+-            return value != null ? value.toString() : null;
++            return value != null ? binary(value.toString()) : null;
+         } else {
+             return defaultValue;
+         }
+     }
+\ No newline at end of file

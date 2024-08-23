@@ -1,0 +1,34 @@
+diff --git a/tmp/8a57c26d-28d9-4fb9-a311-86a159c6a61a_buggy.java b/tmp/e43ae85a-b931-4a70-8ca8-965a620e4fa6_fixed.java
+index e69de29..13ce69e 100644
+--- a/tmp/8a57c26d-28d9-4fb9-a311-86a159c6a61a_buggy.java
++++ b/tmp/e43ae85a-b931-4a70-8ca8-965a620e4fa6_fixed.java
+@@ -0,0 +1,28 @@
++private void _testFieldNameQuotingEnabled(JsonFactory factory, boolean quoteFieldNames, boolean expectedQuoted, String json) throws IOException {
++    StringWriter writer = new StringWriter();
++    JsonGenerator generator = factory.createGenerator(writer);
++    
++    if (quoteFieldNames) {
++        generator.writeStartObject();
++        if (expectedQuoted) {
++            generator.writeNumberField("foo", 1);
++        } else {
++            generator.writeFieldName("foo");
++            generator.writeNumber(1);
++        }
++        generator.writeEndObject();
++    } else {
++        if (expectedQuoted) {
++            generator.writeStartObject();
++            generator.writeNumberField("foo", 1);
++            generator.writeEndObject();
++        } else {
++            generator.writeRaw("{foo:1}");
++        }
++    }
++    
++    generator.close();
++    String result = writer.toString();
++    // Use assertion to validate the result against the expected JSON
++    Assert.assertEquals(json, result);
++}
+\ No newline at end of file

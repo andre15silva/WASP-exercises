@@ -1,0 +1,14 @@
+diff --git a/tmp/564db37f-5127-49cb-9b8f-b08590f1ddce_buggy.java b/tmp/5b8878bd-a442-45c6-84a9-6dc729c6e770_fixed.java
+index a68ccd7..7966f5d 100644
+--- a/tmp/564db37f-5127-49cb-9b8f-b08590f1ddce_buggy.java
++++ b/tmp/5b8878bd-a442-45c6-84a9-6dc729c6e770_fixed.java
+@@ -1,7 +1,7 @@
+     /**
+      Get the attribute value.
+      @return the attribute value
+      */
+     public String getValue() {
+-        return val;
++        return (getBoolean()) ? "" : val;
+     }
+\ No newline at end of file

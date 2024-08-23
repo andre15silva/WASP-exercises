@@ -1,0 +1,50 @@
+diff --git a/tmp/2a3d5997-adbe-4983-99d8-25ce4a232941_buggy.java b/tmp/9d36f036-a344-4e14-9efe-4436ee2c06dd_fixed.java
+index b2db1d6..f16e0b0 100644
+--- a/tmp/2a3d5997-adbe-4983-99d8-25ce4a232941_buggy.java
++++ b/tmp/9d36f036-a344-4e14-9efe-4436ee2c06dd_fixed.java
+@@ -1,29 +1,35 @@
+ protected void _addMethodMixIns(Class<?> targetClass, AnnotatedMethodMap methods,
+         Class<?> mixInCls, AnnotatedMethodMap mixIns)
+ {
+     List<Class<?>> parents = new ArrayList<Class<?>>();
+     parents.add(mixInCls);
+     ClassUtil.findSuperTypes(mixInCls, targetClass, parents);
+     for (Class<?> mixin : parents) {
+         for (Method m : mixin.getDeclaredMethods()) {
+             if (!_isIncludableMemberMethod(m)) {
+                 continue;
+             }
++            // Ensure the mixIn method is not already in the methods map
+             AnnotatedMethod am = methods.find(m);
+-                /* Do we already have a method to augment (from sub-class
+-                 * that will mask this mixIn)? If so, add if visible
+-                 * without masking (no such annotation)
+-                 */
+             if (am != null) {
+                 _addMixUnders(m, am);
+-                    /* Otherwise will have precedence, but must wait
+-                     * until we find the real method (mixIn methods are
+-                     * just placeholder, can't be called)
+-                     */
+             } else {
+-                    // Well, or, as per [Issue#515], multi-level merge within mixins...
++                // Construct and add the annotated method only if it is not masked by targetClass
++                if (!_isMethodMaskedByClass(m, targetClass)) {
+                     mixIns.add(_constructMethod(m));
+                 }
+             }
+         }
+     }
++}
++
++private boolean _isMethodMaskedByClass(Method m, Class<?> targetClass) {
++    String methodName = m.getName();
++    Class<?>[] paramTypes = m.getParameterTypes();
++    try {
++        targetClass.getDeclaredMethod(methodName, paramTypes);
++        return true; // Method exists in the targetClass and is therefore masked
++    } catch (NoSuchMethodException e) {
++        return false; // Method does not exist in the targetClass
++    }
++}
+\ No newline at end of file

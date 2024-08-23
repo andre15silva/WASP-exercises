@@ -1,0 +1,143 @@
+diff --git a/tmp/b8ef0b58-9af5-4239-93b2-f4e8f1403dcf_buggy.java b/tmp/1fdde85a-aa30-4d64-9811-9770c76d7a0c_fixed.java
+index b5a206b..7c15aa9 100644
+--- a/tmp/b8ef0b58-9af5-4239-93b2-f4e8f1403dcf_buggy.java
++++ b/tmp/1fdde85a-aa30-4d64-9811-9770c76d7a0c_fixed.java
+@@ -1,80 +1,101 @@
+-    /**
+-     * Get the next entry in this tar archive. This will skip
+-     * over any remaining data in the current entry, if there
+-     * is one, and place the input stream at the header of the
+-     * next entry, and read the header and instantiate a new
+-     * TarEntry from the header bytes and return that entry.
+-     * If there are no more entries in the archive, null will
+-     * be returned to indicate that the end of the archive has
+-     * been reached.
+-     *
+-     * @return The next TarEntry in the archive, or null.
+-     * @throws IOException on error
+-     */
+     public TarArchiveEntry getNextTarEntry() throws IOException {
+         if (hasHitEOF) {
+             return null;
+         }
+-
+         if (currEntry != null) {
+             long numToSkip = entrySize - entryOffset;
+-
+             while (numToSkip > 0) {
+                 long skipped = skip(numToSkip);
+                 if (skipped <= 0) {
+                     throw new RuntimeException("failed to skip current tar entry");
+                 }
+                 numToSkip -= skipped;
+             }
+-
+             readBuf = null;
+         }
+-
+         byte[] headerBuf = getRecord();
+-
+         if (hasHitEOF) {
+             currEntry = null;
+             return null;
+         }
+-
+-        currEntry = new TarArchiveEntry(headerBuf);
++        currEntry = new TarArchiveEntry(headerBuf, isEofStreamEntry);
+         entryOffset = 0;
+         entrySize = currEntry.getSize();
+-
++        if (currEntry.isGNUSparse()) {
++            readGNUSparse();
++        }
+         if (currEntry.isGNULongNameEntry()) {
+-            // read in the name
+             StringBuffer longName = new StringBuffer();
+             byte[] buf = new byte[SMALL_BUFFER_SIZE];
+             int length = 0;
+             while ((length = read(buf)) >= 0) {
+                 longName.append(new String(buf, 0, length));
+             }
+             getNextEntry();
+             if (currEntry == null) {
+-                // Bugzilla: 40334
+-                // Malformed tar file - long entry name not followed by entry
+                 return null;
+             }
+-            // remove trailing null terminator
+             if (longName.length() > 0
+                 && longName.charAt(longName.length() - 1) == 0) {
+                 longName.deleteCharAt(longName.length() - 1);
+             }
+             currEntry.setName(longName.toString());
+         }
+-
+-        if (currEntry.isPaxHeader()){ // Process Pax headers
++        if (currEntry.isPaxHeader()) {
+             paxHeaders();
+         }
+-
+-        if (currEntry.isGNUSparse()){ // Process sparse files
+-            readGNUSparse();
+-        }
+-
+-        // If the size of the next element in the archive has changed
+-        // due to a new size being reported in the posix header
+-        // information, we update entrySize here so that it contains
+-        // the correct value.
++		if (currEntry.isEXTENDED_HEADER_FORMAT())
++		{
++			if (currEntry.getExtendedHeaders() == null)
++			{
++				currEntry.addExtendedHeader();
++			}
++			String[] fields = currEntry.getExtendedFName().split("\n", -1);
++			if(fields.length < 1)
++			{
++				Log.warn( "Failed reading extended headers!!");
++			}
++			boolean stop = false;
++			for(String tmp : fields)
++			{
++				if (stop) break;
++				if (tmp.length()==0) continue;
++				if ((tmp.startsWith("."))||(tmp.startsWith("_"))) {
++					int ix =0;
++					String[] tok = tmp.split("=");
++					if (tok.length < 2) continue;
++					if(tmp.startsWith("..")){
++						currEntry.putExtendedHeader(tok[0], tok.length>1?tok[1]:"");
++						continue;
++					}
++					if (tok[0].equals("path")){
++						currEntry.setName(tok[1]);
++					}
++					if (tok[0].equals("atime")||tok[0].equals("ctime")||tok[0].equals("mtime")) {
++						long when = Long.parseLong(tok[1]);
++						Calendar cal = Calendar.getInstance();
++						cal.set(Calendar.MILLISECOND, 0);
++						cal.setTimeZone(Calendar.getInstance().getTimeZone());
++						cal.setTimeInMillis(Math.round(when*1000));
++						switch(tok[0]){
++						case "atime": currEntry.setATime(cal.getTime()); break;
++						case "ctime": currEntry.setCTime(cal.getTime()); break;
++						case "mtime": currEntry.setMTime(cal.getTime()); break;
++						}
++					}
++					if (tok[0].equals("longsize")) {
++						long size = Long.parseLong(tok[1]);
++						currEntry.setSize(size);
++					}
++					if (tok[0].equals("spare")){
++						byte[] data = new BigInteger("0"+tok[1],16).toByteArray();
++						for(int j=0; j<data.length;++j) {
++							currEntry.addExtendedHeader(StringUtil.toHexString(data[j])+" "+data[j]+"   ");
++						}
++					}
++				}
++			}
++		}
+         entrySize = currEntry.getSize();
+         return currEntry;
+     }
+\ No newline at end of file

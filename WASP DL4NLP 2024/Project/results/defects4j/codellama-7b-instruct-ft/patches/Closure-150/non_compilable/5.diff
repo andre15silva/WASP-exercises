@@ -1,0 +1,78 @@
+diff --git a/tmp/0b93889d-7608-4689-93a9-553e5ea6db90_buggy.java b/tmp/532a61a7-5393-4f21-a01f-21082a718df5_fixed.java
+index 800e6e1..3a12fd7 100644
+--- a/tmp/0b93889d-7608-4689-93a9-553e5ea6db90_buggy.java
++++ b/tmp/532a61a7-5393-4f21-a01f-21082a718df5_fixed.java
+@@ -1,32 +1,73 @@
+     /**
+      * Visit a node in a local scope, and add any local variables or catch
+      * parameters into the local symbol table.
+      *
+      * @param t The node traversal.
+      * @param n The node being visited.
+      * @param parent The parent of n
+      */
+     @Override public void visit(NodeTraversal t, Node n, Node parent) {
+       if (n == scope.getRootNode()) return;
+ 
++      // Attach type information for namespaced function stub declarations.
++      // goog.addDependency('some_file', [], []);
++      if (NodeUtil.isNamespaced(n, "goog.addDependency")) {
++        ObjectType fn = (ObjectType) findNameType("goog", lastLocalScope);
++        // Add a stub function type, then declare its parameters
++        // See {@code goog.addDependency} in base.js
++        if (fn != null && fn.hasProperty("dependency")) {
++          ObjectType dependency = fn.getPropertyType("dependency");
++          if (dependency != null) {
++            fn.defineFunction("foo",
++                dependency.isFunctionType() ?
++                    dependency : JSType.UNKNOWN_TYPE,
++                null, new Node(Token.EMPTY), false);
++            for (Node param : n.getSecondChild().getFirstChild().children()) {
++              fn.defineParam(param.getString(), JSType.UNKNOWN_TYPE);
++            }
++          }
++        }
++      }
++      if (NodeUtil.isNamespaced(n, "goog.require")) {
++        // TODO(johnlenz): add more goog.require stubs here
++      }
++      if (NodeUtil.isNamespaced(n, "goog.define")) {
++        // TODO(johnlenz): add more goog.define stubs here
++      }
++      if (NodeUtil.isNamespaced(n, "goog.exportSymbol")) {
++        // TODO(johnlenz): add more goog.exportSymbol stubs here
++      }
++      if (NodeUtil.isGoogScope(n)) {
++        // TODO(johnlenz): add more goog.scope stubs here
++      }
++      if (NodeUtil.isFunctionExpression(n) && NodeUtil.isFunctionExpressionStub(n)) {
++        visitFunctionDefinition(t, n, n);
++      }
++      if (NodeUtil.isNamespaced(n, "goog.provide")) {
++        // TODO(johnlenz): add more goog.provide stubs here
++      }
++      if (NodeUtil.isNamespaced(n, "goog.require")) {
++        // TODO(johnlenz): add more goog.require stubs here
++      }
++
+       if (n.getType() == Token.LP && parent == scope.getRootNode()) {
+         handleFunctionInputs(parent);
+         return;
+       }
+ 
+       attachLiteralTypes(n);
+       switch (n.getType()) {
+         case Token.FUNCTION:
+           if (parent.getType() == Token.NAME) {
+             return;
+           }
+           defineDeclaredFunction(n, parent);
+           break;
+         case Token.CATCH:
+           defineCatch(n, parent);
+           break;
+         case Token.VAR:
+           defineVar(n, parent);
+           break;
+       }
+     }

@@ -1,0 +1,36 @@
+diff --git a/tmp/c7dd388e-26a5-43df-85da-4a194329aa90_buggy.java b/tmp/d016ef3d-5979-4fb5-802f-0ba15155bb77_fixed.java
+index 6c0aa19..639eb44 100644
+--- a/tmp/c7dd388e-26a5-43df-85da-4a194329aa90_buggy.java
++++ b/tmp/d016ef3d-5979-4fb5-802f-0ba15155bb77_fixed.java
+@@ -1,20 +1,17 @@
+-    /**
+-     * @param encoding the encoding to use for file names, use null
+-     * for the platform's default encoding
+-     * @param useUnicodeExtraFields whether to use InfoZIP Unicode
+-     * Extra Fields (if present) to set the file names.
+-     * @param allowStoredEntriesWithDataDescriptor whether the stream
+-     * will try to read STORED entries that use a data descriptor
+-     * @since 1.1
+-     */
+ public ZipArchiveInputStream(InputStream inputStream,
+                              String encoding,
+                              boolean useUnicodeExtraFields,
+-                                 boolean allowStoredEntriesWithDataDescriptor) {
++                             boolean allowStoredEntriesWithDataDescriptor) throws IOException {
+     zipEncoding = ZipEncodingHelper.getZipEncoding(encoding);
+     this.useUnicodeExtraFields = useUnicodeExtraFields;
+     in = new PushbackInputStream(inputStream, buf.capacity());
+-        this.allowStoredEntriesWithDataDescriptor =
+-            allowStoredEntriesWithDataDescriptor;
+-        // haven't read anything so far
++    this.allowStoredEntriesWithDataDescriptor = allowStoredEntriesWithDataDescriptor;
++    
++    // Read the initial data from the input stream
++    if (in.available() > 0) {
++        byte[] initialData = new byte[in.available()];
++        in.read(initialData);
++        // Push the read data back to the input stream for proper processing
++        in.unread(initialData);
++    }
+ }
+\ No newline at end of file

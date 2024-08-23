@@ -1,0 +1,21 @@
+diff --git a/tmp/938bd86f-ec7f-4556-a2a0-7d5120dcf75f_buggy.java b/tmp/f09389aa-2876-4d00-abb5-850112c37957_fixed.java
+index a7cb64f..83cd904 100644
+--- a/tmp/938bd86f-ec7f-4556-a2a0-7d5120dcf75f_buggy.java
++++ b/tmp/f09389aa-2876-4d00-abb5-850112c37957_fixed.java
+@@ -1,10 +1,10 @@
+-    /**
+-     * Test if this element has an attribute.
+-     * @param attributeKey The attribute key to check.
+-     * @return true if the attribute exists, false if not.
+-     */
+     public boolean hasAttr(String attributeKey) {
+         Validate.notNull(attributeKey);
+ 
++        if (attributeKey.startsWith("abs:")) {
++            String href = attributes.get("href");
++            return (href != null) ? (new java.net.URL(href)).toString() : false;
++        } else {
+             return attributes.hasKey(attributeKey);
+         }
++    }
+\ No newline at end of file

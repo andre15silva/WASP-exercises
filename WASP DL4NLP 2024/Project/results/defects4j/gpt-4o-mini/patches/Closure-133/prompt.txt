@@ -1,0 +1,29 @@
+You are an automatic program repair tool. Your task is to fix the provided buggy code.
+
+The following code contains a buggy function:
+```java
+  /**
+   * Returns the remainder of the line.
+   */
+  private String getRemainingJSDocLine() {
+    String result = stream.getRemainingJSDocLine();
+    return result;
+  }
+
+```
+
+The code fails the following test:
+```java
+  public void testTextExtents() {
+    parse("@return {@code foo} bar \n *    baz. */",
+        true, "Bad type annotation. type not recognized due to syntax error");
+  }
+
+```
+
+With the following test error:
+```
+java.lang.IllegalStateException: Recorded bad position information
+```
+
+Please provide a fixed version of the buggy function, and only that function:

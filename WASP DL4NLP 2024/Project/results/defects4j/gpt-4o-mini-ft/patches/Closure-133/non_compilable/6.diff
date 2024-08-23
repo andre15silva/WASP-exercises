@@ -1,0 +1,18 @@
+diff --git a/tmp/cb199ba2-b1fb-4596-bfd8-8bee68fd9fee_buggy.java b/tmp/e489dd29-ea1f-45f9-abc5-8c76673bdc1c_fixed.java
+index 42d4174..1fcdbe2 100644
+--- a/tmp/cb199ba2-b1fb-4596-bfd8-8bee68fd9fee_buggy.java
++++ b/tmp/e489dd29-ea1f-45f9-abc5-8c76673bdc1c_fixed.java
+@@ -1,7 +1,13 @@
+   /**
+    * Returns the remainder of the line.
+    */
+   private String getRemainingJSDocLine() {
+     String result = stream.getRemainingJSDocLine();
++    int length = result.length();
++    if (!result.trim().equals(result)) {
++      /* We've hit a bad line.. */
++      hasOutstandingLineError = true;
++      failure++;
++    }
+     return result;
+   }

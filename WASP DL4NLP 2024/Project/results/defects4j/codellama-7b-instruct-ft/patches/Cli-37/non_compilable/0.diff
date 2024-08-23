@@ -1,0 +1,20 @@
+diff --git a/tmp/bfb0f62e-f115-44ac-b571-2296469484b2_buggy.java b/tmp/baa4ee0d-ec30-40ef-9fa1-81272545dea2_fixed.java
+index a7e6997..2ebf9f5 100644
+--- a/tmp/bfb0f62e-f115-44ac-b571-2296469484b2_buggy.java
++++ b/tmp/baa4ee0d-ec30-40ef-9fa1-81272545dea2_fixed.java
+@@ -1,12 +1,13 @@
+     /**
+      * Tells if the token looks like a short option.
+      * 
+      * @param token
+      */
+     private boolean isShortOption(String token)
+     {
+         // short options (-S, -SV, -S=V, -SV1=V2, -S1S2)
+-        return token.startsWith("-") && token.length() >= 2 && options.hasShortOption(token.substring(1, 2));
+-
+         // remove leading "-" and "=value"
++        return token.startsWith("-") && token.length() >= 2 && options.hasShortOption(token.substring(1, 2))
++               && !isOptionsWithValue(token);
++
+     }

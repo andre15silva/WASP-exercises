@@ -1,0 +1,70 @@
+diff --git a/tmp/84f48801-870e-4fb3-a808-17323b3660e3_buggy.java b/tmp/735d77e2-e27e-41ff-8b06-e39127e69a37_fixed.java
+index e4d90e7..6b20d58 100644
+--- a/tmp/84f48801-870e-4fb3-a808-17323b3660e3_buggy.java
++++ b/tmp/735d77e2-e27e-41ff-8b06-e39127e69a37_fixed.java
+@@ -1,45 +1,63 @@
+   @Override
+   String toStringHelper(boolean forAnnotations) {
+     if (hasReferenceName()) {
+       return getReferenceName();
+     } else if (prettyPrint) {
+       // Don't pretty print recursively.
+       prettyPrint = false;
+ 
+       // Use a tree set so that the properties are sorted.
+       Set<String> propertyNames = Sets.newTreeSet();
+       for (ObjectType current = this;
+-           current != null && !current.isNativeObjectType() &&
+-               propertyNames.size() <= MAX_PRETTY_PRINTED_PROPERTIES;
++           current != null
++               && !current.isNativeObjectType()
++               && propertyNames.size() <= MAX_PRETTY_PRINTED_PROPERTIES;
+            current = current.getImplicitPrototype()) {
+         propertyNames.addAll(current.getOwnPropertyNames());
+       }
+ 
+       StringBuilder sb = new StringBuilder();
+       sb.append("{");
+ 
+       int i = 0;
+       for (String property : propertyNames) {
+         if (i > 0) {
+           sb.append(", ");
+         }
+ 
+         sb.append(property);
++
++        if (forAnnotations) {
++          JSType propType = getPropertyType(property);
++          // If propType is also a record that has this type as its
++          // referenced type, then we have a circular reference and
++          // printing a full object for an annotation is just going to
++          // stack overflow.
++          if (!(propType instanceof ObjectType
++              && ((ObjectType)propType).getReferencedType() == this)) {
++            sb.append(": ");
++            sb.append(propType);
++          } else {
++            // Don't print it to an annotation.
++            sb.append(": ?");
++          }
++        } else {
+           sb.append(": ");
+           sb.append(getPropertyType(property).toString());
++        }
+ 
+         ++i;
+         if (i == MAX_PRETTY_PRINTED_PROPERTIES) {
+           sb.append(", ...");
+           break;
+         }
+       }
+ 
+       sb.append("}");
+ 
+       prettyPrint = true;
+       return sb.toString();
+     } else {
+       return "{...}";
+     }
+   }

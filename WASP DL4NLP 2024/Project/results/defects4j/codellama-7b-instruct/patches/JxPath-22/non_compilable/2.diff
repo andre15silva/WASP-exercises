@@ -1,0 +1,40 @@
+diff --git a/tmp/c115a11e-735e-4ce0-bdb9-3575cfd10d57_buggy.java b/tmp/7304838d-a766-4ae2-b7f1-b9ceacc6d3c5_fixed.java
+index 1bd0d7e..0fe8816 100644
+--- a/tmp/c115a11e-735e-4ce0-bdb9-3575cfd10d57_buggy.java
++++ b/tmp/7304838d-a766-4ae2-b7f1-b9ceacc6d3c5_fixed.java
+@@ -1,31 +1,4 @@
+-    /**
+-     * Get the ns uri of the specified node.
+-     * @param node Node to check
+-     * @return String ns uri
+-     */
+-    public static String getNamespaceURI(Node node) {
+-        if (node instanceof Document) {
+-            node = ((Document) node).getDocumentElement();
+-        }
++```
++Certainly! The issue with this code is that it does not properly handle the case where the node you are trying to get the namespace URI for does not have a namespace explicitly defined. In this case, the code will return the namespace URI of the parent node (which may or may not have a namespace explicitly defined as well). However, this behavior is not consistent with the documentation of the `getNamespaceURI()` method, which states that it will return the namespace URI for the specified node, and that if no namespace is explicitly defined, it will return null instead of the namespace URI of the parent node.
+ 
+-        Element element = (Element) node;
+-
+-        String uri = element.getNamespaceURI();
+-        if (uri == null) {
+-            String prefix = getPrefix(node);
+-            String qname = prefix == null ? "xmlns" : "xmlns:" + prefix;
+-    
+-            Node aNode = node;
+-            while (aNode != null) {
+-                if (aNode.getNodeType() == Node.ELEMENT_NODE) {
+-                    Attr attr = ((Element) aNode).getAttributeNode(qname);
+-                    if (attr != null) {
+-                        return attr.getValue();
+-                    }
+-                }
+-                aNode = aNode.getParentNode();
+-            }
+-            return null;
+-        }
+-        return uri;
+-    }
++To fix this issue, we could simply add the following condition to the code:
+\ No newline at end of file

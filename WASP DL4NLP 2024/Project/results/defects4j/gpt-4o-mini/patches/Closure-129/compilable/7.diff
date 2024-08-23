@@ -1,0 +1,38 @@
+diff --git a/tmp/2a1dcab6-0de0-4ef0-aac1-6916d4b729ec_buggy.java b/tmp/af8ca01e-8c05-446a-81cd-4926512c47fd_fixed.java
+index e8705ac..d542fd4 100644
+--- a/tmp/2a1dcab6-0de0-4ef0-aac1-6916d4b729ec_buggy.java
++++ b/tmp/af8ca01e-8c05-446a-81cd-4926512c47fd_fixed.java
+@@ -1,24 +1,24 @@
+-    /**
+-     * There are two types of calls we are interested in calls without explicit
+-     * "this" values (what we are call "free" calls) and direct call to eval.
+-     */
+ private void annotateCalls(Node n) {
+     Preconditions.checkState(n.isCall());
+ 
+-      // Keep track of of the "this" context of a call.  A call without an
++    // Keep track of the "this" context of a call. A call without an
+     // explicit "this" is a free call.
+     Node first = n.getFirstChild();
+ 
+     // ignore cast nodes.
+-
+     if (!NodeUtil.isGet(first)) {
+         n.putBooleanProp(Node.FREE_CALL, true);
++    } else if (first.isGetProp()) {
++        // If it's a property access, we need to check if the property is "eval" as well
++        Node second = first.getLastChild();
++        if (second.isName() && "eval".equals(second.getString())) {
++            n.putBooleanProp(Node.DIRECT_EVAL, true);
++        }
+     }
+ 
+     // Keep track of the context in which eval is called. It is important
+     // to distinguish between "(0, eval)()" and "eval()".
+-      if (first.isName() &&
+-          "eval".equals(first.getString())) {
++    if (first.isName() && "eval".equals(first.getString())) {
+         first.putBooleanProp(Node.DIRECT_EVAL, true);
+     }
+ }
+\ No newline at end of file

@@ -1,0 +1,29 @@
+diff --git a/tmp/a4ded350-b482-45ca-b59d-8c09021690b3_buggy.java b/tmp/fbbb367e-8e83-4643-a540-25930a1b5448_fixed.java
+index 19fe1b4..4576c32 100644
+--- a/tmp/a4ded350-b482-45ca-b59d-8c09021690b3_buggy.java
++++ b/tmp/fbbb367e-8e83-4643-a540-25930a1b5448_fixed.java
+@@ -1,17 +1,24 @@
+     public static boolean isJSIdentifier(String s) {
+       int length = s.length();
+ 
+       if (length == 0 ||
+           !Character.isJavaIdentifierStart(s.charAt(0))) {
+         return false;
+       }
+ 
+       for (int i = 1; i < length; i++) {
+         if (
+             !Character.isJavaIdentifierPart(s.charAt(i))) {
++          // Some JavaScript versions may have quotes around the keys of an
++          // anonymous object declaration like '{"1.0":0}'. We handle this case
++          // below.
++          if (Character.isISOControl(s.charAt(i)) || Character.isSpaceChar(
++              s.charAt(i))) {
++            continue;
++          }
+           return false;
+         }
+       }
+ 
+       return true;
+     }

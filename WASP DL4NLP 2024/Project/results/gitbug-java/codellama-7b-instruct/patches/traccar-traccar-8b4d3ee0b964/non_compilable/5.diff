@@ -1,0 +1,99 @@
+diff --git a/tmp/7880d232-3626-4df5-a06f-28e232ce0274_buggy.java b/tmp/2c9163ce-1af9-40d0-987d-3b02511d7a0e_fixed.java
+index 27f2719..5998e80 100644
+--- a/tmp/7880d232-3626-4df5-a06f-28e232ce0274_buggy.java
++++ b/tmp/2c9163ce-1af9-40d0-987d-3b02511d7a0e_fixed.java
+@@ -1,90 +1,5 @@
+-    @Override
+-    protected Object decode(
+-            Channel channel, SocketAddress remoteAddress, Object msg) throws Exception {
++The buggy function is a custom protocol decoder. The function takes several parameters, including a `Channel`, `SocketAddress`, and a `msg`. The function is supposed to use the `msg` object to decode a protocol message and return a `Position` object if successful, or `null` if the message is not a valid protocol message.
+ 
+-        String sentence = (String) msg;
++The function has several if-elseif-else blocks, each of which is responsible for handling a different type of protocol message. The if-elseif-else blocks are nested, with the inner-most block handling the most specific type of message (in this case, `!D` messages).
+ 
+-        if (sentence.startsWith("!1,")) {
+-            int index = sentence.indexOf(',', 3);
+-            if (index < 0) {
+-                index = sentence.length();
+-            }
+-            getDeviceSession(channel, remoteAddress, sentence.substring(3, index));
+-            return null;
+-        }
+-
+-        DeviceSession deviceSession = getDeviceSession(channel, remoteAddress);
+-        if (deviceSession == null || !sentence.matches("![35A-D],.*")) {
+-            return null;
+-        }
+-
+-        Position position = new Position(getProtocolName());
+-        position.setDeviceId(deviceSession.getDeviceId());
+-
+-        String type = sentence.substring(1, 2);
+-        position.set(Position.KEY_TYPE, type);
+-
+-        if (type.equals("3")) {
+-
+-            getLastLocation(position, null);
+-
+-            position.set(Position.KEY_RESULT, sentence.substring(3));
+-
+-            return position;
+-
+-        } else if (type.equals("5")) {
+-
+-            String[] values = sentence.split(",");
+-
+-            getLastLocation(position, null);
+-
+-            position.set(Position.KEY_RSSI, Integer.parseInt(values[1]));
+-            if (values.length >= 4) {
+-                position.set(Position.KEY_BATTERY_LEVEL, Integer.parseInt(values[3]));
+-            }
+-
+-            return position;
+-
+-        } else if (type.equals("B") || type.equals("D")) {
+-
+-            Parser parser = new Parser(PATTERN_BD, sentence);
+-            if (!parser.matches()) {
+-                return null;
+-            }
+-
+-            decodeFix(position, parser);
+-            decodeState(position, parser);
+-
+-            position.set(Position.KEY_SATELLITES, parser.nextInt(0));
+-            position.set(Position.KEY_SATELLITES_VISIBLE, parser.nextInt(0));
+-            position.set(Position.KEY_HDOP, parser.nextDouble(0));
+-
+-            return position;
+-
+-        } else if (type.equals("C")) {
+-
+-            Parser parser = new Parser(PATTERN_C, sentence);
+-            if (!parser.matches()) {
+-                return null;
+-            }
+-
+-            decodeFix(position, parser);
+-            decodeState(position, parser);
+-
+-            return position;
+-
+-        } else if (type.equals("A")) {
+-
+-            Parser parser = new Parser(PATTERN_A, sentence);
+-            if (!parser.matches()) {
+-                return null;
+-            }
+-
+-            decodeFix(position, parser);
+-
+-            return position;
+-
+-        }
+-
+-        return null;
+-    }
++The specific bug is that the function is not correctly handling `!D` messages. When the function encounters a `!D` message, it returns `null` instead of decoding the message and returning a `Position` object.
+\ No newline at end of file

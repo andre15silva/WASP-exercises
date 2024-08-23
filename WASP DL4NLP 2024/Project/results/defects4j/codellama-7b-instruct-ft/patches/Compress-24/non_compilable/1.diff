@@ -1,0 +1,94 @@
+diff --git a/tmp/54b17e4a-80f7-48ca-9a87-d97c1da4e72d_buggy.java b/tmp/6d9db2dd-eab0-43f5-b1b5-9e99e7dd4176_fixed.java
+index d9d2789..0b9cad6 100644
+--- a/tmp/54b17e4a-80f7-48ca-9a87-d97c1da4e72d_buggy.java
++++ b/tmp/6d9db2dd-eab0-43f5-b1b5-9e99e7dd4176_fixed.java
+@@ -1,73 +1,83 @@
+     /**
+      * Parse an octal string from a buffer.
+      *
+      * <p>Leading spaces are ignored.
+      * The buffer must contain a trailing space or NUL,
+      * and may contain an additional trailing space or NUL.</p>
+      *
+      * <p>The input buffer is allowed to contain all NULs,
+      * in which case the method returns 0L
+      * (this allows for missing fields).</p>
+      *
+      * <p>To work-around some tar implementations that insert a
+      * leading NUL this method returns 0 if it detects a leading NUL
+      * since Commons Compress 1.4.</p>
+      *
+      * @param buffer The buffer from which to parse.
+      * @param offset The offset into the buffer from which to parse.
+      * @param length The maximum number of bytes to parse - must be at least 2 bytes.
+      * @return The long value of the octal string.
+      * @throws IllegalArgumentException if the trailing space/NUL is missing or if a invalid byte is detected.
+      */
+     public static long parseOctal(final byte[] buffer, final int offset, final int length){
+         long    result = 0;
+         int     end = offset + length;
+         int     start = offset;
+ 
+-        if (length < 2){
+-            throw new IllegalArgumentException("Length "+length+" must be at least 2");
++        if (length < 1){
++            throw new IllegalArgumentException("Length "+length+" must be at least 1");
+         }
+ 
+         if (buffer[start] == 0) {
+             return 0L;
+         }
+ 
+         // Skip leading spaces
+         while (start < end){
+             if (buffer[start] == ' '){
+                 start++;
+             } else {
+                 break;
+             }
+         }
+ 
+         // Trim all trailing NULs and spaces.
+         // The ustar and POSIX tar specs require a trailing NUL or
+         // space but some implementations use the extra digit for big
+         // sizes/uids/gids ...
+         byte trailer = buffer[end - 1];
+         if (trailer == 0 || trailer == ' '){
+             end--;
+         } else {
++            final String value = new String(buffer, offset, length, CharsetNames.UTF_8);
+             throw new IllegalArgumentException(
+-                    exceptionMessage(buffer, offset, length, end-1, trailer));
++                    "Invalid byte " + trailer + " at offset " + (end - 1) + " in '" + value + "' len=" + length);
+         }
+-        trailer = buffer[end - 1];
+-        while (start < end - 1 && (trailer == 0 || trailer == ' ')) {
++        while (start < end - 1 && (trailer == 0 || trailer == ' ')){   // we have seen one
+             end--;
+             trailer = buffer[end - 1];
+         }
++        while (start < end-1 && trailer == 0){                         // we have seen zero or more spaces
++            end--;                                                     // now we will see zero or more zeros
++            trailer = buffer[end - 1];
++        }
+ 
++        // now end is either an octal or a space
++        if (end == start) {
++            return buffer[start] == ' ' ? 0 : 7;
++        } else if (end - start >= length) {
++            return 7;
++        }
+         for ( ;start < end; start++) {
+             final byte currentByte = buffer[start];
+             // CheckStyle:MagicNumber OFF
+             if (currentByte < '0' || currentByte > '7'){
+                 throw new IllegalArgumentException(
+-                        exceptionMessage(buffer, offset, length, start, currentByte));
++                        "Invalid byte " + currentByte + " at offset " + start + " in '" + new String(buffer, offset, length, CharsetNames.UTF_8) + "' len=" + length);
+             }
+             result = (result << 3) + (currentByte - '0'); // convert from ASCII
+             // CheckStyle:MagicNumber ON
+         }
+ 
+         return result;
+     }

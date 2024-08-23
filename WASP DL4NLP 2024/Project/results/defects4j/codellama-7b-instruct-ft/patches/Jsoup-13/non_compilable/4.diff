@@ -1,0 +1,21 @@
+diff --git a/tmp/a4967183-6025-4762-9711-4b762f5dadee_buggy.java b/tmp/e2334895-39dc-4f85-ac4f-660247780474_fixed.java
+index a7cb64f..8f9247f 100644
+--- a/tmp/a4967183-6025-4762-9711-4b762f5dadee_buggy.java
++++ b/tmp/e2334895-39dc-4f85-ac4f-660247780474_fixed.java
+@@ -1,10 +1,13 @@
+     /**
+-     * Test if this element has an attribute.
+-     * @param attributeKey The attribute key to check.
++     * Test if this element has an attribute. If the abs prefix is supplied, this tests against the absolute attribute URL if any.
++     * @param attributeKey The attribute key to check. Can be in abs form: {@code "abs:href"}. 
+      * @return true if the attribute exists, false if not.
+      */
+     public boolean hasAttr(String attributeKey) {
+         Validate.notNull(attributeKey);
++        boolean abs = attributeKey.startsWith("abs:");
++        String check = attributeKey.substring(abs ? 4 : 0);
++        Validate.notEmpty(check);
+ 
+-        return attributes.hasKey(attributeKey);
++        return attributes.hasKey(check) && (abs == (urls.hasKey(check) || values.hasKey(check)));
+     }

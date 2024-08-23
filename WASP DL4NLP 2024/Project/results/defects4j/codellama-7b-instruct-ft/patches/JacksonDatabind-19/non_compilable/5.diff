@@ -1,0 +1,24 @@
+diff --git a/tmp/c9d646d6-6019-44a9-b97d-ceb54149eee8_buggy.java b/tmp/051389c1-b87b-4568-a091-e65ba38f72c3_fixed.java
+index 1bec4d6..7e536f6 100644
+--- a/tmp/c9d646d6-6019-44a9-b97d-ceb54149eee8_buggy.java
++++ b/tmp/051389c1-b87b-4568-a091-e65ba38f72c3_fixed.java
+@@ -1,14 +1,18 @@
+     private JavaType _mapType(Class<?> rawClass)
+     {
+-        // 28-May-2015, tatu: Properties are special, as per [databind#810]
++        // 30-May-2015, tatu: Properties are special, as per [databind#810]
+         JavaType[] typeParams = findTypeParameters(rawClass, Map.class);
+         // ok to have no types ("raw")
+         if (typeParams == null) {
+             return MapType.construct(rawClass, _unknownType(), _unknownType());
+         }
+         // but exactly 2 types if any found
+         if (typeParams.length != 2) {
+             throw new IllegalArgumentException("Strange Map type "+rawClass.getName()+": can not determine type parameters");
+         }
++        // 28-May-2015, tatu: Actually need to force coercion to String (as per [databind#810])
++        if (typeParams[0].isTypeOrSuperType(String.class)) {
+             return MapType.construct(rawClass, typeParams[0], typeParams[1]);
+         }
++        return MapType.construct(rawClass, String.class, typeParams[1]);
++    }

@@ -1,0 +1,38 @@
+diff --git a/tmp/e1b161c5-bc9d-4b06-a536-70fd29964712_buggy.java b/tmp/10d4d95d-2545-4bb5-aa9e-47b08670b359_fixed.java
+index e69de29..ce641e8 100644
+--- a/tmp/e1b161c5-bc9d-4b06-a536-70fd29964712_buggy.java
++++ b/tmp/10d4d95d-2545-4bb5-aa9e-47b08670b359_fixed.java
+@@ -0,0 +1,32 @@
++public static class FormElement extends Element {
++    final private static Parser parser = new Parser();
++
++    FormElement(String tagName, String baseUri, String baseUri2) {
++        super(tagName, baseUri, baseUri2);
++    }
++
++    public List<Connection.KeyVal> formData() {
++        List<Connection.KeyVal> formData = new ArrayList<Connection.KeyVal>();
++        for (Node formChild : childNodes()) {
++            if (formChild instanceof FormElement) {
++                continue; // don't include nested forms
++            }
++            String key = null;
++            String val = null;
++            if (formChild instanceof Element) {
++                Element el = (Element) formChild;
++                if (el.tagName().equals("input")) {
++                    key = el.attr("name");
++                    val = el.attr("value");
++                } else if (el.tagName().equals("select")) {
++                    key = el.attr("name");
++                    val = el.val();
++                }
++            }
++            if (key != null && key.length() > 0) {
++                formData.add(Connection.KeyVal.create(key, val));
++            }
++        }
++        return formData;
++    }
++}
+\ No newline at end of file

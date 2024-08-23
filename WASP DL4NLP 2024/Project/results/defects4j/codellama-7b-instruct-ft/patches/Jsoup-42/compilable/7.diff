@@ -1,0 +1,54 @@
+diff --git a/tmp/1f66ffc3-4402-4653-9060-09981f675619_buggy.java b/tmp/bd194e0e-968e-4a23-b510-ee884e814355_fixed.java
+index 442a001..3eba59a 100644
+--- a/tmp/1f66ffc3-4402-4653-9060-09981f675619_buggy.java
++++ b/tmp/bd194e0e-968e-4a23-b510-ee884e814355_fixed.java
+@@ -1,39 +1,46 @@
+     /**
+      * Get the data that this form submits. The returned list is a copy of the data, and changes to the contents of the
+      * list will not be reflected in the DOM.
+      * @return a list of key vals
+      */
+     public List<Connection.KeyVal> formData() {
+         ArrayList<Connection.KeyVal> data = new ArrayList<Connection.KeyVal>();
+ 
+         // iterate the form control elements and accumulate their values
+         for (Element el: elements) {
+             if (!el.tag().isFormSubmittable()) continue; // contents are form listable, superset of submitable
+             String name = el.attr("name");
+             if (name.length() == 0) continue;
+             String type = el.attr("type");
+ 
+             if ("select".equals(el.tagName())) {
+                 Elements options = el.select("option[selected]");
+                 boolean set = false;
+                 for (Element option: options) {
+-                    data.add(HttpConnection.KeyVal.create(name, option.val()));
++                    Connection.KeyVal kv = HttpConnection.KeyVal.create(name, option.val());
++                    if (kv != null) {
++                        data.add(kv);
+                         set = true;
+                     }
++                }
+                 if (!set) {
+                     Element option = el.select("option").first();
+                     if (option != null)
+                         data.add(HttpConnection.KeyVal.create(name, option.val()));
+                 }
+             } else if ("checkbox".equalsIgnoreCase(type) || "radio".equalsIgnoreCase(type)) {
+                 // only add checkbox or radio if they have the checked attribute
+                 if (el.hasAttr("checked")) {
+                     final String val = el.val();
+-                    data.add(HttpConnection.KeyVal.create(name, val));
++                    Connection.KeyVal kv = HttpConnection.KeyVal.create(name, val);
++                    if (kv != null)
++                        data.add(kv);
+                 }
+             } else {
+-                data.add(HttpConnection.KeyVal.create(name, el.val()));
++                Connection.KeyVal kv = HttpConnection.KeyVal.create(name, el.val());
++                if (kv != null)
++                    data.add(kv);
+             }
+         }
+         return data;
+     }

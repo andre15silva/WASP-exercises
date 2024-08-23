@@ -1,0 +1,36 @@
+diff --git a/tmp/14cee27c-6f0f-459a-ace9-cd8c7498ed12_buggy.java b/tmp/84442d4f-8ca3-49c5-8c94-f14e9df8c844_fixed.java
+index 19fd63e..2832c6b 100644
+--- a/tmp/14cee27c-6f0f-459a-ace9-cd8c7498ed12_buggy.java
++++ b/tmp/84442d4f-8ca3-49c5-8c94-f14e9df8c844_fixed.java
+@@ -1,24 +1,6 @@
+-  /**
+-   * @return Whether the node is a block with a single statement that is
+-   *     an expression.
+-   */
+-  private boolean isFoldableExpressBlock(Node n) {
+-    if (n.getType() == Token.BLOCK) {
+-      if (n.hasOneChild()) {
+-        Node maybeExpr = n.getFirstChild();
+-          // IE has a bug where event handlers behave differently when
+-          // their return value is used vs. when their return value is in
+-          // an EXPR_RESULT. It's pretty freaking weird. See:
+-          // http://code.google.com/p/closure-compiler/issues/detail?id=291
+-          // We try to detect this case, and not fold EXPR_RESULTs
+-          // into other expressions.
+-
+-            // We only have to worry about methods with an implicit 'this'
+-            // param, or this doesn't happen.
+-
+-          return NodeUtil.isExpressionNode(maybeExpr);
+-      }
+-    }
+-
+-    return false;
+-  }
++test("if (f) { f.onchange(); }", false);
++test("if (f) { f.bar(); }", false);
++test("if (f) f.onchange();", false);
++test("if (f) { foo(f.onchange()); }", false);
++test("if (f) { f.bonchange(); }", true);
++test("if (f) { f['x'](); }", true);
+\ No newline at end of file

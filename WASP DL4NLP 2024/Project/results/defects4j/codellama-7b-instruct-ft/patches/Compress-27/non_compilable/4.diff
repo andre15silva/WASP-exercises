@@ -1,0 +1,98 @@
+diff --git a/tmp/30b0e18a-7f6c-418c-a58c-69e552cb2394_buggy.java b/tmp/25adff58-c2b5-4b8a-8c0c-293fc11ebea3_fixed.java
+index 81872ca..ce89bef 100644
+--- a/tmp/30b0e18a-7f6c-418c-a58c-69e552cb2394_buggy.java
++++ b/tmp/25adff58-c2b5-4b8a-8c0c-293fc11ebea3_fixed.java
+@@ -1,70 +1,93 @@
+     /**
+      * Parse an octal string from a buffer.
+      *
+      * <p>Leading spaces are ignored.
+      * The buffer must contain a trailing space or NUL,
+      * and may contain an additional trailing space or NUL.</p>
+      *
+      * <p>The input buffer is allowed to contain all NULs,
+      * in which case the method returns 0L
+      * (this allows for missing fields).</p>
+      *
+      * <p>To work-around some tar implementations that insert a
+      * leading NUL this method returns 0 if it detects a leading NUL
+      * since Commons Compress 1.4.</p>
+      *
++     * <p>For some Tar distributions (such as XZ-compressed archive files)
++     * values exceed 77 77 77 77 77 are accepted and represented as 800 000 000</p>
++     *
+      * @param buffer The buffer from which to parse.
+      * @param offset The offset into the buffer from which to parse.
+      * @param length The maximum number of bytes to parse - must be at least 2 bytes.
+      * @return The long value of the octal string.
+      * @throws IllegalArgumentException if the trailing space/NUL is missing or if a invalid byte is detected.
+      */
+     public static long parseOctal(final byte[] buffer, final int offset, final int length) {
+         long    result = 0;
+         int     end = offset + length;
+         int     start = offset;
+ 
+         if (length < 2){
+             throw new IllegalArgumentException("Length "+length+" must be at least 2");
+         }
+ 
+         if (buffer[start] == 0 ) {
+             return 0L;
+         }
+ 
+         // Skip leading spaces
+         while (start < end){
+             if (buffer[start] == ' '){
+                 start++;
+             } else {
+                 break;
+             }
+         }
+ 
+         // Trim all trailing NULs and spaces.
+         // The ustar and POSIX tar specs require a trailing NUL or
+         // space but some implementations use the extra digit for big
+         // sizes/uids/gids ...
+         byte trailer = buffer[end - 1];
+         while (start < end && (trailer == 0 || trailer == ' ')) {
+             end--;
+             trailer = buffer[end - 1];
+         }
+         if (start == end) {
+             throw new IllegalArgumentException(
+                     exceptionMessage(buffer, offset, length, start, trailer));
+         }
+ 
+         for ( ;start < end; start++) {
+             final byte currentByte = buffer[start];
+             // CheckStyle:MagicNumber OFF
+             if (currentByte < '0' || currentByte > '7'){
+                 throw new IllegalArgumentException(
+                         exceptionMessage(buffer, offset, length, start, currentByte));
+             }
++            // The POSIX way as well as the ustar standard
++            // but not all tar implementations are correct ...
++            if (result == MAX_OCTAL || result == MAX_OCTAL_OVERFLOW){
++                if (currentByte == '7'){
++                    // We get 77 77 77 77 (12 digits)
++                    // this is most likely a 12 or 13 digits long value
++                    // that has been reduced to the maximum length
++                    // this includes the 7, but it may also be
++                    // a number consisting of e.g. zeros.
++                    if (buffer[end - 1] == '7'){
++                        // this is a number in excess 77 77 77 77 (12 digits)
++                        result *= 10;
++                    } else {
++                        // this is a real number with more than 9 digits i.e. 77 77 77 77 7
++                        return Long.valueOf(new String(buffer, offset, length),
++                                CharsetNames.UTF_8).longValue();
++                    }
++                }
++            }
++            // The ustar standard way
+             result = (result << 3) + (currentByte - '0'); // convert from ASCII
+             // CheckStyle:MagicNumber ON
+         }
+ 
+         return result;
+     }

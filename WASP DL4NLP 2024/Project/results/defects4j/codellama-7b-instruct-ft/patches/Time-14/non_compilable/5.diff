@@ -1,0 +1,36 @@
+diff --git a/tmp/b57f098a-4593-40ca-a235-ed6d66a3121d_buggy.java b/tmp/1929ac8b-11f3-4659-b6eb-c76bdd2d3247_fixed.java
+index 10616db..c92f9fa 100644
+--- a/tmp/b57f098a-4593-40ca-a235-ed6d66a3121d_buggy.java
++++ b/tmp/1929ac8b-11f3-4659-b6eb-c76bdd2d3247_fixed.java
+@@ -1,19 +1,22 @@
+     //-----------------------------------------------------------------------
+     public int[] add(ReadablePartial partial, int fieldIndex, int[] values, int valueToAdd) {
+         // overridden as superclass algorithm can't handle
+         // 2004-02-29 + 48 months -> 2008-02-29 type dates
+         if (valueToAdd == 0) {
+             return values;
+         }
+-            // month is largest field and being added to, such as month-day
+-        if (DateTimeUtils.isContiguous(partial)) {
+-            long instant = 0L;
+-            for (int i = 0, isize = partial.size(); i < isize; i++) {
+-                instant = partial.getFieldType(i).getField(iChronology).set(instant, values[i]);
+-            }
+-            instant = add(instant, valueToAdd);
+-            return iChronology.get(partial, instant);
+-        } else {
++        try {
+             return super.add(partial, fieldIndex, values, valueToAdd);
++        } catch (IllegalFieldValueException ex) {
++            if (fieldIndex == DateConstants.MONTH_OF_YEAR && 
++                    DateTimeUtils.isContiguous(partial) &&
++                    DateTimeUtils.is28 FebInYearOfLeap(values[0])) {  
++                Partial current = new Partial(partial);
++                int year = DateTimeUtils.add(valueToAdd, values[0]).intValue();
++                current.add(DateConstants.YEAR, year - values[0]);
++                return iChronology.get(current, DateTimeFieldType.year().getField(iChronology).
++                        set(DateTimeUtils.add(valueToAdd, values[0]), 0));
++            }
++            throw ex;
+         }
+     }

@@ -1,0 +1,65 @@
+diff --git a/tmp/d60cefc5-5adf-40df-b221-f1daeb95c839_buggy.java b/tmp/c4ddd1b1-ab42-4f5f-8350-f65d10129a85_fixed.java
+index b36c3f0..8ed1e7a 100644
+--- a/tmp/d60cefc5-5adf-40df-b221-f1daeb95c839_buggy.java
++++ b/tmp/c4ddd1b1-ab42-4f5f-8350-f65d10129a85_fixed.java
+@@ -1,58 +1,59 @@
+   /**
+    * Returns true if calls to this function have side effects.
+    *
+    * @param callNode The call node to inspected.
+    * @param compiler A compiler object to provide program state changing
+    *     context information. Can be null.
+    */
+   static boolean functionCallHasSideEffects(
+       Node callNode, @Nullable AbstractCompiler compiler) {
+     if (callNode.getType() != Token.CALL) {
+       throw new IllegalStateException(
+           "Expected CALL node, got " + Token.name(callNode.getType()));
+     }
+ 
+     if (callNode.isNoSideEffectsCall()) {
+       return false;
+     }
+ 
+     Node nameNode = callNode.getFirstChild();
+ 
+     // Built-in functions with no side effects.
+     if (nameNode.getType() == Token.NAME) {
+       String name = nameNode.getString();
+       if (BUILTIN_FUNCTIONS_WITHOUT_SIDEEFFECTS.contains(name)) {
+         return false;
+       }
+     } else if (nameNode.getType() == Token.GETPROP) {
+       if (callNode.hasOneChild()
+           && OBJECT_METHODS_WITHOUT_SIDEEFFECTS.contains(
+                 nameNode.getLastChild().getString())) {
+         return false;
+       }
+ 
+       if (callNode.isOnlyModifiesThisCall()
+           && evaluatesToLocalValue(nameNode.getFirstChild())) {
+         return false;
+       }
+ 
+-      // Functions in the "Math" namespace have no side effects.
++      // Functions in the "Math" namespace have no side effects if the arguments
++      // aren't used in the function's implementation.
+ 
+       if (compiler != null && !compiler.hasRegExpGlobalReferences()) {
+         if (nameNode.getFirstChild().getType() == Token.REGEXP
+             && REGEXP_METHODS.contains(nameNode.getLastChild().getString())) {
+           return false;
+         } else if (nameNode.getFirstChild().getType() == Token.STRING
+             && STRING_REGEXP_METHODS.contains(
+                 nameNode.getLastChild().getString())) {
+           Node param = nameNode.getNext();
+           if (param != null &&
+               (param.getType() == Token.STRING
+                   || param.getType() == Token.REGEXP))
+           return false;
+         }
+       }
+     }
+ 
+     return true;
+   }

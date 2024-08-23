@@ -1,0 +1,59 @@
+diff --git a/tmp/65a5af8c-d0bb-40c8-885f-8fb87b17961a_buggy.java b/tmp/d819a7c0-e0ed-4be0-bc68-63e128bd77ef_fixed.java
+index 4bbd561..03962e5 100644
+--- a/tmp/65a5af8c-d0bb-40c8-885f-8fb87b17961a_buggy.java
++++ b/tmp/d819a7c0-e0ed-4be0-bc68-63e128bd77ef_fixed.java
+@@ -1,37 +1,54 @@
+     /**
+      * {@inheritDoc}
+      */
+     @Override
+     public int translate(CharSequence input, int index, Writer out) throws IOException {
+         // TODO: Protect from ArrayIndexOutOfBounds
+         if(input.charAt(index) == '&' && input.charAt(index + 1) == '#') {
+             int start = index + 2;
+             boolean isHex = false;
+ 
+             char firstChar = input.charAt(start);
+             if(firstChar == 'x' || firstChar == 'X') {
+                 start++;
+                 isHex = true;
+             }
+ 
+             int end = start;
+             while(input.charAt(end) != ';') {
+                 end++;
+             }
+ 
+             int entityValue;
+             try {
+                 if(isHex) {
+                     entityValue = Integer.parseInt(input.subSequence(start, end).toString(), 16);
+                 } else {
+                     entityValue = Integer.parseInt(input.subSequence(start, end).toString(), 10);
+                 }
+             } catch(NumberFormatException nfe) {
+                 return 0;
+             }
+ 
++            if (entityValue > Character.MAX_VALUE) {
++                // surrogate -> we cannot do anything...
++                return 0;
++            }
++            // special Java Note: The value can be passed to the writer directly which means that it could end up in mode {@link Writer#UNDEFINED}.
++            // Therefore, we check here first if the value is above the Java miaoence limit.
++            // See <a href="https://github.com/google/gwt/issues/3671">issue #3671</a>.
++            //
++            //      If the value is not a Java value we write it back as is to avoid escaping
++            //      The number of characters returned should be equal the number of characters rendered sideways.
++            //      In order for it to be skipped properly by later code (HTML4/HTML5), we write the character out directly.
++            //
++            //      We exclude traitements desBAD states by leaving the original data as rendered text.
++            //      <a class=link>Data format predefined</a>.
++            if (entityValue == 0xFFFF || entityValue == 0xFFFE) { // 65535 > 65535 !DHTML (could be screwed again). Would break HTML > 0.9 forward compat
++                return -1; 
++            }
+             out.write(entityValue);
+             return 2 + (end - start) + (isHex ? 1 : 0) + 1;
+         }
+         return 0;
+     }

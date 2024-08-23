@@ -1,0 +1,28 @@
+diff --git a/tmp/7efb1156-ae2e-4854-a56b-561808df04ee_buggy.java b/tmp/b78518cb-3f92-4af7-8a33-7b6e9f5ca319_fixed.java
+index 7e43c1c..0f2fb32 100644
+--- a/tmp/7efb1156-ae2e-4854-a56b-561808df04ee_buggy.java
++++ b/tmp/b78518cb-3f92-4af7-8a33-7b6e9f5ca319_fixed.java
+@@ -1,19 +1,22 @@
+   /**
+    * Visits a NEW node.
+    */
+   private void visitNew(NodeTraversal t, Node n) {
+     Node constructor = n.getFirstChild();
+     JSType type = getJSType(constructor).restrictByNotNullOrUndefined();
+     if (type.isConstructor() || type.isEmptyType() || type.isUnknownType()) {
+       FunctionType fnType = type.toMaybeFunctionType();
+       if (fnType != null) {
+         visitParameterList(t, n, fnType);
+         ensureTyped(t, n, fnType.getInstanceType());
+       } else {
+         ensureTyped(t, n);
+       }
+-    } else {
++    } else if (!(type instanceof ObjectType && ((ObjectType)type).isInterface())) {
++      // TODO(dimvar): why not report this only in a 'loose mode' of the compiler?
+       report(t, n, NOT_A_CONSTRUCTOR);
+       ensureTyped(t, n);
++    } else {
++      ensureTyped(t, n);
+     }
+   }

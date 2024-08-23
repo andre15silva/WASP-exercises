@@ -1,0 +1,62 @@
+diff --git a/tmp/7539eff9-8d9d-47aa-a073-218e2fd91523_buggy.java b/tmp/f6d2bfe4-0851-40c4-9c53-bb0fcb612fd8_fixed.java
+index 7116384..c49fcdd 100644
+--- a/tmp/7539eff9-8d9d-47aa-a073-218e2fd91523_buggy.java
++++ b/tmp/f6d2bfe4-0851-40c4-9c53-bb0fcb612fd8_fixed.java
+@@ -1,39 +1,23 @@
+-    /**
+-     * Returns at most 63 bits read from the underlying stream.
+-     *
+-     * @param count the number of bits to read, must be a positive
+-     * number not bigger than 63.
+-     * @return the bits concatenated as a long using the stream's byte order.
+-     *         -1 if the end of the underlying stream has been reached before reading
+-     *         the requested number of bits
+-     * @throws IOException on error
+-     */
+-    public long readBits(final int count) throws IOException {
+-        if (count < 0 || count > MAXIMUM_CACHE_SIZE) {
+-            throw new IllegalArgumentException("count must not be negative or greater than " + MAXIMUM_CACHE_SIZE);
++public long readBits(int count) throws IOException {
++  if (count > 63) {
++    throw new IllegalArgumentException("count must not be negative or greater than 63");
+   }
+-        while (bitsCachedSize < count) {
+-            final long nextByte = in.read();
+-            if (nextByte < 0) {
+-                return nextByte;
+-            }
+-            if (byteOrder == ByteOrder.LITTLE_ENDIAN) {
+-                bitsCached |= (nextByte << bitsCachedSize);
+-            } else {
+-                bitsCached <<= 8;
+-                bitsCached |= nextByte;
++  
++  if (count < 9) {
++    long result = 0;
++    for (int i = 0; i < count; i++) {
++      result <<= 1;
++      result |= in.read() & 1;
+     }
+-            bitsCachedSize += 8;
++    return result;
+   }
+-            // bitsCachedSize >= 57 and left-shifting it 8 bits would cause an overflow
+   
+-        final long bitsOut;
+-            if (byteOrder == ByteOrder.LITTLE_ENDIAN) {
+-                bitsOut = (bitsCached & MASKS[count]);
+-                bitsCached >>>= count;
+-            } else {
+-                bitsOut = (bitsCached >> (bitsCachedSize - count)) & MASKS[count];
++  long result = 0;
++  long bitMask = 1L << (count - 1);
++  for (int i = 0; i < count; i++) {
++    result <<= 1;
++    result |= in.read() & 1;
++    bitMask >>>= 1;
+   }
+-            bitsCachedSize -= count;
+-        return bitsOut;
++  return result;
+ }
+\ No newline at end of file

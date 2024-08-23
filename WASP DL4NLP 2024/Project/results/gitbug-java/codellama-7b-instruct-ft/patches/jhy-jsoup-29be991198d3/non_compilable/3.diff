@@ -1,0 +1,47 @@
+diff --git a/tmp/0377de07-a350-4324-a60e-7132fd8092d5_buggy.java b/tmp/785d8572-ecdf-483b-ad21-766e75aea498_fixed.java
+index 862c60c..3992f25 100644
+--- a/tmp/0377de07-a350-4324-a60e-7132fd8092d5_buggy.java
++++ b/tmp/785d8572-ecdf-483b-ad21-766e75aea498_fixed.java
+@@ -1,25 +1,42 @@
+     void outerHtmlHead(Appendable accum, int depth, Document.OutputSettings out) throws IOException {
+         final boolean prettyPrint = out.prettyPrint();
+         final Element parent = parentNode instanceof Element ? ((Element) parentNode) : null;
+         final boolean normaliseWhite = prettyPrint && !Element.preserveWhitespace(parentNode);
+ 
+         boolean trimLeading = false;
+         boolean trimTrailing = false;
+         if (normaliseWhite) {
+             trimLeading = (siblingIndex == 0 && parent != null && parent.tag().isBlock()) ||
+                 parentNode instanceof Document;
+             trimTrailing = nextSibling() == null && parent != null && parent.tag().isBlock();
+ 
+             // if this text is just whitespace, and the next node will cause an indent, skip this text:
+             Node next = this.nextSibling();
+             boolean couldSkip = (next instanceof Element && ((Element) next).shouldIndent(out)) // next will indent
+                 || (next instanceof TextNode && (((TextNode) next).isBlank())); // next is blank text, from re-parenting
+             if (couldSkip && isBlank()) return;
+ 
++            if (isBlank()) {
++                // if text is blank, and the parent is wrapped with a block tag (so output is a block), or
++                // there is text just before us, but we should not wrap that text in br, so append here. (see test case 1)
++                // example: "Hello<br>there" where there is more text to come, so the
++                // two "br"s should be joined to one tag and one newline.
++                if (siblingIndex == 0 && parent != null && (parent.tag().formatAsBlock() == null || nextSibling() != null)
++                    )
++                    accum.append("\n");
++            } else {
++                // this is not the first of one or more inline nodes, and the previous is also a non-block node (or empty)
++                // so output extra line to preserve relative formatting, e.g. "asdf<b>foo<b>bar</b></b>asdf2"
++                if (siblingIndex > 0 && ((Node) nodes.get(siblingIndex - 1)).parent() != null &&
++                            ((Node) nodes.get(siblingIndex - 1)).isEmptyWithoutChildren() &&
++                            (siblingIndex == nodes.size() - 1 || !((Node) nodes.get(siblingIndex + 1)).isBlock()))
++                    accum.append("\n");
++
++            }
+             if ((siblingIndex == 0 && parent != null && parent.tag().formatAsBlock() && !isBlank()) ||
+                 (out.outline() && siblingNodes().size() > 0 && !isBlank()))
+                 indent(accum, depth, out);
+         }
+ 
+         Entities.escape(accum, coreValue(), out, false, normaliseWhite, trimLeading, trimTrailing);
+     }

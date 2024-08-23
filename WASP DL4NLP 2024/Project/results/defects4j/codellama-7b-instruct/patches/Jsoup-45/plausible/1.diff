@@ -1,0 +1,78 @@
+diff --git a/tmp/3d631f97-b5c8-427d-b77f-05421ac00a5b_buggy.java b/tmp/06510868-9faf-445e-a6b7-8e44670ab421_fixed.java
+index 135fc63..384c8d6 100644
+--- a/tmp/3d631f97-b5c8-427d-b77f-05421ac00a5b_buggy.java
++++ b/tmp/06510868-9faf-445e-a6b7-8e44670ab421_fixed.java
+@@ -1,48 +1,55 @@
+     void resetInsertionMode() {
+         boolean last = false;
+         for (int pos = stack.size() -1; pos >= 0 ; pos--) {
+             Element node = stack.get(pos);
+             if (pos == 0) {
+                 last = true;
+                 node = contextElement;
+             }
+             String name = node.nodeName();
+-            if ("select".equals(name)) {
++            if (name.equals("select")) {
+                 transition(HtmlTreeBuilderState.InSelect);
+-                break; // frag
+-            } else if (("td".equals(name) || "td".equals(name) && !last)) {
++                break;
++            } else if (name.equals("td") || name.equals("th")) {
++                if (!last) {
+                     transition(HtmlTreeBuilderState.InCell);
++                } else {
++                    transition(HtmlTreeBuilderState.InBody);
+                     break;
+-            } else if ("tr".equals(name)) {
++                }
++                break;
++            } else if (name.equals("tr")) {
+                 transition(HtmlTreeBuilderState.InRow);
+                 break;
+-            } else if ("tbody".equals(name) || "thead".equals(name) || "tfoot".equals(name)) {
++            } else if (name.equals("tbody") || name.equals("thead") || name.equals("tfoot")) {
+                 transition(HtmlTreeBuilderState.InTableBody);
+                 break;
+-            } else if ("caption".equals(name)) {
++            } else if (name.equals("caption")) {
+                 transition(HtmlTreeBuilderState.InCaption);
+                 break;
+-            } else if ("colgroup".equals(name)) {
++            } else if (name.equals("colgroup")) {
+                 transition(HtmlTreeBuilderState.InColumnGroup);
+-                break; // frag
+-            } else if ("table".equals(name)) {
++                break;
++            } else if (name.equals("table")) {
+                 transition(HtmlTreeBuilderState.InTable);
+                 break;
+-            } else if ("head".equals(name)) {
++            } else if (name.equals("head")) {
+                 transition(HtmlTreeBuilderState.InBody);
+-                break; // frag
+-            } else if ("body".equals(name)) {
++                break;
++            } else if (name.equals("body")) {
+                 transition(HtmlTreeBuilderState.InBody);
+                 break;
+-            } else if ("frameset".equals(name)) {
++            } else if (name.equals("frameset")) {
+                 transition(HtmlTreeBuilderState.InFrameset);
+-                break; // frag
+-            } else if ("html".equals(name)) {
++                break;
++            } else if (name.equals("html")) {
+                 transition(HtmlTreeBuilderState.BeforeHead);
+-                break; // frag
+-            } else if (last) {
++                break;
++            } else {
++                if (last) {
+                     transition(HtmlTreeBuilderState.InBody);
+-                break; // frag
++                    break;
++                }
+             }
+         }
+     }

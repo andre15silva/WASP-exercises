@@ -1,0 +1,70 @@
+diff --git a/tmp/f456834b-9859-4db2-ac0a-43c34fd1e875_buggy.java b/tmp/d82fc5cd-7d96-4e06-af79-d64751035b09_fixed.java
+index d80b7d0..aa5abbe 100644
+--- a/tmp/f456834b-9859-4db2-ac0a-43c34fd1e875_buggy.java
++++ b/tmp/d82fc5cd-7d96-4e06-af79-d64751035b09_fixed.java
+@@ -1,61 +1,65 @@
+     /**
+      * Checks dimensions and values of boundaries and inputSigma if defined.
+      */
+     private void checkParameters() {
+         final double[] init = getStartPoint();
+         final double[] lB = getLowerBound();
+         final double[] uB = getUpperBound();
+ 
+         // Checks whether there is at least one finite bound value.
+         boolean hasFiniteBounds = false;
+         for (int i = 0; i < lB.length; i++) {
+             if (!Double.isInfinite(lB[i]) ||
+                 !Double.isInfinite(uB[i])) {
+                 hasFiniteBounds = true;
+                 break;
+             }
+         }
+         // Checks whether there is at least one infinite bound value.
+         boolean hasInfiniteBounds = false;
+         if (hasFiniteBounds) {
+             for (int i = 0; i < lB.length; i++) {
+                 if (Double.isInfinite(lB[i]) ||
+                     Double.isInfinite(uB[i])) {
+                     hasInfiniteBounds = true;
+                     break;
+                 }
+             }
+ 
+             if (hasInfiniteBounds) {
+                 // If there is at least one finite bound, none can be infinite,
+                 // because mixed cases are not supported by the current code.
+                 throw new MathUnsupportedOperationException();
+             } else {
+                 // Convert API to internal handling of boundaries.
+                 boundaries = new double[2][];
+                 boundaries[0] = lB;
+                 boundaries[1] = uB;
+ 
+                 // Abort early if the normalization will overflow (cf. "encode" method).
++                final double diff = boundaries[1][0] - boundaries[0][0];
++                if (DiffFun.isInfinite(diff)) {
++                    throw new NumberIsTooLargeException(diff, 0, true);
++                }
+             }
+         } else {
+             // Convert API to internal handling of boundaries.
+             boundaries = null;
+         }
+ 
+         if (inputSigma != null) {
+             if (inputSigma.length != init.length) {
+                 throw new DimensionMismatchException(inputSigma.length, init.length);
+             }
+             for (int i = 0; i < init.length; i++) {
+                 if (inputSigma[i] < 0) {
+                     throw new NotPositiveException(inputSigma[i]);
+                 }
+                 if (boundaries != null) {
+                     if (inputSigma[i] > boundaries[1][i] - boundaries[0][i]) {
+                         throw new OutOfRangeException(inputSigma[i], 0, boundaries[1][i] - boundaries[0][i]);
+                     }
+                 }
+             }
+         }
+     }

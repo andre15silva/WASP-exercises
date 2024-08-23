@@ -1,0 +1,32 @@
+diff --git a/tmp/878a0baa-50da-40ca-bddf-390f8e285df4_buggy.java b/tmp/0d8dbf64-85ad-472d-bead-56887b16742b_fixed.java
+index 6c0aa19..b20332e 100644
+--- a/tmp/878a0baa-50da-40ca-bddf-390f8e285df4_buggy.java
++++ b/tmp/0d8dbf64-85ad-472d-bead-56887b16742b_fixed.java
+@@ -1,20 +1,14 @@
+-    /**
+-     * @param encoding the encoding to use for file names, use null
+-     * for the platform's default encoding
+-     * @param useUnicodeExtraFields whether to use InfoZIP Unicode
+-     * Extra Fields (if present) to set the file names.
+-     * @param allowStoredEntriesWithDataDescriptor whether the stream
+-     * will try to read STORED entries that use a data descriptor
+-     * @since 1.1
+-     */
+ public ZipArchiveInputStream(InputStream inputStream,
+                              String encoding,
+                              boolean useUnicodeExtraFields,
+                              boolean allowStoredEntriesWithDataDescriptor) {
+     zipEncoding = ZipEncodingHelper.getZipEncoding(encoding);
+     this.useUnicodeExtraFields = useUnicodeExtraFields;
++    this.allowStoredEntriesWithDataDescriptor = allowStoredEntriesWithDataDescriptor;
++
++    // Initialize the PushbackInputStream with a buffer size
+     in = new PushbackInputStream(inputStream, buf.capacity());
+-        this.allowStoredEntriesWithDataDescriptor =
+-            allowStoredEntriesWithDataDescriptor;
+-        // haven't read anything so far
++    
++    // Call a method that initializes necessary fields or prepares the stream for reading
++    readHeader(); // Assuming there is a method to initialize reading state
+ }
+\ No newline at end of file

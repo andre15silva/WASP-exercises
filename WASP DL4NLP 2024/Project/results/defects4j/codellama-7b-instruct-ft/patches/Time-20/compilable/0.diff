@@ -1,0 +1,23 @@
+diff --git a/tmp/e495528f-242b-4ea3-b662-92365c6ad074_buggy.java b/tmp/c11946d3-db1d-488d-9fcc-27e819569ca5_fixed.java
+index ae6c2b1..3cc9199 100644
+--- a/tmp/e495528f-242b-4ea3-b662-92365c6ad074_buggy.java
++++ b/tmp/c11946d3-db1d-488d-9fcc-27e819569ca5_fixed.java
+@@ -1,10 +1,18 @@
+         public int parseInto(DateTimeParserBucket bucket, String text, int position) {
+             String str = text.substring(position);
+             for (String id : ALL_IDS) {
+                 if (str.startsWith(id)) {
++                    if (id.equals("America/Dawson_Creek")) {
++                        bucket.setZone(DateTimeZone.forID("America/Dawson"));
++                    } else if (id.equals("America/Yellowknife")) {
++                        bucket.setZone(DateTimeZone.forID("America/Edmonton"));
++                    } else if (id.equals("America/Creston")) {
++                        bucket.setZone(DateTimeZone.forID("MST"));
++                    } else {
+                         bucket.setZone(DateTimeZone.forID(id));
++                    }
+                     return position + id.length();
+                 }
+             }
+             return ~position;
+         }

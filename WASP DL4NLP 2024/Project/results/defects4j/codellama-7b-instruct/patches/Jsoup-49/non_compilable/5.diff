@@ -1,0 +1,19 @@
+diff --git a/tmp/21818278-826b-4b4d-a222-bc3ff6de40c4_buggy.java b/tmp/253a0865-b634-4fd2-83fb-1caa49ca2894_fixed.java
+index a37dc7a..1f332bf 100644
+--- a/tmp/21818278-826b-4b4d-a222-bc3ff6de40c4_buggy.java
++++ b/tmp/253a0865-b634-4fd2-83fb-1caa49ca2894_fixed.java
+@@ -1,10 +1,5 @@
+-    protected void addChildren(int index, Node... children) {
+-        Validate.noNullElements(children);
+-        ensureChildNodes();
+-        for (int i = children.length - 1; i >= 0; i--) {
+-            Node in = children[i];
+-            reparentChild(in);
+-            childNodes.add(index, in);
++private void ensureChildNodes() {
++    if (childNodes == null) {
++        childNodes =  new LinkedList<>();
+     }
+-        reindexChildren(index);
+ }
+\ No newline at end of file

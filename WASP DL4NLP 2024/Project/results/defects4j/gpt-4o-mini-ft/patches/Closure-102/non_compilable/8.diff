@@ -1,0 +1,22 @@
+diff --git a/tmp/3c9d009d-5a63-484e-9d45-76d077835130_buggy.java b/tmp/32085047-57fc-425c-bd5a-e572433c6bc0_fixed.java
+index f47d784..5519f83 100644
+--- a/tmp/3c9d009d-5a63-484e-9d45-76d077835130_buggy.java
++++ b/tmp/32085047-57fc-425c-bd5a-e572433c6bc0_fixed.java
+@@ -1,12 +1,17 @@
+   @Override
+   public void process(Node externs, Node root) {
+     NodeTraversal.traverse(compiler, root, this);
+     if (MAKE_LOCAL_NAMES_UNIQUE) {
+       MakeDeclaredNamesUnique renamer = new MakeDeclaredNamesUnique();
+       NodeTraversal t = new NodeTraversal(compiler, renamer);
+       t.traverseRoots(externs, root);
+     }
+     removeDuplicateDeclarations(root);
++    if (compiler.getWarningLevel(SYNTAX_ERROR) != WarningLevel.OFF) {
++      JSError error =
++          JSError.make(GOOG_NAMESPACE_ESCAPE, "JSC_USE_GOOG_NAMESPACE");
++      compiler.report(JSError.make(GOOG_NAMESPACE_ESCAPE, error));
++    }
+     new PropogateConstantAnnotations(compiler, assertOnChange)
+         .process(externs, root);
+   }

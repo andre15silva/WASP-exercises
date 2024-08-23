@@ -1,0 +1,17 @@
+diff --git a/tmp/004f7bbe-136b-4cff-b8a1-2e4cfde0277c_buggy.java b/tmp/fc73647f-75a5-4b43-9c9e-4cd3b00e62a9_fixed.java
+index 7be2eb0..96ba3ef 100644
+--- a/tmp/004f7bbe-136b-4cff-b8a1-2e4cfde0277c_buggy.java
++++ b/tmp/fc73647f-75a5-4b43-9c9e-4cd3b00e62a9_fixed.java
+@@ -1,11 +1,9 @@
+   @Override
+   public boolean equals(Object object) {
+     if (!(object instanceof KeyPair)) {
+       return false;
+     }
+-
+     KeyPair other = (KeyPair) object;
+     return this.mPrivateKey.equals(other.mPrivateKey) &&
+        this.mPublicKey.equals(other.mPublicKey);
+-
+   }
+\ No newline at end of file

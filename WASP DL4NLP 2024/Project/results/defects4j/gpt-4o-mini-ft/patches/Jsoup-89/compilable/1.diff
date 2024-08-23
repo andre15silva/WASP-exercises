@@ -1,0 +1,22 @@
+diff --git a/tmp/9c27d11e-60c2-4f52-a9fa-a947206dc434_buggy.java b/tmp/299b2a24-83dd-4415-8bf0-bc0600d7abbd_fixed.java
+index 25217b6..0416053 100644
+--- a/tmp/9c27d11e-60c2-4f52-a9fa-a947206dc434_buggy.java
++++ b/tmp/299b2a24-83dd-4415-8bf0-bc0600d7abbd_fixed.java
+@@ -1,14 +1,14 @@
+     /**
+      Set the attribute value.
+      @param val the new attribute value; must not be null
+      */
+     public String setValue(String val) {
+-        String oldVal = parent.get(this.key);
++        String oldVal = this.val;
++        this.val = val;
+         if (parent != null) {
+             int i = parent.indexOfKey(this.key);
+             if (i != Attributes.NotFound)
+-                parent.vals[i] = val;
++                parent.vals[i] = this.val;
+         }
+-        this.val = val;
+         return Attributes.checkNotNull(oldVal);
+     }

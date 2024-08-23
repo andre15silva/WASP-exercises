@@ -1,0 +1,24 @@
+diff --git a/tmp/8356544f-e79e-4bcb-8497-9e5ece8de3c7_buggy.java b/tmp/0803cb3d-7ea4-4e7e-b6c9-6a137e22b3e3_fixed.java
+index 7cd18df..5ecc098 100644
+--- a/tmp/8356544f-e79e-4bcb-8497-9e5ece8de3c7_buggy.java
++++ b/tmp/0803cb3d-7ea4-4e7e-b6c9-6a137e22b3e3_fixed.java
+@@ -1,9 +1,17 @@
+         @Override
+         protected Object _deserializeFromEmptyString() throws IOException {
+             // As per [databind#398], URI requires special handling
+             if (_kind == STD_URI) {
+                 return URI.create("");
+             }
+-            // As per [databind#1123], Locale too
+-            return super._deserializeFromEmptyString();
++            // As per [databind#1123], Locale has a special case
++            // where empty String means root; but then need to handle
++            // locale with extension (see #1025)
++            try {
++                Object result = super._deserializeFromEmptyString();
++                // [databind#910] special handling for Locale extension
++                return (result == null) ? null : _deserializeLocale((String)result);
++            } catch (MismatchedJsonTypeException e) {
++                return _deserializeLocale((String)e.getValueInContext());
++            }
+         }

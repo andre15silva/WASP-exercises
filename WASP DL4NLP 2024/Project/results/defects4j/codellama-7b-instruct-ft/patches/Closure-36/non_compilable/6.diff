@@ -1,0 +1,123 @@
+diff --git a/tmp/494081e6-d01b-4458-bc18-aa5d0b5c0d6a_buggy.java b/tmp/5d92246d-ad6f-493d-ae8e-a002bb1874a7_fixed.java
+index 2955e62..6c6e674 100644
+--- a/tmp/494081e6-d01b-4458-bc18-aa5d0b5c0d6a_buggy.java
++++ b/tmp/5d92246d-ad6f-493d-ae8e-a002bb1874a7_fixed.java
+@@ -1,66 +1,113 @@
+     /**
+      * @return true if the provided reference and declaration can be safely
+      *         inlined according to our criteria
+      */
+     private boolean canInline(
+         Reference declaration,
+         Reference initialization,
+         Reference reference) {
+       if (!isValidDeclaration(declaration)
+           || !isValidInitialization(initialization)
+           || !isValidReference(reference)) {
+         return false;
+       }
+ 
+       // If the value is read more than once, skip it.
+       // VAR declarations and EXPR_RESULT don't need the value, but other
+       // ASSIGN expressions parents do.
+       if (declaration != initialization &&
+           !initialization.getGrandparent().isExprResult()) {
+         return false;
+       }
+ 
+       // Be very conservative and do no cross control structures or
+-      // scope boundaries
++      // scope boundaries.
+       if (declaration.getBasicBlock() != initialization.getBasicBlock()
+           || declaration.getBasicBlock() != reference.getBasicBlock()) {
+         return false;
+       }
+ 
+       // Do not inline into a call node. This would change
+       // the context in which it was being called. For example,
+       //   var a = b.c;
+       //   a();
+       // should not be inlined, because it calls a in the context of b
+       // rather than the context of the window.
+       //   var a = b.c;
+       //   f(a)
+       // is ok.
+       Node value = initialization.getAssignedValue();
+       Preconditions.checkState(value != null);
+       if (value.isGetProp()
+           && reference.getParent().isCall()
+           && reference.getParent().getFirstChild() == reference.getNode()) {
+         return false;
+       }
+ 
+       if (value.isFunction()) {
+         Node callNode = reference.getParent();
+         if (reference.getParent().isCall()) {
+           CodingConvention convention = compiler.getCodingConvention();
+-          // Bug 2388531: Don't inline subclass definitions into class defining
+-          // calls as this confused class removing logic.
++          // Don't inline subclass calls into class defining. This would change
++          // the context in which they were defined and possibly confuse class
++          // removing logic.
+           SubclassRelationship relationship =
+               convention.getClassesDefinedByCall(callNode);
+           if (relationship != null) {
+             return false;
+           }
+ 
+-          // issue 668: Don't inline singleton getter methods
+-          // calls as this confused class removing logic.
++          // issue 668: Don't inline singleton definitions from the goog.addSingletonGetter
++          // singleton getter method. This is because we would otherwise be
++          // removing the instance_ var.
++          Node scopeRoot = reference.getNode().getStaticScope().getRoot();
++          for (int i = 0; i < scopeRoot.getChildCount(); i++) {
++            Node node = scopeRoot.getChildAtIndex(i);
++            if (node.isEmpty()) {
++              continue;
++            }
++            JSModule module = node.getStaticModule();
++            if (module.getRawScope() == null) {
++              // skip declarations that were moved from externs
++              continue;
++            }
++            if (node.isExprResult()) {
++              // skip declarations on the rhs of an assign
++              continue;
++            }
++            if (node.getFirstChild().matchesName(declaration.getName()) &&
++                node.getParent().isScript() &&
++                module.getPath() == StaticSourceFile.COMPUTED_NAME) {
++              // If we detect this, its because the goog.addSingletonGetter was
++              // processed after the inlining of var.
++              // This would create bugs, so don't inline this. We would
++              // incur the performance penalty for more than once function call.
++              return false;
++            }
++          }
++
++          // issue 269: Don't inline singleton definitions from the goog.addSingletonGetter
++          // singleton getter method. This is because we would otherwise be
++          // removing the instance_ var.
++          for (int i = 0; i < reference.getNode().getParent().getChildCount(); ++i) {
++            if (reference.getNode().getParent().getChildAtIndex(i).matchesName(
++                "goog") &&
++                !reference.getNode().getNode().getString().equals("goog")) {
++              break;
++            }
++            if ((reference.getNode().getParent().getChildAtIndex(i)
++                 .matchesName("function") &&
++                 reference.getNode().getNode().getString().equals("getInstance"))) {
++              // If we detect this, its because the goog.addSingletonGetter was
++              // processed after the inlining of var.
++              // This would create bugs, so don't inline this. We would
++              // incur the performance penalty for more than once function call.
++              return false;
++            }
++          }
+         }
+       }
+ 
+       return canMoveAggressively(value) ||
+           canMoveModerately(initialization, reference);
+     }

@@ -1,0 +1,23 @@
+diff --git a/tmp/8d6104e3-fb92-49bd-a5df-a7cbc55e4203_buggy.java b/tmp/09ff6325-b721-4e32-8e20-2db9633b8616_fixed.java
+index 51430e1..8b25e74 100644
+--- a/tmp/8d6104e3-fb92-49bd-a5df-a7cbc55e4203_buggy.java
++++ b/tmp/09ff6325-b721-4e32-8e20-2db9633b8616_fixed.java
+@@ -1,12 +1,7 @@
+-    @Override
+-    public void serialize(Object value, JsonGenerator jgen, SerializerProvider provider) throws IOException {
+-        String str;
+-        
+-        if (value instanceof Date) {
+-            provider.defaultSerializeDateKey((Date) value, jgen);
+-            return;
+-        } else {
+-            str = value.toString();
+-        }
+-        jgen.writeFieldName(str);
++    public void testClassKey() throws IOException
++    {
++        Map<Class<?>,Integer> map = new LinkedHashMap<Class<?>,Integer>();
++        map.put(String.class, 2);
++        String json = MAPPER.writeValueAsString(map);
++        assertEquals(aposToQuotes("{'java.lang.String':2}"), json);
+     }

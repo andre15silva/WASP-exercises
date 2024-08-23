@@ -1,0 +1,47 @@
+diff --git a/tmp/0429318b-e6da-4de8-9dbe-c815b0f1c32c_buggy.java b/tmp/c6fddbc3-7259-4697-bbe5-361a2baa76f8_fixed.java
+index c51c8b1..7f01699 100644
+--- a/tmp/0429318b-e6da-4de8-9dbe-c815b0f1c32c_buggy.java
++++ b/tmp/c6fddbc3-7259-4697-bbe5-361a2baa76f8_fixed.java
+@@ -1,31 +1,36 @@
+     private void recordAssignment(NodeTraversal t, Node n, Node recordNode) {
+       Node nameNode = n.getFirstChild();
+       Node parent = n.getParent();
+       NameInformation ns = createNameInformation(t, nameNode);
+       if (ns != null) {
+         if (parent.isFor() && !NodeUtil.isForIn(parent)) {
+           // Patch for assignments that appear in the init,
+           // condition or iteration part of a FOR loop.  Without
+           // this change, all 3 of those parts try to claim the for
+           // loop as their dependency scope.  The last assignment in
+           // those three fields wins, which can result in incorrect
+           // reference edges between referenced and assigned variables.
+           //
+           // TODO(user) revisit the dependency scope calculation
+           // logic.
+           if (parent.getFirstChild().getNext() != n) {
+             recordDepScope(recordNode, ns);
+           } else {
+             recordDepScope(nameNode, ns);
+           }
+         } else {
+-          // The rhs of the assignment is the caller, so it's used by the
+-          // context. Don't associate it w/ the lhs.
+-          // FYI: this fixes only the specific case where the assignment is the
+-          // caller expression, but it could be nested deeper in the caller and
+-          // we would still get a bug.
+-          // See testAssignWithCall2 for an example of this.
++          Node varParent = NodeUtil.getEnclosingVariableScan(parent);
++          if (varParent != null) {
++            varParent = varParent.getParent();
++          }
++          if (varParent != null && !varParent.isScript()
++              && !NodeUtil.isFunctionCall(varParent.getParent())) {
++            // Don't make the name of the function a
++            // referencing node. This is confusing.
+             recordDepScope(recordNode, ns);
++          } else {
++            recordDepScope(nameNode, ns);
++          }
+         }
+       }
+     }

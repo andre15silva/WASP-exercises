@@ -1,0 +1,14 @@
+diff --git a/tmp/c0d16d8c-c7eb-4886-b394-0087b46d680d_buggy.java b/tmp/83032f17-9568-4218-b5d7-50a700a24d91_fixed.java
+index e807cbf..6149432 100644
+--- a/tmp/c0d16d8c-c7eb-4886-b394-0087b46d680d_buggy.java
++++ b/tmp/83032f17-9568-4218-b5d7-50a700a24d91_fixed.java
+@@ -1,7 +1,7 @@
+     private boolean isInlineable(Document.OutputSettings out) {
+         if (!tag.isInline())
+             return false;
+-        return (parent() == null || parent().isBlock())
++        return (parent() == null || parent().isBlock() || (parent() instanceof Element && ((Element) parent()).tag.getName().equals("p")))
+             && !isEffectivelyFirst()
+             && !out.outline();
+     }
+\ No newline at end of file

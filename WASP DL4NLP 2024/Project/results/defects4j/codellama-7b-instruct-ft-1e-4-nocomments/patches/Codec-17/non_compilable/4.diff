@@ -1,0 +1,88 @@
+diff --git a/tmp/5c085a58-3c2e-4fb0-a89e-c3b2de718268_buggy.java b/tmp/b08bf1f5-4f1f-48a4-971f-8e700361be58_fixed.java
+index 780fa1a..11f39f9 100644
+--- a/tmp/5c085a58-3c2e-4fb0-a89e-c3b2de718268_buggy.java
++++ b/tmp/b08bf1f5-4f1f-48a4-971f-8e700361be58_fixed.java
+@@ -1,15 +1,76 @@
+     /**
+-     * Constructs a new <code>String</code> by decoding the specified array of bytes using the ISO-8859-1 charset.
++     * Constructs a new <code>String</code> by decoding the specified array of bytes using the UTF-8 charset.
+      *
+      * @param bytes
+      *            The bytes to be decoded into characters, may be <code>null</code>
+-     * @return A new <code>String</code> decoded from the specified array of bytes using the ISO-8859-1 charset, or
++     * @return A new <code>String</code> decoded from the specified array of bytes using the UTF-8 charset, or
+      *         <code>null</code> if the input byte array was <code>null</code>.
+      * @throws NullPointerException
+-     *             Thrown if {@link Charsets#ISO_8859_1} is not initialized, which should never happen since it is
++     *             Thrown if {@link Charsets#UTF_8} is not initialized, which should never happen since it is
+      *             required by the Java platform specification.
+-     * @since As of 1.7, throws {@link NullPointerException} instead of UnsupportedEncodingException
++     * @see String#String(byte[], String)
++     * @since Commons Lang 2.2
+      */
+-    public static String newStringIso8859_1(final byte[] bytes) {
+-        return new String(bytes, Charsets.ISO_8859_1);
++    public static String newStringUtf8(final byte[] bytes) {
++        return new String(bytes, Charsets.UTF_8);
++    }
++    /**
++     * Constructs a new <code>String</code> by decoding the specified array of bytes using the US-ASCII charset.
++     *
++     * @param bytes
++     *            The bytes to be decoded into characters, may be <code>null</code>
++     * @return A new <code>String</code> decoded from the specified array of bytes using the US-ASCII charset, or
++     *         <code>null</code> if the input byte array was <code>null</code>.
++     * @throws NullPointerException
++     *             Thrown if {@link Charsets#US_ASCII} is not initialized, which should never happen since it is
++     *             required by the Java platform specification.
++     * @since Commons Lang 2.2
++     */
++    public static String newStringUsAscii(final byte[] bytes) {
++        return new String(bytes, Charsets.US_ASCII);
++    }
++    /**
++     * Constructs a new <code>String</code> by decoding the specified array of bytes using the UTF-16 charset.
++     *
++     * @param bytes
++     *            The bytes to be decoded into characters, may be <code>null</code>
++     * @return A new <code>String</code> decoded from the specified array of bytes using the UTF-16 charset, or
++     *         <code>null</code> if the input byte array was <code>null</code>.
++     * @throws NullPointerException
++     *             Thrown if {@link Charsets#UTF_16} is not initialized, which should never happen since it is
++     *             required by the Java platform specification.
++     * @since Commons Lang 2.2
++     */
++    public static String newStringUtf16(final byte[] bytes) {
++        return new String(bytes, Charsets.UTF_16);
++    }
++    /**
++     * Constructs a new <code>String</code> by decoding the specified array of bytes using the UTF-16BE charset.
++     *
++     * @param bytes
++     *            The bytes to be decoded into characters, may be <code>null</code>
++     * @return A new <code>String</code> decoded from the specified array of bytes using the UTF-16BE charset, or
++     *         <code>null</code> if the input byte array was <code>null</code>.
++     * @throws NullPointerException
++     *             Thrown if {@link Charsets#UTF_16BE} is not initialized, which should never happen since it is
++     *             required by the Java platform specification.
++     * @since Commons Lang 2.2
++     */
++    public static String newStringUtf16Be(final byte[] bytes) {
++        return new String(bytes, Charsets.UTF_16BE);
++    }
++    /**
++     * Constructs a new <code>String</code> by decoding the specified array of bytes using the UTF-16LE charset.
++     *
++     * @param bytes
++     *            The bytes to be decoded into characters, may be <code>null</code>
++     * @return A new <code>String</code> decoded from the specified array of bytes using the UTF-16LE charset, or
++     *         <code>null</code> if the input byte array was <code>null</code>.
++     * @throws NullPointerException
++     *             Thrown if {@link Charsets#UTF_16LE} is not initialized, which should never happen since it is
++     *             required by the Java platform specification.
++     * @since Commons Lang 2.2
++     */
++    public static String newStringUtf16Le(final byte[] bytes) {
++        return new String(bytes, Charsets.UTF_16LE);
+     }
+\ No newline at end of file

@@ -1,0 +1,165 @@
+diff --git a/tmp/ced6d5d3-509f-4e10-96bf-5f5b53c1d5fd_buggy.java b/tmp/e765aab1-f0f9-4958-a140-2429cfa5c50f_fixed.java
+index 27f2719..1430ad6 100644
+--- a/tmp/ced6d5d3-509f-4e10-96bf-5f5b53c1d5fd_buggy.java
++++ b/tmp/e765aab1-f0f9-4958-a140-2429cfa5c50f_fixed.java
+@@ -1,90 +1,155 @@
+     @Override
+     protected Object decode(
+             Channel channel, SocketAddress remoteAddress, Object msg) throws Exception {
+ 
+         String sentence = (String) msg;
+ 
+         if (sentence.startsWith("!1,")) {
+             int index = sentence.indexOf(',', 3);
+             if (index < 0) {
+                 index = sentence.length();
+             }
+             getDeviceSession(channel, remoteAddress, sentence.substring(3, index));
+             return null;
+         }
+ 
+         DeviceSession deviceSession = getDeviceSession(channel, remoteAddress);
+-        if (deviceSession == null || !sentence.matches("![35A-D],.*")) {
++        if (deviceSession == null || !sentence.matches("![35ABCD],.*")) {
+             return null;
+         }
+ 
+         Position position = new Position(getProtocolName());
+         position.setDeviceId(deviceSession.getDeviceId());
+ 
+         String type = sentence.substring(1, 2);
+         position.set(Position.KEY_TYPE, type);
+ 
+         if (type.equals("3")) {
+ 
+             getLastLocation(position, null);
+ 
+             position.set(Position.KEY_RESULT, sentence.substring(3));
+ 
+             return position;
+ 
+         } else if (type.equals("5")) {
+ 
+             String[] values = sentence.split(",");
+ 
+             getLastLocation(position, null);
+ 
+             position.set(Position.KEY_RSSI, Integer.parseInt(values[1]));
+             if (values.length >= 4) {
+                 position.set(Position.KEY_BATTERY_LEVEL, Integer.parseInt(values[3]));
+             }
+ 
+             return position;
+ 
+         } else if (type.equals("B") || type.equals("D")) {
+ 
+             Parser parser = new Parser(PATTERN_BD, sentence);
+             if (!parser.matches()) {
+                 return null;
+             }
+ 
+             decodeFix(position, parser);
+             decodeState(position, parser);
+ 
+             position.set(Position.KEY_SATELLITES, parser.nextInt(0));
+             position.set(Position.KEY_SATELLITES_VISIBLE, parser.nextInt(0));
+             position.set(Position.KEY_HDOP, parser.nextDouble(0));
+ 
+             return position;
+ 
+-        } else if (type.equals("C")) {
++        } else if (type.equals("C") || type.equals("A")) {
+ 
+             Parser parser = new Parser(PATTERN_C, sentence);
+             if (!parser.matches()) {
+                 return null;
+             }
+ 
+             decodeFix(position, parser);
+             decodeState(position, parser);
+ 
+             return position;
+ 
+-        } else if (type.equals("A")) {
++        } else if (type.equals("ABCD")) {
+ 
+-            Parser parser = new Parser(PATTERN_A, sentence);
++            Parser parser = new Parser(PATTERN_ABCDE, sentence);
+             if (!parser.matches()) {
+                 return null;
+             }
+ 
+-            decodeFix(position, parser);
++            // decode phone
++            int start = parser.findNext("[01234567]") + 1;
++            int stop = parser.find(",");
++            if (start < 0 || stop < 0) {
++                return null;
++            }
++            String phone = parser.group(start, stop);
++            String phone1 = phone.substring(0, phone.indexOf(":0"));
++            String phone2 = phone.substring(phone.indexOf(":0") + 2, phone.indexOf(":0").length()))
++                    .replace("~", "");
++            position.set("phone1", phone1);
++            position.set("phone2", phone2);
++
++            // decode 5
++            start = parser.findNext(",") + 1;
++            stop = parser.find(",") < 0 ? -1 : parser.find(",") + 1;
++            if (start < 0 || stop < 0) {
++                return null;
++            }
++            String value = parser.group(start, stop);
++            if (value.equals("")) {
++                return null;
++            }
++            String[] values = value.split(",");
++            position.set(Position.KEY_BATTERY_LEVEL, Integer.parseInt(values[0]));
++            position.set(Position.KEY_SATELLITES, Integer.parseInt(values[1]));
++            position.set(Position.KEY_SATELLITES_VISIBLE, Integer.parseInt(values[2]));
++            position.set(Position.KEY_HDOP, Double.parseDouble(values[3]));
++            position.set("mode", values[4] = "");
++            position.set("channel", values[5] = "");
++            position.set("speed", Double.parseDouble(values[6]));
++            position.set("course", Double.parseDouble(values[7]));
++
++            // decode B
++            start = parser.findNext(",") + 1;
++            stop = parser.find("$,") < 0 ? -1 : parser.find("$,") + 2;
++            if (start < 0 || stop < 0) {
++                return null;
++            }
++            value = parser.group(start, stop);
++            if (value.equals("")) {
++                return null;
++            }
++            values = value.split(",");
++            position.set(Position.KEY_ODOMETER, Double.parseDouble(values[0]));
++            position.set(Position.KEY_CLUSTER_ALARM, Integer.parseInt(values[1]));
++            position.set(Position.KEY_GPS_SATELLITE, Integer.parseInt(values[2]));
++            position.set(Position.KEY_STATUS, Integer.parseInt(values[3]));
++            position.set(Position.KEY_RSSI, Integer.parseInt(values[4]));
++            position.set(Position.KEY_ODOMETER_SATELLITE, Integer.parseInt(values[5]));
++
++            // decode A
++            start = parser.findNext(",") + 1;
++            stop = parser.find("$,") < 0 ? -1 : parser.find("$,") + 2;
++            if (start < 0 || stop < 0) {
++                return null;
++            }
++            value = parser.group(start, stop);
++            if (value.equals("")) {
++                return null;
++            }
++            values = value.split(",");
++            position.set(Position.KEY_ODOMETER_COST, Double.parseDouble(values[0]));
++            position.set(Position.KEY_RESULT, values[1]);
++            position.set(Position.KEY_ODOMETER_LAST_TIME, DateBuilder.zzz(Integer.parseInt(values[2])));
++            position.set(Position.KEY_ODOMETER_LAST_KM, Double.parseDouble(values[3]));
+ 
+             return position;
+ 
+         }
+ 
+         return null;
+     }

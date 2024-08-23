@@ -1,0 +1,11 @@
+diff --git a/tmp/0a64e42a-4550-4bfa-b681-22b837bcf0a7_buggy.java b/tmp/200adf76-f004-4ff9-b232-6f576de30225_fixed.java
+index 2d36d6e..1af24e8 100644
+--- a/tmp/0a64e42a-4550-4bfa-b681-22b837bcf0a7_buggy.java
++++ b/tmp/200adf76-f004-4ff9-b232-6f576de30225_fixed.java
+@@ -1,4 +1,4 @@
+-    public void joinAsSpectator(MemberId memberId) {
++    public void joinAsSpectator(final MemberId memberId) {
+     membersAsSpectators.add(memberId);
+     membersWhoAccepted.remove(memberId);
+     }
+\ No newline at end of file

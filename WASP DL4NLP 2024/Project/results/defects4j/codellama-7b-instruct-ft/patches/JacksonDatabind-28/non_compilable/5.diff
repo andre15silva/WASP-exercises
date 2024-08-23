@@ -1,0 +1,35 @@
+diff --git a/tmp/e0d40cb9-41ae-4aed-afa8-55416c704092_buggy.java b/tmp/ae7a63b9-c972-4b6d-b6de-a317c4774043_fixed.java
+index 66bb99f..3465432 100644
+--- a/tmp/e0d40cb9-41ae-4aed-afa8-55416c704092_buggy.java
++++ b/tmp/ae7a63b9-c972-4b6d-b6de-a317c4774043_fixed.java
+@@ -1,14 +1,27 @@
+         @Override
+         public ObjectNode deserialize(JsonParser p, DeserializationContext ctxt) throws IOException
+         {
+             if (p.getCurrentToken() == JsonToken.START_OBJECT) {
+                 p.nextToken();
+                 return deserializeObject(p, ctxt, ctxt.getNodeFactory());
+             }
+-            // 23-Sep-2015, tatu: Ugh. We may also be given END_OBJECT (similar to FIELD_NAME),
+-            //    if caller has advanced to the first token of Object, but for empty Object
+-            if (p.getCurrentToken() == JsonToken.FIELD_NAME) {
++            // 23-Sep-2015, tatu: Uggh. Can also get `JsonToken.FIELD_NAME` before
++            //    starting object, and then we do weird recovery; can also end-up
++            //    having `JsonToken.END_OBJECT`
++            if (p.getCurrentToken() == JsonToken.END_OBJECT || p.getCurrentToken() == JsonToken.FIELD_NAME) {
+                 return deserializeObject(p, ctxt, ctxt.getNodeFactory());
+             }
++            // 23-Sep-2015, tatu: Also, for backwards-compatible (older JDK and older Jackson modules)
++            //    it may be possible to encounter `JsonToken.START_ARRAY` in addition to those before.
++            if (p.getCurrentToken() == JsonToken.START_ARRAY) {
++                return deserializeArray(p, ctxt, ctxt.getNodeFactory());
++            }
++            // 08-May-2017, tatu: And if for backwards compatibility we support
++            //    `JsonToken.START_OBJECT`, may end up with `JsonToken.END_OBJECT`,
++            //    in which case we need to advance just as if we had an empty object...
++            if (p.getCurrentToken() == JsonToken.END_OBJECT) {
++                p.nextToken();
++                return ctxt.getNodeFactory().objectNode();
++            }
+             throw ctxt.mappingException(ObjectNode.class);
+          }

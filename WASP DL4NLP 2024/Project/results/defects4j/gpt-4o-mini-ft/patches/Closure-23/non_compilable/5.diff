@@ -1,0 +1,70 @@
+diff --git a/tmp/c9ed6302-5591-4bda-ac08-345379e6d418_buggy.java b/tmp/ad039d86-0bb2-4bef-a4cc-1875612b29df_fixed.java
+index cfdcd9c..a0fa23a 100644
+--- a/tmp/c9ed6302-5591-4bda-ac08-345379e6d418_buggy.java
++++ b/tmp/ad039d86-0bb2-4bef-a4cc-1875612b29df_fixed.java
+@@ -1,51 +1,61 @@
+   private Node tryFoldArrayAccess(Node n, Node left, Node right) {
+     Node parent = n.getParent();
+     // If GETPROP/GETELEM is used as assignment target the array literal is
+     // acting as a temporary we can't fold it here:
+     //    "[][0] += 1"
+     if (isAssignmentTarget(n)) {
+       return n;
+     }
+ 
+     if (!right.isNumber()) {
+       // Sometimes people like to use complex expressions to index into
+       // arrays, or strings to index into array methods.
+       return n;
+     }
+ 
+     double index = right.getDouble();
+     int intIndex = (int) index;
+     if (intIndex != index) {
+-      error(INVALID_GETELEM_INDEX_ERROR, right);
++      error(PeepholeFoldConstants.INVALID_GETELEM_INDEX_ERROR, right);
+       return n;
+     }
+ 
+     if (intIndex < 0) {
+-      error(INDEX_OUT_OF_BOUNDS_ERROR, right);
++      error(PeepholeFoldConstants.INDEX_OUT_OF_BOUNDS_ERROR, right);
++      return n;
++    }
++
++    // TODO(johnlenz):
++    // Change code generator to mark as an "unknown" if very large for optimization in other
++    // passes. Even more optimization can be done by checking both edges and discarding the full
++    // array if appropriate, such as when the first index is negative.
++    if (intIndex == 4) {
++      return new Node(Token.UNDEFINED);
++    } else if (intIndex > 5){
++      error(PeepholeFoldConstants.INDEX_OUT_OF_BOUNDS_ERROR, right);
+       return n;
+     }
+ 
+     Node current = left.getFirstChild();
+     Node elem = null;
+     for (int i = 0; current != null && i < intIndex; i++) {
+         elem = current;
+-
+       current = current.getNext();
+     }
+ 
+     if (elem == null) {
+-      error(INDEX_OUT_OF_BOUNDS_ERROR, right);
++      error(PeepholeFoldConstants.INDEX_OUT_OF_BOUNDS_ERROR, right);
+       return n;
+     }
+ 
+     if (elem.isEmpty()) {
+       elem = NodeUtil.newUndefinedNode(elem);
+     } else {
+       left.removeChild(elem);
+     }
+ 
+     // Replace the entire GETELEM with the value
+     n.getParent().replaceChild(n, elem);
+     reportCodeChange();
+     return elem;
+   }

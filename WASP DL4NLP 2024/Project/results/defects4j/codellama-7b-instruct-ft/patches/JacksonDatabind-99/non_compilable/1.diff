@@ -1,0 +1,26 @@
+diff --git a/tmp/9cd748da-c7df-442d-a369-f3c923d9263a_buggy.java b/tmp/27661e15-0e88-4a63-980b-be005a13b528_fixed.java
+index ee836e4..5192825 100644
+--- a/tmp/9cd748da-c7df-442d-a369-f3c923d9263a_buggy.java
++++ b/tmp/27661e15-0e88-4a63-980b-be005a13b528_fixed.java
+@@ -1,9 +1,20 @@
+     @Override
+     protected String buildCanonicalName()
+     {
+         StringBuilder sb = new StringBuilder();
+         sb.append(_class.getName());
+-        sb.append('<');
++        if (_referencedType!=null) {
++            sb.append(TypeFactory.typeSeparator);
+             sb.append(_referencedType.toCanonical());
++        } else {
++            // 21-Feb-2014, tatu: If type-erased, no way to know canonical name
++            // 21-Oct-2018, tatu: ... although that wasn't much of an issue in practice
++            // as generic collection/maps were type-erased...
++            // but I suppose there could be some issues with nested types, so it'd be better
++            // to have a better solution
++            sb.append('<');
++            sb.append(Object.class.getName());
++            sb.append('>');
++        }
+         return sb.toString();
+     }

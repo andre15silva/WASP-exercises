@@ -1,0 +1,23 @@
+diff --git a/tmp/c36dc0e0-5b3c-458b-b3cd-e6353cdbce43_buggy.java b/tmp/78ee0688-74a4-4a8b-b539-f08987172dc0_fixed.java
+index 66bb99f..ea272d2 100644
+--- a/tmp/c36dc0e0-5b3c-458b-b3cd-e6353cdbce43_buggy.java
++++ b/tmp/78ee0688-74a4-4a8b-b539-f08987172dc0_fixed.java
+@@ -1,14 +1,17 @@
+         @Override
+         public ObjectNode deserialize(JsonParser p, DeserializationContext ctxt) throws IOException
+         {
+             if (p.getCurrentToken() == JsonToken.START_OBJECT) {
+                 p.nextToken();
+                 return deserializeObject(p, ctxt, ctxt.getNodeFactory());
+             }
+             // 23-Sep-2015, tatu: Ugh. We may also be given END_OBJECT (similar to FIELD_NAME),
+             //    if caller has advanced to the first token of Object, but for empty Object
+             if (p.getCurrentToken() == JsonToken.FIELD_NAME) {
+                 return deserializeObject(p, ctxt, ctxt.getNodeFactory());
+             }
+-            throw ctxt.mappingException(ObjectNode.class);
++            // Issue 941, reported by [tatu-dev], this was incorrect handling of missing value
++            //   that we needed to change to handle; better to throw an exception here though
++            tokenInputProblem(p, ctxt);
++            throw new IOException();
+          }

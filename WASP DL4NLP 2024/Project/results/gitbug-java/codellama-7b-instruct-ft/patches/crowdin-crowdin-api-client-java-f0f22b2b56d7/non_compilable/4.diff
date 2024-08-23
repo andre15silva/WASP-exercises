@@ -1,0 +1,34 @@
+diff --git a/tmp/cacb0a5f-f7dd-464e-b0ec-d6a2ecb6e566_buggy.java b/tmp/87fdff39-cdc4-4943-bffa-d891a427c885_fixed.java
+index f399576..016ba84 100644
+--- a/tmp/cacb0a5f-f7dd-464e-b0ec-d6a2ecb6e566_buggy.java
++++ b/tmp/87fdff39-cdc4-4943-bffa-d891a427c885_fixed.java
+@@ -1,26 +1,28 @@
+     public JacksonJsonTransformer() {
+         ObjectMapper cleanObjectMapper = new ObjectMapper()
+             .configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
+         SimpleModule enumModule = new SimpleModule()
+             .addDeserializer(Enum.class, new EnumDeserializer());
+ 
+         SimpleModule module = new SimpleModule()
+             .addSerializer(Enum.class, new EnumSerializer())
+             .addDeserializer(Enum.class, new EnumDeserializer())
+             .addDeserializer(CrowdinApiException.class, new CrowdinApiExceptionDeserializer(cleanObjectMapper))
+             .addDeserializer(Project.class, new ProjectDeserializer(cleanObjectMapper.copy()
+                 .registerModule(enumModule)))
+             .addDeserializer(FileInfo.class, new FileInfoDeserializer(cleanObjectMapper.copy()
+                 .registerModule(enumModule)
+                 .registerModule(new SimpleModule()
+                     .addDeserializer(ImportOptions.class, new FileImportOptionsDeserializer(cleanObjectMapper))
+                     .addDeserializer(ExportOptions.class, new FileExportOptionsDeserializer(cleanObjectMapper)))))
+-            .addDeserializer(LanguageTranslations.class, new LanguageTranslationsDeserializer(cleanObjectMapper));
++            .addDeserializer(LanguageTranslations.class, new LanguageTranslationsDeserializer(cleanObjectMapper))
++            .addDeserializer(GetUpdateScreenshotResponse.class, new GetUpdateScreenshotResponseDeserializer())
++            .addDeserializer(UpdateScreenshotRequest.class, new UpdateScreenshotRequestDeserializer(cleanObjectMapper));
+         this.objectMapper = cleanObjectMapper.copy()
+                 .setSerializationInclusion(JsonInclude.Include.NON_NULL)
+                 .setDateFormat(new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss+hh:mm"))
+                 .registerModule(module)
+                 .setVisibility(PropertyAccessor.ALL, JsonAutoDetect.Visibility.NONE)
+                 .setVisibility(PropertyAccessor.FIELD, JsonAutoDetect.Visibility.ANY);
+         this.errorObjectMapper = cleanObjectMapper;
+     }

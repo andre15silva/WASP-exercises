@@ -1,0 +1,128 @@
+diff --git a/tmp/013f8a9c-ef3f-4dad-b95b-0e2a311efc53_buggy.java b/tmp/913224f4-8650-4719-8118-8b65a8e7ee43_fixed.java
+index 10da689..3586801 100644
+--- a/tmp/013f8a9c-ef3f-4dad-b95b-0e2a311efc53_buggy.java
++++ b/tmp/913224f4-8650-4719-8118-8b65a8e7ee43_fixed.java
+@@ -1,7 +1,115 @@
+-    /** Multiply this by a single digit x.
+-     * @param x multiplicand
+-     * @return product of this and x
+-     */
+-    public Dfp multiply(final int x) {
+-            return multiplyFast(x);
+-    }
++// multiplication by infinity
++test(field.newDfp("2").multiply(field.newDfp("1/0")),
++        1 / 0,
++        0, "Multiply #1");
++
++test(field.newDfp("2").multiply(field.newDfp("-1/0")),
++        1 / 0,
++        0, "Multiply #2");
++
++test(field.newDfp("-2").multiply(field.newDfp("1/0")),
++        -1 / 0,
++        0, "Multiply #3");
++
++test(field.newDfp("-2").multiply(field.newDfp("-1/0")),
++        1 / 0,
++        0, "Multiply #4");
++
++// multiplication by zero
++test(field.newDfp("2").multiply(field.newDfp("0")),
++        0,
++        0, "Multiply #5");
++
++test(field.newDfp("2").multiply(0),
++        0,
++        0, "Multiply #6");
++
++test(field.newDfp("-2").multiply(0),
++        0,
++        0, "Multiply #7");
++
++test(field.newDfp("-2").multiply(field.newDfp("0")),
++        0,
++        0, "Multiply #8");
++
++test(field.newDfp("2").multiply(pinf),
++        0,
++        DfpField.FLAG_INVALID, "Multiply #9");
++
++test(field.newDfp("-2").multiply(pinf),
++        -0,
++        DfpField.FLAG_INVALID, "Multiply #10");
++
++test(field.newDfp("2").multiply(ninf),
++        0,
++        DfpField.FLAG_INVALID, "Multiply #11");
++
++test(field.newDfp("-2").multiply(ninf),
++        -0,
++        DfpField.FLAG_INVALID, "Multiply #12");
++
++test(field.newDfp("1").multiply(pinf),
++        1 / 0,
++        0, "Multiply #13");
++
++test(field.newDfp("-1").multiply(pinf),
++        -1 / 0,
++        0, "Multiply #14");
++
++test(field.newDfp("1").multiply(ninf),
++        0,
++        DfpField.FLAG_INVALID, "Multiply #15");
++
++test(field.newDfp("-1").multiply(ninf),
++        -0,
++        DfpField.FLAG_INVALID, "Multiply #16");
++
++// multiplication with small numbers and large numbers
++test(field.newDfp("3e-129"),
++        field.newDfp("-4e-130"),
++        0, "Multiply #17");
++
++test(field.newDfp("-5"),
++        field.newDfp("4e-130"),
++        0, "Multiply #18");
++
++test(field.newDfp("30"),
++        field.newDfp("4e-130"),
++        0, "Multiply #19");
++
++test(field.newDfp("30"),
++        field.newDfp("4e100"),
++        0, "Multiply #20");
++
++test(field.newDfp("30"),
++        field.newDfp("4e6666"),
++        0, "Multiply #21");
++
++test(field.newDfp("30"),
++        field.newDfp("4e20000"),
++        0, "Multiply #22");
++
++// multiplication with small numbers and small numbers
++test(field.newDfp("36.5e-200"),
++        field.newDfp("4.6e-201"),
++        0, "Multiply #23");
++
++test(field.newDfp("36.5e-12"),
++        field.newDfp("4.6e-13"),
++        0, "Multiply #24");
++
++test(field.newDfp("36.5e-12"),
++        field.newDfp("4.6e-130"),
++        0, "Multiply #25");
++
++test(field.newDfp("36.5e-12"),
++        field.newDfp("4.6e100"),
++        0, "Multiply #26");
++
++test(field.newDfp("36.5e-12"),
++        field.newDfp("4.6e6666"),
++        0, "Multiply #27");
++
++test(field.newDfp("36.5e-12"),
++        field.newDfp("4.6e2000"),
++        0, "Multiply #28");
+\ No newline at end of file

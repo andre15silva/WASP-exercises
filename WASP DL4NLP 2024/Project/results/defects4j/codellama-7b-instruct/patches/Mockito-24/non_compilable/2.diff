@@ -1,0 +1,35 @@
+diff --git a/tmp/15a09f88-7154-4b23-9099-29ae6b54166d_buggy.java b/tmp/a9175b74-d24d-4e9c-bb44-c72de558f82d_fixed.java
+index 47915ed..38f8768 100644
+--- a/tmp/15a09f88-7154-4b23-9099-29ae6b54166d_buggy.java
++++ b/tmp/a9175b74-d24d-4e9c-bb44-c72de558f82d_fixed.java
+@@ -1,22 +1,11 @@
+-    /* (non-Javadoc)
+-     * @see org.mockito.stubbing.Answer#answer(org.mockito.invocation.InvocationOnMock)
+-     */
+-    public Object answer(InvocationOnMock invocation) {
+-        if (methodsGuru.isToString(invocation.getMethod())) {
+-            Object mock = invocation.getMock();
+-            MockName name = mockUtil.getMockName(mock);
+-            if (name.isDefault()) {
+-                return "Mock for " + mockUtil.getMockSettings(mock).getTypeToMock().getSimpleName() + ", hashCode: " + mock.hashCode();
+-            } else {
+-                return name.toString();
++public class MethodsGuruMock {
++
++    public boolean isToString(Method method) {
++        return method.getName().equals("toString");
+     }
+-        } else if (methodsGuru.isCompareToMethod(invocation.getMethod())) {
+-            //see issue 184.
+-            //mocks by default should return 0 if references are the same, otherwise some other value because they are not the same. Hence we return 1 (anything but 0 is good).
+-            //Only for compareTo() method by the Comparable interface
+-            return 1;
++
++    public boolean isCompareToMethod(Method method) {
++        return method.getName().equals("compareTo") && method.getParameterTypes().length == 1 && method.getParameterTypes()[0].equals(Date.class);
+     }
+ 
+-        Class<?> returnType = invocation.getMethod().getReturnType();
+-        return returnValueFor(returnType);
+ }
+\ No newline at end of file

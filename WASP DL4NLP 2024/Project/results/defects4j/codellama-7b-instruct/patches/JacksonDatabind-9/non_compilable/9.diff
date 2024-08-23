@@ -1,0 +1,19 @@
+diff --git a/tmp/27bdd25b-abc3-47bf-b5f4-e90f5fb7c5ae_buggy.java b/tmp/8546b668-efe0-47b0-bdaa-ad189b39cd3c_fixed.java
+index 51430e1..edd6a01 100644
+--- a/tmp/27bdd25b-abc3-47bf-b5f4-e90f5fb7c5ae_buggy.java
++++ b/tmp/8546b668-efe0-47b0-bdaa-ad189b39cd3c_fixed.java
+@@ -1,12 +1,12 @@
+ @Override
+ public void serialize(Object value, JsonGenerator jgen, SerializerProvider provider) throws IOException {
+     String str;
+ 
+     if (value instanceof Date) {
+         provider.defaultSerializeDateKey((Date) value, jgen);
+-            return;
+     } else {
+         str = value.toString();
+     }
++
+     jgen.writeFieldName(str);
+ }
+\ No newline at end of file

@@ -1,0 +1,25 @@
+diff --git a/tmp/7940d866-8fa9-4f07-b6a6-ecb0cdf973ae_buggy.java b/tmp/5fc38628-699b-4836-97c0-f4fa6385c7d1_fixed.java
+index d457dbe..cb8a1b6 100644
+--- a/tmp/7940d866-8fa9-4f07-b6a6-ecb0cdf973ae_buggy.java
++++ b/tmp/5fc38628-699b-4836-97c0-f4fa6385c7d1_fixed.java
+@@ -1,10 +1,16 @@
+     @Override
+     public boolean equals(Object o) {
+         if (this == o) return true;
+         if (o == null || getClass() != o.getClass()) return false;
+         if (!super.equals(o)) return false;
+-
+         Element element = (Element) o;
+-
+-        return this == o;
++        TreeBuilder tb = TreeBuilder.create();
++        TreeBuilder tb2 = TreeBuilder.create();
++        tb.handleParseErrors = false;
++        tb2.handleParseErrors = false;
++        String html = this.outerHtml();
++        String html2 = element.outerHtml();
++        String cmp = tb.parse(new StringReader(html), "").html();
++        String cmp2 = tb2.parse(new StringReader(html2), "").html();
++        return cmp.equals(cmp2);
+     }
+\ No newline at end of file

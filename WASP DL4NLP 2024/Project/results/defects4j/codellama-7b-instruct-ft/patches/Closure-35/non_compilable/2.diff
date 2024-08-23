@@ -1,0 +1,59 @@
+diff --git a/tmp/8b5134cd-e6d2-4d80-987d-89ac263026aa_buggy.java b/tmp/0d353a88-4da0-4fa4-a993-2d438387f917_fixed.java
+index d57736b..21f4d86 100644
+--- a/tmp/8b5134cd-e6d2-4d80-987d-89ac263026aa_buggy.java
++++ b/tmp/0d353a88-4da0-4fa4-a993-2d438387f917_fixed.java
+@@ -1,39 +1,54 @@
+   /**
+    * Suppose X is an object with inferred properties.
+    * Suppose also that X is used in a way where it would only type-check
+    * correctly if some of those properties are widened.
+    * Then we should be polite and automatically widen X's properties for him.
+    *
+    * For a concrete example, consider:
+    * param x {{prop: (number|undefined)}}
+    * function f(x) {}
+    * f({});
+    *
+    * If we give the anonymous object an inferred property of (number|undefined),
+    * then this code will type-check appropriately.
+    */
+   private void inferPropertyTypesToMatchConstraint(
+       JSType type, JSType constraint) {
+     if (type == null || constraint == null) {
+       return;
+     }
+ 
+     ObjectType constraintObj =
+         ObjectType.cast(constraint.restrictByNotNullOrUndefined());
+     if (constraintObj != null && constraintObj.isRecordType()) {
+       ObjectType objType = ObjectType.cast(type.restrictByNotNullOrUndefined());
+       if (objType != null) {
+         for (String prop : constraintObj.getOwnPropertyNames()) {
+           JSType propType = constraintObj.getPropertyType(prop);
+           if (!objType.isPropertyTypeDeclared(prop)) {
++            // If we add a property whose type is (Object|undefined)[A]
++            // to an object (Object|undefined)[A]. This will be resolved to (A)
++            // rather than (Object|undefined). We want to prevent this from
++            // happening. See issue 669.
++            if (constraintObj.isParameterized()) {
++              if (objType.hasProperty(prop)) {
++                JSType definedObjType =
++                    objType.getPropertyType(prop).restrictByNotNullOrUndefined();
++                if (definedObjType != null && definedObjType.isTemplateType()) {
++                  JSType typeToInfer = constraintObj.getPropertyType(prop);
++                  objType.defineInferredProperty(prop, typeToInfer, null);
++                }
++              }
++            } else {
+               JSType typeToInfer = propType;
+               if (!objType.hasProperty(prop)) {
+                 typeToInfer =
+                     getNativeType(VOID_TYPE).getLeastSupertype(propType);
+               }
+               objType.defineInferredProperty(prop, typeToInfer, null);
+             }
+           }
+         }
+       }
+     }
++  }

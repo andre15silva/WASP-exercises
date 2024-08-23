@@ -1,0 +1,52 @@
+diff --git a/tmp/d7432a85-1d5a-4762-911a-ce55c83c6dd5_buggy.java b/tmp/2683c64e-f3a9-4b87-8c43-c48b17f2a0e5_fixed.java
+index 3ec995f..d2a8b0c 100644
+--- a/tmp/d7432a85-1d5a-4762-911a-ce55c83c6dd5_buggy.java
++++ b/tmp/2683c64e-f3a9-4b87-8c43-c48b17f2a0e5_fixed.java
+@@ -1,26 +1,42 @@
+     /**
+      * <p>
+      * Converts the given Java version string to an <code>int</code>.
+      * </p>
+      * 
+      * <p>
+      * Example return values:
+      * </p>
+      * <ul>
+      * <li><code>120</code> for Java 1.2</li>
+      * <li><code>131</code> for Java 1.3.1</li>
+      * <li><code>160</code> for Java 1.6.0_20</li>
+      * </ul>
+-     * 
+      * <p>
+      * Patch releases are not reported.
+      * </p>
+      * <p>
+      * This method is package private instead of private to support unit test invocation.
+      * </p>
+-     * 
+-     * @return the version, for example 131 for Java 1.3.1
++     * @return the version, for example <code>131</code> for Java 1.3.1
+      */
+     static float toJavaVersionInt(String version) {
+-        return toVersionInt(toJavaVersionIntArray(version, JAVA_VERSION_TRIM_SIZE));
++        float result = 0f; 
++        if(version!=null && version.length() > 0){
++            String trimStr = version.trim();
++            if(trimStr.indexOf(' ')<0){
++                int dot = trimStr.indexOf('.');
++                if(dot>0){
++                    String part1 = trimStr.substring(0,dot);
++                    String part2 = trimStr.substring(dot+1);
++                    try{
++                        int major   = Integer.parseInt(part1);
++                        int minor0  = Integer.parseInt(part2.substring(0,1));
++                        int minor1  = Integer.parseInt(part2.substring(1));
++                        result = (major * 10) + minor1;
++                    }catch(Exception ignore){
++                    }
++                }
++            }
++        }
++        return result;
+     }
+\ No newline at end of file

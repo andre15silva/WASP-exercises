@@ -1,0 +1,59 @@
+diff --git a/tmp/0ec6d040-e438-4728-a45c-93da9c16e437_buggy.java b/tmp/62754c62-8d98-4b72-8a85-ef8ceeaa1a0f_fixed.java
+index 71189c3..47de6bf 100644
+--- a/tmp/0ec6d040-e438-4728-a45c-93da9c16e437_buggy.java
++++ b/tmp/62754c62-8d98-4b72-8a85-ef8ceeaa1a0f_fixed.java
+@@ -1,46 +1,50 @@
+ public void validate(final WriteableCommandLine commandLine)
+     throws OptionException {
+     // number of options found
+     int present = 0;
+ 
+     // reference to first unexpected option
+     Option unexpected = null;
+ 
+     for (final Iterator i = options.iterator(); i.hasNext();) {
+         final Option option = (Option) i.next();
+ 
+         // needs validation?
+         boolean validate = option.isRequired() || option instanceof Group;
+         if (validate) {
+             option.validate(commandLine);
+         }
+ 
+         // if the child option is present then validate it
+         if (commandLine.hasOption(option)) {
+             if (++present > maximum) {
+                 unexpected = option;
+-
+                 break;
+             }
+-
++            // Store the value correctly based on argument type
++            Object value = commandLine.getValue(option);
++            if (option.hasArgument() && value instanceof File) {
++                // In case the option relates to a file, ensure it’s a File object
++                // Any additional logic to handle the File object if necessary
++            }
+             option.validate(commandLine);
+         }
+     }
+ 
+     // too many options
+     if (unexpected != null) {
+         throw new OptionException(this, ResourceConstants.UNEXPECTED_TOKEN,
+                                   unexpected.getPreferredName());
+     }
+ 
+-        // too few option
++    // too few options
+     if (present < minimum) {
+         throw new OptionException(this, ResourceConstants.MISSING_OPTION);
+     }
+ 
+     // validate each anonymous argument
+     for (final Iterator i = anonymous.iterator(); i.hasNext();) {
+         final Option option = (Option) i.next();
+         option.validate(commandLine);
+     }
+ }
+\ No newline at end of file

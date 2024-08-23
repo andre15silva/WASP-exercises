@@ -1,0 +1,83 @@
+diff --git a/tmp/6df192be-04c5-493d-9874-b8aa6ac2bb2c_buggy.java b/tmp/016200a7-7c95-4228-9659-77f52ef84be8_fixed.java
+index e4d90e7..5afaa4b 100644
+--- a/tmp/6df192be-04c5-493d-9874-b8aa6ac2bb2c_buggy.java
++++ b/tmp/016200a7-7c95-4228-9659-77f52ef84be8_fixed.java
+@@ -1,45 +1,74 @@
+   @Override
+   String toStringHelper(boolean forAnnotations) {
+     if (hasReferenceName()) {
+       return getReferenceName();
+     } else if (prettyPrint) {
+       // Don't pretty print recursively.
+       prettyPrint = false;
+ 
+       // Use a tree set so that the properties are sorted.
+       Set<String> propertyNames = Sets.newTreeSet();
+       for (ObjectType current = this;
+            current != null && !current.isNativeObjectType() &&
+                propertyNames.size() <= MAX_PRETTY_PRINTED_PROPERTIES;
+            current = current.getImplicitPrototype()) {
+         propertyNames.addAll(current.getOwnPropertyNames());
+       }
+ 
+       StringBuilder sb = new StringBuilder();
+       sb.append("{");
+ 
+       int i = 0;
+       for (String property : propertyNames) {
++        boolean referentiallyRecursive = false;
++        ObjectType propType = getPropertyType(property);
++        if (propType != null) {
++          ObjectType propReftype = propType.getReferencedType();
++          if (propReftype != null) {
++            JSType firstType = propReftype;
++            while (propReftype.isRecordType()) {
++              ObjectType newPropType =
++                  propReftype.toMaybeRecordType().getPropertyType("loop");
++              if (firstType == newPropType) {
++                referentiallyRecursive = true;
++                break;
++              }
++              if (firstType == newPropType.getReferencedType()) {
++                continue;
++              }
++              firstType = propReftype;
++              propReftype = newPropType;
++            }
++          }
++        }
++        if (referentiallyRecursive) {
++          if (i > 0) {
++            sb.append(", ");
++          }
++
++          sb.append(property);
++        } else {
++          if (i == MAX_PRETTY_PRINTED_PROPERTIES - 1) {
++            sb.append(", ...");
++            break;
++          }
+           if (i > 0) {
+             sb.append(", ");
+           }
+ 
+           sb.append(property);
+           sb.append(": ");
+           sb.append(getPropertyType(property).toString());
++        }
+ 
+         ++i;
+-        if (i == MAX_PRETTY_PRINTED_PROPERTIES) {
+-          sb.append(", ...");
+-          break;
+-        }
+       }
+ 
+       sb.append("}");
+ 
+       prettyPrint = true;
+       return sb.toString();
+     } else {
+       return "{...}";
+     }
+   }

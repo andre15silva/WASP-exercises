@@ -1,0 +1,219 @@
+diff --git a/tmp/e0e8f0ed-609b-46e2-b202-37a46c67b9cf_buggy.java b/tmp/2c5b9b9c-a6b2-4a56-b0f8-7a2c5c069b14_fixed.java
+index 032fa8e..567339c 100644
+--- a/tmp/e0e8f0ed-609b-46e2-b202-37a46c67b9cf_buggy.java
++++ b/tmp/2c5b9b9c-a6b2-4a56-b0f8-7a2c5c069b14_fixed.java
+@@ -1,108 +1,115 @@
+-    /** Evaluate the impact of the proposed step on the event handler.
+-     * @param interpolator step interpolator for the proposed step
+-     * @return true if the event handler triggers an event before
+-     * the end of the proposed step (this implies the step should be
+-     * rejected)
+-     * @exception DerivativeException if the interpolator fails to
+-     * compute the switching function somewhere within the step
+-     * @exception EventException if the switching function
+-     * cannot be evaluated
+-     * @exception ConvergenceException if an event cannot be located
+-     */
+-    public boolean evaluateStep(final StepInterpolator interpolator)
+-        throws DerivativeException, EventException, ConvergenceException {
+-
+-        try {
+-
+-            forward = interpolator.isForward();
+-            final double t1 = interpolator.getCurrentTime();
+-            final int    n  = Math.max(1, (int) Math.ceil(Math.abs(t1 - t0) / maxCheckInterval));
+-            final double h  = (t1 - t0) / n;
+-
+-            double ta = t0;
+-            double ga = g0;
+-            double tb = t0 + (interpolator.isForward() ? convergence : -convergence);
+-            for (int i = 0; i < n; ++i) {
+-
+-                // evaluate handler value at the end of the substep
+-                tb += h;
+-                interpolator.setInterpolatedTime(tb);
+-                final double gb = handler.g(tb, interpolator.getInterpolatedState());
+-
+-                // check events occurrence
+-                if (g0Positive ^ (gb >= 0)) {
+-                    // there is a sign change: an event is expected during this step
++    import org.apache.commons.math3.RealFieldElement;
++    import org.apache.commons.math3.analysis.UnivariateRealFunction;
++    import org.apache.commons.math3.analysis.solvers.BrentSolver;
++    import org.apache.commons.math3.analysis.combination.LagrangeInterpolator;
++    import org.apache.commons.math3.exception.DimensionMismatchException;
++    import org.apache.commons.math3.exception.NoDataException;
++    import org.apache.commons.math3.exception.NullArgumentException;
++    import org.apache.commons.math3.exception.NonMonotonicSequenceException;
+ 
+-                        // this is a corner case:
+-                        // - there was an event near ta,
+-                        // - there is another event between ta and tb
+-                        // - when ta was computed, convergence was reached on the "wrong side" of the interval
+-                        // this implies that the real sign of ga is the same as gb, so we need to slightly
+-                        // shift ta to make sure ga and gb get opposite signs and the solver won't complain
+-                        // about bracketing
+-                            // this should never happen
+-                         
+-                    // variation direction, with respect to the integration direction
+-                    increasing = gb >= ga;
++    /**
++     * Find the root of a function using the Brent solver.
++     * The algorithm combines bisection with a modified form of the
++     * secant method.
++     *
++     * @version $Revision: 906950 $ $Date: 2010-01-23 00:04:54 -0800 (Sat, 23 Jan
++     *          2010) $
++     * @since 2.0
++     */
++    public class BracketedBrentSolver
++        extends AbstractUnivariateSolver<UnivariateRealFunction> {
+ 
+-                    final UnivariateRealFunction f = new UnivariateRealFunction() {
+-                        public double value(final double t) throws FunctionEvaluationException {
+-                            try {
+-                                interpolator.setInterpolatedTime(t);
+-                                return handler.g(t, interpolator.getInterpolatedState());
+-                            } catch (DerivativeException e) {
+-                                throw new FunctionEvaluationException(e, t);
+-                            } catch (EventException e) {
+-                                throw new FunctionEvaluationException(e, t);
+-                            }
+-                        }
+-                    };
+-                    final BrentSolver solver = new BrentSolver();
+-                    solver.setAbsoluteAccuracy(convergence);
+-                    solver.setMaximalIterationCount(maxIterationCount);
+-                    final double root = (ta <= tb) ? solver.solve(f, ta, tb) : solver.solve(f, tb, ta);
+-                    if ((Math.abs(root - ta) <= convergence) &&
+-                         (Math.abs(root - previousEventTime) <= convergence)) {
+-                        // we have either found nothing or found (again ?) a past event, we simply ignore it
+-                        ta = tb;
+-                        ga = gb;
+-                    } else if (Double.isNaN(previousEventTime) ||
+-                               (Math.abs(previousEventTime - root) > convergence)) {
+-                        pendingEventTime = root;
+-                        if (pendingEvent && (Math.abs(t1 - pendingEventTime) <= convergence)) {
+-                            // we were already waiting for this event which was
+-                            // found during a previous call for a step that was
+-                            // rejected, this step must now be accepted since it
+-                            // properly ends exactly at the event occurrence
+-                            return false;
+-                        }
+-                        // either we were not waiting for the event or it has
+-                        // moved in such a way the step cannot be accepted
+-                        pendingEvent = true;
+-                        return true;
++        /**
++         * Construct a solver.
++         */
++        public BracketedBrentSolver() {
+         }
+ 
++        /** {@inheritDoc} */
++        @Override
++        protected RealFieldElement doSolve() {
++            UnivariateRealFunction f = this.getObjectiveFunction();
++            // Check the function is properly defined over the bracket.
++            double epsilon = getAbsoluteAccuracy();
++            double absoluteAccuracyOverThree = (getAbsoluteAccuracy() / 3.0);
++            if (Math.abs(f.value(this.min)) < epsilon) {
++                throw new NonMonotonicSequenceException(localizedFormats.getComputationMethod() + " failed. ", this.min);
++            }
++            if (Math.abs(f.value(this.max)) < epsilon) {
++                throw new NonMonotonicSequenceException(localizedFormats.getComputationMethod() + " failed. ", this.max);
++            }
++            if (f.value(this.min) * f.value(this.max) >= 0.0) {
++                throw new NonMonotonicSequenceException(localizedFormats.getComputationMethod() + " failed. ", this.min, this.max);
++            }
++            LagrangeInterpolator li = new LagrangeInterpolator();
++            li.add(this.min, 1d);
++            li.add(this.max, 1d);
++            UnivariateRealFunction fp = li.getInterpolatedFunction();
++            if (!hasDerivativeStructure()) {
++                double px = computeObjectiveValue(this.min);
++                double s = 0.0d;
++                double fs = px;
++                double dx = this.max - this.min;
++                double xm;
++                for (int count = 0; count < 32; count++) {
++                    double xl = f.value(this.min) * dx - 2 * fp.value(this.min) * s;
++                    double xm = this.min + dx;
++                    double fxl = f.value(xl);
++                    double fm = 0;
++                    if (Math.abs(xl) > epsilon) {
++                        fm = Math.abs(xl) > Math.abs(fm) ? Math.copySign(fm, fx.value(xl)) : Math.copySign(fx.value(xl), fm);
+                     } else {
+-                    // no sign change: there is no event for now
+-                    ta = tb;
+-                    ga = gb;
++                        fm = fxl;
+                     }
+-
++                    double dxm = fx.value(xm);
++                    double fdm = 0;
++                    if (Math.abs(dxm) > epsilon) {
++                        fdm = Math.abs(dxm) > Math.abs(fdm) ? Math.copySign(fdm, fx.value(dxm)) : Math.copySign(fx.value(dxm), fdm);
++                    } else {
++                        fdm = dxm;
+                     }
+-
+-            // no event during the whole step
+-            pendingEvent     = false;
+-            pendingEventTime = Double.NaN;
+-            return false;
+-
+-        } catch (FunctionEvaluationException e) {
+-            final Throwable cause = e.getCause();
+-            if ((cause != null) && (cause instanceof DerivativeException)) {
+-                throw (DerivativeException) cause;
+-            } else if ((cause != null) && (cause instanceof EventException)) {
+-                throw (EventException) cause;
++                    fs = fx.value(xm);
++                    double m = Math.abs(dx) * Math.abs(fs) < Math.ulp(1) ? 0.5 : fm / fx.value(xm);
++                    dx = s;
++                    s = px;
++                    px = Math.abs(px) > Math.abs(fs) ? Math.copySign(px, fs) : Math.copySign(fs, px);
++                    if (count == 3) {
++                        xm = f.value(xl) == 0.0 ? xl : x.value(xm);
++                    }
++                    if (px.equals(fs)) {
++                        throw new NonMonotonicSequenceException(localizedFormats.getComputationMethod() + " failed. ", this.min, this.max);
++                    }
++                    if (Math.abs(xm - xl) <= absoluteAccuracyOverThree) {
++                        break;
++                    }
++                    throw new ConvergenceException(localizedFormats.getComputationMethod() + " failed. ", this.min, this.max);
++                }
++                double result = (this.min + this.max) / 2.0;
++                return new RealFieldElement(result);
++            }
++            // With derivatives.
++            double t = this.max;
++            double px = computeObjectiveValue(this.min);
++            double fs = px;
++            double fp = computeDerivativeValue(px);
++            double s = 0.0d;
++            double dx = this.max - this.min;
++            double xm;
++            for (int count = 0; count < 32; count++) {
++                double xl = f.value(this.min) * dx - 2 * fp.value(this.min) * s;
++                double dxl = computeDerivativeValue(f.value(xl));
++                double xm = this.min + dx;
++                double dxm = computeDerivativeValue(f.value(xl));
++                dx = s;
++                s = px;
++                px = computeObjectiveValue(xl);
++                MathArrays.checkIncreasing(dxl, dxm);
++                s = Math.abs(px) > Math.abs(fs) ? Math.copySign(px, fs) : Math.copySign(fs, px);
++                if (px.equals(fs)) {
++                    throw new NonMonotonicSequenceException(localizedFormats.getComputationMethod() + " failed. ", this.min, this.max);
++                }
++            }
++            throw new MaxCountExceededException(localizedFormats.getComputationMethod(), this.maxEval);
+         }
+-            throw new EventException(e);
+     }
+-
+     }
+\ No newline at end of file

@@ -1,0 +1,41 @@
+diff --git a/tmp/c65350a7-f41c-49b2-a217-7a3869ece3e5_buggy.java b/tmp/71a96e0b-cd9a-4b82-be29-b7a9b90641a4_fixed.java
+index 546f262..adba4a8 100644
+--- a/tmp/c65350a7-f41c-49b2-a217-7a3869ece3e5_buggy.java
++++ b/tmp/71a96e0b-cd9a-4b82-be29-b7a9b90641a4_fixed.java
+@@ -1,29 +1,31 @@
+     /**
+      * <p>Throws a {@link MissingOptionException} if all of the
+      * required options are no present.</p>
+      *
+      * @throws MissingOptionException if any of the required Options
+      * are not present.
+      */
+     protected void checkRequiredOptions()
+         throws MissingOptionException
+     {
+         // if there are required options that have not been
+         // processsed
+         if (getRequiredOptions().size() > 0)
+         {
++            List bld = new Vector();
+             Iterator iter = getRequiredOptions().iterator();
+-            StringBuffer buff = new StringBuffer("Missing required option");
+-            buff.append(getRequiredOptions().size() == 1 ? "" : "s");
+-            buff.append(": ");
++            bld.add("Missing required option");
++            bld.add(getRequiredOptions().size() == 1 ? "" : "s");
++            bld.add(": ");
+ 
+ 
+             // loop through the required options
+             while (iter.hasNext())
+             {
+-                buff.append(iter.next());
++                bld.add(iter.next());
+             }
+ 
+-            throw new MissingOptionException(buff.toString());
++            String buff = buildExceptionMessage(bld);
++            throw new MissingOptionException(buff);
+         }
+     }

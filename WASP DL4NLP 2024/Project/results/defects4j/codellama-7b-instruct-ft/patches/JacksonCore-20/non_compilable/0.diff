@@ -1,0 +1,24 @@
+diff --git a/tmp/8eaba277-200f-451f-80db-f8d5fad9a804_buggy.java b/tmp/d7e985f4-bdfc-4a71-8e71-ed4b3b8ab37d_fixed.java
+index a6f008f..4ad10dd 100644
+--- a/tmp/8eaba277-200f-451f-80db-f8d5fad9a804_buggy.java
++++ b/tmp/d7e985f4-bdfc-4a71-8e71-ed4b3b8ab37d_fixed.java
+@@ -1,11 +1,15 @@
+     /**
+      * Method that can be called on backends that support passing opaque datatypes of
+-     * non-JSON formats
++     * non-JSON formats (such as binary data)
+      *
+      * @since 2.8
+      */
+     public void writeEmbeddedObject(Object object) throws IOException {
+-        // 01-Sep-2016, tatu: As per [core#318], handle small number of cases
+-        throw new JsonGenerationException("No native support for writing embedded objects",
+-                this);
++        // 01-Sep-2016, tatu: As per [core#318], need to handle small number of cases by
++        //    passing data as quoted String; for a big set of these this could be made more
++        //    efficient, but for now this covers the main cases.
++        //    Note: note that this is not the general solution, but a temporary workaround
++        //      for a specific case of Java-style byte/char arrays used with JEP-314
++        //      ("binary data").
++        writeString(quote(new String(WIKIPEDIA_BASE64_AS_BYTES, "UTF-8")));
+     }

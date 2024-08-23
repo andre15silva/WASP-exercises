@@ -1,0 +1,83 @@
+diff --git a/tmp/072c94bb-5f12-4b3c-8f2d-be59402c9329_buggy.java b/tmp/a8adbc36-8d7a-4e7c-ab0c-64e7e1e0308c_fixed.java
+index e087f95..c7540b0 100644
+--- a/tmp/072c94bb-5f12-4b3c-8f2d-be59402c9329_buggy.java
++++ b/tmp/a8adbc36-8d7a-4e7c-ab0c-64e7e1e0308c_fixed.java
+@@ -1,53 +1,60 @@
+     /**
+      * Parse an octal string from a buffer.
+      * Leading spaces are ignored.
+      * The buffer must contain a trailing space or NUL,
+      * and may contain an additional trailing space or NUL.
+      *
+      * The input buffer is allowed to contain all NULs,
+      * in which case the method returns 0L
+      * (this allows for missing fields).
+      *
+      * @param buffer The buffer from which to parse.
+      * @param offset The offset into the buffer from which to parse.
+      * @param length The maximum number of bytes to parse - must be at least 2 bytes.
+      * @return The long value of the octal string.
+-     * @throws IllegalArgumentException if the trailing space/NUL is missing or if a invalid byte is detected.
++     * @throws IllegalArgumentException if data format is not correct.
+      */
+     public static long parseOctal(final byte[] buffer, final int offset, final int length) {
+         long    result = 0;
+-        boolean stillPadding = true;
+         int     end = offset + length;
+         int     start = offset;
++        boolean isEven = true;
+ 
++        // skip leading spaces
+         for (int i = start; i < end; i++){
+             final byte currentByte = buffer[i];
+-            if (currentByte == 0) {
+-                break;
+-            }
+-
+-        // Skip leading spaces
+-            if (currentByte == (byte) ' ' || currentByte == '0') {
+-                if (stillPadding) {
++            if (currentByte == (byte) ' ' || currentByte == 0) {
+                 continue;
+             }
+-                if (currentByte == (byte) ' ') {
+             break;
+         }
+-            }
+-
+-        // Must have trailing NUL or space
+-        // May have additional NUL or space
++        start = offset;
+ 
+-            stillPadding = false;
+-            // CheckStyle:MagicNumber OFF
++        // parse octal value
++        isEven = true;
++        for (int i = start; i < end; i++){
++            byte currentByte = buffer[i];
++            if (currentByte == 0) {
++                break;
++            }
++            if (isEven) {
+                 if (currentByte < '0' || currentByte > '7'){
+                     throw new IllegalArgumentException(
+                             exceptionMessage(buffer, offset, length, start, currentByte));
+                 }
+-            result = (result << 3) + (currentByte - '0'); // convert from ASCII
+-            // CheckStyle:MagicNumber ON
++                currentByte = (byte) (currentByte - '0');
++                isEven = false;
++            } else {
++                currentByte = (byte) ((currentByte - '0') << 3);
++                isEven = true;
++            }
++            result += currentByte;
++        }
++
++        // last digit in an odd position has been shifted left 3 bits
++        if (!isEven) {
++            result <<= 3;
+         }
+ 
+         return result;
+     }

@@ -1,0 +1,56 @@
+diff --git a/tmp/e073e212-b3ea-41e0-9f98-3bb0a14ad1c1_buggy.java b/tmp/7a100a09-e0c0-4bbe-b1b7-34ab0e98222c_fixed.java
+index 29a9d2f..dda2b4f 100644
+--- a/tmp/e073e212-b3ea-41e0-9f98-3bb0a14ad1c1_buggy.java
++++ b/tmp/7a100a09-e0c0-4bbe-b1b7-34ab0e98222c_fixed.java
+@@ -1,43 +1,51 @@
+   /**
+    * Handles a goog.require call.
+    */
+   private void processRequireCall(NodeTraversal t, Node n, Node parent) {
+     Node left = n.getFirstChild();
+     Node arg = left.getNext();
+     if (verifyLastArgumentIsString(t, left, arg)) {
+       String ns = arg.getString();
+       ProvidedName provided = providedNames.get(ns);
+       if (provided == null || !provided.isExplicitlyProvided()) {
++        if (t.getModule() != null) {
+           unrecognizedRequires.add(
+               new UnrecognizedRequire(n, ns, t.getSourceName()));
++        }
+       } else {
+         JSModule providedModule = provided.explicitModule;
+ 
+         // This must be non-null, because there was an explicit provide.
+         Preconditions.checkNotNull(providedModule);
+ 
+         JSModule module = t.getModule();
+         if (moduleGraph != null &&
+             module != providedModule &&
+             !moduleGraph.dependsOn(module, providedModule)) {
+           compiler.report(
+               t.makeError(n, XMODULE_REQUIRE_ERROR, ns,
+                   providedModule.getName(),
+                   module.getName()));
+         }
+       }
+ 
++      // In the case that this is a closure pass we don't need to
++      // verify that goog is defined, and the last argument is
++      // a string, and in some test cases that may end up causing
++      // a spurious undeclared var warning at compile time.
++      if (moduleGraph == null) {
+         maybeAddToSymbolTable(left);
+         maybeAddStringNodeToSymbolTable(arg);
++      }
+ 
+       // Requires should be removed before further processing.
+       // Some clients run closure pass multiple times, first with
+       // the checks for broken requires turned off. In these cases, we
+       // allow broken requires to be preserved by the first run to
+       // let them be caught in the subsequent run.
+       if (provided != null) {
+         parent.detachFromParent();
+         compiler.reportCodeChange();
+       }
+     }
+   }

@@ -1,0 +1,21 @@
+diff --git a/tmp/c272212f-b3e1-4617-a9a3-fd0dc9a90bd2_buggy.java b/tmp/ec80f0b6-5250-41fa-a355-e1c67beb869c_fixed.java
+index cce9d1e..4d95899 100644
+--- a/tmp/c272212f-b3e1-4617-a9a3-fd0dc9a90bd2_buggy.java
++++ b/tmp/ec80f0b6-5250-41fa-a355-e1c67beb869c_fixed.java
+@@ -1,14 +1,16 @@
+     /**
+      * <p>Stop the stopwatch.</p>
+      * 
+      * <p>This method ends a new timing session, allowing the time to be retrieved.</p>
+      *
+      * @throws IllegalStateException if the StopWatch is not running.
+      */
+     public void stop() {
+         if(this.runningState != STATE_RUNNING && this.runningState != STATE_SUSPENDED) {
+             throw new IllegalStateException("Stopwatch is not running. ");
+         }
++        if(this.runningState == STATE_RUNNING) {
+             stopTime = System.currentTimeMillis();
++        }
+         this.runningState = STATE_STOPPED;
+     }

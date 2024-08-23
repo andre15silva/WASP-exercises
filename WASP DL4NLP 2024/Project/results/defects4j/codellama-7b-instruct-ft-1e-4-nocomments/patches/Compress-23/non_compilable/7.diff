@@ -1,0 +1,42 @@
+diff --git a/tmp/794184ec-e216-4bf1-aaa4-ec7d8c2b0979_buggy.java b/tmp/ced56e22-93c1-4f29-8cde-32d650f57de4_fixed.java
+index 0e18f59..24b320b 100644
+--- a/tmp/794184ec-e216-4bf1-aaa4-ec7d8c2b0979_buggy.java
++++ b/tmp/ced56e22-93c1-4f29-8cde-32d650f57de4_fixed.java
+@@ -1,13 +1,35 @@
+         @Override
+         InputStream decode(final InputStream in, final Coder coder,
+                 byte[] password) throws IOException {
+             byte propsByte = coder.properties[0];
+             long dictSize = coder.properties[1];
+             for (int i = 1; i < 4; i++) {
+                 dictSize |= (coder.properties[i + 1] << (8 * i));
+             }
+             if (dictSize > LZMAInputStream.DICT_SIZE_MAX) {
+                 throw new IOException("Dictionary larger than 4GiB maximum size");
+             }
+-            return new LZMAInputStream(in, -1, propsByte, (int) dictSize);
++            final LZMAInputStream inp = new LZMAInputStream(in, -1, propsByte,
++                    (int) dictSize);
++            final InputStream result = new InputStream() {
++                private final byte[] buffer = new byte[8096];
++                @Override
++                public boolean markSupported() {
++                    return false;
++                }
++                @Override
++                public int read() throws IOException {
++                    return inp.read();
++                }
++                @Override
++                public int read(byte[] b, int off, int len) throws IOException {
++                    int read = inp.read(b, off, len);
++                    return read == -1 ? -1 : read;
++                }
++                @Override
++                public long skip(long n) throws IOException {
++                    return inp.skipBytes((int) n);
++                }
++            };
++            return result;
+         }
+\ No newline at end of file

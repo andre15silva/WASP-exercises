@@ -1,0 +1,14 @@
+diff --git a/tmp/c74af5bd-e9a8-4a2b-97b5-b6d3906d2f24_buggy.java b/tmp/b5510f4c-cf83-4cfc-b10c-d30e4bb79ce8_fixed.java
+index 3ecd591..b86670e 100644
+--- a/tmp/c74af5bd-e9a8-4a2b-97b5-b6d3906d2f24_buggy.java
++++ b/tmp/b5510f4c-cf83-4cfc-b10c-d30e4bb79ce8_fixed.java
+@@ -1,6 +1,8 @@
+     private boolean isInlineable(Document.OutputSettings out) {
+         return tag().isInline()
+             && (parent() == null || parent().isBlock())
+             && previousSibling() != null
+-            && !out.outline();
++            && !out.outline()
++            /* exclude nested anchors, as if it is inline, they must be self-contained */
++            && (!tagName().equals("a") || ((Element)this).siblingIndex() > 0);
+     }

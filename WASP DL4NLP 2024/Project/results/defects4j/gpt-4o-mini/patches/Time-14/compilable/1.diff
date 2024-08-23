@@ -1,0 +1,50 @@
+diff --git a/tmp/f7069fd6-8f2c-4475-b087-5cdb8334550d_buggy.java b/tmp/e39c6f95-ddc1-4949-ba49-122396205fb6_fixed.java
+index 10616db..998d6d1 100644
+--- a/tmp/f7069fd6-8f2c-4475-b087-5cdb8334550d_buggy.java
++++ b/tmp/e39c6f95-ddc1-4949-ba49-122396205fb6_fixed.java
+@@ -1,19 +1,39 @@
+-    //-----------------------------------------------------------------------
+ public int[] add(ReadablePartial partial, int fieldIndex, int[] values, int valueToAdd) {
+-        // overridden as superclass algorithm can't handle
+-        // 2004-02-29 + 48 months -> 2008-02-29 type dates
+     if (valueToAdd == 0) {
+         return values;
+     }
+-            // month is largest field and being added to, such as month-day
++    
+     if (DateTimeUtils.isContiguous(partial)) {
+         long instant = 0L;
+         for (int i = 0, isize = partial.size(); i < isize; i++) {
+             instant = partial.getFieldType(i).getField(iChronology).set(instant, values[i]);
+         }
++        
++        // Modify the approach to handle leap years correctly
+         instant = add(instant, valueToAdd);
+-            return iChronology.get(partial, instant);
++        int[] adjustedValues = iChronology.get(partial, instant);
++        
++        // Check for invalid day of month value
++        if (partial.getFieldType(fieldIndex) == DateTimeFieldType.dayOfMonth()) {
++            int day = adjustedValues[fieldIndex];
++            int month = adjustedValues[fieldIndex - 1]; // Assuming the day is at fieldIndex and the month is at fieldIndex - 1
++            if (day > 28 && !isValidDay(month, day)) {
++                adjustedValues[fieldIndex] = adjustDayForMonth(month, day);
++            }
++        }
++        
++        return adjustedValues;
+     } else {
+         return super.add(partial, fieldIndex, values, valueToAdd);
+     }
+ }
++
++private boolean isValidDay(int month, int day) {
++    // Check if the day is valid for the given month
++    return (day <= 28 || (day <= 29 && month == 2));
++}
++
++private int adjustDayForMonth(int month, int day) {
++    // Adjust the day to a valid value when month is February
++    return (month == 2) ? 28 : day; // Defaulting to 28 for February
++}
+\ No newline at end of file

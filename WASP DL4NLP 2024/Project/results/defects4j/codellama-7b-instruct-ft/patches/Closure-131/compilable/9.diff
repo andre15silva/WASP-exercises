@@ -1,0 +1,31 @@
+diff --git a/tmp/0e8579d3-466a-4719-92d1-a69896a095d2_buggy.java b/tmp/83ecf460-6cff-4671-83b7-9b210ed6b4e8_fixed.java
+index 19fe1b4..91cea39 100644
+--- a/tmp/0e8579d3-466a-4719-92d1-a69896a095d2_buggy.java
++++ b/tmp/83ecf460-6cff-4671-83b7-9b210ed6b4e8_fixed.java
+@@ -1,17 +1,23 @@
+     public static boolean isJSIdentifier(String s) {
+       int length = s.length();
+ 
+       if (length == 0 ||
+           !Character.isJavaIdentifierStart(s.charAt(0))) {
+         return false;
+       }
+ 
+-      for (int i = 1; i < length; i++) {
+-        if (
+-            !Character.isJavaIdentifierPart(s.charAt(i))) {
++      for(int ic = 0; ic < length; ic++) {
++        char c = s.charAt(ic);
++        if(!Character.isJavaIdentifierPart(c)) {
++          if(length > 3 && c == '\'' && s.charAt(ic+1) == '\''
++              && Character.isJavaIdentifierStart(s.charAt(ic+2))) {
++            // property name with a quoted identifier
++            ic += 2;
++          } else {
+             return false;
+           } 
+         }
++      }
+ 
+       return true;
+     }

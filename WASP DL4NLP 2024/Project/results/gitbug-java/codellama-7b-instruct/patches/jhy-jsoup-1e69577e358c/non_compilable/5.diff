@@ -1,0 +1,53 @@
+diff --git a/tmp/5957385a-4da2-410c-b0fe-963ea47edba6_buggy.java b/tmp/d26d9a07-dced-4866-9c49-2a54ffdc943b_fixed.java
+index c9c77a4..dcff75d 100644
+--- a/tmp/5957385a-4da2-410c-b0fe-963ea47edba6_buggy.java
++++ b/tmp/d26d9a07-dced-4866-9c49-2a54ffdc943b_fixed.java
+@@ -1,35 +1,24 @@
+-    URL build() {
++    public static URL build(URL u) throws MalformedURLException, URISyntaxException, UnsupportedEncodingException {
+         try {
+-            // use the URI class to encode non-ascii in path
+-            URI uri = new URI(
++            String normUrl = new URI(
+                     u.getProtocol(),
+                     u.getUserInfo(),
+                     IDN.toASCII(decodePart(u.getHost())), // puny-code
+                     u.getPort(),
+                     decodePart(u.getPath()),
+                     null, null // query and fragment appended later so as not to encode
+-            );
+-
+-            String normUrl = uri.toASCIIString();
+-            if (q != null || u.getRef() != null) {
+-                StringBuilder sb = StringUtil.borrowBuilder().append(normUrl);
+-                if (q != null) {
+-                    sb.append('?');
+-                    appendToAscii(StringUtil.releaseBuilder(q), true, sb);
+-                }
++            ).toASCIIString();
++            if (u.getHost() != null && u.getPath() == null)
++                    normUrl = normUrl.substring(0, normUrl.length - 1); // remove trailing '\'
+             if (u.getRef() != null) {
+-                    sb.append('#');
+-                    appendToAscii(u.getRef(), false, sb);
++                StringBuilder sb = new StringBuilder(normUrl);
++                sb.append('#').append(IDN.toASCII(decodePart(u.getRef())));
++                return new URL(sb.toString());
+             }
+-                normUrl = StringUtil.releaseBuilder(sb);
++            return new URL(normUrl);
++        } catch (URISyntaxException e) {
++            e.printStackTrace();
+         }
+-            u =  new URL(normUrl);
+-            return u;
+-        } catch (MalformedURLException | URISyntaxException | UnsupportedEncodingException e) {
+-            // we assert here so that any incomplete normalization issues can be caught in devel. but in practise,
+-            // the remote end will be able to handle it, so in prod we just pass the original URL.
+-            // The UnsupportedEncodingException would never happen as always UTF8
+-            assert Validate.assertFail(e.toString());
+-            return u;
+     }
++
+ }
+\ No newline at end of file

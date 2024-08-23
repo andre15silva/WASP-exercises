@@ -1,0 +1,83 @@
+diff --git a/tmp/83cc19ec-51aa-4dfe-a52a-b1f1de5e0763_buggy.java b/tmp/2885509d-b83c-40ec-87d5-f19a1670e1ce_fixed.java
+index 4b7e1e4..be458aa 100644
+--- a/tmp/83cc19ec-51aa-4dfe-a52a-b1f1de5e0763_buggy.java
++++ b/tmp/2885509d-b83c-40ec-87d5-f19a1670e1ce_fixed.java
+@@ -1,52 +1,61 @@
+     // https://www.gnu.org/software/tar/manual/html_section/tar_92.html#SEC188
+-    Map<String, String> parsePaxHeaders(final InputStream i)
++    Map<String, String> parsePaxHeaders(final InputStream is)
+         throws IOException {
+         final Map<String, String> headers = new HashMap<String, String>(globalPaxHeaders);
+         // Format is "length keyword=value\n";
+         while(true){ // get length
+             int ch;
+             int len = 0;
+-            int read = 0;
+-            while((ch = i.read()) != -1) {
+-                read++;
+-                if (ch == ' '){
++            while((ch = is.read()) != -1) {
++                len++;
++                if (ch == 0x0a){ // NL
++                    break;
++                }
++            }
++            if (ch == -1){ // EOF
++                break;
++            }
+             // Get keyword
+             final ByteArrayOutputStream coll = new ByteArrayOutputStream();
+-                    while((ch = i.read()) != -1) {
+-                        read++;
++            while((ch = is.read()) != -1) {
++                len++;
+                 if (ch == '='){ // end of keyword
+                     final String keyword = coll.toString(CharsetNames.UTF_8);
+                     // Get rest of entry
+-                            final int restLen = len - read;
++                    final int restLen = len - 1;
+                     if (restLen == 1) { // only NL
+                         headers.remove(keyword);
+                     } else {
+                         final byte[] rest = new byte[restLen];
+-                                final int got = IOUtils.readFully(i, rest);
+-                                if (got != restLen) {
++                        final int read = IOUtils.readFully(is, rest);
++                        if (read != restLen) {
+                             throw new IOException("Failed to read "
+                                                   + "Paxheader. Expected "
+                                                   + restLen
+                                                   + " bytes, read "
+-                                                          + got);
++                                                  + read);
+                         }
+                         // Drop trailing NL
+                         final String value = new String(rest, 0,
+                                                     restLen - 1, CharsetNames.UTF_8);
+                         headers.put(keyword, value);
+                     }
+                     break;
+                 }
+                 coll.write((byte) ch);
+             }
+-                    break; // Processed single header
+         }
+-                len *= 10;
+-                len += ch - '0';
+-            }
+-            if (ch == -1){ // EOF
+-                break;
++        // Some tools may not return NL after the last tar member, so we look
++        // ahead:
++        final int ch = is.read();
++        if (ch != -1 && ch != 0x0a) {
++            String warning_ = "archive is missing a required NL";
++            if (headers.containsKey("warnings")) {
++                warning_ += " and a possible entry of '" +
++                    TarUtils.readTarLine(is, TarUtils.getPlatformLineSeparator())
++                        + "'. Please check the archives manual for details.";
+             }
++            warning(warning_);
+         }
+         return headers;
+     }

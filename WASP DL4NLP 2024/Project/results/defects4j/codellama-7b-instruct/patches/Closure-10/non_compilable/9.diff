@@ -1,0 +1,27 @@
+diff --git a/tmp/5ff2b038-5a12-4199-8563-b8da2376ac4f_buggy.java b/tmp/069f1ba6-34be-499f-8b6b-472e60dbfd05_fixed.java
+index 6fecc90..176a021 100644
+--- a/tmp/5ff2b038-5a12-4199-8563-b8da2376ac4f_buggy.java
++++ b/tmp/069f1ba6-34be-499f-8b6b-472e60dbfd05_fixed.java
+@@ -1,7 +1,21 @@
+ static boolean mayBeString(Node n, boolean recurse) {
+   if (recurse) {
+     return allResultsMatch(n, MAY_BE_STRING_PREDICATE);
+   } else {
+     return mayBeStringHelper(n);
+   }
+ }
++
++public void testIssue821() {
++  foldSame("var a =(Math.random()>0.5? '1' : 2 ) + 3 + 4;");
++  foldSame("var a = ((Math.random() ? 0 : 1) ||" +
++      "(Math.random()>0.5? '1' : 2 )) + 3 + 4;");
++}
++
++static boolean mayBeStringHelper(Node n) {
++  // ...
++}
++
++static boolean allResultsMatch(Node n, Predicate<Node> predicate) {
++  // ...
++}
+\ No newline at end of file

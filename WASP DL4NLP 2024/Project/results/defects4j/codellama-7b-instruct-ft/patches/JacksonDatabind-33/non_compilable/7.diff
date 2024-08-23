@@ -1,0 +1,40 @@
+diff --git a/tmp/297bfce7-760e-45a2-9f4e-643550de8b68_buggy.java b/tmp/0b159e5a-d2a4-4012-9b30-256d44b1da1e_fixed.java
+index 3cb9232..f4020c9 100644
+--- a/tmp/297bfce7-760e-45a2-9f4e-643550de8b68_buggy.java
++++ b/tmp/0b159e5a-d2a4-4012-9b30-256d44b1da1e_fixed.java
+@@ -1,26 +1,35 @@
+     @Override
+     public PropertyName findNameForSerialization(Annotated a)
+     {
+         String name = null;
+ 
+         JsonGetter jg = _findAnnotation(a, JsonGetter.class);
+         if (jg != null) {
+             name = jg.value();
+         } else {
+             JsonProperty pann = _findAnnotation(a, JsonProperty.class);
+             if (pann != null) {
+                 name = pann.value();
+                 /* 22-Apr-2014, tatu: Should figure out a better way to do this, but
+                  *   it's actually bit tricky to do it more efficiently (meta-annotations
+                  *   add more lookups; AnnotationMap costs etc)
+                  */
+             } else if (_hasAnnotation(a, JsonSerialize.class)
+                     || _hasAnnotation(a, JsonView.class)
+                     || _hasAnnotation(a, JsonRawValue.class)) {
+                 name = "";
++            } else if (a.getClassAnnotations().getAnnotation("JsonUnwrapped") != null) {
++                /* 28-May-2014, tatu: Actually, have to be a special case for this, if anything!
++                 *   (otherwise won't work correctly for fields; probably would for BeanViews with
++                 *    properties). Let's try...
++                 */
++                AnnotatedField af = a.getFieldAnnotation();
++                if (af != null) {
++                    name = af.getName();
++                }
+             } else {
+                 return null;
+             }
+         }
+         return PropertyName.construct(name);
+     }

@@ -1,0 +1,29 @@
+diff --git a/tmp/d1718334-7df7-4bc9-b8ca-a4f8e5a221e8_buggy.java b/tmp/f06150f6-a881-4369-999d-18900e1c98e9_fixed.java
+index ef76662..0ad5885 100644
+--- a/tmp/d1718334-7df7-4bc9-b8ca-a4f8e5a221e8_buggy.java
++++ b/tmp/f06150f6-a881-4369-999d-18900e1c98e9_fixed.java
+@@ -1,17 +1,24 @@
+         void read(Tokeniser t, CharacterReader r) {
+             char c = r.consume();
+             switch (c) {
+                 case '>':
+                     t.tagPending.selfClosing = true;
+                     t.emitTagPending();
+                     t.transition(Data);
+                     break;
+                 case eof:
+                     t.eofError(this);
+                     t.transition(Data);
+                     break;
+                 default:
++                    // is this character the slash that self-closing was looking for?
++                    if (r.isEmpty()) {
++                        t.tagPending.selfClosing = true;
++                        t.emitTagPending();
++                        t.transition(Data);
++                    } else {
+                         t.error(this);
+                         t.transition(BeforeAttributeName);
+                     }
+             }
++        }

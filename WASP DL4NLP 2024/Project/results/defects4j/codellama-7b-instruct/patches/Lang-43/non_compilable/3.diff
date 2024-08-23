@@ -1,0 +1,58 @@
+diff --git a/tmp/f31b94c4-7f4c-46cf-840c-70d5dcb1d987_buggy.java b/tmp/c2b1b9b5-7774-4dae-ab1b-134885d05615_fixed.java
+index b6b11b6..a67e289 100644
+--- a/tmp/f31b94c4-7f4c-46cf-840c-70d5dcb1d987_buggy.java
++++ b/tmp/c2b1b9b5-7774-4dae-ab1b-134885d05615_fixed.java
+@@ -1,38 +1,51 @@
+     /**
+      * Consume a quoted string, adding it to <code>appendTo</code> if
+      * specified.
+      * 
+      * @param pattern pattern to parse
+      * @param pos current parse position
+      * @param appendTo optional StringBuffer to append
+      * @param escapingOn whether to process escaped quotes
+      * @return <code>appendTo</code>
+      */
+     private StringBuffer appendQuotedString(String pattern, ParsePosition pos,
+             StringBuffer appendTo, boolean escapingOn) {
+         int start = pos.getIndex();
+         char[] c = pattern.toCharArray();
+         if (escapingOn && c[start] == QUOTE) {
+             return appendTo == null ? null : appendTo.append(QUOTE);
+         }
+         int lastHold = start;
+         for (int i = pos.getIndex(); i < pattern.length(); i++) {
+             if (escapingOn && pattern.substring(i).startsWith(ESCAPED_QUOTE)) {
++                if (appendTo == null) {
++                    StringBuffer buffer = new StringBuffer(c, lastHold, i);
++                    // add escaped quote
++                    buffer.append(QUOTE);
++                    buffer.append(c, i + ESCAPED_QUOTE.length(), pattern.length());
++                    return buffer;
++                }
+                 appendTo.append(c, lastHold, pos.getIndex() - lastHold).append(
+                         QUOTE);
+                 pos.setIndex(i + ESCAPED_QUOTE.length());
+                 lastHold = pos.getIndex();
+                 continue;
+             }
+             switch (c[pos.getIndex()]) {
+             case QUOTE:
+                 next(pos);
+-                return appendTo == null ? null : appendTo.append(c, lastHold,
+-                        pos.getIndex() - lastHold);
++                if (appendTo == null) {
++                    StringBuffer buffer = new StringBuffer(c, lastHold, i);
++                    // add escaped quote
++                    buffer.append(QUOTE);
++                    buffer.append(c, i + 1, pattern.length());
++                    return buffer;
++                }
++                return appendTo.append(c, lastHold, pos.getIndex());
+             default:
+                 next(pos);
+             }
+         }
+         throw new IllegalArgumentException(
+                 "Unterminated quoted string at position " + start);
+     }

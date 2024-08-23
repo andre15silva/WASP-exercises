@@ -1,0 +1,21 @@
+diff --git a/tmp/f0326d80-57b0-4997-b9fd-331c073f24f2_buggy.java b/tmp/c406de2b-eeb3-4dbb-818a-642349de46bf_fixed.java
+index 4e21866..076e677 100644
+--- a/tmp/f0326d80-57b0-4997-b9fd-331c073f24f2_buggy.java
++++ b/tmp/c406de2b-eeb3-4dbb-818a-642349de46bf_fixed.java
+@@ -1,10 +1,16 @@
+     /**
+      * Computes the square-root of the weight matrix.
+      *
++     * <p>
++     * When dealing with large sample sets, we need a more efficient method.
++     * The current {@link SVD} implementation is less efficient but it
++     * seems the most robust to me.
++     * </p>
++     *
+      * @param m Symmetric, positive-definite (weight) matrix.
+      * @return the square-root of the weight matrix.
+      */
+     private RealMatrix squareRoot(RealMatrix m) {
+             final EigenDecomposition dec = new EigenDecomposition(m);
+             return dec.getSquareRoot();
+     }

@@ -1,0 +1,103 @@
+diff --git a/tmp/afd577d8-535d-4aaa-b284-9a339a0a2364_buggy.java b/tmp/f054426f-7f48-4e49-a924-6dac55dc4396_fixed.java
+index eb0c9a2..79af912 100644
+--- a/tmp/afd577d8-535d-4aaa-b284-9a339a0a2364_buggy.java
++++ b/tmp/f054426f-7f48-4e49-a924-6dac55dc4396_fixed.java
+@@ -1,85 +1,29 @@
+-    /**
+-     * Update the index values for the maximum and minimum bounds.
+-     * 
+-     * @param period  the time period.
+-     * @param index  the index of the time period.
+-     */
+ private void updateBounds(TimePeriod period, int index) {
+-        
+     long start = period.getStart().getTime();
+     long end = period.getEnd().getTime();
+     long middle = start + ((end - start) / 2);
+ 
+-        if (this.minStartIndex >= 0) {
+-            long minStart = getDataItem(this.minStartIndex).getPeriod()
+-                .getStart().getTime();
+-            if (start < minStart) {
+-                this.minStartIndex = index;           
+-            }
+-        }
+-        else {
+-            this.minStartIndex = index;
++    if (minStartIndex < 0 || start < minStart) {
++        minStartIndex = index;
+     }
+ 
+-        if (this.maxStartIndex >= 0) {
+-            long maxStart = getDataItem(this.maxStartIndex).getPeriod()
+-                .getStart().getTime();
+-            if (start > maxStart) {
+-                this.maxStartIndex = index;           
+-            }
+-        }
+-        else {
+-            this.maxStartIndex = index;
++    if (maxStartIndex < 0 || start > maxStart) {
++        maxStartIndex = index;
+     }
+ 
+-        if (this.minMiddleIndex >= 0) {
+-            long s = getDataItem(this.minMiddleIndex).getPeriod().getStart()
+-                .getTime();
+-            long e = getDataItem(this.minMiddleIndex).getPeriod().getEnd()
+-                .getTime();
+-            long minMiddle = s + (e - s) / 2;
+-            if (middle < minMiddle) {
+-                this.minMiddleIndex = index;           
+-            }
+-        }
+-        else {
+-            this.minMiddleIndex = index;
++    if (minMiddleIndex < 0 || middle < minMiddle) {
++        minMiddleIndex = index;
+     }
+ 
+-        if (this.maxMiddleIndex >= 0) {
+-            long s = getDataItem(this.minMiddleIndex).getPeriod().getStart()
+-                .getTime();
+-            long e = getDataItem(this.minMiddleIndex).getPeriod().getEnd()
+-                .getTime();
+-            long maxMiddle = s + (e - s) / 2;
+-            if (middle > maxMiddle) {
+-                this.maxMiddleIndex = index;           
+-            }
+-        }
+-        else {
+-            this.maxMiddleIndex = index;
++    if (maxMiddleIndex < 0 || middle > maxMiddle) {
++        maxMiddleIndex = index;
+     }
+ 
+-        if (this.minEndIndex >= 0) {
+-            long minEnd = getDataItem(this.minEndIndex).getPeriod().getEnd()
+-                .getTime();
+-            if (end < minEnd) {
+-                this.minEndIndex = index;           
+-            }
+-        }
+-        else {
+-            this.minEndIndex = index;
++    if (minEndIndex < 0 || end < minEnd) {
++        minEndIndex = index;
+     }
+ 
+-        if (this.maxEndIndex >= 0) {
+-            long maxEnd = getDataItem(this.maxEndIndex).getPeriod().getEnd()
+-                .getTime();
+-            if (end > maxEnd) {
+-                this.maxEndIndex = index;           
++    if (maxEndIndex < 0 || end > maxEnd) {
++        maxEndIndex = index;
+     }
+ }
+\ No newline at end of file
+-        else {
+-            this.maxEndIndex = index;
+-        }
+-        
+-    }

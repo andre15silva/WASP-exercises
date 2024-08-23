@@ -1,0 +1,63 @@
+diff --git a/tmp/44450e6e-4272-4106-af7c-3cca6f93051f_buggy.java b/tmp/b7f7b95b-b161-4822-82e8-372baab8b116_fixed.java
+index a7549f0..d73d36b 100644
+--- a/tmp/44450e6e-4272-4106-af7c-3cca6f93051f_buggy.java
++++ b/tmp/b7f7b95b-b161-4822-82e8-372baab8b116_fixed.java
+@@ -1,50 +1,40 @@
+-    /**
+-     * Sets the values of Options using the values in <code>properties</code>.
+-     *
+-     * @param properties The value properties to be processed.
+-     */
+     protected void processProperties(Properties properties)
+     {
+         if (properties == null)
+         {
+             return;
+         }
+-
+         for (Enumeration e = properties.propertyNames(); e.hasMoreElements();)
+         {
+             String option = e.nextElement().toString();
+-
++            if (option.length() > 0 &&  option.charAt(0) != '-') {
++                if (option.length() > 1 &&  option.charAt(1) == '-') option="-".concat(option.substring(1));
++                if (option.length() > 1 &&  option.charAt(1) == '-') continue;
++            }
+             if (!cmd.hasOption(option))
+             {
+                 Option opt = getOptions().getOption(option);
+-
+-                // get the value from the properties instance
+                 String value = properties.getProperty(option);
+-
+                 if (opt.hasArg())
+                 {
+                     if (opt.getValues() == null || opt.getValues().length == 0)
+                     {
+                         try
+                         {
+                             opt.addValueForProcessing(value);
+                         }
+                         catch (RuntimeException exp)
+                         {
+-                            // if we cannot add the value don't worry about it
+                         }
+                     }
+                 }
+-                else if (!("yes".equalsIgnoreCase(value)
+-                        || "true".equalsIgnoreCase(value)
+-                        || "1".equalsIgnoreCase(value)))
++                else if (!
++                        ("yes".equalsIgnoreCase(value) || "true".equalsIgnoreCase(value) || "1".equalsIgnoreCase(value))
++                        )
+                 {
+-                    // if the value is not yes, true or 1 then don't add the
+-                    // option to the CommandLine
+                     break;
+                 }
+-
+                 cmd.addOption(opt);
+             }
+         }
+     }
+\ No newline at end of file

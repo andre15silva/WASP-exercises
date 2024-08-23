@@ -1,0 +1,31 @@
+diff --git a/tmp/17c76a0f-2f92-4937-8b54-85ae3b46caef_buggy.java b/tmp/3af15f28-7857-475b-b5c6-f9cb35742745_fixed.java
+index 70cafe0..308abfa 100644
+--- a/tmp/17c76a0f-2f92-4937-8b54-85ae3b46caef_buggy.java
++++ b/tmp/3af15f28-7857-475b-b5c6-f9cb35742745_fixed.java
+@@ -1,18 +1,26 @@
+     /**
+      * Checks whether the given column is basic.
+      * @param col index of the column to check
+      * @return the row that the variable is basic in.  null if the column is not basic
+      */
+     private Integer getBasicRow(final int col) {
+         Integer row = null;
+         for (int i = getNumObjectiveFunctions(); i < getHeight(); i++) {
+             if (!MathUtils.equals(getEntry(i, col), 0.0, epsilon)) {
+                 if (row == null) {
+                     row = i;
+                 } else {
++                    // the model may have a single variable and a single constraint
++                    // and the single constraint has the same name as the single variable
++                    // which means all basic variables except for the single variable
++                    // has a value of 0
++                    final double value = MathUtils.sum(getObjectiveFunction(), getConstraint(i));
++                    if (MathUtils.equals(value, 0.0, epsilon)) {
++                        return Integer.valueOf(i);
++                    }
+                     return null;
+                 }
+             }
+         }
+         return row;
+     }

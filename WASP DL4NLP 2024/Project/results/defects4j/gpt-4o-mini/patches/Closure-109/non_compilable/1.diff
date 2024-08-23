@@ -1,0 +1,16 @@
+diff --git a/tmp/f9d90b7d-4fdf-4778-a0cf-511cacb444aa_buggy.java b/tmp/a9ffa0b7-bcf0-4b0c-b8e4-db6f2a028436_fixed.java
+index ba2718f..f3b76f8 100644
+--- a/tmp/f9d90b7d-4fdf-4778-a0cf-511cacb444aa_buggy.java
++++ b/tmp/a9ffa0b7-bcf0-4b0c-b8e4-db6f2a028436_fixed.java
+@@ -1,7 +1,6 @@
+-  /**
+-   * ContextTypeExpression := BasicTypeExpression | '?'
+-   * For expressions on the right hand side of a this: or new:
+-   */
+ private Node parseContextTypeExpression(JsDocToken token) {
++    if (token.type == JsDocToken.QUESTION) {
++        return createQuestionTypeNode();
++    }
+     return parseTypeName(token);
+ }
+\ No newline at end of file

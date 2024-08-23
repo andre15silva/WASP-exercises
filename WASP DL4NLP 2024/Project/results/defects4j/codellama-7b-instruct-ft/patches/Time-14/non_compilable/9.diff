@@ -1,0 +1,29 @@
+diff --git a/tmp/3421c3a3-6f28-4bac-a51d-e42d353c8dbf_buggy.java b/tmp/7eab477c-dfca-411c-b85a-fe35f6a72cbe_fixed.java
+index 10616db..6256614 100644
+--- a/tmp/3421c3a3-6f28-4bac-a51d-e42d353c8dbf_buggy.java
++++ b/tmp/7eab477c-dfca-411c-b85a-fe35f6a72cbe_fixed.java
+@@ -1,19 +1,24 @@
+     //-----------------------------------------------------------------------
+     public int[] add(ReadablePartial partial, int fieldIndex, int[] values, int valueToAdd) {
+         // overridden as superclass algorithm can't handle
+         // 2004-02-29 + 48 months -> 2008-02-29 type dates
+         if (valueToAdd == 0) {
+             return values;
+         }
+             // month is largest field and being added to, such as month-day
+         if (DateTimeUtils.isContiguous(partial)) {
+             long instant = 0L;
+             for (int i = 0, isize = partial.size(); i < isize; i++) {
+                 instant = partial.getFieldType(i).getField(iChronology).set(instant, values[i]);
+             }
+             instant = add(instant, valueToAdd);
++            try {
+                 return iChronology.get(partial, instant);
++            } catch (IllegalFieldValueException e) {
++                // fall through
++            }
+         } else {
+             return super.add(partial, fieldIndex, values, valueToAdd);
+         }
++        return iChronology.get(partial, iChronology.add(instant, -valueToAdd));
+     }

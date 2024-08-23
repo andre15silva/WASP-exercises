@@ -1,0 +1,60 @@
+diff --git a/tmp/45fc9b34-1b9d-4666-8d9c-ea7f6179c10d_buggy.java b/tmp/6a48d883-96f5-4fae-b788-2ab085e615f4_fixed.java
+index 72a422c..5a135ed 100644
+--- a/tmp/45fc9b34-1b9d-4666-8d9c-ea7f6179c10d_buggy.java
++++ b/tmp/6a48d883-96f5-4fae-b788-2ab085e615f4_fixed.java
+@@ -1,51 +1,48 @@
+     /**
+      * {@inheritDoc}
+      */
+     @Override
+     public int translate(CharSequence input, int index, Writer out) throws IOException {
+         int seqEnd = input.length();
+         // Uses -2 to ensure there is something after the &#
+         if(input.charAt(index) == '&' && index < seqEnd - 1 && input.charAt(index + 1) == '#') {
+             int start = index + 2;
+             boolean isHex = false;
+ 
+             char firstChar = input.charAt(start);
+             if(firstChar == 'x' || firstChar == 'X') {
+                 start++;
+                 isHex = true;
+ 
+                 // Check there's more than just an x after the &#
+-            }
+-
+-            int end = start;
+-            // Note that this supports character codes without a ; on the end
+-            while(input.charAt(end) != ';')
++                while(input.charAt(start) != ';')
+                 {
+-                end++;
++                    start++;
+                 }
+ 
++                int end = start;
+             int entityValue;
+             try {
+                 if(isHex) {
+                     entityValue = Integer.parseInt(input.subSequence(start, end).toString(), 16);
+                 } else {
+                     entityValue = Integer.parseInt(input.subSequence(start, end).toString(), 10);
+                 }
+-            } catch(NumberFormatException nfe) {
++            } catch(Exception e) {
+             System.err.println("FAIL: " + input.subSequence(start, end) + "[" + start +"]["+ end +"]");
+                 return 0;
+             }
+ 
+             if(entityValue > 0xFFFF) {
+                 char[] chrs = Character.toChars(entityValue);
+                 out.write(chrs[0]);
+                 out.write(chrs[1]);
+             } else {
+                 out.write(entityValue);
+             }
+ 
+ 
+             return 2 + (end - start) + (isHex ? 1 : 0) + 1;
+         }
+         return 0;
+     }

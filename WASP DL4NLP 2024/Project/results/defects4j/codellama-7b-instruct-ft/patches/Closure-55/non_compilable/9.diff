@@ -1,0 +1,17 @@
+diff --git a/tmp/745631b2-3eaa-4e7c-b37b-7ad6bfb2bbef_buggy.java b/tmp/9b80e541-6efe-445d-8037-756131dfeb14_fixed.java
+index 43937f5..80f8fe6 100644
+--- a/tmp/745631b2-3eaa-4e7c-b37b-7ad6bfb2bbef_buggy.java
++++ b/tmp/9b80e541-6efe-445d-8037-756131dfeb14_fixed.java
+@@ -1,3 +1,11 @@
+   private static boolean isReduceableFunctionExpression(Node n) {
+-    return NodeUtil.isFunctionExpression(n);
++    return NodeUtil.isFunctionExpression(n) || n.isCall() && !n.getChildAtIndex(0)
++        .matchesQualifiedName("WebInspector.Setting") ||
++        // TODO(johnlenz): consider adding getXxx() in the list of functions
++        // that can be safely replaced.
++        n.isCall() && !n.getChildAtIndex(0).matchesQualifiedName("WebInspector." +
++          "Setting") && !n.getChildAtIndex(0).matchesQualifiedName("WebInspector.Setting") &&
++        !n.getChildAtIndex(0).matchesQualifiedName("Math") &&
++        !n.getChildAtIndex(0).matchesQualifiedName("Array") &&
++        !n.getChildAtIndex(0).matchesQualifiedName("Function");
+   }

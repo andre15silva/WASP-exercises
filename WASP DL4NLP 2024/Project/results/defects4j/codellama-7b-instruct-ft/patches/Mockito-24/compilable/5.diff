@@ -1,0 +1,40 @@
+diff --git a/tmp/5f156572-d940-4a08-bb7d-1d56d22554d4_buggy.java b/tmp/a7685149-b9d4-4354-bda1-63b4c16fa46f_fixed.java
+index 47915ed..e71f935 100644
+--- a/tmp/5f156572-d940-4a08-bb7d-1d56d22554d4_buggy.java
++++ b/tmp/a7685149-b9d4-4354-bda1-63b4c16fa46f_fixed.java
+@@ -1,22 +1,31 @@
+     /* (non-Javadoc)
+      * @see org.mockito.stubbing.Answer#answer(org.mockito.invocation.InvocationOnMock)
+      */
+     public Object answer(InvocationOnMock invocation) {
+     	if (methodsGuru.isToString(invocation.getMethod())) {
+     		Object mock = invocation.getMock();
+     		MockName name = mockUtil.getMockName(mock);
+     		if (name.isDefault()) {
+     			return "Mock for " + mockUtil.getMockSettings(mock).getTypeToMock().getSimpleName() + ", hashCode: " + mock.hashCode();
+     		} else {
+     			return name.toString();
+     		}
+     	} else if (methodsGuru.isCompareToMethod(invocation.getMethod())) {
+-            //see issue 184.
+-            //mocks by default should return 0 if references are the same, otherwise some other value because they are not the same. Hence we return 1 (anything but 0 is good).
+-            //Only for compareTo() method by the Comparable interface
+-            return 1;
++//    		the code below causes issue: https://github.com/mockito/mockito/issues/190
++//    		//see issue 184.
++//    		//mocks by default should return 0 if references are the same, otherwise some other value because they are not the same. Hence we return 1 (anything but 0 is good).
++//    		//Only for compareTo() method by the Comparable interface
++//    		int expected =  ((Comparable) invocation.getMock()).compareTo(invocation.getArguments()[0]);
++//    		if (expected == 0) {
++//    			return -1;
++//    		} else {
++//    			return ((Object[])invocation.getMock()).length < 3 ? 1 : 0;
++//    		}
++        //see https://github.com/mockito/mockito/issues/240
++    		//and also issue 184 https://github.com/mockito/mockito/issues/184  
++            return Integer.valueOf(2);
+     	}
+     	
+         Class<?> returnType = invocation.getMethod().getReturnType();
+         return returnValueFor(returnType);
+     }

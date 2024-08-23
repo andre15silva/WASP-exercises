@@ -1,0 +1,12 @@
+diff --git a/tmp/89a2a74e-6f25-4c39-90a3-f8fbf0665805_buggy.java b/tmp/f4457502-6b54-41d7-988c-82e8d94f2e23_fixed.java
+index 5eedc11..d30a838 100644
+--- a/tmp/89a2a74e-6f25-4c39-90a3-f8fbf0665805_buggy.java
++++ b/tmp/f4457502-6b54-41d7-988c-82e8d94f2e23_fixed.java
+@@ -1,6 +1,7 @@
+     private static void handleRawtext(Token.StartTag startTag, HtmlTreeBuilder tb) {
+         tb.insert(startTag);
+         tb.tokeniser.transition(TokeniserState.Rawtext);
++        tb.doctypePending = false; // <iframe><noframes></noframes> causes immediate eer
+         tb.markInsertionMode();
+         tb.transition(Text);
+     }

@@ -1,0 +1,44 @@
+diff --git a/tmp/cbf277d6-0afd-47b8-a10b-54c1cabf6ecc_buggy.java b/tmp/ac444311-ea24-47ad-becc-8dd6e5ed376a_fixed.java
+index 4aff4e4..64a0ecc 100644
+--- a/tmp/cbf277d6-0afd-47b8-a10b-54c1cabf6ecc_buggy.java
++++ b/tmp/ac444311-ea24-47ad-becc-8dd6e5ed376a_fixed.java
+@@ -1,15 +1,29 @@
+-    private boolean testValidProtocol(Element el, Attribute attr, Set<Protocol> protocols) {
+-        // try to resolve relative urls to abs, and optionally update the attribute so output html has abs.
+-        // rels without a baseuri get removed
+-        String value = el.absUrl(attr.getKey());
+-        if (!preserveRelativeLinks)
+-            attr.setValue(value);
++public class Jsoup {
++    /**
++    * Cleans a body of HTML content, normalises whitespace, analyzes the structural
++    * elements, and reformats the text (normalises spaces, removes excessive whitespace,
++    * and converts to lowercase (if configured))
++    * @param body the {@link org.jsoup.nodes.Document.OutputSettings} for the clean output
++    * @param baseUri baseUri the base uri of the document (used for resolve relative links)
++    * @return the cleaned document
++    */
++    public static Document clean(String html, org.jsoup.safety.Whitelist whitelist, org.jsoup.safety.OutputSettings outputSettings) {
++        Document doc = new org.jsoup.nodes.Document(baseUri);
++        org.jsoup.parser.Parser parser = new org.jsoup.parser.Parser(new org.jsoup.parser.Tokeniser(new org.jsoup.parser.TreeBuilder(doc)));
++        parser.parseInput(html, baseUri);
++        return doc;
++    }
+ 
+-        for (Protocol protocol : protocols) {
+-            String prot = protocol.toString() + ":";
+-            if (value.toLowerCase().startsWith(prot)) {
++    /**
++     * Tests if the provided string is a valid protocol
++     * @param protocol the protocol to test (e.g. "http", "https")
++     * @return true if the protocol is valid, false otherwise
++     */
++    public static boolean isValidProtocol(String protocol) {
++        String prot = protocol.toLowerCase();
++        if ("http".equals(prot) || "https".equals(prot) || "ftp".equals(prot) || "mailto".equals(prot)) {
+           return true;
+         }
+-        }
+         return false;
+     }
++}

@@ -1,0 +1,74 @@
+diff --git a/tmp/a3a150d2-c73b-4083-a91d-01484ad25bfc_buggy.java b/tmp/15bf1ed8-04ac-4853-b7e0-7aa03c467998_fixed.java
+index 822447c..b5f83aa 100644
+--- a/tmp/a3a150d2-c73b-4083-a91d-01484ad25bfc_buggy.java
++++ b/tmp/15bf1ed8-04ac-4853-b7e0-7aa03c467998_fixed.java
+@@ -1,37 +1,51 @@
+-    /**
+-     * <p>
+-     * Escapes the characters in the <code>String</code> passed and writes the result to the <code>Writer</code>
+-     * passed.
+-     * </p>
+-     * 
+-     * @param writer
+-     *            The <code>Writer</code> to write the results of the escaping to. Assumed to be a non-null value.
+-     * @param str
+-     *            The <code>String</code> to escape. Assumed to be a non-null value.
+-     * @throws IOException
+-     *             when <code>Writer</code> passed throws the exception from calls to the {@link Writer#write(int)}
+-     *             methods.
+-     * 
+-     * @see #escape(String)
+-     * @see Writer
+-     */
+     public void escape(Writer writer, String str) throws IOException {
+         int len = str.length();
+         for (int i = 0; i < len; i++) {
+             char c = str.charAt(i);
+             String entityName = this.entityName(c);
+             if (entityName == null) {
++            	boolean isHighUnicode = false;
+                 if (c > 0x7F) {
++                    if (len - i > 1) {
++                    	char next = str.charAt(i + 1);
++                    	if (Character.isSurrogate(next)) {
++                    		int unicode = 0;
++                    		isHighUnicode = true;
++                    		i++;
++                    		char low = str.charAt(i + 1);
++                    		if (Character.isSurrogatePair(c, low)) {
++                    			unicode = Character.toCodePoint(c, low);
++                    			i++;
++                    		}
++                    		if (c  > 0xFFFF && unicode > 0) {
+                     			writer.write("&#");
++                    			writer.write(Integer.toString(unicode - 0x10000 + 55296, 10));
++                    			writer.write(';');
++                    		} else {
++                    			if (next == '\'' && (c >= 0xA0 && c < 0xD800)) {
++                    				writer.write("&#");
++                    				writer.write(Integer.toString(c - 0xA0 + 55296, 10));
++                    				writer.write(';');
++                    			} else {
++                    				writer.write("&#");
++                    				writer.write(Integer.toString(c, 10));
++                    				writer.write(';');
++                    			}
++                    		}
++                    	}
++                    } 
++                    if (!isHighUnicode) {
++                        writer.write('&#');
+                         writer.write(Integer.toString(c, 10));
+                         writer.write(';');
++                    }
+                	} else {
+                     writer.write(c);
+                 }
+             } else {
+                 writer.write('&');
+                 writer.write(entityName);
+                 writer.write(';');
+             }
+         }
+     }
+\ No newline at end of file

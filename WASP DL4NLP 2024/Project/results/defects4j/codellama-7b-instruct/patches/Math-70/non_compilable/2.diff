@@ -1,0 +1,72 @@
+diff --git a/tmp/56d30226-dd2b-4357-bf94-342c4c8ab7db_buggy.java b/tmp/fe04887f-cc4c-48c5-8153-87f05b4a3a69_fixed.java
+index d931bce..5e6c439 100644
+--- a/tmp/56d30226-dd2b-4357-bf94-342c4c8ab7db_buggy.java
++++ b/tmp/fe04887f-cc4c-48c5-8153-87f05b4a3a69_fixed.java
+@@ -1,5 +1,63 @@
+-    /** {@inheritDoc} */
+-    public double solve(final UnivariateRealFunction f, double min, double max, double initial)
++ @FunctionalInterface
++interface UnivariateRealFunction {
++    /**
++     * Compute the value of the function.
++     * @param x the point at which the function value should be computed
++     * @return the value of the function at point {@code x}
++     * @throws FunctionEvaluationException if the function cannot be evaluated at
++     * the point {@code x}
++     */
++    double apply(double x) throws FunctionEvaluationException;
++}
++
++class BisectionSolver implements UnivariateRealSolver {
++
++    /** The absolute accuracy tolerance. */
++    private final double absoluteAccuracy;
++
++    /** The maximum number of iterations. */
++    private final int maxIterations;
++
++    /**
++     * Build a solver that uses the bisection method with the given
++     * absolute accuracy and the specified maximum number of iterations.
++     * @param absoluteAccuracy the absolute accuracy
++     * @param maxIterations the maximum number of iterations
++     * @throws MathIllegalArgumentException if {@code absoluteAccuracy} is not positive
++     * @throws MathIllegalArgumentException if {@code maxIterations} is less than or equal
++     * to {@code 0}
++     */
++    public BisectionSolver(final double absoluteAccuracy, final int maxIterations)
++        throws MathIllegalArgumentException {
++        if (absoluteAccuracy <= 0) {
++            throw new MathIllegalArgumentException(LocalizedCoreFormats.ACCURACY,
++                absoluteAccuracy);
++        }
++        if (maxIterations <= 0) {
++            throw new MathIllegalArgumentException(LocalizedCoreFormats.MAX_ITERATIONS,
++                maxIterations);
++        }
++        this.absoluteAccuracy = absoluteAccuracy;
++        this.maxIterations = maxIterations;
++    }
++
++    /**
++     * {@inheritDoc}
++     */
++   @Override
++    public double solve(final UnivariateRealFunction f, double min, double max, final double initial)
+         throws MaxIterationsExceededException, FunctionEvaluationException {
+-        return solve(min, max);
++        // This is the code that causes the bug.
++        return solve(f, min, max);
++    }
++
++    /**
++     * {@inheritDoc}
++     */
++    @Override
++    public double estimate(final UnivariateRealFunction f, double min, double max)
++        throws MaxIterationsExceededException, FunctionEvaluationException {
++        // This is not affected by the bug.
++        return solve(f, min, max);
++    }
+ }
+\ No newline at end of file

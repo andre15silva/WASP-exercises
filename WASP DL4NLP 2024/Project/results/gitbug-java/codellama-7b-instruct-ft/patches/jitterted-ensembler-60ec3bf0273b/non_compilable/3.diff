@@ -1,0 +1,14 @@
+diff --git a/tmp/ad40b54b-7f4b-4e2c-b05d-98dd3e243b41_buggy.java b/tmp/21287d33-05e1-4755-a244-31792e6167b9_fixed.java
+index 2d36d6e..c2a1e73 100644
+--- a/tmp/ad40b54b-7f4b-4e2c-b05d-98dd3e243b41_buggy.java
++++ b/tmp/21287d33-05e1-4755-a244-31792e6167b9_fixed.java
+@@ -1,4 +1,8 @@
+     public void joinAsSpectator(MemberId memberId) {
+         membersAsSpectators.add(memberId);
+-        membersWhoAccepted.remove(memberId);
++        // The ensembles that are being joined must remove the member from the ignored list if they haven't joined in yet
++        // But, since that's a new ensemble, there is no one to get the list
++        if (declinedMembers.contains(memberId)) {
++            declinedMembers.remove(memberId);
++        }
+     }

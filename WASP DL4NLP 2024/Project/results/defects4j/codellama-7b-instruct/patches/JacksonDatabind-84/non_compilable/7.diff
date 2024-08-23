@@ -1,0 +1,18 @@
+diff --git a/tmp/aca114db-fee0-4dc7-a102-b88f5bf75413_buggy.java b/tmp/7a48c403-c3a0-4f44-9c1c-818829728f60_fixed.java
+index e69de29..5c780a2 100644
+--- a/tmp/aca114db-fee0-4dc7-a102-b88f5bf75413_buggy.java
++++ b/tmp/7a48c403-c3a0-4f44-9c1c-818829728f60_fixed.java
+@@ -0,0 +1,12 @@
++public String serializeSub(Sub sub) throws IOException {
++    StringWriter sw = new StringWriter();
++    Map<String, Object> baseFields = new HashMap<>();
++    baseFields.put("base", sub.getBase().getId());
++    Map<String, Object> subFields = new HashMap<>();
++    subFields.put("sub", sub.getSub());
++    Map<String, Object> fields = new HashMap<>();
++    fields.putAll(baseFields);
++    fields.putAll(subFields);
++    objectMapper.writeValue(sw, fields);
++    return sw.toString();
++}
+\ No newline at end of file

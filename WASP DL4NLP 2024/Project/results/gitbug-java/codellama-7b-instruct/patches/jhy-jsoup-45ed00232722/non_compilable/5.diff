@@ -1,0 +1,20 @@
+diff --git a/tmp/697108f2-b26e-450c-94b8-42c05216c5e7_buggy.java b/tmp/e3c3b225-2314-4e9b-92c8-06695735530b_fixed.java
+index 855afa5..d575240 100644
+--- a/tmp/697108f2-b26e-450c-94b8-42c05216c5e7_buggy.java
++++ b/tmp/e3c3b225-2314-4e9b-92c8-06695735530b_fixed.java
+@@ -1,13 +1,13 @@
+-    static URL encodeUrl(URL u) {
++    URL encodeUrl(URL u) {
+         u = punyUrl(u);
+         try {
+             //  odd way to encode urls, but it works!
+             String urlS = u.toExternalForm(); // URL external form may have spaces which is illegal in new URL() (odd asymmetry)
+-            urlS = urlS.replace(" ", "%20");
++            urlS = urlS.replace(" ", "%20"); // encode spaces with %20
+             final URI uri = new URI(urlS);
+             return new URL(uri.toASCIIString());
+         } catch (URISyntaxException | MalformedURLException e) {
+             // give up and return the original input
+             return u;
+         }
+     }

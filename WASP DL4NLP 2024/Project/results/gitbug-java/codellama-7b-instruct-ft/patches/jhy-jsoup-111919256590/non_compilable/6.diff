@@ -1,0 +1,15 @@
+diff --git a/tmp/86443db4-8cac-4f0b-81ed-934db5109dba_buggy.java b/tmp/b4a7b4ea-bb99-44b8-93b9-cd1ba40383b7_fixed.java
+index e807cbf..c5c1ae8 100644
+--- a/tmp/86443db4-8cac-4f0b-81ed-934db5109dba_buggy.java
++++ b/tmp/b4a7b4ea-bb99-44b8-93b9-cd1ba40383b7_fixed.java
+@@ -1,7 +1,9 @@
+     private boolean isInlineable(Document.OutputSettings out) {
+         if (!tag.isInline())
+             return false;
+         return (parent() == null || parent().isBlock())
+             && !isEffectivelyFirst()
+-            && !out.outline();
++            && !out.outline()
++            || isParentPre()
++            ;
+     }

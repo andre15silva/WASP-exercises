@@ -1,0 +1,32 @@
+diff --git a/tmp/b875d7d0-0e74-4a85-a024-d331183970d5_buggy.java b/tmp/764e4a04-38fe-41ca-a794-974271e01121_fixed.java
+index e8705ac..f8aaa96 100644
+--- a/tmp/b875d7d0-0e74-4a85-a024-d331183970d5_buggy.java
++++ b/tmp/764e4a04-38fe-41ca-a794-974271e01121_fixed.java
+@@ -1,24 +1,24 @@
+     /**
+      * There are two types of calls we are interested in calls without explicit
+      * "this" values (what we are call "free" calls) and direct call to eval.
+      */
+     private void annotateCalls(Node n) {
+       Preconditions.checkState(n.isCall());
+ 
+       // Keep track of of the "this" context of a call.  A call without an
+       // explicit "this" is a free call.
+       Node first = n.getFirstChild();
+ 
+-      // ignore cast nodes.
+-
+-      if (!NodeUtil.isGet(first)) {
++      // Avoid annotations of a function call which takes the value of a cast
++      // expression (issue 937)
++      if (NodeUtil.isCastResult(first.getNext())) {
+         n.putBooleanProp(Node.FREE_CALL, true);
+       }
+ 
+       // Keep track of the context in which eval is called. It is important
+       // to distinguish between "(0, eval)()" and "eval()".
+       if (first.isName() &&
+           "eval".equals(first.getString())) {
+         first.putBooleanProp(Node.DIRECT_EVAL, true);
+       }
+     }

@@ -1,0 +1,14 @@
+diff --git a/tmp/5fd39da2-0720-401b-ab22-575591a88757_buggy.java b/tmp/cac273c1-fb7c-46f9-8168-13e5ddacd09e_fixed.java
+index 1c92640..9c67e72 100644
+--- a/tmp/5fd39da2-0720-401b-ab22-575591a88757_buggy.java
++++ b/tmp/cac273c1-fb7c-46f9-8168-13e5ddacd09e_fixed.java
+@@ -1,7 +1,9 @@
+     /**
+      * Set the name of the entry.
+      * @param name the name to use
+      */
+     protected void setName(String name) {
++        // This is a workaround for winzip bug
++        name = name.replaceAll("\\\\", "/");
+         this.name = name;
+     }

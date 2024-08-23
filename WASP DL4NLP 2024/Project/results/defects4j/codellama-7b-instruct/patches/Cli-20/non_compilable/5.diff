@@ -1,0 +1,151 @@
+diff --git a/tmp/f05c95b1-73d4-437b-8ea0-9c76bf4483ad_buggy.java b/tmp/3fdc463e-e4fd-43f5-9737-a33fb1219fe6_fixed.java
+index 31f58d4..ab96dd3 100644
+--- a/tmp/f05c95b1-73d4-437b-8ea0-9c76bf4483ad_buggy.java
++++ b/tmp/3fdc463e-e4fd-43f5-9737-a33fb1219fe6_fixed.java
+@@ -1,101 +1,70 @@
+     /**
+-     * <p>An implementation of {@link Parser}'s abstract
+-     * {@link Parser#flatten(Options,String[],boolean) flatten} method.</p>
+-     *
+-     * <p>The following are the rules used by this flatten method.
+-     * <ol>
+-     *  <li>if <code>stopAtNonOption</code> is <b>true</b> then do not
+-     *  burst anymore of <code>arguments</code> entries, just add each
+-     *  successive entry without further processing.  Otherwise, ignore
+-     *  <code>stopAtNonOption</code>.</li>
+-     *  <li>if the current <code>arguments</code> entry is "<b>--</b>"
+-     *  just add the entry to the list of processed tokens</li>
+-     *  <li>if the current <code>arguments</code> entry is "<b>-</b>"
+-     *  just add the entry to the list of processed tokens</li>
+-     *  <li>if the current <code>arguments</code> entry is two characters
+-     *  in length and the first character is "<b>-</b>" then check if this
+-     *  is a valid {@link Option} id.  If it is a valid id, then add the
+-     *  entry to the list of processed tokens and set the current {@link Option}
+-     *  member.  If it is not a valid id and <code>stopAtNonOption</code>
+-     *  is true, then the remaining entries are copied to the list of 
+-     *  processed tokens.  Otherwise, the current entry is ignored.</li>
+-     *  <li>if the current <code>arguments</code> entry is more than two
+-     *  characters in length and the first character is "<b>-</b>" then
+-     *  we need to burst the entry to determine its constituents.  For more
+-     *  information on the bursting algorithm see 
+-     *  {@link PosixParser#burstToken(String, boolean) burstToken}.</li>
+-     *  <li>if the current <code>arguments</code> entry is not handled 
+-     *  by any of the previous rules, then the entry is added to the list
+-     *  of processed tokens.</li>
+-     * </ol>
++     * <p>Process a short or long option token.  The following characters
++     * in a token indicate that a long option start.
++     * If a long option is found, then it is added to the list of processed tokens.
++     * If not, then check if the token is a valid {@link Option} id.  If it is a valid id,
++     * then add the token to the list of processed tokens and set the current
++     * {@link Option} member.  Otherwise, add the token to the list of processed tokens.
+      * </p>
+      *
+-     * @param options The command line {@link Options}
+-     * @param arguments The command line arguments to be parsed
+-     * @param stopAtNonOption Specifies whether to stop flattening
+-     * when an non option is found.
+-     * @return The flattened <code>arguments</code> String array.
++     * @param token The option token to process
++     * @param stopAtNonOption Specifies whether to stop processing
++     * command line tokens when a non option is found.
+      */
+-    protected String[] flatten(Options options, String[] arguments, boolean stopAtNonOption)
++    private void processOptionToken(String token, boolean stopAtNonOption)
+     {
+-        init();
+-        this.options = options;
++        boolean isLongOption = token.startsWith("--");
++        boolean isLongOptionId = options.hasOption(token.substring(2));
+ 
+-        // an iterator for the command line tokens
+-        Iterator iter = Arrays.asList(arguments).iterator();
+-
+-        // process each command line token
+-        while (iter.hasNext())
+-        {
+-            // get the next command line token
+-            String token = (String) iter.next();
+-
+-            // handle long option --foo or --foo=bar
+-            if (token.startsWith("--"))
++        if (isLongOptionId)
+         {
+-                if (token.indexOf('=') != -1)
++            tokens.add(token.substring(2));
++            setOption(token);
++        }
++        else if (isLongOption)
+         {
+-                    tokens.add(token.substring(0, token.indexOf('=')));
+-                    tokens.add(token.substring(token.indexOf('=') + 1, token.length()));
++            tokens.add(token);
+         }
+         else
+         {
+-                    tokens.add(token);
++            // require bursting
++            burstToken(token, stopAtNonOption);
+         }
+     }
+ 
+-            // single hyphen
+-            else if ("-".equals(token))
+-            {
+-                tokens.add(token);
+-            }
+-            else if (token.startsWith("-"))
++
++    /**
++     * <p>Burst a token to determine its constituent parts.  If a token
++     * is two characters in length and the first character is "<b>-</b>" then
++     * the token is assumed to be a short option.  If the second character is
++     * "<b>-</b>" then the token is a long option.  The constituent parts are
++     * added to the list of processed tokens.
++     * </p>
++     *
++     * @param token The token to burst
++     * @param stopAtNonOption Specifies whether to stop processing command
++     * line tokens when a non option is found.
++     */
++    private void burstToken(String token, boolean stopAtNonOption)
+     {
+         if (token.length() == 2)
++        {
++            if (token.charAt(1) == '-')
+             {
+                 processOptionToken(token, stopAtNonOption);
+             }
+-                else if (options.hasOption(token))
+-                {
+-                    tokens.add(token);
+-                }
+-                // requires bursting
+-                else
+-                {
+-                    burstToken(token, stopAtNonOption);
+-                }
+-            }
+             else if (stopAtNonOption)
+-            {
+-                process(token);
+-            }
+-            else
+             {
+                 tokens.add(token);
+             }
+-
+-            gobble(iter);
+         }
+-
+-        return (String[]) tokens.toArray(new String[tokens.size()]);
++        else
++        {
++            String arg = token.substring(1);
++            String[] args = arg.split("");
++            for (int i = 0; i < args.length; i++)
++            {
++                tokens.add(args[i]);
++            }
++        }
+     }

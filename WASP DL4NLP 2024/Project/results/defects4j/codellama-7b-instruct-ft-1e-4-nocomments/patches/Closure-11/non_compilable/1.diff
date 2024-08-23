@@ -1,0 +1,36 @@
+diff --git a/tmp/5a97c4c8-1d43-4153-b9e8-61b36c749b71_buggy.java b/tmp/55f14050-08b1-427e-a478-5f39aaeec246_fixed.java
+index 57c40b2..51f512f 100644
+--- a/tmp/5a97c4c8-1d43-4153-b9e8-61b36c749b71_buggy.java
++++ b/tmp/55f14050-08b1-427e-a478-5f39aaeec246_fixed.java
+@@ -1,27 +1,17 @@
+-  /**
+-   * Visits a GETPROP node.
+-   *
+-   * @param t The node traversal object that supplies context, such as the
+-   * scope chain to use in name lookups as well as error reporting.
+-   * @param n The node being visited.
+-   * @param parent The parent of <code>n</code>
+-   */
+   private void visitGetProp(NodeTraversal t, Node n, Node parent) {
+-    // obj.prop or obj.method()
+-    // Lots of types can appear on the left, a call to a void function can
+-    // never be on the left. getPropertyType will decide what is acceptable
+-    // and what isn't.
+     Node property = n.getLastChild();
+     Node objNode = n.getFirstChild();
+     JSType childType = getJSType(objNode);
+-
+     if (childType.isDict()) {
+       report(t, property, TypeValidator.ILLEGAL_PROPERTY_ACCESS, "'.'", "dict");
+     } else if (n.getJSType() != null && parent.isAssign()) {
+       return;
++    } else if (!validator.isSubtypeOfNativeObjectType(childType)) {
++      validator.reportConstViolation(t, childType, n,
++          "No properties on this expression", getNativeType(OBJECT_TYPE));
+     } else if (validator.expectNotNullOrUndefined(t, n, childType,
+         "No properties on this expression", getNativeType(OBJECT_TYPE))) {
+       checkPropertyAccess(childType, property.getString(), t, n);
+     }
+     ensureTyped(t, n);
+   }
+\ No newline at end of file

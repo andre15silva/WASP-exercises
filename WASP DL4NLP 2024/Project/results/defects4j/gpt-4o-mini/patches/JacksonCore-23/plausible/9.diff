@@ -1,0 +1,11 @@
+diff --git a/tmp/a8a6efc2-4e77-41a7-b093-f9a7d13487dc_buggy.java b/tmp/7318666b-8bdd-431e-b740-c2cb09f26f40_fixed.java
+index fc49bcd..e4e7920 100644
+--- a/tmp/a8a6efc2-4e77-41a7-b093-f9a7d13487dc_buggy.java
++++ b/tmp/7318666b-8bdd-431e-b740-c2cb09f26f40_fixed.java
+@@ -1,4 +1,4 @@
+ @Override
+ public DefaultPrettyPrinter createInstance() {
+-        return new DefaultPrettyPrinter(this);
++    throw new IllegalStateException("MyPrettyPrinter does not override createInstance");
+ }
+\ No newline at end of file

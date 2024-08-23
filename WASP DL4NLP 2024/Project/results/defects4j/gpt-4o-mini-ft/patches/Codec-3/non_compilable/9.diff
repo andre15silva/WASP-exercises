@@ -1,0 +1,67 @@
+diff --git a/tmp/116207e0-0781-431f-937f-47c9665373cb_buggy.java b/tmp/38815858-bca8-4a9b-a9e2-78da8b38a54b_fixed.java
+index 4e7ca9e..7cd9e7a 100644
+--- a/tmp/116207e0-0781-431f-937f-47c9665373cb_buggy.java
++++ b/tmp/38815858-bca8-4a9b-a9e2-78da8b38a54b_fixed.java
+@@ -1,55 +1,53 @@
+     /**
+      * Handles 'G' cases
+      */
+     private int handleG(String value, 
+                         DoubleMetaphoneResult result, 
+                         int index, 
+                         boolean slavoGermanic) {
+         if (charAt(value, index + 1) == 'H') {
+             index = handleGH(value, result, index);
+         } else if (charAt(value, index + 1) == 'N') {
+             if (index == 1 && isVowel(charAt(value, 0)) && !slavoGermanic) {
+                 result.append("KN", "N");
+             } else if (!contains(value, index + 2, 2, "EY") && 
+                        charAt(value, index + 1) != 'Y' && !slavoGermanic) {
+                 result.append("N", "KN");
+             } else {
+                 result.append("KN");
+             }
+             index = index + 2;
+         } else if (contains(value, index + 1, 2, "LI") && !slavoGermanic) {
+             result.append("KL", "L");
+             index += 2;
+         } else if (index == 0 && (charAt(value, index + 1) == 'Y' || contains(value, index + 1, 2, ES_EP_EB_EL_EY_IB_IL_IN_IE_EI_ER))) {
+             //-- -ges-, -gep-, -gel-, -gie- at beginning --//
+-            result.append('K', 'J');
++            result.append(distanceNIn(value, index, 2) + 'K', distanceNIn(value, index, 2) + 'J');
+             index += 2;
+         } else if ((contains(value, index + 1, 2, "ER") || 
+                     charAt(value, index + 1) == 'Y') &&
+                    !contains(value, 0, 6, "DANGER", "RANGER", "MANGER") &&
+                    !contains(value, index - 1, 1, "E", "I") && 
+                    !contains(value, index - 1, 3, "RGY", "OGY")) {
+             //-- -ger-, -gy- --//
+-            result.append('K', 'J');
++            result.append(nIn(value, index, 2) + 'K', nIn(value, index, 2) + 'J');
+             index += 2;
+         } else if (contains(value, index + 1, 1, "E", "I", "Y") || 
+                    contains(value, index - 1, 4, "AGGI", "OGGI")) {
+-            //-- Italian "biaggi" --//
+             if ((contains(value, 0 ,4, "VAN ", "VON ") || contains(value, 0, 3, "SCH")) || contains(value, index + 1, 2, "ET")) {
+-                //-- obvious germanic --//
+-                result.append('K');
++                result.append("K");
+             } else if (contains(value, index + 1, 4, "IER")) {
+-                result.append('J');
++                result.append("J");
+             } else {
+-                result.append('J', 'K');
++                result.append("JK");
+             }
+             index += 2;
+         } else if (charAt(value, index + 1) == 'G') {
+             index += 2;
+-            result.append('K');
++            result.append("K");
+         } else {
+             index++;
+-            result.append('K');
++            result.append("K");
+         }
+         return index;
+     }

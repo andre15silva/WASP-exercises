@@ -1,0 +1,52 @@
+diff --git a/tmp/895c29f9-140c-4b01-b2e8-62af77817b5f_buggy.java b/tmp/e1ed02c0-b8ce-4f1c-8c13-5930618f4ff6_fixed.java
+index 4bbd561..32e309c 100644
+--- a/tmp/895c29f9-140c-4b01-b2e8-62af77817b5f_buggy.java
++++ b/tmp/e1ed02c0-b8ce-4f1c-8c13-5930618f4ff6_fixed.java
+@@ -1,37 +1,46 @@
+     /**
+      * {@inheritDoc}
+      */
+     @Override
+     public int translate(CharSequence input, int index, Writer out) throws IOException {
+         // TODO: Protect from ArrayIndexOutOfBounds
+         if(input.charAt(index) == '&' && input.charAt(index + 1) == '#') {
+             int start = index + 2;
+             boolean isHex = false;
+ 
+             char firstChar = input.charAt(start);
+             if(firstChar == 'x' || firstChar == 'X') {
+                 start++;
+                 isHex = true;
+             }
+ 
+             int end = start;
+             while(input.charAt(end) != ';') {
+                 end++;
+             }
+ 
+             int entityValue;
+             try {
+                 if(isHex) {
+                     entityValue = Integer.parseInt(input.subSequence(start, end).toString(), 16);
+                 } else {
+                     entityValue = Integer.parseInt(input.subSequence(start, end).toString(), 10);
+                 }
+             } catch(NumberFormatException nfe) {
+                 return 0;
+             }
+-
++            if (isHighSurrogate((char) entityValue)) {
++                if (end < input.length() - 1 && input.charAt(end + 1) == ';') {
++                    end++;
++                    out.append((char) entityValue).append(translate(input, end + 1, out));
++                    return end + 2;
++                } else {
++                    return 0;
++                }
++            }else{
+                 out.write(entityValue);
++            }
+             return 2 + (end - start) + (isHex ? 1 : 0) + 1;
+         }
+         return 0;
+     }

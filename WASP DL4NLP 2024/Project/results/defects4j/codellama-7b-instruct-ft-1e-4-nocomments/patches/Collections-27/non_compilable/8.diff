@@ -1,0 +1,18 @@
+diff --git a/tmp/320e4720-03ea-44af-84cb-a648d29df02f_buggy.java b/tmp/0fdbb290-f568-4f35-bf5c-da290982f112_fixed.java
+index e69de29..1c88764 100644
+--- a/tmp/320e4720-03ea-44af-84cb-a648d29df02f_buggy.java
++++ b/tmp/0fdbb290-f568-4f35-bf5c-da290982f112_fixed.java
+@@ -0,0 +1,12 @@
++    public <T> T deserialize(Class<T> clazz, byte[] object) {
++        T deserialized;
++        try {
++            BaseInput input = new UnsafeByteArrayInput(object);
++            deserialized = unmarshaller.unmarshal(input, clazz);
++        } catch (ClassNotFoundException e) {
++            throw new IllegalArgumentException("Illegal class name", e);
++        } catch (IOException e) {
++            throw exceptionConverter.convert(e);
++        }
++        return deserialized;
++    }
+\ No newline at end of file

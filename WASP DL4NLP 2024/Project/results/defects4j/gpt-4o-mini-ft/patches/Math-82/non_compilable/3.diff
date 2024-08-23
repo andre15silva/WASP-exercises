@@ -1,0 +1,35 @@
+diff --git a/tmp/621b4984-adbd-4c69-b4c4-eb85cb2e3945_buggy.java b/tmp/09eb3204-41af-426c-bd74-276d52f196f5_fixed.java
+index 220820e..a9d079c 100644
+--- a/tmp/621b4984-adbd-4c69-b4c4-eb85cb2e3945_buggy.java
++++ b/tmp/09eb3204-41af-426c-bd74-276d52f196f5_fixed.java
+@@ -1,22 +1,28 @@
+     /**
+      * Returns the row with the minimum ratio as given by the minimum ratio test (MRT).
++     * An exception is thrown if the ratios are non-positive, which means there is an issue with the Simplex
++     * tableau (it shouldn't happen).
+      * @param tableau simple tableau for the problem
+      * @param col the column to test the ratio of.  See {@link #getPivotColumn(SimplexTableau)}
+      * @return row with the minimum ratio
+      */
+     private Integer getPivotRow(final int col, final SimplexTableau tableau) {
+         double minRatio = Double.MAX_VALUE;
+         Integer minRatioPos = null;
+         for (int i = tableau.getNumObjectiveFunctions(); i < tableau.getHeight(); i++) {
+             final double rhs = tableau.getEntry(i, tableau.getWidth() - 1);
+             final double entry = tableau.getEntry(i, col);
+-            if (MathUtils.compareTo(entry, 0, epsilon) >= 0) {
++            if (MathUtils.compareTo(entry, 0, epsilon) > 0) { // jdk 1.6 bug  (http://bugs.sun.com/view_bug.do?bug_id=4831244)
+                 final double ratio = rhs / entry;
+-                if (ratio < minRatio) {
++                if (MathUtils.compareTo(ratio, minRatio, epsilon) < 0) {
+                     minRatio = ratio;
+                     minRatioPos = i; 
+                 }
+             }
+         }
++        // in a buggy tableau Java can return us non-positive ratios.
++        if (minRatioPos == null) {
++            throw new OptimizationException(LocalizedFormats.CANNOT_COMPUTE_ROW_FOR_COLUMN, col);
++        }
+         return minRatioPos;
+     }

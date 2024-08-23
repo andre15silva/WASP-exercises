@@ -1,0 +1,40 @@
+diff --git a/tmp/ecc882aa-9744-49ec-93b9-cf730ba7b19d_buggy.java b/tmp/319e6037-0f69-49b7-83b0-2c26b30aee7e_fixed.java
+index be2af16..a595c8b 100644
+--- a/tmp/ecc882aa-9744-49ec-93b9-cf730ba7b19d_buggy.java
++++ b/tmp/319e6037-0f69-49b7-83b0-2c26b30aee7e_fixed.java
+@@ -1,29 +1,35 @@
+     public long getDateTimeMillis(int year, int monthOfYear, int dayOfMonth,
+                                   int hourOfDay, int minuteOfHour,
+                                   int secondOfMinute, int millisOfSecond)
+         throws IllegalArgumentException
+     {
+         Chronology base;
+         if ((base = getBase()) != null) {
+             return base.getDateTimeMillis
+                 (year, monthOfYear, dayOfMonth,
+                  hourOfDay, minuteOfHour, secondOfMinute, millisOfSecond);
+         }
+ 
+         // Assume date is Gregorian.
+         long instant;
+             instant = iGregorianChronology.getDateTimeMillis
+                 (year, monthOfYear, dayOfMonth,
+                  hourOfDay, minuteOfHour, secondOfMinute, millisOfSecond);
+         if (instant < iCutoverMillis) {
+             // Maybe it's Julian.
++            // Note that the dayOfMonth check isn't correct, but I think it's just
++            // a theoretical problem, and the JVM doesn't actually get it wrong.
+             instant = iJulianChronology.getDateTimeMillis
+                 (year, monthOfYear, dayOfMonth,
+                  hourOfDay, minuteOfHour, secondOfMinute, millisOfSecond);
+             if (instant >= iCutoverMillis) {
+                 // Okay, it's in the illegal cutover gap.
+                 throw new IllegalArgumentException("Specified date does not exist");
+             }
++        } else if (iGregorianChronology.isLeapYear(year) && dayOfMonth > 28) {
++            // Gregorian leap year.
++            instant = instant + (iJulianChronology.getEstimatedLeapSeconds() * 1000); 
++            // Add time required for days added by leap seconds between gregorian and julian
+         }
+         return instant;
+     }

@@ -1,0 +1,46 @@
+diff --git a/tmp/0a3b601e-0f25-4a31-bd38-0153f7f2dfe5_buggy.java b/tmp/b10d9aff-c0e6-4089-9ca1-e3f061112eca_fixed.java
+index 1530b34..986b1af 100644
+--- a/tmp/0a3b601e-0f25-4a31-bd38-0153f7f2dfe5_buggy.java
++++ b/tmp/b10d9aff-c0e6-4089-9ca1-e3f061112eca_fixed.java
+@@ -1,23 +1,41 @@
+     /**
+      * Declares all of a function's arguments.
+      */
+     private void declareArguments(Node functionNode) {
+       Node astParameters = functionNode.getFirstChild().getNext();
+       Node body = astParameters.getNext();
+       FunctionType functionType = (FunctionType) functionNode.getJSType();
+       if (functionType != null) {
+         Node jsDocParameters = functionType.getParametersNode();
+         if (jsDocParameters != null) {
+           Node jsDocParameter = jsDocParameters.getFirstChild();
+           for (Node astParameter : astParameters.children()) {
+             if (jsDocParameter != null) {
++              JSType jsDocType = jsDocParameter.getJSType();
++              if (jsDocType != null) {
++                jsDocType = jsDocType.restrictByNotNullOrUndefined();
++                if (!jsDocType.subtypeOf(
++                    astParameter.getJSType().restrictByNotNullOrUndefined())) {
++                  ASTValidator.warning(
++                      "variable " + astParameter.getString() + " " +
++                          "redefined with type " +
++                          jsDocType.toString() + ", original definition" +
++                          " at  " + jsDocParameter.getSourceFileName() +
++                          " : " + jsDocParameter.getLineno() +
++                          " with type " +
++                          ((astParameter.getJSType() != null) ?
++                              astParameter.getJSType().toString() :
++                              "unknown"),
++                      jsDocParameter);
++                }
++              }
+               defineSlot(astParameter, functionNode,
+                   jsDocParameter.getJSType(), true);
+               jsDocParameter = jsDocParameter.getNext();
+             } else {
+               defineSlot(astParameter, functionNode, null, true);
+             }
+           }
+         }
+       }
+     } // end declareArguments

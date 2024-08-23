@@ -1,0 +1,19 @@
+diff --git a/tmp/1945a935-bd53-44df-8b93-639ee4efc480_buggy.java b/tmp/294c4950-30f7-40d3-b76d-a2056f7726fc_fixed.java
+index d2a3c80..ed58f75 100644
+--- a/tmp/1945a935-bd53-44df-8b93-639ee4efc480_buggy.java
++++ b/tmp/294c4950-30f7-40d3-b76d-a2056f7726fc_fixed.java
+@@ -1,11 +1,2 @@
+-    /**
+-     * Outputs the record separator.
+-     *
+-     * @throws IOException
+-     *             If an I/O error occurs
+-     */
+-    public void println() throws IOException {
+-        final String recordSeparator = format.getRecordSeparator();
+-            out.append(recordSeparator);
+-        newRecord = true;
+-    }
++junit.framework.AssertionFailedError: expected: not <null>
++ but was: <null>.
+\ No newline at end of file

@@ -1,0 +1,92 @@
+diff --git a/tmp/3e598ac0-8d4a-4154-9e1a-e1912d9967c6_buggy.java b/tmp/217ca788-749d-483c-92ec-1f69654678b0_fixed.java
+index 0fe7b81..8937e87 100644
+--- a/tmp/3e598ac0-8d4a-4154-9e1a-e1912d9967c6_buggy.java
++++ b/tmp/217ca788-749d-483c-92ec-1f69654678b0_fixed.java
+@@ -1,67 +1,34 @@
+-    /**
+-     * Find a zero in the given interval with an initial guess.
+-     * <p>Throws <code>IllegalArgumentException</code> if the values of the
+-     * function at the three points have the same sign (note that it is
+-     * allowed to have endpoints with the same sign if the initial point has
+-     * opposite sign function-wise).</p>
+-     *
+-     * @param f function to solve.
+-     * @param min the lower bound for the interval.
+-     * @param max the upper bound for the interval.
+-     * @param initial the start value to use (must be set to min if no
+-     * initial point is known).
+-     * @return the value where the function is zero
+-     * @throws MaxIterationsExceededException the maximum iteration count
+-     * is exceeded
+-     * @throws FunctionEvaluationException if an error occurs evaluating
+-     *  the function
+-     * @throws IllegalArgumentException if initial is not between min and max
+-     * (even if it <em>is</em> a root)
+-     */
+-    public double solve(final UnivariateRealFunction f,
+-                        final double min, final double max, final double initial)
++public double solve(UnivariateRealFunction f, double min, double max, double init)
+         throws MaxIterationsExceededException, FunctionEvaluationException {
+ 
+-        clearResult();
+-        verifySequence(min, initial, max);
+-
+-        // return the initial guess if it is good enough
+-        double yInitial = f.value(initial);
+-        if (Math.abs(yInitial) <= functionValueAccuracy) {
+-            setResult(initial, 0);
+-            return result;
+-        }
+-
+-        // return the first endpoint if it is good enough
+-        double yMin = f.value(min);
+-        if (Math.abs(yMin) <= functionValueAccuracy) {
+-            setResult(yMin, 0);
+-            return result;
++    // check the arguments
++    if (Math.signum(f.value(min)) == Math.signum(f.value(max))) {
++        throw new IllegalArgumentException("arguments must have opposite signs");
+     }
+ 
+-        // reduce interval if min and initial bracket the root
+-        if (yInitial * yMin < 0) {
+-            return solve(f, min, yMin, initial, yInitial, min, yMin);
++    if (init < min || init > max) {
++        throw new IllegalArgumentException("initial point must be between min and max");
+     }
+ 
+-        // return the second endpoint if it is good enough
+-        double yMax = f.value(max);
+-        if (Math.abs(yMax) <= functionValueAccuracy) {
+-            setResult(yMax, 0);
+-            return result;
++    // check the function accuracy
++    double yInitial = Math.abs(f.value(init));
++    if (yInitial <= functionValueAccuracy) {
++        return init;
+     }
+ 
+-        // reduce interval if initial and max bracket the root
+-        if (yInitial * yMax < 0) {
+-            return solve(f, initial, yInitial, max, yMax, initial, yInitial);
++    // find the root in the first interval
++    double newtonResult = newtonSolve(f, init);
++    if (Math.abs(f.value(newtonResult)) <= functionValueAccuracy) {
++        return newtonResult;
+     }
+ 
+-        if (yMin * yMax > 0) {
+-            throw MathRuntimeException.createIllegalArgumentException(
+-                  NON_BRACKETING_MESSAGE, min, max, yMin, yMax);
++    // find the root in the remaining intervals
++    double bisectionResult = bisectionSolve(f, min, max, init);
++    if (Math.abs(f.value(bisectionResult)) <= functionValueAccuracy) {
++        return bisectionResult;
+     }
+ 
+-        // full Brent algorithm starting with provided initial guess
+-        return solve(f, min, yMin, max, yMax, initial, yInitial);
++    // use the Brent algorithm if all else fails
++    return brentSolve(f, min, max, init);
+ 
+ }

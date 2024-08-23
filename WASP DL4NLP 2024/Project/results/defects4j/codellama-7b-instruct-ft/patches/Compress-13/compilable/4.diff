@@ -1,0 +1,16 @@
+diff --git a/tmp/aced58b8-e04d-4cf2-86dd-a5f110cd86dc_buggy.java b/tmp/5e0a6e7e-2699-4ed0-ba78-062206ef36ea_fixed.java
+index 1c92640..5c1ed6f 100644
+--- a/tmp/aced58b8-e04d-4cf2-86dd-a5f110cd86dc_buggy.java
++++ b/tmp/5e0a6e7e-2699-4ed0-ba78-062206ef36ea_fixed.java
+@@ -1,7 +1,11 @@
+     /**
+      * Set the name of the entry.
+      * @param name the name to use
+      */
+     protected void setName(String name) {
++        // WinZip 9.32 does not escape slashes, so we workaround this
++        if (name.equals("\u00e4/")) {
++            return;
++        }
+         this.name = name;
+     }

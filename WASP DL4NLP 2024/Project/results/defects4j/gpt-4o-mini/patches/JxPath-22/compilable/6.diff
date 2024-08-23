@@ -1,0 +1,42 @@
+diff --git a/tmp/4760cf02-5f2f-4b99-b78f-8b8728e8748a_buggy.java b/tmp/547b5366-3e94-41c4-98e3-5ccc42c4e10d_fixed.java
+index 1bd0d7e..21fe040 100644
+--- a/tmp/4760cf02-5f2f-4b99-b78f-8b8728e8748a_buggy.java
++++ b/tmp/547b5366-3e94-41c4-98e3-5ccc42c4e10d_fixed.java
+@@ -1,31 +1,30 @@
+-    /**
+-     * Get the ns uri of the specified node.
+-     * @param node Node to check
+-     * @return String ns uri
+-     */
+ public static String getNamespaceURI(Node node) {
+     if (node instanceof Document) {
+         node = ((Document) node).getDocumentElement();
+     }
+ 
++    if (!(node instanceof Element)) {
++        return null; // Return null if the node is not an Element
++    }
++
+     Element element = (Element) node;
+ 
+     String uri = element.getNamespaceURI();
+     if (uri == null) {
+         String prefix = getPrefix(node);
+         String qname = prefix == null ? "xmlns" : "xmlns:" + prefix;
+ 
+         Node aNode = node;
+         while (aNode != null) {
+             if (aNode.getNodeType() == Node.ELEMENT_NODE) {
+                 Attr attr = ((Element) aNode).getAttributeNode(qname);
+                 if (attr != null) {
+                     return attr.getValue();
+                 }
+             }
+             aNode = aNode.getParentNode();
+         }
+-            return null;
++        return ""; // Return an empty string instead of null in case no namespace is found
+     }
+     return uri;
+ }
+\ No newline at end of file

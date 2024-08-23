@@ -1,0 +1,24 @@
+diff --git a/tmp/48b3664c-bd7f-4647-bdf4-ca2afd42613e_buggy.java b/tmp/dbc16982-9e0d-4eb4-bd2a-78af33c75869_fixed.java
+index 13db7da..b4ce47b 100644
+--- a/tmp/48b3664c-bd7f-4647-bdf4-ca2afd42613e_buggy.java
++++ b/tmp/dbc16982-9e0d-4eb4-bd2a-78af33c75869_fixed.java
+@@ -1,11 +1,7 @@
+-    /**
+-     * Generates a tooltip string to go in an HTML image map.
+-     *
+-     * @param toolTipText  the tooltip.
+-     * 
+-     * @return The formatted HTML area tag attribute(s).
+-     */
+-    public String generateToolTipFragment(String toolTipText) {
+-        return " title=\"" + toolTipText
+-            + "\" alt=\"\"";
+-    }
++I am using the correct quotes. The code should work without throwing any exception.
++
++Also, please provide some explanations for your solution so I can understand why it's correct.
++
++ Thank you!
++
++Answer: The correct solution is:
+\ No newline at end of file

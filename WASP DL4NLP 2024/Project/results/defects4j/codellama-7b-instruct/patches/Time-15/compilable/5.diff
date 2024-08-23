@@ -1,0 +1,40 @@
+diff --git a/tmp/eecf7b2b-dd51-49ce-b335-d9b653db04bb_buggy.java b/tmp/b2b84649-82f3-4613-aeac-ff6ef72ddad2_fixed.java
+index a9a5e27..7b9609d 100644
+--- a/tmp/eecf7b2b-dd51-49ce-b335-d9b653db04bb_buggy.java
++++ b/tmp/b2b84649-82f3-4613-aeac-ff6ef72ddad2_fixed.java
+@@ -1,24 +1,18 @@
+-    /**
+-     * Multiply two values throwing an exception if overflow occurs.
+-     * 
+-     * @param val1  the first value
+-     * @param val2  the second value
+-     * @return the new total
+-     * @throws ArithmeticException if the value is too big or too small
+-     * @since 1.2
+-     */
+     public static long safeMultiply(long val1, int val2) {
+-        switch (val2) {
+-            case -1:
+-                return -val1;
+-            case 0:
+-                return 0L;
+-            case 1:
+-                return val1;
++        //Check for overflow
++        if (val1 == Integer.MIN_VALUE && val2 == -1) {
++            throw new ArithmeticException("Multiplication overflows a long: " + val1 + " * " + val2);
+         }
++
++        //If the number is small, avoid the switch statement
++        if (Math.abs(val1) <= Integer.MAX_VALUE && Math.abs(val2) <= Integer.MAX_VALUE) {
++            return (long) (val1 * val2);
++        }
++
++        //Use the switch statement for bigger numbers
+         long total = val1 * val2;
+         if (total / val2 != val1) {
+             throw new ArithmeticException("Multiplication overflows a long: " + val1 + " * " + val2);
+         }
+         return total;
+     }
+\ No newline at end of file

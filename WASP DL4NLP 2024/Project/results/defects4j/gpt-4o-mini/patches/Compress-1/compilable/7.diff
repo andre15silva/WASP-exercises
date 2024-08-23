@@ -1,0 +1,20 @@
+diff --git a/tmp/8b202f90-5366-41d7-b244-a9612df10cbb_buggy.java b/tmp/eaf0a010-2428-4c9c-953f-ea923633e75d_fixed.java
+index c3986cc..098638a 100644
+--- a/tmp/8b202f90-5366-41d7-b244-a9612df10cbb_buggy.java
++++ b/tmp/eaf0a010-2428-4c9c-953f-ea923633e75d_fixed.java
+@@ -1,13 +1,14 @@
+ /**
+  * Closes the CPIO output stream as well as the stream being filtered.
+  * 
+  * @throws IOException
+  *             if an I/O error has occurred or if a CPIO file error has
+  *             occurred
+  */
+ public void close() throws IOException {
+     if (!this.closed) {
++        // Ensure that we properly close the ArchiveInputStream
+         super.close();
+         this.closed = true;
+     }
+ }
+\ No newline at end of file

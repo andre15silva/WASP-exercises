@@ -1,0 +1,34 @@
+diff --git a/tmp/e11bcd1a-acde-461f-a9ab-feced70ab407_buggy.java b/tmp/5ca2b1c5-f373-47f1-9a89-eee6563dd902_fixed.java
+index 07b0792..9a756e4 100644
+--- a/tmp/e11bcd1a-acde-461f-a9ab-feced70ab407_buggy.java
++++ b/tmp/5ca2b1c5-f373-47f1-9a89-eee6563dd902_fixed.java
+@@ -1,22 +1,20 @@
+     /**
+      * @return Whether the variable is only assigned a value once for its
+      *     lifetime.
+      */
+     boolean isAssignedOnceInLifetime() {
+       Reference ref = getOneAndOnlyAssignment();
+       if (ref == null) {
+         return false;
+       }
+ 
+-      // Make sure this assignment is not in a loop.
+-      for (BasicBlock block = ref.getBasicBlock();
+-           block != null; block = block.getParent()) {
+-        if (block.isFunction) {
+-          break;
+-        } else if (block.isLoop) {
++      // If the reference is not a variable, it must be considered as a
++      // "read". Otherwise, it could be a read of a member variable of 
++      // an object and thus we would go outside the scope for the
++      // assignment.
++      if (ref.isVariable && ref.isInteresting()) {
++        return Optional.isNullable(findOwner(ref)).isNull();
++      } else {
+         return false;
+       }
+     }
+-
+-      return true;
+-    }

@@ -1,0 +1,16 @@
+diff --git a/tmp/70057eab-b912-4242-bd93-0e2ef6c3acb6_buggy.java b/tmp/be9a04cb-da00-4983-9349-456cf859fe3f_fixed.java
+index 593602f..ef20b7c 100644
+--- a/tmp/70057eab-b912-4242-bd93-0e2ef6c3acb6_buggy.java
++++ b/tmp/be9a04cb-da00-4983-9349-456cf859fe3f_fixed.java
+@@ -1,6 +1,9 @@
+     @Override
+     public String toString() {
+-        return rangesList.stream()
++        return range == null ? rangesList.stream()
+             .map(RangesList::formatRanges)
+-            .collect(joining(OR_JOINER));
++            .collect(joining(OR_JOINER))
++            .replaceAll(AND_JOINER + " ", AND_JOINER)
++            .replaceAll(AND_JOINER + " ", AND_JOINER) :
++            AND_JOINER + " " + range;
+     }

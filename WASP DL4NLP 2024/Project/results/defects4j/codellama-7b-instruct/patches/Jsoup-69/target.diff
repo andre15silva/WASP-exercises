@@ -1,0 +1,10 @@
+diff --git a/tmp/840eaa43-7e99-491a-b866-7ec202b1a0b7_buggy.java b/tmp/ec6072bf-b04a-482d-b6f3-a276dc4bb5b0_fixed.java
+index e69de29..06ab265 100644
+--- a/tmp/840eaa43-7e99-491a-b866-7ec202b1a0b7_buggy.java
++++ b/tmp/ec6072bf-b04a-482d-b6f3-a276dc4bb5b0_fixed.java
+@@ -0,0 +1,5 @@
++    @Override
++    protected void removeChild(Node out) {
++        super.removeChild(out);
++        elements.remove(out);
++    }

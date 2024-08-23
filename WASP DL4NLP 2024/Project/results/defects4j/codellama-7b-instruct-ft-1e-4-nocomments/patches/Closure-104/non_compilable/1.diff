@@ -1,0 +1,44 @@
+diff --git a/tmp/8cb00d8a-d000-4a90-927e-9aa3a12215ec_buggy.java b/tmp/855ca853-708f-411d-a3c5-32aad506cd99_fixed.java
+index b36b2a9..9218213 100644
+--- a/tmp/8cb00d8a-d000-4a90-927e-9aa3a12215ec_buggy.java
++++ b/tmp/855ca853-708f-411d-a3c5-32aad506cd99_fixed.java
+@@ -1,26 +1,35 @@
+   JSType meet(JSType that) {
+     UnionTypeBuilder builder = new UnionTypeBuilder(registry);
+     for (JSType alternate : alternates) {
+       if (alternate.isSubtype(that)) {
+         builder.addAlternate(alternate);
+       }
+     }
+-
+     if (that instanceof UnionType) {
+       for (JSType otherAlternate : ((UnionType) that).alternates) {
+         if (otherAlternate.isSubtype(this)) {
+-          builder.addAlternate(otherAlternate);
++          JSType subtype = alternate.getGreatestSubtype(otherAlternate);
++          if (subtype != null) {
++            builder.addAlternate(subtype);
++          } else {
++            return getNativeType(JSTypeNative.NO_OBJECT_TYPE);
++          }
+         }
+       }
+     } else if (that.isSubtype(this)) {
+-      builder.addAlternate(that);
++      JSType subtype = alternate.getGreatestSubtype(that);
++      if (subtype != null) {
++        builder.addAlternate(subtype);
++      } else {
++        return getNativeType(JSTypeNative.NO_OBJECT_TYPE);
++      }
+     }
+     JSType result = builder.build();
+     if (result != null) {
+       return result;
+     } else if (this.isObject() && that.isObject()) {
+       return getNativeType(JSTypeNative.NO_OBJECT_TYPE);
+     } else {
+       return getNativeType(JSTypeNative.NO_TYPE);
+     }
+   }
+\ No newline at end of file

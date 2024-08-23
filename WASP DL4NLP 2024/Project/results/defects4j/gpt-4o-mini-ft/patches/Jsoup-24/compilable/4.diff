@@ -1,0 +1,52 @@
+diff --git a/tmp/b8c23eeb-c8a4-4d66-8c07-9d0015449628_buggy.java b/tmp/63b71c07-ae07-4451-9a8a-6b5a022857d1_fixed.java
+index b2d53db..db2c7d6 100644
+--- a/tmp/b8c23eeb-c8a4-4d66-8c07-9d0015449628_buggy.java
++++ b/tmp/63b71c07-ae07-4451-9a8a-6b5a022857d1_fixed.java
+@@ -1,34 +1,47 @@
+         void read(Tokeniser t, CharacterReader r) {
+             if (r.matchesLetter()) {
+                 String name = r.consumeLetterSequence();
+                 t.tagPending.appendTagName(name.toLowerCase());
+                 t.dataBuffer.append(name);
+                 r.advance();
+                 return;
+             }
+ 
+             if (t.isAppropriateEndTagToken() && !r.isEmpty()) {
+                 char c = r.consume();
+                 switch (c) {
+                     case '\t':
+                     case '\n':
+                     case '\f':
+                     case ' ':
+                         t.transition(BeforeAttributeName);
+                         break;
++                    case '\"':
++                    case '\'':
++                        c = r.consume();
++                        char quote = c;
++                        t.dataBuffer.append(quote);
++                        t.dataBuffer.append(c);
++                        // consume any remaining chars
++                        while (!r.isEmpty() && (c = r.consume()) != quote) 
++                            t.dataBuffer.append(c);
++                        t.dataBuffer.append(quote);
++                        t.dataBuffer.append(quote); // (double) end quotes
++                        anythingElse(t, r);
++                        break;
+                     case '/':
+                         t.transition(SelfClosingStartTag);
+                         break;
+                     case '>':
+                         t.emitTagPending();
+                         t.transition(Data);
+                         break;
+                     default:
+                         t.dataBuffer.append(c);
+                         anythingElse(t, r);
+                         break;
+                 }
+             } else {
+                 anythingElse(t, r);
+             }
+         }

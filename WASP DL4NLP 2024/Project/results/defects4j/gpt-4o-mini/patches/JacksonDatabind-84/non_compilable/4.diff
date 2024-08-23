@@ -1,0 +1,27 @@
+diff --git a/tmp/802d5ae5-3376-4848-9a4c-be92770905d1_buggy.java b/tmp/a85de5d8-dcaa-4a87-8d44-fd603366e811_fixed.java
+index e69de29..ebb9e2b 100644
+--- a/tmp/802d5ae5-3376-4848-9a4c-be92770905d1_buggy.java
++++ b/tmp/a85de5d8-dcaa-4a87-8d44-fd603366e811_fixed.java
+@@ -0,0 +1,21 @@
++@JsonTypeInfo(use = JsonTypeInfo.Id.CLASS, include = JsonTypeInfo.As.PROPERTY, property = "type")
++@JsonSubTypes({
++    @JsonSubTypes.Type(value = Sub.class, name = "sub")
++})
++public class Base {
++    @JsonProperty("base")
++    private int base = 1;
++
++    public int getBase() {
++        return base;
++    }
++}
++
++public class Sub extends Base {
++    @JsonProperty("sub")
++    private int sub = 2;
++
++    public int getSub() {
++        return sub;
++    }
++}
+\ No newline at end of file

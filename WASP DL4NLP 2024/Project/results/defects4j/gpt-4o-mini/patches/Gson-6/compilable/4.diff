@@ -1,0 +1,33 @@
+diff --git a/tmp/1e5e8fa5-8011-4a14-b222-bc6e354c4f12_buggy.java b/tmp/fac21bb7-95d2-4ec8-bc6a-ea4ffc3b9363_fixed.java
+index 1c53d31..243766d 100644
+--- a/tmp/1e5e8fa5-8011-4a14-b222-bc6e354c4f12_buggy.java
++++ b/tmp/fac21bb7-95d2-4ec8-bc6a-ea4ffc3b9363_fixed.java
+@@ -1,20 +1,25 @@
+ @SuppressWarnings("unchecked") // Casts guarded by conditionals.
+ static TypeAdapter<?> getTypeAdapter(ConstructorConstructor constructorConstructor, Gson gson,
+     TypeToken<?> fieldType, JsonAdapter annotation) {
+   Class<?> value = annotation.value();
+   TypeAdapter<?> typeAdapter;
+   if (TypeAdapter.class.isAssignableFrom(value)) {
+     Class<TypeAdapter<?>> typeAdapterClass = (Class<TypeAdapter<?>>) value;
+     typeAdapter = constructorConstructor.get(TypeToken.get(typeAdapterClass)).construct();
+   } else if (TypeAdapterFactory.class.isAssignableFrom(value)) {
+     Class<TypeAdapterFactory> typeAdapterFactory = (Class<TypeAdapterFactory>) value;
+     typeAdapter = constructorConstructor.get(TypeToken.get(typeAdapterFactory))
+         .construct()
+         .create(gson, fieldType);
+   } else {
+     throw new IllegalArgumentException(
+         "@JsonAdapter value must be TypeAdapter or TypeAdapterFactory reference.");
+   }
+-      typeAdapter = typeAdapter.nullSafe();
+-    return typeAdapter;
++  
++  // Ensure that the typeAdapter is not null before calling nullSafe()
++  if (typeAdapter == null) {
++    throw new IllegalStateException("TypeAdapter cannot be null.");
++  }
++  
++  return typeAdapter.nullSafe();
+ }
+\ No newline at end of file

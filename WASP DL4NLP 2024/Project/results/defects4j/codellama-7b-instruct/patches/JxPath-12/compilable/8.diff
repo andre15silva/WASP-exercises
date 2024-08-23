@@ -1,0 +1,68 @@
+diff --git a/tmp/e13b8d08-f21b-4cc1-bcd1-13264a511f7d_buggy.java b/tmp/437d95ea-f65f-43bb-941d-e6bbf8bee6d6_fixed.java
+index 40f74f7..cf9516a 100644
+--- a/tmp/e13b8d08-f21b-4cc1-bcd1-13264a511f7d_buggy.java
++++ b/tmp/437d95ea-f65f-43bb-941d-e6bbf8bee6d6_fixed.java
+@@ -1,50 +1,20 @@
+     public static boolean testNode(Node node, NodeTest test) {
+-        if (test == null) {
+-            return true;
+-        }
+         if (test instanceof NodeNameTest) {
+-            if (node.getNodeType() != Node.ELEMENT_NODE) {
+-                return false;
+-            }
+-
+-            NodeNameTest nodeNameTest = (NodeNameTest) test;
+-            QName testName = nodeNameTest.getNodeName();
+-            String namespaceURI = nodeNameTest.getNamespaceURI();
+-            boolean wildcard = nodeNameTest.isWildcard();
+-            String testPrefix = testName.getPrefix();
+-            if (wildcard && testPrefix == null) {
+-                return true;
++            // check if the node is an instance of NodeNameTest
++            if (node instanceof NodeNameTest) {
++                // do something for NodeNameTest
+             }
+-            if (wildcard
+-                || testName.getName()
+-                        .equals(DOMNodePointer.getLocalName(node))) {
+-                String nodeNS = DOMNodePointer.getNamespaceURI(node);
+-                return equalStrings(namespaceURI, nodeNS);
+-            }
+-            return false;
+-        }
+-        if (test instanceof NodeTypeTest) {
+-            int nodeType = node.getNodeType();
+-            switch (((NodeTypeTest) test).getNodeType()) {
+-                case Compiler.NODE_TYPE_NODE :
+-                    return nodeType == Node.ELEMENT_NODE
+-                            || nodeType == Node.DOCUMENT_NODE;
+-                case Compiler.NODE_TYPE_TEXT :
+-                    return nodeType == Node.CDATA_SECTION_NODE
+-                        || nodeType == Node.TEXT_NODE;
+-                case Compiler.NODE_TYPE_COMMENT :
+-                    return nodeType == Node.COMMENT_NODE;
+-                case Compiler.NODE_TYPE_PI :
+-                    return nodeType == Node.PROCESSING_INSTRUCTION_NODE;
+-            }
+-            return false;
++        } else if (test instanceof NodeTypeTest) {
++            // check if the node is an instance of NodeTypeTest
++            if (node instanceof NodeTypeTest) {
++                // do something for NodeTypeTest
+             }
+-        if (test instanceof ProcessingInstructionTest) {
+-            if (node.getNodeType() == Node.PROCESSING_INSTRUCTION_NODE) {
+-                String testPI = ((ProcessingInstructionTest) test).getTarget();
+-                String nodePI = ((ProcessingInstruction) node).getTarget();
+-                return testPI.equals(nodePI);
++        } else if (test instanceof ProcessingInstructionTest) {
++            // check if the node is an instance of ProcessingInstructionTest
++            if (node instanceof ProcessingInstructionTest) {
++                // do something for ProcessingInstructionTest
+             }
+         }
++        // add the return statement at the end of the function
+         return false;
+     }
+\ No newline at end of file

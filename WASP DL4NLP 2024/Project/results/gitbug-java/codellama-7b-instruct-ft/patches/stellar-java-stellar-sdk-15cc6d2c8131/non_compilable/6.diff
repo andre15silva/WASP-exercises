@@ -1,0 +1,17 @@
+diff --git a/tmp/12569d7e-e9a0-49ee-98ca-b167217acc13_buggy.java b/tmp/591a36ee-e9b5-413a-b887-f595392a0e4c_fixed.java
+index 7be2eb0..96ce247 100644
+--- a/tmp/12569d7e-e9a0-49ee-98ca-b167217acc13_buggy.java
++++ b/tmp/591a36ee-e9b5-413a-b887-f595392a0e4c_fixed.java
+@@ -1,11 +1,11 @@
+   @Override
+   public boolean equals(Object object) {
+     if (!(object instanceof KeyPair)) {
+       return false;
+     }
+ 
+     KeyPair other = (KeyPair) object;
+     return this.mPrivateKey.equals(other.mPrivateKey) &&
+-            this.mPublicKey.equals(other.mPublicKey);
++            this.mPublicKey.toAccountId().equals(other.mPublicKey.toAccountId());
+ 
+   }

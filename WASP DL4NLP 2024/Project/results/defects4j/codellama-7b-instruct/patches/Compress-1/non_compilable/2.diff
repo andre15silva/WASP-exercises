@@ -1,0 +1,24 @@
+diff --git a/tmp/4f937fa5-dee1-4fef-b7b2-62803b7a9de7_buggy.java b/tmp/5a4ed308-42b7-45cd-af8e-053c16f1da47_fixed.java
+index c3986cc..edf9efe 100644
+--- a/tmp/4f937fa5-dee1-4fef-b7b2-62803b7a9de7_buggy.java
++++ b/tmp/5a4ed308-42b7-45cd-af8e-053c16f1da47_fixed.java
+@@ -1,13 +1,16 @@
+     /**
+      * Closes the CPIO output stream as well as the stream being filtered.
+      * 
++     * This method calls the super.close() method, sets the closed field to
++     * true, and ensures that all the underlying resources are properly
++     * closed.
++     *
+      * @throws IOException
+      *             if an I/O error has occurred or if a CPIO file error has
+      *             occurred
+      */
+     public void close() throws IOException {
+-        if (!this.closed) {
+         super.close();
+         this.closed = true;
+-        }
++        IOUtils.closeQuietly(out);
+     }
+\ No newline at end of file

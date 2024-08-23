@@ -1,0 +1,177 @@
+diff --git a/tmp/6ac601fc-0f8c-4527-a225-a8cec15a7495_buggy.java b/tmp/0706d473-5003-497a-b66e-e6eb40a583df_fixed.java
+index 032fa8e..2d0e086 100644
+--- a/tmp/6ac601fc-0f8c-4527-a225-a8cec15a7495_buggy.java
++++ b/tmp/0706d473-5003-497a-b66e-e6eb40a583df_fixed.java
+@@ -1,108 +1,172 @@
+     /** Evaluate the impact of the proposed step on the event handler.
+      * @param interpolator step interpolator for the proposed step
+      * @return true if the event handler triggers an event before
+      * the end of the proposed step (this implies the step should be
+      * rejected)
+      * @exception DerivativeException if the interpolator fails to
+      * compute the switching function somewhere within the step
+      * @exception EventException if the switching function
+      * cannot be evaluated
+      * @exception ConvergenceException if an event cannot be located
+      */
+     public boolean evaluateStep(final StepInterpolator interpolator)
+         throws DerivativeException, EventException, ConvergenceException {
+ 
+         try {
+ 
+             forward = interpolator.isForward();
+             final double t1 = interpolator.getCurrentTime();
+             final int    n  = Math.max(1, (int) Math.ceil(Math.abs(t1 - t0) / maxCheckInterval));
+             final double h  = (t1 - t0) / n;
+ 
+             double ta = t0;
+             double ga = g0;
+             double tb = t0 + (interpolator.isForward() ? convergence : -convergence);
+             for (int i = 0; i < n; ++i) {
+ 
+                 // evaluate handler value at the end of the substep
+                 tb += h;
+                 interpolator.setInterpolatedTime(tb);
+                 final double gb = handler.g(tb, interpolator.getInterpolatedState());
+ 
+                 // check events occurrence
+                 if (g0Positive ^ (gb >= 0)) {
+                     // there is a sign change: an event is expected during this step
+ 
++                    if (Math.abs(ta - tb) < Math.PI / 2) {
++                        // close events: we need to find an event near the step end point
++                        // we cannot evaluate f(t) at the end points directly since g(t) != f(t) and then
++                        // f must be evaluated at both end points
++
+                         // this is a corner case:
+                         // - there was an event near ta,
+                         // - there is another event between ta and tb
+                         // - when ta was computed, convergence was reached on the "wrong side" of the interval
+                         // this implies that the real sign of ga is the same as gb, so we need to slightly
+                         // shift ta to make sure ga and gb get opposite signs and the solver won't complain
+                         // about bracketing
+                             // this should never happen
+                          
+                         // variation direction, with respect to the integration direction
+                         increasing = gb >= ga;
+ 
++                        final double end1 = 0.5 * ta + 0.5 * tb;
++                        final double end2 = 0.5 * tb + 0.5 * (1.0 + tolerance);
++                        final UnivariateRealFunction f = new UnivariateRealFunction() {
++                            public double value(final double t) throws FunctionEvaluationException {
++                                try {
++                                    interpolator.setInterpolatedTime(t);
++                                    return handler.g(t, interpolator.getInterpolatedState());
++                                } catch (DerivativeException e) {
++                                    throw new FunctionEvaluationException(e, t);
++                                } catch (EventException e) {
++                                    throw new FunctionEvaluationException(e, t);
++                                }
++                            }
++                        };
++                        final BrentSolver solver = new BrentSolver();
++                        solver.setAbsoluteAccuracy(convergence);
++                        solver.setMaximalIterationCount(maxIterationCount);
++                        double root;
++                        double min;
++                        if ((end1 >= t0) && (end1 <= t1)) {
++                            // the first endpoint is in the step
++                            // use it as an initial estimate for the solver
++                            root = end1;
++                            min = Math.max(end1 - startTolerance, t0);
++                        } else if ((end2 >= t0) && (end2 <= t1)) {
++                            // the second endpoint is in the step
++                            // use it as an initial estimate for the solver
++                            root = end2;
++                            min = Math.max(end2 - startTolerance, t0);
++                        } else {
++                            // both endpoints are out of the step
++                            // use step end time instead as an initial estimate for the solver
++                            root = t1;
++                            min = Math.max(tb - startTolerance, t0);
++                        }
++                        if (Math.abs(min - maxCheckInterval) < 10.0 * maxCheckInterval) {
++                            // this is a corner case when min is very close to maxCheckInterval
++                            // (which happens if step size is very small)
++                            // we have to use an appropriate step size in this case
++                            min = convergence * 10.0;
++                        }
++                        final double rootEnd = (int) Math.rint((root - min) / maxCheckInterval) * maxCheckInterval + min;
++                        final double first = min;
++                        final double last  = rootEnd;
++                        root = (first <= last) ? solver.solve(f, first, last) : solver.solve(f, last, first);
++                        // since root and first are close to each other (or in a very
++                        // small step size), we use a more accurate value as the new ta
++                        ta = Math.max(min, last);
++                        ga = f.value(ta);
++                        gb = f.value(ta - (increasing ? convergence * maxCheckInterval : -convergence * maxCheckInterval));
++                    } else {
++                        // far events: we are going to estimate the event first time
++                        // using the interval size
++
++                        // variation direction, with respect to the integration direction
++                        increasing = gb >= ga;
++
+                         final UnivariateRealFunction f = new UnivariateRealFunction() {
+                             public double value(final double t) throws FunctionEvaluationException {
+                                 try {
+                                     interpolator.setInterpolatedTime(t);
+                                     return handler.g(t, interpolator.getInterpolatedState());
+                                 } catch (DerivativeException e) {
+                                     throw new FunctionEvaluationException(e, t);
+                                 } catch (EventException e) {
+                                     throw new FunctionEvaluationException(e, t);
+                                 }
+                             }
+                         };
+                         final BrentSolver solver = new BrentSolver();
+                         solver.setAbsoluteAccuracy(convergence);
+                         solver.setMaximalIterationCount(maxIterationCount);
+                         final double root = (ta <= tb) ? solver.solve(f, ta, tb) : solver.solve(f, tb, ta);
+                         if ((Math.abs(root - ta) <= convergence) &&
+                          (Math.abs(root - previousEventTime) <= convergence)) {
+                             // we have either found nothing or found (again ?) a past event, we simply ignore it
+                             ta = tb;
+                             ga = gb;
+                         } else if (Double.isNaN(previousEventTime) ||
+                                (Math.abs(previousEventTime - root) > convergence)) {
+                             pendingEventTime = root;
+                             if (pendingEvent && (Math.abs(t1 - pendingEventTime) <= convergence)) {
+                                 // we were already waiting for this event which was
+                                 // found during a previous call for a step that was
+                                 // rejected, this step must now be accepted since it
+                                 // properly ends exactly at the event occurrence
+                                 return false;
+                             }
+                             // either we were not waiting for the event or it has
+                             // moved in such a way the step cannot be accepted
+                             pendingEvent = true;
+                             return true;
+                         }
+ 
++                    }
++
+                 } else {
+                     // no sign change: there is no event for now
+                     ta = tb;
+                     ga = gb;
+                 }
+ 
+             }
+ 
+             // no event during the whole step
+             pendingEvent     = false;
+             pendingEventTime = Double.NaN;
+             return false;
+ 
+         } catch (FunctionEvaluationException e) {
+             final Throwable cause = e.getCause();
+             if ((cause != null) && (cause instanceof DerivativeException)) {
+                 throw (DerivativeException) cause;
+             } else if ((cause != null) && (cause instanceof EventException)) {
+                 throw (EventException) cause;
+             }
+             throw new EventException(e);
+         }
+ 
+     }

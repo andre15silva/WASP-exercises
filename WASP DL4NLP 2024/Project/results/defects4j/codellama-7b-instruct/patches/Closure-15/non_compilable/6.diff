@@ -1,0 +1,49 @@
+diff --git a/tmp/e710782e-3181-4d5b-b9f7-244b25b3c036_buggy.java b/tmp/94258eb8-8fa0-469c-b029-2d2002e92995_fixed.java
+index b56897c..e2684af 100644
+--- a/tmp/e710782e-3181-4d5b-b9f7-244b25b3c036_buggy.java
++++ b/tmp/94258eb8-8fa0-469c-b029-2d2002e92995_fixed.java
+@@ -1,27 +1,26 @@
+-      @Override
+-      public boolean apply(Node n) {
+-        // When the node is null it means, we reached the implicit return
+-        // where the function returns (possibly without an return statement)
+-        if (n == null) {
+-          return false;
++public class Test {
++  public static void main(String[] args) {
++    Node n = null;
++    boolean b = apply(n);
+   }
+ 
+-        // TODO(user): We only care about calls to functions that
+-        // passes one of the dependent variable to a non-side-effect free
+-        // function.
+-        if (n.isCall() && NodeUtil.functionCallHasSideEffects(n)) {
+-          return true;
++  public static boolean apply(Node n) {
++    // Buggy code here
+   }
+ 
+-        if (n.isNew() && NodeUtil.constructorCallHasSideEffects(n)) {
+-          return true;
++  public static boolean isCall() {
++    // TODO(user): Implement this
+   }
+ 
++  public static boolean NodeUtil.functionCallHasSideEffects(Node n) {
++    // TODO(user): Implement this
++  }
+ 
+-        for (Node c = n.getFirstChild(); c != null; c = c.getNext()) {
+-          if (!ControlFlowGraph.isEnteringNewCfgNode(c) && apply(c)) {
+-            return true;
++  public static boolean NodeUtil.constructorCallHasSideEffects(Node n) {
++    // TODO(user): Implement this
+   }
++
++  public static boolean ControlFlowGraph.isEnteringNewCfgNode(Node n) {
++    // TODO(user): Implement this
+   }
+-        return false;
+ }
+\ No newline at end of file

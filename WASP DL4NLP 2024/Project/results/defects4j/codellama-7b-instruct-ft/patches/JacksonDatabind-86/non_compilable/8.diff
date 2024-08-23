@@ -1,0 +1,39 @@
+diff --git a/tmp/db679a7a-a272-47f8-a04a-7f718c8d6922_buggy.java b/tmp/01d890d2-eaa8-46a1-978b-cf3ddbca0ce5_fixed.java
+index e69de29..c5e0e16 100644
+--- a/tmp/db679a7a-a272-47f8-a04a-7f718c8d6922_buggy.java
++++ b/tmp/01d890d2-eaa8-46a1-978b-cf3ddbca0ce5_fixed.java
+@@ -0,0 +1,34 @@
++    private static class Base {
++        @JsonTypeInfo(use=JsonTypeInfo.Id.CLASS)
++        public java.lang.Object a;
++    }
++
++    private static class Sub extends Base {
++        public Sub() { }
++        public Sub(long n) {
++            a = n;
++        }
++        public Sub(int n) {
++            a = n;
++        }
++    }
++
++    private static class WithReferencedJavaType {
++        public WithReferencedJavaType(Base base, int id) {
++            super();
++            this.base = base;
++            this.id = id;
++        }
++        public Base base;
++        public int id;
++    }
++
++    private static class WithReferencedType {
++        public WithReferencedType(Sub<?> base, int id) {
++            super();
++            this.base = base;
++            this.id = id;
++        }
++        public Sub<?> base;
++        public int id;
++    }

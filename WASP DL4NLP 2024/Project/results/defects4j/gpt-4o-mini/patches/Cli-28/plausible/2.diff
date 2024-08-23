@@ -1,0 +1,64 @@
+diff --git a/tmp/ef590b17-c343-4124-a0ea-e201f91cf4d3_buggy.java b/tmp/0a4b92ac-4939-418b-86f6-2c9e9457a976_fixed.java
+index a7549f0..4bfd572 100644
+--- a/tmp/ef590b17-c343-4124-a0ea-e201f91cf4d3_buggy.java
++++ b/tmp/0a4b92ac-4939-418b-86f6-2c9e9457a976_fixed.java
+@@ -1,50 +1,32 @@
+-    /**
+-     * Sets the values of Options using the values in <code>properties</code>.
+-     *
+-     * @param properties The value properties to be processed.
+-     */
+ protected void processProperties(Properties properties)
+ {
+     if (properties == null)
+     {
+         return;
+     }
+ 
+     for (Enumeration e = properties.propertyNames(); e.hasMoreElements();)
+     {
+         String option = e.nextElement().toString();
+ 
+         if (!cmd.hasOption(option))
+         {
+             Option opt = getOptions().getOption(option);
+ 
+             // get the value from the properties instance
+             String value = properties.getProperty(option);
+ 
+             if (opt.hasArg())
+             {
+-                    if (opt.getValues() == null || opt.getValues().length == 0)
+-                    {
+-                        try
+-                        {
+-                            opt.addValueForProcessing(value);
+-                        }
+-                        catch (RuntimeException exp)
+-                        {
+-                            // if we cannot add the value don't worry about it
+-                        }
+-                    }
+-                }
+-                else if (!("yes".equalsIgnoreCase(value)
+-                        || "true".equalsIgnoreCase(value)
+-                        || "1".equalsIgnoreCase(value)))
+-                {
+-                    // if the value is not yes, true or 1 then don't add the
+-                    // option to the CommandLine
+-                    break;
+-                }
+-
++                // Always add option to CommandLine since it may accept arguments
+                 cmd.addOption(opt);
++                opt.addValueForProcessing(value);  // Adding value directly for options with args
++            }
++            else if ("yes".equalsIgnoreCase(value) || "true".equalsIgnoreCase(value) || "1".equalsIgnoreCase(value))
++            {
++                cmd.addOption(opt);  // Add option if the value is "yes", "true" or "1"
++            }
++            // No need to add anything for false values, so we skip this
+         }
+     }
+ }
+\ No newline at end of file

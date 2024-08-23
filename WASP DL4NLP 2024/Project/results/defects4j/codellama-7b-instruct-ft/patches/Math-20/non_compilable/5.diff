@@ -1,0 +1,14 @@
+diff --git a/tmp/22d53acd-5c41-4b3a-897d-71e43f53fd25_buggy.java b/tmp/8981c398-9400-4960-b673-e808e5375f7a_fixed.java
+index 46799da..6027cdf 100644
+--- a/tmp/22d53acd-5c41-4b3a-897d-71e43f53fd25_buggy.java
++++ b/tmp/8981c398-9400-4960-b673-e808e5375f7a_fixed.java
+@@ -1,8 +1,8 @@
+         /**
+          * @param x Normalized objective variables.
+          * @return the original objective variables, possibly repaired.
+          */
+         public double[] repairAndDecode(final double[] x) {
+             return
+-                decode(x);
++                math.toReal(decode(math.toX(x)));
+         }

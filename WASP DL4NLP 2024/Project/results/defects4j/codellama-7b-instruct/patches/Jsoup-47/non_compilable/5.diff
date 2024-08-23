@@ -1,0 +1,118 @@
+diff --git a/tmp/6fd2a7f6-213f-42a1-b18d-32ff6bc0604d_buggy.java b/tmp/7549299b-5506-4618-8b0a-498cf1b8f72f_fixed.java
+index d28ed6a..7d0c54d 100644
+--- a/tmp/6fd2a7f6-213f-42a1-b18d-32ff6bc0604d_buggy.java
++++ b/tmp/7549299b-5506-4618-8b0a-498cf1b8f72f_fixed.java
+@@ -1,78 +1,34 @@
+-    // this method is ugly, and does a lot. but other breakups cause rescanning and stringbuilder generations
+-    static void escape(StringBuilder accum, String string, Document.OutputSettings out,
+-                       boolean inAttribute, boolean normaliseWhite, boolean stripLeadingWhite) {
+-
+-        boolean lastWasWhite = false;
+-        boolean reachedNonWhite = false;
+-        final EscapeMode escapeMode = out.escapeMode();
+-        final CharsetEncoder encoder = out.encoder();
+-        final CoreCharset coreCharset = CoreCharset.byName(encoder.charset().name());
+-        final Map<Character, String> map = escapeMode.getMap();
+-        final int length = string.length();
+-
+-        int codePoint;
+-        for (int offset = 0; offset < length; offset += Character.charCount(codePoint)) {
+-            codePoint = string.codePointAt(offset);
+-
+-            if (normaliseWhite) {
+-                if (StringUtil.isWhitespace(codePoint)) {
+-                    if ((stripLeadingWhite && !reachedNonWhite) || lastWasWhite)
+-                        continue;
+-                    accum.append(' ');
+-                    lastWasWhite = true;
+-                    continue;
+-                } else {
+-                    lastWasWhite = false;
+-                    reachedNonWhite = true;
+-                }
+-            }
+-            // surrogate pairs, split implementation for efficiency on single char common case (saves creating strings, char[]):
+-            if (codePoint < Character.MIN_SUPPLEMENTARY_CODE_POINT) {
+-                final char c = (char) codePoint;
+-                // html specific and required escapes:
+-                switch (c) {
+-                    case '&':
+-                        accum.append("&amp;");
+-                        break;
+-                    case 0xA0:
+-                        if (escapeMode != EscapeMode.xhtml)
+-                            accum.append("&nbsp;");
+-                        else
+-                            accum.append("&#xa0;");
+-                        break;
+-                    case '<':
+-                        // escape when in character data or when in a xml attribue val; not needed in html attr val
+-                        if (!inAttribute)
+-                            accum.append("&lt;");
+-                        else
+-                            accum.append(c);
+-                        break;
+-                    case '>':
+-                        if (!inAttribute)
+-                            accum.append("&gt;");
+-                        else
+-                            accum.append(c);
+-                        break;
+-                    case '"':
+-                        if (inAttribute)
+-                            accum.append("&quot;");
+-                        else
+-                            accum.append(c);
+-                        break;
+-                    default:
+-                        if (canEncode(coreCharset, c, encoder))
+-                            accum.append(c);
+-                        else if (map.containsKey(c))
+-                            accum.append('&').append(map.get(c)).append(';');
+-                        else
+-                            accum.append("&#x").append(Integer.toHexString(codePoint)).append(';');
+-                }
+-            } else {
+-                final String c = new String(Character.toChars(codePoint));
+-                if (encoder.canEncode(c)) // uses fallback encoder for simplicity
+-                    accum.append(c);
+-                else
+-                    accum.append("&#x").append(Integer.toHexString(codePoint)).append(';');
+-            }
+-        }
+-    }
++
++## 3. Code
++
++The code in question is a method that takes a `StringBuilder`, a `String`, a `Document.OutputSettings` object, and a few boolean flags as input, and appends the encoded version of the `String` to the `StringBuilder`. The method is intended to encode a string according to the specified output settings, such as whether to escape HTML characters or not.
++
++The method uses a state machine to keep track of the current state of the output and encode the characters of the input string accordingly. It also takes advantage of the `EscapeMode` class to handle the specific encoding requirements of different output modes.
++
++The problem is that the method is not fully functional, and does not produce the expected output in some cases. Specifically, it fails the test `testEscapesGtInXmlAttributesButNotInHtml` in the JUnit test suite. The test expects the method to produce an output that is similar to the expected output in the test case, but the method is not producing the expected output.
++
++To fix the problem, the method needs to be modified to produce the expected output in the test case. This involves reviewing the code and identifying the error or inconsistency in the method's implementation. Once the issue is identified, it can be fixed by making necessary changes to the method.
++
++## 4. Inputs and Outputs
++
++The inputs to the method are a `StringBuilder` object, a `String` object, a `Document.OutputSettings` object, and a few boolean flags. These inputs provide the context and requirements for the method, which are used to determine how the output is generated.
++
++The method's output is a `StringBuilder` object, which is modified by the method to include the encoded version of the input `String`. This output is used to store the encoded string for further processing or output.
++
++## 5. Testing
++
++The method is tested using a JUnit test suite. The test suite provides a series of tests that exercise the method in different scenarios and check the output against expected results. The tests cover different aspects of the method's behavior and ensure that it works correctly in a wide range of use cases.
++
++The `testEscapesGtInXmlAttributesButNotInHtml` test in particular checks that the method does not escape the `<` character in XML attributes, but does escape it in XML documents. This test is failing because the method is not producing the expected output in this case.
++
++## 6. Approach
++
++To fix the bug in the method, we can follow these steps:
++
++1. Review the code and identify the error or inconsistency in its implementation.
++2. Make necessary changes to the method to fix the issue and produce the expected output in the test case.
++3. Test the modified method to ensure that it is working correctly and producing the expected output.
++
++## 7. Implementation
++
++Here is the modified version of the method that fixes the bug and produces the expected output in the test case:
+\ No newline at end of file

@@ -1,0 +1,32 @@
+diff --git a/tmp/9e373803-3f18-4ec9-812e-1544c1644acc_buggy.java b/tmp/dc66bd93-12c8-4766-869e-bc56f543813f_fixed.java
+index 98d89dc..9528034 100644
+--- a/tmp/9e373803-3f18-4ec9-812e-1544c1644acc_buggy.java
++++ b/tmp/dc66bd93-12c8-4766-869e-bc56f543813f_fixed.java
+@@ -1,23 +1,24 @@
+     private boolean compute(Object left, Object right) {
+         left = reduce(left);
+         right = reduce(right);
+-
+         if (left instanceof InitialContext) {
+             ((InitialContext) left).reset();
+         }
+         if (right instanceof InitialContext) {
+             ((InitialContext) right).reset();
+         }
+         if (left instanceof Iterator && right instanceof Iterator) {
+             return findMatch((Iterator) left, (Iterator) right);
+         }
+         if (left instanceof Iterator) {
+             return containsMatch((Iterator) left, right);
+         }
+         if (right instanceof Iterator) {
+             return containsMatch((Iterator) right, left);
+         }
+         double ld = InfoSetUtil.doubleValue(left);
+         double rd = InfoSetUtil.doubleValue(right);
+-        return evaluateCompare(ld == rd ? 0 : ld < rd ? -1 : 1);
++        int compare = (ld != ld || rd != rd) ? 0 : Double.toRawLongBits(ld) == Double.toRawLongBits(rd) ?
++                0 : (ld < rd ? -1 : 1);
++        return evaluateCompare(compare);
+     }
+\ No newline at end of file

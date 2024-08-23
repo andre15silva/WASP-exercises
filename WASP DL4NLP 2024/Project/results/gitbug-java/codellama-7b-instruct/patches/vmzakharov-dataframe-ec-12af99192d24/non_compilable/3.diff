@@ -1,0 +1,17 @@
+diff --git a/tmp/c9e3c4eb-41a8-4ac3-945c-e272bd26e785_buggy.java b/tmp/b0d65c75-7a4f-4aa2-bc05-0dcdda574003_fixed.java
+index 8bae155..eadfb5e 100644
+--- a/tmp/c9e3c4eb-41a8-4ac3-945c-e272bd26e785_buggy.java
++++ b/tmp/b0d65c75-7a4f-4aa2-bc05-0dcdda574003_fixed.java
+@@ -1,5 +1,11 @@
+     @Override
+     public String asStringLiteral()
+     {
+-        return '"' + this.value + '"';
++        String result =
++            "\"" +
++            this.value.
++                replace("\"","'"") + // replace " with '
++                "'"
++            + "\""; // add back the initial "
++        return result;
+     }

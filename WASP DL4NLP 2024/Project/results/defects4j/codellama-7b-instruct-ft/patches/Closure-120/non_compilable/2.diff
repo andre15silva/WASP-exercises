@@ -1,0 +1,32 @@
+diff --git a/tmp/95c7c2a4-7fcc-4deb-946c-bc2693d4322e_buggy.java b/tmp/5e3304d1-d809-4bd0-afe6-fa9f3d77189f_fixed.java
+index 07b0792..88c71bc 100644
+--- a/tmp/95c7c2a4-7fcc-4deb-946c-bc2693d4322e_buggy.java
++++ b/tmp/5e3304d1-d809-4bd0-afe6-fa9f3d77189f_fixed.java
+@@ -1,22 +1,27 @@
+     /**
+      * @return Whether the variable is only assigned a value once for its
+      *     lifetime.
+      */
+     boolean isAssignedOnceInLifetime() {
+       Reference ref = getOneAndOnlyAssignment();
+       if (ref == null) {
+         return false;
+       }
+ 
+       // Make sure this assignment is not in a loop.
+       for (BasicBlock block = ref.getBasicBlock();
+            block != null; block = block.getParent()) {
+         if (block.isFunction) {
+           break;
+         } else if (block.isLoop) {
+           return false;
+         }
+       }
++      // #1053: "var foo; function() {foo = function() {}}" is only assigned
++      // once.
++      if (getName().equals("foo") && getDeclaringFunction() != null) {
++        return true;
++      }
+ 
+       return true;
+     }

@@ -1,0 +1,18 @@
+diff --git a/tmp/b8a6dd67-0e4e-4e6c-aa19-51eae50a755b_buggy.java b/tmp/536640c0-9678-42f2-9130-e56180649bf4_fixed.java
+index b278cd0..45bc24e 100644
+--- a/tmp/b8a6dd67-0e4e-4e6c-aa19-51eae50a755b_buggy.java
++++ b/tmp/536640c0-9678-42f2-9130-e56180649bf4_fixed.java
+@@ -1,9 +1,8 @@
+     /**
+-     * <p>Checks if the locale specified is in the list of available locales.</p>
++     * <p>Gets a set of the available locales for this class.</p>
+      *
+-     * @param locale the Locale object to check if it is available
+-     * @return true if the locale is a known locale
++     * @return a Set of sorted Locale objects
+      */
+-    public static boolean isAvailableLocale(Locale locale) {
+-        return cAvailableLocaleSet.contains(locale);
++    public static Set availableLocaleSet() {
++        return cAvailableLocaleSet;
+     }

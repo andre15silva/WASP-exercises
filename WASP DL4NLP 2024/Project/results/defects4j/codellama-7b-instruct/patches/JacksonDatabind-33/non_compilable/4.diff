@@ -1,0 +1,51 @@
+diff --git a/tmp/1ac83c31-10c9-4add-95c0-cd41f5ad0ed9_buggy.java b/tmp/aadcae56-9c8f-4e2f-b780-f6cef26163d5_fixed.java
+index 3cb9232..c8f1875 100644
+--- a/tmp/1ac83c31-10c9-4add-95c0-cd41f5ad0ed9_buggy.java
++++ b/tmp/aadcae56-9c8f-4e2f-b780-f6cef26163d5_fixed.java
+@@ -1,26 +1,24 @@
+-    @Override
+-    public PropertyName findNameForSerialization(Annotated a)
++@JsonSerialize(using = IncludeExcludeFieldsFilter.class)
++public class IncludeExcludeFieldsFilter
++        extends FilterProvider
++        implements SimpleFilterProvider
+ {
+-        String name = null;
+-
+-        JsonGetter jg = _findAnnotation(a, JsonGetter.class);
+-        if (jg != null) {
+-            name = jg.value();
+-        } else {
+-            JsonProperty pann = _findAnnotation(a, JsonProperty.class);
+-            if (pann != null) {
+-                name = pann.value();
+-                /* 22-Apr-2014, tatu: Should figure out a better way to do this, but
+-                 *   it's actually bit tricky to do it more efficiently (meta-annotations
+-                 *   add more lookups; AnnotationMap costs etc)
+-                 */
+-            } else if (_hasAnnotation(a, JsonSerialize.class)
+-                    || _hasAnnotation(a, JsonView.class)
+-                    || _hasAnnotation(a, JsonRawValue.class)) {
+-                name = "";
+-            } else {
+-                return null;
++    @Override
++    public PropertyName findNameForSerialization(Annotated a) {
++        // this method is to be fixed
+     }
++
++    @Override
++    public void setDefaultFiltering(DefaultFilterProvider defaultFiltering) { }
++
++    @Override
++    public void setFilters(FilterProvider filterProvider) { }
++
++    @Override
++    public boolean useAnnotations() {
++        return true;
+     }
+-        return PropertyName.construct(name);
++
++    @Override
++    public void initialize(BootstrapContext context) { }
+ }

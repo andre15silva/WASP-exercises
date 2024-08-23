@@ -1,0 +1,38 @@
+diff --git a/tmp/ee70ef21-c507-4b53-bab2-03790e026ec6_buggy.java b/tmp/2c5e3441-823d-4d4b-adc8-43a81e2aac05_fixed.java
+index d56e399..4533904 100644
+--- a/tmp/ee70ef21-c507-4b53-bab2-03790e026ec6_buggy.java
++++ b/tmp/2c5e3441-823d-4d4b-adc8-43a81e2aac05_fixed.java
+@@ -1,11 +1,22 @@
+-    /**
+-     * <p>Formats a <code>Date</code> object.</p>
+-     * 
+-     * @param date  the date to format
+-     * @return the formatted string
+-     */
+-    public String format(Date date) {
+-        Calendar c = new GregorianCalendar(mTimeZone);
+-        c.setTime(date);
+-        return applyRules(c, new StringBuffer(mMaxLengthEstimate)).toString();
++protected StringBuffer applyRules(Calendar calendar, StringBuffer buf) {
++  int field;
++  int pos;
++  int count = mRules.length;
++  for (pos = count, field = mRules[--pos]; pos > 0; field = mRules[--pos]) {
++    if (field == Character.MAX_CODE_POINT) {
++        int value;
++        pos--;
++        field = mRules[pos];
++        if (field == 4 || field == 5) {
++            value = calendar.get(field);
++        } else {
++            value = calendar.getActualMaximum(field);
++        }
++        pos++;
++        buf.append(Integer.toString(value));
++    } else {
++        buf.append(getRuleText(field));
++    }
++  }
++  return buf;
+ }
+\ No newline at end of file

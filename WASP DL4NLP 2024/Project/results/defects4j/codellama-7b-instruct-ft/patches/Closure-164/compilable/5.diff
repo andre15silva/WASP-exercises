@@ -1,0 +1,108 @@
+diff --git a/tmp/c60b1022-50ad-47de-9923-d5284235514c_buggy.java b/tmp/e90cd4f2-f71a-4b08-a0a4-ba53877d2e00_fixed.java
+index 9976e43..255607f 100644
+--- a/tmp/c60b1022-50ad-47de-9923-d5284235514c_buggy.java
++++ b/tmp/e90cd4f2-f71a-4b08-a0a4-ba53877d2e00_fixed.java
+@@ -1,76 +1,95 @@
+   @Override
+   public boolean isSubtype(JSType other) {
+     if (!(other instanceof ArrowType)) {
+       return false;
+     }
+ 
+     ArrowType that = (ArrowType) other;
+ 
+     // This is described in Draft 2 of the ES4 spec,
+     // Section 3.4.7: Subtyping Function Types.
+ 
+     // this.returnType <: that.returnType (covariant)
+-    if (!this.returnType.isSubtype(that.returnType)) {
++    //
++    // If they have the same number of parameters, no need to
++    // worry about var_args.
++    int thisNumParams = this.parameters.getChildCount();
++    int thatNumParams = that.parameters.getChildCount();
++    int numParamsToCheck = thisNumParams;
++    if (thisNumParams > thatNumParams) {
++      // "that" can't be a supertype, because it's missing a required parameter.
++      // It's not a 100% guarantee that "that" is a subtype of "this", but
++      // it's better than nothing.
++      return false;
++    } else if (thisNumParams < thatNumParams) {
++      // "that" could be a supertype... see the example in method-inference-tests.js.
++      numParamsToCheck = thatNumParams;
++    }
++    if (this.returnType instanceof FunctionType &&
++        that.returnType instanceof FunctionType &&
++        numParamsToCheck == thisNumParams) {
++      FunctionType otherReturnType = (FunctionType) that.returnType;
++      FunctionType thisReturnType = (FunctionType) this.returnType;
++      if (!FunctionType.isSubtypeHelper(thisReturnType, otherReturnType)) {
++        return false;
++      }
++    } else if (this.returnType != that.returnType) {
+       return false;
+     }
+ 
+     // that.paramType[i] <: this.paramType[i] (contravariant)
+     //
+     // If this.paramType[i] is required,
+     // then that.paramType[i] is required.
+     //
+     // In theory, the "required-ness" should work in the other direction as
+     // well. In other words, if we have
+     //
+     // function f(number, number) {}
+     // function g(number) {}
+     //
+-    // Then f *should* not be a subtype of g, and g *should* not be
+-    // a subtype of f. But in practice, we do not implement it this way.
+-    // We want to support the use case where you can pass g where f is
+-    // expected, and pretend that g ignores the second argument.
+-    // That way, you can have a single "no-op" function, and you don't have
+-    // to create a new no-op function for every possible type signature.
++    // Then this.f < that.g, and this.g < this.f.
+     //
+-    // So, in this case, g < f, but f !< g
++    // So this doesn't exactly follow what the spec says to do, but that is
++    // a problem we would have with this spec section anyway.
+     Node thisParam = parameters.getFirstChild();
+     Node thatParam = that.parameters.getFirstChild();
+     while (thisParam != null && thatParam != null) {
+       JSType thisParamType = thisParam.getJSType();
+       JSType thatParamType = thatParam.getJSType();
+       if (thisParamType != null) {
+         if (thatParamType == null ||
+             !thatParamType.isSubtype(thisParamType)) {
+           return false;
+         }
+       }
+ 
+       boolean thisIsVarArgs = thisParam.isVarArgs();
+       boolean thatIsVarArgs = thatParam.isVarArgs();
+ 
+       // "that" can't be a supertype, because it's missing a required argument.
+         // NOTE(nicksantos): In our type system, we use {function(...?)} and
+         // {function(...NoType)} to to indicate that arity should not be
+         // checked. Strictly speaking, this is not a correct formulation,
+         // because now a sub-function can required arguments that are var_args
+         // in the super-function. So we special-case this.
+ 
+       // don't advance if we have variable arguments
+       if (!thisIsVarArgs) {
+         thisParam = thisParam.getNext();
+       }
+       if (!thatIsVarArgs) {
+         thatParam = thatParam.getNext();
+       }
+ 
+       // both var_args indicates the end
+       if (thisIsVarArgs && thatIsVarArgs) {
+         thisParam = null;
+         thatParam = null;
+       }
+     }
+ 
+     // "that" can't be a supertype, because it's missing a required arguement.
+ 
+     return true;
+   }

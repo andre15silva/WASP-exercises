@@ -1,0 +1,24 @@
+diff --git a/tmp/294592d9-c76c-45d6-8f68-34b1680dda1f_buggy.java b/tmp/09e1f178-d3e5-4ad9-a46a-e9b3c3c5b69a_fixed.java
+index 5bf31b1..9c030ea 100644
+--- a/tmp/294592d9-c76c-45d6-8f68-34b1680dda1f_buggy.java
++++ b/tmp/09e1f178-d3e5-4ad9-a46a-e9b3c3c5b69a_fixed.java
+@@ -1,17 +1,15 @@
+     private String consumeSubQuery() {
+         StringBuilder sq = StringUtil.borrowBuilder();
+         while (!tq.isEmpty()) {
++            String tag = tq.matchesAny(Combinators)?null:tq.consume();
+             if (tq.matches("("))
+                 sq.append("(").append(tq.chompBalanced('(', ')')).append(")");
+             else if (tq.matches("["))
+                 sq.append("[").append(tq.chompBalanced('[', ']')).append("]");
+-            else if (tq.matchesAny(Combinators))
+-                if (sq.length() > 0)
++            else if (tag != null)
+                 break;
+-                else
+-                    tq.consume();
+             else
+                 sq.append(tq.consume());
+         }
+         return StringUtil.releaseBuilder(sq);
+     }

@@ -1,0 +1,18 @@
+diff --git a/tmp/0f1b0c33-ec1c-4f1a-b582-08deec8e6351_buggy.java b/tmp/a4bf121f-cf14-4914-a56b-32c2fe9af4ec_fixed.java
+index 308b324..fdf98ab 100644
+--- a/tmp/0f1b0c33-ec1c-4f1a-b582-08deec8e6351_buggy.java
++++ b/tmp/a4bf121f-cf14-4914-a56b-32c2fe9af4ec_fixed.java
+@@ -1,11 +1,12 @@
+   /**
+    * Check to see if the given block comment looks like it should be JSDoc.
+    */
+   private void handleBlockComment(Comment comment) {
+-    if (comment.getValue().indexOf("/* @") != -1 || comment.getValue().indexOf("\n * @") != -1) {
++    Pattern p = Pattern.compile("(/|(\n[ \t]*))\\*[ \t]*@[a-zA-Z]");
++    if (p.matcher(comment.getValue()).find()) {
+       errorReporter.warning(
+           SUSPICIOUS_COMMENT_WARNING,
+           sourceName,
+           comment.getLineno(), "", 0);
+     }
+   }

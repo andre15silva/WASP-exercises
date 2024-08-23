@@ -1,0 +1,72 @@
+diff --git a/tmp/2eb15dc8-b858-47d6-bce1-d76e2457d524_buggy.java b/tmp/bc65bcba-5ee8-4be8-bb4f-6d9536721039_fixed.java
+index 2608424..72e30d0 100644
+--- a/tmp/2eb15dc8-b858-47d6-bce1-d76e2457d524_buggy.java
++++ b/tmp/bc65bcba-5ee8-4be8-bb4f-6d9536721039_fixed.java
+@@ -1,39 +1,66 @@
+     /**
+      * Convert to multidimensional counter.
+      *
+      * @param index Index in unidimensional counter.
+      * @return the multidimensional counts.
+      * @throws OutOfRangeException if {@code index} is not between
+      * {@code 0} and the value returned by {@link #getSize()} (excluded).
+      */
+     public int[] getCounts(int index) {
+         if (index < 0 ||
+             index >= totalSize) {
+             throw new OutOfRangeException(index, 0, totalSize);
+         }
+ 
+         final int[] indices = new int[dimension];
+ 
+         int count = 0;
+-        for (int i = 0; i < last; i++) {
++        switch (last) {
++            case 0:
++                indices[0] = index;
++                break;
++            case 1:
++                indices[0] = count;
++                count += uniCounterOffset[0];
++                indices[1] = count;
++                break;
++            case 2:
++            default:
+                 int idx = 0;
++                for (int i = 0; i < last; i++) {
+                     final int offset = uniCounterOffset[i];
+                     while (count <= index) {
+                         count += offset;
+                         ++idx;
+                     }
+                     --idx;
+                     count -= offset;
+                     indices[i] = idx;
+                 }
++        }
+ 
+         int idx = 1;
++        switch (last) {
++            case 0:
++                break;
++            case 1:
++                idx = 0;
+                 while (count < index) {
+                     count += idx;
+                     ++idx;
+                 }
+                 --idx;
+                 indices[last] = idx;
++                break;
++            case 2:
++            default:
++                while (count < index) {
++                    count += idx;
++                    ++idx;
++                }
++                --idx;
++                indices[last] = idx;
++        }
+ 
+         return indices;
+     }

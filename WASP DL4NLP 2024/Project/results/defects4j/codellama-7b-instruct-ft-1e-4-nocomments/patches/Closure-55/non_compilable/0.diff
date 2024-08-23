@@ -1,0 +1,24 @@
+diff --git a/tmp/5acfe52b-91d7-40a6-be95-fbe06a053d44_buggy.java b/tmp/46035dff-173e-4e4e-805c-87f0737762e8_fixed.java
+index 43937f5..10a34b9 100644
+--- a/tmp/5acfe52b-91d7-40a6-be95-fbe06a053d44_buggy.java
++++ b/tmp/46035dff-173e-4e4e-805c-87f0737762e8_fixed.java
+@@ -1,3 +1,17 @@
+   private static boolean isReduceableFunctionExpression(Node n) {
+-    return NodeUtil.isFunctionExpression(n);
++    if (NodeUtil.isFunctionExpression(n)) {
++      return true;
++    }
++
++    Node parent = n.getParent();
++    Node grandparent = parent.getParent();
++    if (NodeUtil.isGet(parent)) {
++      if (grandparent.isCall() &&
++          !n.getVarCount() &&  
++	  NodeUtil.getGetProp(grandparent).isCall() && 
++	  NodeUtil.isFunctionExpression(parent.getFirstChild())) {
++	return true;
++      }
++    }
++    return false;
+   }
+\ No newline at end of file

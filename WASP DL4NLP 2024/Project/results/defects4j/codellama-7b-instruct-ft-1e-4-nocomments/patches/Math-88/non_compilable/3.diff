@@ -1,0 +1,41 @@
+diff --git a/tmp/8983ab73-3b19-4646-8a9a-f8b32332feaf_buggy.java b/tmp/afd37374-cee7-4640-b38b-7a54711c3f12_fixed.java
+index 544303b..88ab31c 100644
+--- a/tmp/8983ab73-3b19-4646-8a9a-f8b32332feaf_buggy.java
++++ b/tmp/afd37374-cee7-4640-b38b-7a54711c3f12_fixed.java
+@@ -1,29 +1,25 @@
+-    /**
+-     * Get the current solution.
+-     * <p>
+-     * {@link #solve} should be called first for this to be the optimal solution.
+-     * </p>
+-     * @return current solution
+-     */
+     protected RealPointValuePair getSolution() {
+         double[] coefficients = new double[getOriginalNumDecisionVariables()];
+         Integer basicRow =
+             getBasicRow(getNumObjectiveFunctions() + getOriginalNumDecisionVariables());
+         double mostNegative = basicRow == null ? 0 : getEntry(basicRow, getRhsOffset());
+         for (int i = 0; i < coefficients.length; i++) {
+             basicRow = getBasicRow(getNumObjectiveFunctions() + i);
+-                // if multiple variables can take a given value 
+-                // then we choose the first and set the rest equal to 0
+             coefficients[i] =
+                 (basicRow == null ? 0 : getEntry(basicRow, getRhsOffset())) -
+                 (restrictToNonNegative ? 0 : mostNegative);
+             if (basicRow != null) {
+                 for (int j = getNumObjectiveFunctions(); j < getNumObjectiveFunctions() + i; j++) {
+-                    if (tableau.getEntry(basicRow, j) == 1) {
++                    final int c = tableau.getEntry(basicRow, j);
++                    if ( c == 1 ) {
++                         coefficients[i] += mostNegative;
++                         coefficients[j - getNumObjectiveFunctions()] -= mostNegative;
++                    } else if (c != 0) {
+                         coefficients[i] = 0;
++                        coefficients[j - getNumObjectiveFunctions()] = 0;
+                     }
+                 }
+             }
+         }
+         return new RealPointValuePair(coefficients, f.getValue(coefficients));
+     }
+\ No newline at end of file

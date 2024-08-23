@@ -1,0 +1,30 @@
+diff --git a/tmp/6f041a7d-56b8-44d0-b581-71de6b0bb7ef_buggy.java b/tmp/7f7c3d73-a26e-4ed0-848e-c80f8b721efb_fixed.java
+index 1530b34..b4a580d 100644
+--- a/tmp/6f041a7d-56b8-44d0-b581-71de6b0bb7ef_buggy.java
++++ b/tmp/7f7c3d73-a26e-4ed0-848e-c80f8b721efb_fixed.java
+@@ -1,23 +1,25 @@
+     /**
+      * Declares all of a function's arguments.
+      */
+     private void declareArguments(Node functionNode) {
+       Node astParameters = functionNode.getFirstChild().getNext();
+       Node body = astParameters.getNext();
+       FunctionType functionType = (FunctionType) functionNode.getJSType();
+       if (functionType != null) {
+         Node jsDocParameters = functionType.getParametersNode();
+         if (jsDocParameters != null) {
+           Node jsDocParameter = jsDocParameters.getFirstChild();
+           for (Node astParameter : astParameters.children()) {
+             if (jsDocParameter != null) {
++              checkDuplicateDeclaration(astParameter, astParameter.getFirstChild(),
++                  functionNode.getSourceFileName(), functionNode.getLineno(), functionNode);
+               defineSlot(astParameter, functionNode,
+                   jsDocParameter.getJSType(), true);
+               jsDocParameter = jsDocParameter.getNext();
+             } else {
+               defineSlot(astParameter, functionNode, null, true);
+             }
+           }
+         }
+       }
+     } // end declareArguments

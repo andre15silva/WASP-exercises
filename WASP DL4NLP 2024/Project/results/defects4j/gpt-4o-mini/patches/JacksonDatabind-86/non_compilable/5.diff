@@ -1,0 +1,16 @@
+diff --git a/tmp/75ffed93-4e02-411c-89ad-9a536df84a58_buggy.java b/tmp/7ea4e131-79ae-4b34-a40e-8a04689fedc8_fixed.java
+index e69de29..b213eff 100644
+--- a/tmp/75ffed93-4e02-411c-89ad-9a536df84a58_buggy.java
++++ b/tmp/7ea4e131-79ae-4b34-a40e-8a04689fedc8_fixed.java
+@@ -0,0 +1,10 @@
++public JavaType getSuperClass() {
++    if (_superClass == null) {
++        if (_class == null) {
++            return null;
++        }
++        // Construct the super class type from the raw class
++        _superClass = TypeFactory.defaultInstance().constructType(_class.getSuperclass());
++    }
++    return _superClass;
++}
+\ No newline at end of file

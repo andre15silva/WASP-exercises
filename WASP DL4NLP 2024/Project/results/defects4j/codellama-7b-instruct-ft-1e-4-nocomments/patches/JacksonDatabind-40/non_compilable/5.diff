@@ -1,0 +1,12 @@
+diff --git a/tmp/ee773e86-42fa-4bcf-8a1c-6844b288475e_buggy.java b/tmp/9d036045-92d1-46c7-b138-de61e7c91ffa_fixed.java
+index e69de29..2604387 100644
+--- a/tmp/ee773e86-42fa-4bcf-8a1c-6844b288475e_buggy.java
++++ b/tmp/9d036045-92d1-46c7-b138-de61e7c91ffa_fixed.java
+@@ -0,0 +1,6 @@
++    public void testEmptyToNullCoercion() throws Exception {
++        _testEmptyToNullCoercion(int.class, null);
++        _testEmptyToNullCoercion(long.class, null);
++        _testEmptyToNullCoercion(double.class, null);
++        _testEmptyToNullCoercion(float.class, null);
++    }
+\ No newline at end of file

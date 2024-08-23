@@ -1,0 +1,18 @@
+diff --git a/tmp/2fe19338-3637-4a25-91f0-e8868ba327d0_buggy.java b/tmp/4e36bdf1-a725-4315-9a2d-d4c827e1b0e9_fixed.java
+index 6e155da..8e83623 100644
+--- a/tmp/2fe19338-3637-4a25-91f0-e8868ba327d0_buggy.java
++++ b/tmp/4e36bdf1-a725-4315-9a2d-d4c827e1b0e9_fixed.java
+@@ -1,10 +1,13 @@
+   @Override public void skipValue() throws IOException {
+     if (peek() == JsonToken.NAME) {
+       nextName();
+       pathNames[stackSize - 2] = "null";
++       // stackSize - 2 due to the two values from JsonElement and JsonObject,
++       // need to fill these because JsonObject.NULL is not instantiated.
++      pathIndices[stackSize - 2]++;
+     } else {
+       popStack();
+         pathNames[stackSize - 1] = "null";
+     }
+       pathIndices[stackSize - 1]++;
+   }

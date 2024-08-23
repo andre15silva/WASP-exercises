@@ -1,0 +1,23 @@
+diff --git a/tmp/c5cbeca5-222f-4422-b993-97587b68b2eb_buggy.java b/tmp/bd233d4b-7324-48a8-a131-d39980dfd2b5_fixed.java
+index 7fb120e..bc4ab70 100644
+--- a/tmp/c5cbeca5-222f-4422-b993-97587b68b2eb_buggy.java
++++ b/tmp/bd233d4b-7324-48a8-a131-d39980dfd2b5_fixed.java
+@@ -1,16 +1,16 @@
+     /**
+      * Parse out a charset from a content type header. If the charset is not supported, returns null (so the default
+      * will kick in.)
+      * @param contentType e.g. "text/html; charset=EUC-JP"
+      * @return "EUC-JP", or null if not found. Charset is trimmed and uppercased.
+      */
+     static String getCharsetFromContentType(String contentType) {
+         if (contentType == null) return null;
+         Matcher m = charsetPattern.matcher(contentType);
+         if (m.find()) {
+             String charset = m.group(1).trim();
+-            charset = charset.toUpperCase(Locale.ENGLISH);
+-            return charset;
++            String name = Charset.forName(charset).name();
++            return name.toUpperCase(Locale.ENGLISH);
+         }
+         return null;
+     }

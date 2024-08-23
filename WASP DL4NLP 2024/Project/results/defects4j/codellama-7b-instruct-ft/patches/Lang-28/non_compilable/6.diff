@@ -1,0 +1,58 @@
+diff --git a/tmp/acb88e1d-46fd-41b2-8075-9374709fa78e_buggy.java b/tmp/e7fdbf70-30d7-44bd-9a66-e9dfebe5beac_fixed.java
+index 4bbd561..4966aae 100644
+--- a/tmp/acb88e1d-46fd-41b2-8075-9374709fa78e_buggy.java
++++ b/tmp/e7fdbf70-30d7-44bd-9a66-e9dfebe5beac_fixed.java
+@@ -1,37 +1,53 @@
+     /**
+      * {@inheritDoc}
+      */
+     @Override
+     public int translate(CharSequence input, int index, Writer out) throws IOException {
+         // TODO: Protect from ArrayIndexOutOfBounds
+         if(input.charAt(index) == '&' && input.charAt(index + 1) == '#') {
+             int start = index + 2;
+             boolean isHex = false;
+ 
+             char firstChar = input.charAt(start);
+             if(firstChar == 'x' || firstChar == 'X') {
+                 start++;
+                 isHex = true;
+             }
+ 
+             int end = start;
+             while(input.charAt(end) != ';') {
+                 end++;
+             }
+ 
+             int entityValue;
+             try {
+                 if(isHex) {
+                     entityValue = Integer.parseInt(input.subSequence(start, end).toString(), 16);
+                 } else {
+                     entityValue = Integer.parseInt(input.subSequence(start, end).toString(), 10);
+                 }
+             } catch(NumberFormatException nfe) {
+                 return 0;
+             }
+ 
+                 out.write(entityValue);
+             return 2 + (end - start) + (isHex ? 1 : 0) + 1;
+         }
++        if (!UtilG.checkSurrogatePair(input, index)) {
+             return 0;
+         }
++        int end = CharVerifier.findSurrogatePairEnd(input, index);
++        int entityValue;
++        try {
++            if (input.charAt(index) == '\uD800' && input.charAt(end) == '\uDC00') {
++                out.write(input.subSequence(index, end));
++                return CharVerifier.surrogatePairLength(input, index);
++            }
++            entityValue = Integer.parseInt(input.subSequence(index, end).toString(), 16);
++        } catch (NumberFormatException nfe) {
++            return 0;
++        }
++
++        out.write(entityValue);
++        return CharVerifier.surrogatePairLength(input, index);
++    }

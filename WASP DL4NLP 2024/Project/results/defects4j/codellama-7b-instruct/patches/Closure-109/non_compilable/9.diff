@@ -1,0 +1,21 @@
+diff --git a/tmp/c8822fb3-36fe-45e3-bcf2-6f5f5ac05443_buggy.java b/tmp/18b600a9-fc64-46fb-b55c-a047e13b837a_fixed.java
+index ba2718f..6f56e8e 100644
+--- a/tmp/c8822fb3-36fe-45e3-bcf2-6f5f5ac05443_buggy.java
++++ b/tmp/18b600a9-fc64-46fb-b55c-a047e13b837a_fixed.java
+@@ -1,7 +1,15 @@
+   /**
+    * ContextTypeExpression := BasicTypeExpression | '?'
+    * For expressions on the right hand side of a this: or new:
+    */
+   private Node parseContextTypeExpression(JsDocToken token) {
+-          return parseTypeName(token);
++      if (token.isBasicType()) {
++          return parseBasicTypeExpression(token);
++      }
++
++      if (token.isTypeUnknown()) {
++          return new Node(Token.newSymbol(Token.QMARK, 0, 0));
++      }
++
++      throw new RuntimeException("Syntax error: expecting type name but found token '?'");
+   }

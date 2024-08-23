@@ -1,0 +1,20 @@
+diff --git a/tmp/1c3d80ea-3121-4eb8-a3f1-f1353d1feb5b_buggy.java b/tmp/806e47f5-0e4a-405e-803d-4bfc4788c376_fixed.java
+index ae3784d..ec2b591 100644
+--- a/tmp/1c3d80ea-3121-4eb8-a3f1-f1353d1feb5b_buggy.java
++++ b/tmp/806e47f5-0e4a-405e-803d-4bfc4788c376_fixed.java
+@@ -1,14 +1,14 @@
+     /**
+      Remove an attribute by key. <b>Case insensitive.</b>
+      @param key attribute key to remove
+      */
+     public void removeIgnoreCase(String key) {
+         Validate.notEmpty(key);
+         if (attributes == null)
+             return;
+         for (Iterator<String> it = attributes.keySet().iterator(); it.hasNext(); ) {
+             String attrKey = it.next();
+             if (attrKey.equalsIgnoreCase(key))
+-                attributes.remove(attrKey);
++                it.remove();
+         }
+     }

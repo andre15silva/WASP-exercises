@@ -1,0 +1,48 @@
+diff --git a/tmp/072a85bf-d8f1-47ff-990f-0fc675f1d5eb_buggy.java b/tmp/b1eff87a-3993-4d35-b10f-7f63937ae15c_fixed.java
+index fa42cd9..3d4f38d 100644
+--- a/tmp/072a85bf-d8f1-47ff-990f-0fc675f1d5eb_buggy.java
++++ b/tmp/b1eff87a-3993-4d35-b10f-7f63937ae15c_fixed.java
+@@ -1,27 +1,19 @@
+-  /**
+-   * Declares a refined type in {@code scope} for the name represented by
+-   * {@code node}. It must be possible to refine the type of the given node in
+-   * the given scope, as determined by {@link #getTypeIfRefinable}.
+-   */
+-  protected void declareNameInScope(FlowScope scope, Node node, JSType type) {
+-    switch (node.getType()) {
+-      case Token.NAME:
+-        scope.inferSlotType(node.getString(), type);
+-        break;
++  public class JSTypeTest {
++    // ... other methods and fields ...
+ 
+-      case Token.GETPROP:
+-        String qualifiedName = node.getQualifiedName();
+-        Preconditions.checkNotNull(qualifiedName);
++    private static final String TEST_THAT_WAS_FAILED = "TEST_THAT_WAS_FAILED";
+ 
+-        JSType origType = node.getJSType();
+-        origType = origType == null ? getNativeType(UNKNOWN_TYPE) : origType;
+-        scope.inferQualifiedSlot(node, qualifiedName, origType, type);
+-        break;
+-
+-        // "this" references aren't currently modeled in the CFG.
+-
+-      default:
+-        throw new IllegalArgumentException("Node cannot be refined. \n" +
+-            node.toStringTree());
++    @Test
++    public void testNoThisInference() {
++      JSType thisType = createNullableType(OBJECT_TYPE);
++      assumingThisType(thisType);
++      inFunction("var out = 3; if (goog.isNull(this)) out = this;");
++      verify("out", createUnionType(OBJECT_TYPE, NUMBER_TYPE));
++      if (TEST_THAT_WAS_FAILED.equals(TEST_THAT_WAS_FAILED)) {
++        // This condition will be true if the test was failed
++        throw new AssertionError("Test failed");
+       }
+     }
++
++    // ... other methods ...
++  }
+\ No newline at end of file

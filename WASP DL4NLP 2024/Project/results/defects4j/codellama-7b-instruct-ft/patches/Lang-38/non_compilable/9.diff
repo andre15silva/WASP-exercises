@@ -1,0 +1,21 @@
+diff --git a/tmp/3fe27f9a-da3b-4a25-9f01-3a6a07f56cd2_buggy.java b/tmp/558f7f0b-5f62-4c49-bfdc-396ea9aabbd7_fixed.java
+index c1f30a5..d659f67 100644
+--- a/tmp/3fe27f9a-da3b-4a25-9f01-3a6a07f56cd2_buggy.java
++++ b/tmp/558f7f0b-5f62-4c49-bfdc-396ea9aabbd7_fixed.java
+@@ -1,15 +1,15 @@
+     /**
+      * <p>Formats a <code>Calendar</code> object into the
+      * supplied <code>StringBuffer</code>.</p>
+      * 
+      * @param calendar  the calendar to format
+      * @param buf  the buffer to format into
+      * @return the specified string buffer
+      */
+     public StringBuffer format(Calendar calendar, StringBuffer buf) {
+         if (mTimeZoneForced) {
+             calendar = (Calendar) calendar.clone();
+             calendar.setTimeZone(mTimeZone);
+         }
+-        return applyRules(calendar, buf);
++        return applyRulesLang538(calendar, buf);
+     }

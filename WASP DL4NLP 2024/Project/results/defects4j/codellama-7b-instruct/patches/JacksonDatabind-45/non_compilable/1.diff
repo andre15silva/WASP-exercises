@@ -1,0 +1,48 @@
+diff --git a/tmp/8c4820c9-a944-470d-9936-21e601137614_buggy.java b/tmp/9350b8d9-ee55-4843-a711-956652f47b8d_fixed.java
+index 0dbce00..db495bf 100644
+--- a/tmp/8c4820c9-a944-470d-9936-21e601137614_buggy.java
++++ b/tmp/9350b8d9-ee55-4843-a711-956652f47b8d_fixed.java
+@@ -1,33 +1,15 @@
+-    @Override
+-    public JsonSerializer<?> createContextual(SerializerProvider serializers,
+-            BeanProperty property) throws JsonMappingException
+-    {
+-        if (property != null) {
+-            JsonFormat.Value format = serializers.getAnnotationIntrospector().findFormat((Annotated)property.getMember());
+-            if (format != null) {
++public class DateAsDefaultBean {
++    protected long _date;
+ 
+-            	// Simple case first: serialize as numeric timestamp?
+-                JsonFormat.Shape shape = format.getShape();
+-                if (shape.isNumeric()) {
+-                    return withFormat(Boolean.TRUE, null);
++    public DateAsDefaultBean(long date) {
++        _date = date;
+     }
+ 
+-                if (format.getShape() == JsonFormat.Shape.STRING) {
+-                    TimeZone tz = format.getTimeZone();
+-                    final String pattern = format.hasPattern()
+-                                    ? format.getPattern()
+-                                    : StdDateFormat.DATE_FORMAT_STR_ISO8601;
+-                    final Locale loc = format.hasLocale()
+-                                    ? format.getLocale()
+-                                    : serializers.getLocale();
+-                    SimpleDateFormat df = new SimpleDateFormat(pattern, loc);
+-                    if (tz == null) {
+-                        tz = serializers.getTimeZone();
+-                    }
+-                    df.setTimeZone(tz);
+-                    return withFormat(Boolean.FALSE, df);
+-                }
++    public long getDate() {
++        return _date;
+     }
++
++    public void setDate(long date) {
++        this._date = date;
+     }
+-        return this;
+ }
+\ No newline at end of file

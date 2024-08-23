@@ -1,0 +1,36 @@
+diff --git a/tmp/f72e6e93-ef77-4a30-ad28-0c51f3a0ebc9_buggy.java b/tmp/4afb7382-f9ad-4072-86c2-41476679747e_fixed.java
+index 5b8a4d2..62c75c5 100644
+--- a/tmp/f72e6e93-ef77-4a30-ad28-0c51f3a0ebc9_buggy.java
++++ b/tmp/4afb7382-f9ad-4072-86c2-41476679747e_fixed.java
+@@ -1,12 +1,21 @@
+-    /**
+-     * Creates a period from the given millisecond duration with the standard period type
+-     * and ISO rules, ensuring that the calculation is performed with the time-only period type.
+-     * <p>
+-     * The calculation uses the hour, minute, second and millisecond fields.
+-     *
+-     * @param duration  the duration, in milliseconds
+-     */
+     protected BasePeriod(long duration) {
+         this(duration, null, null);
+-        // bug [3264409]
++        
++        long totalLength = 
++            (4L + (3L * 7L) + (2L * 30L) + 365L) * DateTimeConstants.MILLIS_PER_DAY +
++            (5L * DateTimeConstants.MILLIS_PER_HOUR) + 
++            (6L * DateTimeConstants.MILLIS_PER_MINUTE) + 
++            (7L * DateTimeConstants.MILLIS_PER_SECOND) + 8L;
++        
++        Duration dur = new Duration(totalLength);
++        Period test = dur.toPeriod();
++        assertEquals(0, test.getYears());
++        assertEquals(0, test.getMonths());
++        assertEquals(0, test.getWeeks());
++        assertEquals(0, test.getDays());
++        assertEquals((450 * 24) + 5, test.getHours());
++        assertEquals(6, test.getMinutes());
++        assertEquals(7, test.getSeconds());
++        assertEquals(8, test.getMillis());
+     }
++    
+\ No newline at end of file

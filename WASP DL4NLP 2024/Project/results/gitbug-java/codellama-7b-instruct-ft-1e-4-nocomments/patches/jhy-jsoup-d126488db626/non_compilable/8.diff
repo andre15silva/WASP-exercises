@@ -1,0 +1,26 @@
+diff --git a/tmp/36873b43-3f9a-4ae3-b872-d047b52ae71b_buggy.java b/tmp/7089d734-d34b-4460-9177-5a58c40f4312_fixed.java
+index 5bf31b1..a2431f1 100644
+--- a/tmp/36873b43-3f9a-4ae3-b872-d047b52ae71b_buggy.java
++++ b/tmp/7089d734-d34b-4460-9177-5a58c40f4312_fixed.java
+@@ -1,17 +1,17 @@
+     private String consumeSubQuery() {
+         StringBuilder sq = StringUtil.borrowBuilder();
+-        while (!tq.isEmpty()) {
++        while (tq.matches()) {
+             if (tq.matches("("))
+-                sq.append("(").append(tq.chompBalanced('(', ')')).append(")");
++                sq.append("(").append(tq.consume().chompBalanced('(', ')')).append(")");
+             else if (tq.matches("["))
+-                sq.append("[").append(tq.chompBalanced('[', ']')).append("]");
++                sq.append("[").append(tq.consume().chompBalanced('[', ']')).append("]");
+             else if (tq.matchesAny(Combinators))
+                 if (sq.length() > 0)
+                     break;
+                 else
+                     tq.consume();
+             else
+                 sq.append(tq.consume());
+         }
+         return StringUtil.releaseBuilder(sq);
+     }
+\ No newline at end of file

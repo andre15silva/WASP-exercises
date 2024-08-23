@@ -1,0 +1,24 @@
+diff --git a/tmp/8b348404-f93c-4abe-807d-3eec9cd51c70_buggy.java b/tmp/106850c9-4cd1-4bad-a23a-1f9538d5d97c_fixed.java
+index f7bc541..e35da4a 100644
+--- a/tmp/8b348404-f93c-4abe-807d-3eec9cd51c70_buggy.java
++++ b/tmp/106850c9-4cd1-4bad-a23a-1f9538d5d97c_fixed.java
+@@ -1,14 +1,19 @@
+     /**
+      Creates a new, clean document, from the original dirty document, containing only elements allowed by the whitelist.
+      The original document is not modified. Only elements from the dirt document's <code>body</code> are used.
+      @param dirtyDocument Untrusted base document to clean.
+      @return cleaned document.
+      */
+     public Document clean(Document dirtyDocument) {
+         Validate.notNull(dirtyDocument);
+ 
++        // clean() used to also sanitize <frameset> (and thus, any unsafe <frame>), but that is
++        // very dangerous. sanitizing <frameset> would discard the entire tree.
++        if (dirtyDocument.body() == null)
++            return Document.createShell(dirtyDocument.baseUri());
++
+         Document clean = Document.createShell(dirtyDocument.baseUri());
+         copySafeNodes(dirtyDocument.body(), clean.body());
+ 
+         return clean;
+     }

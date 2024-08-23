@@ -1,0 +1,42 @@
+diff --git a/tmp/3084783f-cff3-4673-bb62-877f5ab7c594_buggy.java b/tmp/9873258d-f203-41bd-b80a-412b89b3e9a0_fixed.java
+index b36b2a9..a2a0606 100644
+--- a/tmp/3084783f-cff3-4673-bb62-877f5ab7c594_buggy.java
++++ b/tmp/9873258d-f203-41bd-b80a-412b89b3e9a0_fixed.java
+@@ -1,26 +1,30 @@
+   JSType meet(JSType that) {
+     UnionTypeBuilder builder = new UnionTypeBuilder(registry);
+     for (JSType alternate : alternates) {
+       if (alternate.isSubtype(that)) {
+         builder.addAlternate(alternate);
+       }
+     }
+ 
+     if (that instanceof UnionType) {
+       for (JSType otherAlternate : ((UnionType) that).alternates) {
+         if (otherAlternate.isSubtype(this)) {
+           builder.addAlternate(otherAlternate);
+         }
+       }
+-    } else if (that.isSubtype(this)) {
+-      builder.addAlternate(that);
+-    }
+       JSType result = builder.build();
+       if (result != null) {
+         return result;
+-    } else if (this.isObject() && that.isObject()) {
++      }
++    } else if (that.isSubtype(this)) {
++      return builder.addAlternate(that).build();
++    }
++    if ((this instanceof UnionType && !this.isNoResolve()) ||
++        (that instanceof UnionType && !that.isNoResolve())) {
++      // Avoid using NO_OBJECT_TYPE unless one is involved. If the union is of
++      // errors, or has no alternate, let it be NO_OBJECT_TYPE. Otherwise we might get
++      // too conservative by resolving as {function()} instead of {}
++      return EVAL_ERROR_TYPE;
++    }
+     return getNativeType(JSTypeNative.NO_OBJECT_TYPE);
+-    } else {
+-      return getNativeType(JSTypeNative.NO_TYPE);
+-    }
+   }

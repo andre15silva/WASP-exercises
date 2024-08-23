@@ -1,0 +1,25 @@
+diff --git a/tmp/c8ef4c28-6f33-4a3e-ab39-6865d77b0cc1_buggy.java b/tmp/f9ad4f95-369f-40ba-acb0-7de85bde5af1_fixed.java
+index a5ff4fc..d2dd37f 100644
+--- a/tmp/c8ef4c28-6f33-4a3e-ab39-6865d77b0cc1_buggy.java
++++ b/tmp/f9ad4f95-369f-40ba-acb0-7de85bde5af1_fixed.java
+@@ -1,17 +1,19 @@
+     /**
+      * Helper method used to prevent both caching and cache lookups for structured
+      * types that have custom value handlers
+      *
+      * @since 2.8.11
+      */
+     private boolean _hasCustomHandlers(JavaType t) {
+         if (t.isContainerType()) {
+             // First: value types may have both value and type handlers
+             JavaType ct = t.getContentType();
+             if (ct != null) {
+                 return (ct.getValueHandler() != null) || (ct.getTypeHandler() != null);
+             // Second: map(-like) types may have value handler for key (but not type; keys are untyped)
+             }
+         }
+-        return false;
++        // otherwise if we serialize Map<String,String> and JsonParser with useAnnotations(false)
++        // it may fail binding because MapKeyDeserializers don't kick in (see [Issue-328])
++        return true;
+     }

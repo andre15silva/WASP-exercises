@@ -1,0 +1,20 @@
+diff --git a/tmp/cfc55a59-44f0-479a-ba99-a27f25d87dc2_buggy.java b/tmp/783a8565-0c73-4292-be37-fa62dd605ddc_fixed.java
+index d2a3c80..6f51c17 100644
+--- a/tmp/cfc55a59-44f0-479a-ba99-a27f25d87dc2_buggy.java
++++ b/tmp/783a8565-0c73-4292-be37-fa62dd605ddc_fixed.java
+@@ -1,11 +1,15 @@
+     /**
+      * Outputs the record separator.
+      *
+      * @throws IOException
+      *             If an I/O error occurs
+      */
+     public void println() throws IOException {
+         final String recordSeparator = format.getRecordSeparator();
++        if (recordSeparator == null && format.isCSV()) {
++            out.append("\r\n");
++        } else {
+             out.append(recordSeparator);
++        }
+         newRecord = true;
+     }

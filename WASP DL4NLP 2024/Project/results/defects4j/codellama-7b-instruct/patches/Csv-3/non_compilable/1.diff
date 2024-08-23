@@ -1,0 +1,51 @@
+diff --git a/tmp/c2f434a3-f02f-4be1-84a4-705a9e47110e_buggy.java b/tmp/2f55afca-0556-4445-bac8-1a4fccbc948f_fixed.java
+index 1ad070d..c9e1389 100644
+--- a/tmp/c2f434a3-f02f-4be1-84a4-705a9e47110e_buggy.java
++++ b/tmp/2f55afca-0556-4445-bac8-1a4fccbc948f_fixed.java
+@@ -1,38 +1,7 @@
+-    /**
+-     * Handle an escape sequence.
+-     * The current character must be the escape character.
+-     * On return, the next character is available by calling {@link ExtendedBufferedReader#getLastChar()}
+-     * on the input stream.
+-     * 
+-     * @return the unescaped character (as an int) or {@link END_OF_STREAM} if char following the escape is invalid. 
+-     * @throws IOException if there is a problem reading the stream or the end of stream is detected: 
+-     * the escape character is not allowed at end of strem
+-     */
+-    int readEscape() throws IOException {
+-        // the escape char has just been read (normally a backslash)
+-        final int c = in.read();
+-        switch (c) {
+-        case 'r':
+-            return CR;
+-        case 'n':
+-            return LF;
+-        case 't':
+-            return TAB;
+-        case 'b':
+-            return BACKSPACE;
+-        case 'f':
+-            return FF;
+-        case CR:
+-        case LF:
+-        case FF: // TODO is this correct?
+-        case TAB: // TODO is this correct? Do tabs need to be escaped?
+-        case BACKSPACE: // TODO is this correct?
+-            return c;
+-        case END_OF_STREAM:
+-            throw new IOException("EOF whilst processing escape sequence");
+-        default:
+-            // Now check for meta-characters
+-                return c;
+-            // indicate unexpected char - available from in.getLastChar()
+-        }
+-    }
++// buggy code
++final Lexer lexer = getLexer(" character\\NEscaped", formatWithEscaping);
++assertThat(lexer.nextToken(new Token()), hasContent("character\\NEscaped"));
++
++// fixed version
++final Lexer lexer = getLexer("character\\NEscaped", formatWithEscaping);
++assertThat(lexer.nextToken(new Token()), hasContent("character\\NEscaped"));
+\ No newline at end of file

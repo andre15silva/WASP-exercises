@@ -1,0 +1,74 @@
+diff --git a/tmp/7dda3879-b654-4ee4-be6e-d1cbd5afdb3c_buggy.java b/tmp/b50d3982-37e3-4796-a93b-5c565b0c395d_fixed.java
+index d926eea..6f45c2c 100644
+--- a/tmp/7dda3879-b654-4ee4-be6e-d1cbd5afdb3c_buggy.java
++++ b/tmp/b50d3982-37e3-4796-a93b-5c565b0c395d_fixed.java
+@@ -1,48 +1,37 @@
+     @Override
+     public JsonSerializer<?> createContextual(SerializerProvider serializers,
+-            BeanProperty property) throws JsonMappingException
++            BeanProperty prop) throws JsonMappingException
+     {
+-        if (property == null) {
++        JsonFormat.Value fmt = findFormatOverrides(serializers, prop, handledType());
++        if (fmt == null) {
+             return this;
+         }
+-        JsonFormat.Value format = findFormatOverrides(serializers, property, handledType());
+-        if (format == null) {
+-            return this;
++        JsonFormat.Shape shape = fmt.getShape();
++        if (shape.isClobber()) {
++            Boolean useTimestamp = fmt.isTextual() || fmt.isBoolean();
++            // 08-Jun-2019, tatu: Not only should we never use time format for textual, but
++            //   also should only use it for date-time (instead of just date) and timestamp:
++            if (useTimestamp) {
++                Date time = new Date(0L);
++                return withFormat(Boolean.TRUE, time);
+             }
+-        // Simple case first: serialize as numeric timestamp?
+-        JsonFormat.Shape shape = format.getShape();
+-        if (shape.isNumeric()) {
+-            return withFormat(Boolean.TRUE, null);
++            return withFormat(Boolean.FALSE, fmt.getFormat());
+         }
+-
+-        // 08-Jun-2017, tatu: With [databind#1648], this gets bit tricky..
+-        // First: custom pattern will override things
+-                if ((shape == JsonFormat.Shape.STRING) || format.hasPattern()
+-                                || format.hasLocale() || format.hasTimeZone()) {
+-                    TimeZone tz = format.getTimeZone();
+-                    final String pattern = format.hasPattern()
+-                                    ? format.getPattern()
++        // [databind#1648]: custom pattern will override things
++        if ((shape == JsonFormat.Shape.STRING) || fmt.hasPattern()
++                || fmt.hasLocale() || fmt.hasTimeZone()) {
++            TimeZone tz = fmt.getTimeZone();
++            final String pattern = fmt.hasPattern()
++                    ? fmt.getPattern()
+                     : StdDateFormat.DATE_FORMAT_STR_ISO8601;
+-            final Locale loc = format.hasLocale()
+-                            ? format.getLocale()
+-                            : serializers.getLocale();
++            final Locale loc = fmt.hasLocale() ? fmt.getLocale() : serializers.getLocale();
+                 SimpleDateFormat df = new SimpleDateFormat(pattern, loc);
+                 if (tz == null) {
+                     tz = serializers.getTimeZone();
+                 }
+                 df.setTimeZone(tz);
+                 return withFormat(Boolean.FALSE, df);
+         }
+-
+-        // Otherwise, need one of these changes:
+-
+-
+-        // Jackson's own `StdDateFormat` is quite easy to deal with...
+-
+-        // 08-Jun-2017, tatu: Unfortunately there's no generally usable
+-        //    mechanism for changing `DateFormat` instances (or even clone()ing)
+-        //    So: require it be `SimpleDateFormat`; can't config other types
+-//            serializers.reportBadDefinition(handledType(), String.format(
+-            // Ugh. No way to change `Locale`, create copy; must re-crete completely:
++        // Otherwise, use as is
+         return this;
+     }
+\ No newline at end of file

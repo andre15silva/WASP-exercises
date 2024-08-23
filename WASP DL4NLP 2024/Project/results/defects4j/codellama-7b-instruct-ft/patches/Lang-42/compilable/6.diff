@@ -1,0 +1,48 @@
+diff --git a/tmp/a70cf588-9358-4e89-80d2-947b0b93d31c_buggy.java b/tmp/ea3fabbb-d6bb-43b0-96a6-6c9a322b7c16_fixed.java
+index 822447c..a7128fa 100644
+--- a/tmp/a70cf588-9358-4e89-80d2-947b0b93d31c_buggy.java
++++ b/tmp/ea3fabbb-d6bb-43b0-96a6-6c9a322b7c16_fixed.java
+@@ -1,37 +1,43 @@
+     /**
+      * <p>
+      * Escapes the characters in the <code>String</code> passed and writes the result to the <code>Writer</code>
+      * passed.
+      * </p>
+      * 
+      * @param writer
+      *            The <code>Writer</code> to write the results of the escaping to. Assumed to be a non-null value.
+      * @param str
+      *            The <code>String</code> to escape. Assumed to be a non-null value.
+      * @throws IOException
+      *             when <code>Writer</code> passed throws the exception from calls to the {@link Writer#write(int)}
+      *             methods.
+      * 
+      * @see #escape(String)
+      * @see Writer
+      */
+     public void escape(Writer writer, String str) throws IOException {
+         int len = str.length();
+         for (int i = 0; i < len; i++) {
+             char c = str.charAt(i);
+             String entityName = this.entityName(c);
+             if (entityName == null) {
+                 if (c > 0x7F) {
++                    if (c > 0x07FF) {
+                         writer.write("&#");
+                         writer.write(Integer.toString(c, 10));
+                         writer.write(';');
++                    } else {
++                        writer.write("&#x");
++                        writer.write(Integer.toHexString(c));
++                        writer.write(';');
++                    }
+                 } else {
+                     writer.write(c);
+                 }
+             } else {
+                 writer.write('&');
+                 writer.write(entityName);
+                 writer.write(';');
+             }
+         }
+     }

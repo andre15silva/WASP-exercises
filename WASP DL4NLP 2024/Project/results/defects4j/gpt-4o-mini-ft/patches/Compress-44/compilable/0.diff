@@ -1,0 +1,18 @@
+diff --git a/tmp/dd4ee763-2ed1-49a5-8f26-170f13b709a3_buggy.java b/tmp/a543f6d1-d913-4d78-8de2-147790f8b4b2_fixed.java
+index 741e96b..78700b3 100644
+--- a/tmp/dd4ee763-2ed1-49a5-8f26-170f13b709a3_buggy.java
++++ b/tmp/a543f6d1-d913-4d78-8de2-147790f8b4b2_fixed.java
+@@ -1,7 +1,10 @@
+     public ChecksumCalculatingInputStream(final Checksum checksum, final InputStream in) {
+-
+-
+-
++        if (checksum == null) {
++            throw new NullPointerException("Checksum is null");
++        }
++        if (in == null) {
++            throw new NullPointerException("Input stream is null");
++        }
+         this.checksum = checksum;
+         this.in = in;
+     }

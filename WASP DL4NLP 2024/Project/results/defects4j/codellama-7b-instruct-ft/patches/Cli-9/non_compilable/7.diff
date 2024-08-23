@@ -1,0 +1,55 @@
+diff --git a/tmp/39eaffa9-9f0c-4dd2-abf1-36193e7acbd9_buggy.java b/tmp/82915efe-9611-4bbf-9d3d-609d89d37b7d_fixed.java
+index 546f262..d65c83e 100644
+--- a/tmp/39eaffa9-9f0c-4dd2-abf1-36193e7acbd9_buggy.java
++++ b/tmp/82915efe-9611-4bbf-9d3d-609d89d37b7d_fixed.java
+@@ -1,29 +1,47 @@
+     /**
+      * <p>Throws a {@link MissingOptionException} if all of the
+      * required options are no present.</p>
+      *
+      * @throws MissingOptionException if any of the required Options
+      * are not present.
+      */
+     protected void checkRequiredOptions()
+         throws MissingOptionException
+     {
+         // if there are required options that have not been
+         // processsed
+         if (getRequiredOptions().size() > 0)
+         {
+             Iterator iter = getRequiredOptions().iterator();
+-            StringBuffer buff = new StringBuffer("Missing required option");
+-            buff.append(getRequiredOptions().size() == 1 ? "" : "s");
++            StringBuffer buff = new StringBuffer("Missing required options");
++            if (getRequiredOptions().size() > 1)
++            {
++                buff.append(getRequiredOptions().size() - 1 == 0 ? " is" : "s ");
++                buff.append("required: ");
++            }
++            else
++            {
+                 buff.append(": ");
++            }
+ 
+ 
+             // loop through the required options
+             while (iter.hasNext())
+             {
+-                buff.append(iter.next());
++                if (iter.next().getOpt() != null)
++                {
++                    if (buff.length() > 40)
++                    {
++                        buff.append(buff.length() >= 50 ? "," : ", ");
++                    }
++                    else
++                    {
++                        buff.append(buff.length() >= 29 ? "." : ".");
++                    }
++                    buff.append(iter.next().getOpt());
++                }
+             }
+ 
+             throw new MissingOptionException(buff.toString());
+         }
+     }

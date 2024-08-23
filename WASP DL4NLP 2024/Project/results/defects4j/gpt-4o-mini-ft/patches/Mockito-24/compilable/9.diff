@@ -1,0 +1,31 @@
+diff --git a/tmp/bb02d233-f649-4e4f-9d96-34a188d575ec_buggy.java b/tmp/72c9343a-444f-4a05-9649-4fe0b412eda1_fixed.java
+index 47915ed..79ed230 100644
+--- a/tmp/bb02d233-f649-4e4f-9d96-34a188d575ec_buggy.java
++++ b/tmp/72c9343a-444f-4a05-9649-4fe0b412eda1_fixed.java
+@@ -1,22 +1,24 @@
+     /* (non-Javadoc)
+      * @see org.mockito.stubbing.Answer#answer(org.mockito.invocation.InvocationOnMock)
+      */
+     public Object answer(InvocationOnMock invocation) {
+         if (methodsGuru.isToString(invocation.getMethod())) {
+             Object mock = invocation.getMock();
+             MockName name = mockUtil.getMockName(mock);
+             if (name.isDefault()) {
+                 return "Mock for " + mockUtil.getMockSettings(mock).getTypeToMock().getSimpleName() + ", hashCode: " + mock.hashCode();
+             } else {
+                 return name.toString();
+             }
+         } else if (methodsGuru.isCompareToMethod(invocation.getMethod())) {
+             //see issue 184.
+-            //mocks by default should return 0 if references are the same, otherwise some other value because they are not the same. Hence we return 1 (anything but 0 is good).
++            //NOTE: mocks by default should return (b<0 ? -1 : (b>0 ? 1 : 0) for compareTo() method. returnType - 1 / 0 / 2 is required.
+             //Only for compareTo() method by the Comparable interface
+-            return 1;
++            //0 if the mocks has the same compareTo()
++            //2 for comparing mocks which are not the same
++            return 2;
+         }
+         
+         Class<?> returnType = invocation.getMethod().getReturnType();
+         return returnValueFor(returnType);
+     }

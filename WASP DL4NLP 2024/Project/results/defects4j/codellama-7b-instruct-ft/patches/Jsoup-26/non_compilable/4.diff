@@ -1,0 +1,23 @@
+diff --git a/tmp/e8485437-c9fb-41a3-bfb1-be7d7d6ea034_buggy.java b/tmp/ccd2b5c9-2e7a-47c0-9f0c-516423401660_fixed.java
+index f7bc541..d770cef 100644
+--- a/tmp/e8485437-c9fb-41a3-bfb1-be7d7d6ea034_buggy.java
++++ b/tmp/ccd2b5c9-2e7a-47c0-9f0c-516423401660_fixed.java
+@@ -1,14 +1,18 @@
+     /**
+      Creates a new, clean document, from the original dirty document, containing only elements allowed by the whitelist.
+      The original document is not modified. Only elements from the dirt document's <code>body</code> are used.
+      @param dirtyDocument Untrusted base document to clean.
+      @return cleaned document.
+      */
+     public Document clean(Document dirtyDocument) {
+         Validate.notNull(dirtyDocument);
+         
++        // framesets are iframed, so we can safely drop them.
++        Document dirty = Jsoup.clean(dirtyDocument.outerHtml(), Whitelist.relaxed());
++        dirty.select("frameset").remove();
++
+         Document clean = Document.createShell(dirtyDocument.baseUri());
+         copySafeNodes(dirtyDocument.body(), clean.body());
+ 
+         return clean;
+     }

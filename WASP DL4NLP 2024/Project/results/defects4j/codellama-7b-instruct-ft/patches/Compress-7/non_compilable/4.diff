@@ -1,0 +1,40 @@
+diff --git a/tmp/afa5b864-3b8c-41d4-9f8d-dbffe4b8babc_buggy.java b/tmp/fae2ef6d-0a81-4651-8a0b-459fe8c369e2_fixed.java
+index d6662c7..c56a1b9 100644
+--- a/tmp/afa5b864-3b8c-41d4-9f8d-dbffe4b8babc_buggy.java
++++ b/tmp/fae2ef6d-0a81-4651-8a0b-459fe8c369e2_fixed.java
+@@ -1,23 +1,35 @@
+     /**
+      * Parse an entry name from a buffer.
+      * Parsing stops when a NUL is found
+      * or the buffer length is reached.
+      *
+      * @param buffer The buffer from which to parse.
+      * @param offset The offset into the buffer from which to parse.
+      * @param length The maximum number of bytes to parse.
+      * @return The entry name.
+      */
+     public static String parseName(byte[] buffer, final int offset, final int length) {
+         StringBuffer result = new StringBuffer(length);
+         int          end = offset + length;
+ 
+         for (int i = offset; i < end; ++i) {
+             if (buffer[i] == 0) {
+                 break;
+             }
+             result.append((char) buffer[i]);
+         }
++        // COMPRESS-114
++        for (int i = 0; i < result.length(); ++i) {
++            final int b = result.charAt(i);
++            // these are not NULs, but invalid input
++            if (b == 1 || b == 7 || b == 8 || b == 11 || b == 16 || b == 19 || b == 25 || b == 96 || b == 127) {
++                byte[] newname = new byte[result.length()+1];
++                newname[0] = b;
++                System.arraycopy(result.toString().getBytes(), 0, newname, 1, result.length());
++                result.delete(0, result.length());
++                result.append(new String(newname));
++            }
++        }
+ 
+         return result.toString();
+     }

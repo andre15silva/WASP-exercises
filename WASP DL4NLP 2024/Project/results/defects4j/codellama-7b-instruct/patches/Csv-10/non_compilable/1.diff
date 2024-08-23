@@ -1,0 +1,40 @@
+diff --git a/tmp/4f0c2b05-d6ce-434d-9b36-581486fc28a9_buggy.java b/tmp/0be85072-ba16-4a4c-a1a6-35fafbe4bc1e_fixed.java
+index 97f28e5..2735c47 100644
+--- a/tmp/4f0c2b05-d6ce-434d-9b36-581486fc28a9_buggy.java
++++ b/tmp/0be85072-ba16-4a4c-a1a6-35fafbe4bc1e_fixed.java
+@@ -1,26 +1,10 @@
+-    /**
+-     * Creates a printer that will print values to the given stream following the CSVFormat.
+-     * <p>
+-     * Currently, only a pure encapsulation format or a pure escaping format is supported. Hybrid formats (encapsulation
+-     * and escaping with a different character) are not supported.
+-     * </p>
+-     * 
+-     * @param out
+-     *        stream to which to print. Must not be null.
+-     * @param format
+-     *        the CSV format. Must not be null.
+-     * @throws IOException
+-     *         thrown if the optional header cannot be printed.
+-     * @throws IllegalArgumentException
+-     *         thrown if the parameters of the format are inconsistent or if either out or format are null.
+-     */
+-    public CSVPrinter(final Appendable out, final CSVFormat format) throws IOException {
+-        Assertions.notNull(out, "out");
+-        Assertions.notNull(format, "format");
+-
+-        this.out = out;
+-        this.format = format;
+-        this.format.validate();
+-        // TODO: Is it a good idea to do this here instead of on the first call to a print method?
+-        // It seems a pain to have to track whether the header has already been printed or not.
++    @Test
++    public void testHeader() throws IOException {
++        final StringWriter sw = new StringWriter();
++        final CSVPrinter printer = new CSVPrinter(sw, CSVFormat.DEFAULT.withQuoteChar(null)
++                .withHeader("C1", "C2", "C3"));
++        printer.printRecord("a", "b", "c");
++        printer.printRecord("x", "y", "z");
++        assertEquals("C1,C2,C3\r\na,b,c\r\nx,y,z\r\n", sw.toString());
++        printer.close();
+     }

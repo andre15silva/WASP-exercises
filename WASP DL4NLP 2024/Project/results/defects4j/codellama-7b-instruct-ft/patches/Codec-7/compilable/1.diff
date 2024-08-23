@@ -1,0 +1,31 @@
+diff --git a/tmp/68c5595c-89e8-4e1b-9b5b-e5506a47e44a_buggy.java b/tmp/a7527e53-31c1-4bce-90b6-0a91becd6d18_fixed.java
+index 31c6a4b..29e9c37 100644
+--- a/tmp/68c5595c-89e8-4e1b-9b5b-e5506a47e44a_buggy.java
++++ b/tmp/a7527e53-31c1-4bce-90b6-0a91becd6d18_fixed.java
+@@ -1,11 +1,26 @@
+     /**
+      * Encodes binary data using the base64 algorithm into 76 character blocks separated by CRLF.
+      *
+      * @param binaryData
+      *            binary data to encode
+      * @return String containing Base64 characters.
+      * @since 1.4
+      */    
+     public static String encodeBase64String(byte[] binaryData) {
+         return StringUtils.newStringUtf8(encodeBase64(binaryData, true));
+     }
++
++    /**
++     *
++     * Encodes an array of bytes into Base64 notation. All bytes, except for {@link org.apache.commons.codec.binary.BinaryCodec.ByteProcessingUtilities#PadCharacter} or
++     * {@link org.apache.commons.codec.binary.BinaryCodec.ByteProcessingUtilities#NoPadding}.
++     * 
++     * @param data - binary data to encode
++     * @param binary - true if should not allow anything not 0 - 255
++     * @return The Base64 encoded bytes.
++     * @see #byteToString(byte[], boolean)
++     * @since 1.4
++     */    
++    public static String byteToString(byte[] data, boolean binary){
++        return StringUtils.newStringUtf8(encodeBase64(data, binary));
++    }

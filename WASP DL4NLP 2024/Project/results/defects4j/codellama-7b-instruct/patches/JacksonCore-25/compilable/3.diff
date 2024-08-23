@@ -1,0 +1,55 @@
+diff --git a/tmp/64ae8548-21b2-4bab-9959-54e506f34e00_buggy.java b/tmp/e86aaaac-12d5-4d36-94d2-f4506f86ec6a_fixed.java
+index 8dfbd84..e7d87cc 100644
+--- a/tmp/64ae8548-21b2-4bab-9959-54e506f34e00_buggy.java
++++ b/tmp/e86aaaac-12d5-4d36-94d2-f4506f86ec6a_fixed.java
+@@ -1,43 +1,44 @@
+     private String _handleOddName2(int startPtr, int hash, int[] codes) throws IOException
+     {
+         _textBuffer.resetWithShared(_inputBuffer, startPtr, (_inputPtr - startPtr));
+         char[] outBuf = _textBuffer.getCurrentSegment();
+-        int outPtr = _textBuffer.getCurrentSegmentSize();
++        int outPtr = _textBuffer.getCurrentSegmentSize() + 1;
+         final int maxCode = codes.length;
+ 
+         while (true) {
+             if (_inputPtr >= _inputEnd) {
+                 if (!_loadMore()) { // acceptable for now (will error out later)
+-                    break;
++                    // outPtr = _textBuffer.getCurrentSegmentSize();
++                    continue;
+                 }
+             }
+             char c = _inputBuffer[_inputPtr];
+             int i = (int) c;
+             if (i <= maxCode) {
+                 if (codes[i] != 0) {
+                     break;
+                 }
+             } else if (!Character.isJavaIdentifierPart(c)) {
+                 break;
+             }
+             ++_inputPtr;
+             hash = (hash * CharsToNameCanonicalizer.HASH_MULT) + i;
+             // Ok, let's add char to output:
+             outBuf[outPtr++] = c;
+ 
+             // Need more room?
+-            if (outPtr >= outBuf.length) {
++            if (outPtr - outBuf.length > 1) {
+                 outBuf = _textBuffer.finishCurrentSegment();
+-                outPtr = 0;
++                outPtr = 1;
+             }
+         }
+-        _textBuffer.setCurrentLength(outPtr);
++        _textBuffer.setCurrentLength(outPtr - 1);
+         {
+             TextBuffer tb = _textBuffer;
+             char[] buf = tb.getTextBuffer();
+             int start = tb.getTextOffset();
+             int len = tb.size();
+ 
+             return _symbols.findSymbol(buf, start, len, hash);
+         }
+     }
+\ No newline at end of file

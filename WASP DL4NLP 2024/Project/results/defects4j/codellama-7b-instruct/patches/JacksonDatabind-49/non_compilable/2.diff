@@ -1,0 +1,27 @@
+diff --git a/tmp/2abffdca-bb66-4cbf-9b03-b8c461c8985a_buggy.java b/tmp/1e3826d0-4200-430e-a25c-fbc80f152aa4_fixed.java
+index c222270..3a9224a 100644
+--- a/tmp/2abffdca-bb66-4cbf-9b03-b8c461c8985a_buggy.java
++++ b/tmp/1e3826d0-4200-430e-a25c-fbc80f152aa4_fixed.java
+@@ -1,7 +1,21 @@
++@JsonIgnoreProperties(ignoreUnknown=true)
++public class Foo {
++    @JsonProperty("id")
++    Object id = generateId();
++
++    private static Object generateId() {
++        return null;
++    }
++
+     public Object generateId(Object forPojo) {
+         // 04-Jun-2016, tatu: As per [databind#1255], need to consider possibility of
+         //    id being generated for "alwaysAsId", but not being written as POJO; regardless,
+         //    need to use existing id if there is one:
+         id = generator.generateId(forPojo);
+         return id;
+     }
++
++    public String getId() {
++        return id.toString();
++    }
++}
+\ No newline at end of file

@@ -1,0 +1,39 @@
+diff --git a/tmp/e8219644-5b90-40ac-9416-e7da528185eb_buggy.java b/tmp/09ba6013-1910-40ff-812c-4aaa7d7e75f8_fixed.java
+index bcd80aa..5f6f73a 100644
+--- a/tmp/e8219644-5b90-40ac-9416-e7da528185eb_buggy.java
++++ b/tmp/09ba6013-1910-40ff-812c-4aaa7d7e75f8_fixed.java
+@@ -1,25 +1,32 @@
+         void processResponseHeaders(Map<String, List<String>> resHeaders) {
+             for (Map.Entry<String, List<String>> entry : resHeaders.entrySet()) {
+                 String name = entry.getKey();
+                 if (name == null)
+                     continue; // http/1.1 line
+ 
+                 List<String> values = entry.getValue();
+                 if (name.equalsIgnoreCase("Set-Cookie")) {
+                     for (String value : values) {
+                         if (value == null)
+                             continue;
+                         TokenQueue cd = new TokenQueue(value);
+                         String cookieName = cd.chompTo("=").trim();
+                         String cookieVal = cd.consumeTo(";").trim();
+                         // ignores path, date, domain, validateTLSCertificates et al. req'd?
+                         // name not blank, value not null
+                         if (cookieName.length() > 0)
+                             cookie(cookieName, cookieVal);
+                     }
+                 } else { // combine same header names with comma: http://www.w3.org/Protocols/rfc2616/rfc2616-sec4.html#sec4.2
+-                    if (!values.isEmpty())
+-                        header(name, values.get(0));
++                    StringBuffer header = new StringBuffer();
++                    for (String value : values)
++                        if (value != null) {
++                            if (header.length() > 0)
++                                header.append(", ");
++                            header.append(value);
++                        }
++                    if (header.length() > 0)
++                        header(name, header.toString());
+                 }
+             }
+         }

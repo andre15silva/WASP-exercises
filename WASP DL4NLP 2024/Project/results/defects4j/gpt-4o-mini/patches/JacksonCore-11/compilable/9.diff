@@ -1,0 +1,23 @@
+diff --git a/tmp/aee0fe3c-3924-4ce4-a53f-a8bc7291b089_buggy.java b/tmp/b5ea09a5-1d79-4a49-8f33-1ef8d96ce49b_fixed.java
+index 29d025a..a5f7b57 100644
+--- a/tmp/aee0fe3c-3924-4ce4-a53f-a8bc7291b089_buggy.java
++++ b/tmp/b5ea09a5-1d79-4a49-8f33-1ef8d96ce49b_fixed.java
+@@ -1,13 +1,15 @@
+     private void _verifySharing()
+     {
+         if (_hashShared) {
++            // Create new arrays with the same length as before
+             _hashArea = Arrays.copyOf(_hashArea, _hashArea.length);
+             _names = Arrays.copyOf(_names, _names.length);
++
++            // Reset the need-rehash flag since we are copying shared structures
++            _needRehash = true;  // Ensure we mark that a rehash is needed after sharing
+             _hashShared = false;
+-            // 09-Sep-2015, tatu: As per [jackson-core#216], also need to ensure
+-            //    we rehash as needed, as need-rehash flag is not copied from parent
+         }
+         if (_needRehash) {
+             rehash();
+         }
+     }
+\ No newline at end of file

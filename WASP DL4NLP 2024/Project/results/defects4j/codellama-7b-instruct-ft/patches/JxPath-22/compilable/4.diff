@@ -1,0 +1,45 @@
+diff --git a/tmp/ff88183e-64b9-427e-b75c-107667c74a85_buggy.java b/tmp/2e4bbbf7-f1a9-4f1e-8ab7-c10fe3b51c34_fixed.java
+index 1bd0d7e..9ec4cd9 100644
+--- a/tmp/ff88183e-64b9-427e-b75c-107667c74a85_buggy.java
++++ b/tmp/2e4bbbf7-f1a9-4f1e-8ab7-c10fe3b51c34_fixed.java
+@@ -1,31 +1,40 @@
+     /**
+      * Get the ns uri of the specified node.
+      * @param node Node to check
+      * @return String ns uri
+      */
+     public static String getNamespaceURI(Node node) {
+         if (node instanceof Document) {
+             node = ((Document) node).getDocumentElement();
+         }
+ 
+         Element element = (Element) node;
+ 
+         String uri = element.getNamespaceURI();
+         if (uri == null) {
+             String prefix = getPrefix(node);
+             String qname = prefix == null ? "xmlns" : "xmlns:" + prefix;
+     
+             Node aNode = node;
+             while (aNode != null) {
+                 if (aNode.getNodeType() == Node.ELEMENT_NODE) {
+                     Attr attr = ((Element) aNode).getAttributeNode(qname);
+                     if (attr != null) {
+                         return attr.getValue();
+                     }
++                } else if (aNode.getNodeType() == Node.DOCUMENT_NODE) {
++                    NodeList children = aNode.getChildNodes();
++                    if (children != null) {
++                        for (int i = 0; i < children.getLength(); i++) {
++                            if (children.item(i).getNodeType() == Node.TEXT_NODE) {
++                                return "";
++                            }
++                        }
++                    }
+                 }
+                 aNode = aNode.getParentNode();
+             }
+             return null;
+         }
+         return uri;
+     }

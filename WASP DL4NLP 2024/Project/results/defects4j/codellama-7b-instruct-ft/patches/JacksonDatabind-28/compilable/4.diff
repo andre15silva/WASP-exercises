@@ -1,0 +1,23 @@
+diff --git a/tmp/699ec656-1536-4b58-8938-b96a640e30dd_buggy.java b/tmp/a5a782ef-16b1-477b-806d-c2529a4e0447_fixed.java
+index 66bb99f..e5e13b5 100644
+--- a/tmp/699ec656-1536-4b58-8938-b96a640e30dd_buggy.java
++++ b/tmp/a5a782ef-16b1-477b-806d-c2529a4e0447_fixed.java
+@@ -1,14 +1,15 @@
+         @Override
+         public ObjectNode deserialize(JsonParser p, DeserializationContext ctxt) throws IOException
+         {
+             if (p.getCurrentToken() == JsonToken.START_OBJECT) {
+                 p.nextToken();
+                 return deserializeObject(p, ctxt, ctxt.getNodeFactory());
+             }
+-            // 23-Sep-2015, tatu: Ugh. We may also be given END_OBJECT (similar to FIELD_NAME),
+-            //    if caller has advanced to the first token of Object, but for empty Object
+-            if (p.getCurrentToken() == JsonToken.FIELD_NAME) {
++            // special case, alas for backward compat: 3.0, support being handed bogus
++            // END_OBJECT for empty Object
++            for (; p.getCurrentToken() == JsonToken.FIELD_NAME; p.nextToken()) {
++            	p.nextToken();
+             	return deserializeObject(p, ctxt, ctxt.getNodeFactory());
+             }
+             throw ctxt.mappingException(ObjectNode.class);
+          }

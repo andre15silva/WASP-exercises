@@ -1,0 +1,52 @@
+diff --git a/tmp/315accc3-b7b6-454e-9a3c-3325e1b5ae79_buggy.java b/tmp/35a562d0-91dd-462b-a845-233f36b13b46_fixed.java
+index 8dfbd84..54886b8 100644
+--- a/tmp/315accc3-b7b6-454e-9a3c-3325e1b5ae79_buggy.java
++++ b/tmp/35a562d0-91dd-462b-a845-233f36b13b46_fixed.java
+@@ -1,43 +1,45 @@
+     private String _handleOddName2(int startPtr, int hash, int[] codes) throws IOException
+     {
+         _textBuffer.resetWithShared(_inputBuffer, startPtr, (_inputPtr - startPtr));
+         char[] outBuf = _textBuffer.getCurrentSegment();
+         int outPtr = _textBuffer.getCurrentSegmentSize();
+         final int maxCode = codes.length;
+ 
+         while (true) {
+             if (_inputPtr >= _inputEnd) {
+                 if (!_loadMore()) { // acceptable for now (will error out later)
+                     break;
+                 }
+             }
+             char c = _inputBuffer[_inputPtr];
+             int i = (int) c;
+             if (i <= maxCode) {
+                 if (codes[i] != 0) {
+                     break;
+                 }
+             } else if (!Character.isJavaIdentifierPart(c)) {
+                 break;
+             }
+             ++_inputPtr;
+             hash = (hash * CharsToNameCanonicalizer.HASH_MULT) + i;
+-            // Ok, let's add char to output:
++            // Make sure outPtr is within the bounds of outBuf before writing to it:
++            if (outPtr < outBuf.length) {
+                 outBuf[outPtr++] = c;
++            }
+ 
+             // Need more room?
+             if (outPtr >= outBuf.length) {
+                 outBuf = _textBuffer.finishCurrentSegment();
+                 outPtr = 0;
+             }
+         }
+         _textBuffer.setCurrentLength(outPtr);
+         {
+             TextBuffer tb = _textBuffer;
+             char[] buf = tb.getTextBuffer();
+             int start = tb.getTextOffset();
+             int len = tb.size();
+ 
+             return _symbols.findSymbol(buf, start, len, hash);
+         }
+     }
+\ No newline at end of file

@@ -1,0 +1,11 @@
+diff --git a/tmp/1f5dfa0d-0209-48f7-8f01-0defed3111d0_buggy.java b/tmp/039f970e-0cf7-4ac8-96ab-33a175b16429_fixed.java
+index 43937f5..786109b 100644
+--- a/tmp/1f5dfa0d-0209-48f7-8f01-0defed3111d0_buggy.java
++++ b/tmp/039f970e-0cf7-4ac8-96ab-33a175b16429_fixed.java
+@@ -1,3 +1,5 @@
+   private static boolean isReduceableFunctionExpression(Node n) {
+-    return NodeUtil.isFunctionExpression(n);
++    return NodeUtil.isFunctionExpression(n) || n.isFunction();
++    // These all normally reduce down into standalone functions
++    // (e.g., `declare()` in closures)
+   }

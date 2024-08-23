@@ -1,0 +1,27 @@
+diff --git a/tmp/6da6ddcb-c4a2-4bb5-9a61-e0f007d891ed_buggy.java b/tmp/97d8f84f-3136-46cc-a011-66539aa3f2f7_fixed.java
+index 7030ef0..11bb098 100644
+--- a/tmp/6da6ddcb-c4a2-4bb5-9a61-e0f007d891ed_buggy.java
++++ b/tmp/97d8f84f-3136-46cc-a011-66539aa3f2f7_fixed.java
+@@ -1,15 +1,13 @@
+-    /**
+-     Add a list of allowed elements to a safelist. (If a tag is not allowed, it will be removed from the HTML.)
+-
+-     @param tags tag names to allow
+-     @return this (for chaining)
+-     */
+ public Safelist addTags(String... tags) {
+-        Validate.notNull(tags);
++    for (String tagName : tags) {
++        if (TagName.valueOf(tagName) == null) {
++            throw new ValidationException("unsupported tag");
++        }
++    }
+ 
+     for (String tagName : tags) {
+-            Validate.notEmpty(tagName);
+         tagNames.add(TagName.valueOf(tagName));
+     }
++
+     return this;
+ }
+\ No newline at end of file

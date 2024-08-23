@@ -1,0 +1,26 @@
+diff --git a/tmp/80be5e15-4511-4538-8ec8-4396d54b0349_buggy.java b/tmp/16805098-5e6a-4113-832b-6e7543cb9424_fixed.java
+index 7f06a9c..aef3a72 100644
+--- a/tmp/80be5e15-4511-4538-8ec8-4396d54b0349_buggy.java
++++ b/tmp/16805098-5e6a-4113-832b-6e7543cb9424_fixed.java
+@@ -1,7 +1,21 @@
+     public void acceptedBy(MemberId memberId) {
+         requireNotCompleted();
+         requireNotCanceled();
+         requireHasSpace();
+         membersWhoAccepted.add(memberId);
+         membersWhoDeclined.remove(memberId);
++        List<MemberId> spectators = Lists.newArrayList(spectators());
++        for(MemberId spectator : spectators) {
++            if(spectator.equals(memberId)) {
++                spectators.remove(spectator);
++                leaveAsSpectator(spectator);
++            }
++        }
++        for(MemberId spectator : spectators) {
++            if(spectator.equals(memberId)) {
++                spectators.remove(spectator);
++                leaveAsSpectator(spectator);
++            }
++        }
++        membersWhoSpectating.removeAll(spectators);
+     }

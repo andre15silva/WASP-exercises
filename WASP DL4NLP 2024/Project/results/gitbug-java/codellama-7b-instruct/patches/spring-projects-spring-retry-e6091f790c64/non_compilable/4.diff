@@ -1,0 +1,81 @@
+diff --git a/tmp/efc0bd45-3f50-4128-9d2a-02b20564f45c_buggy.java b/tmp/b12080cb-47c1-41d7-a694-c0f3aca186dd_fixed.java
+index b8e3fa3..815b419 100644
+--- a/tmp/efc0bd45-3f50-4128-9d2a-02b20564f45c_buggy.java
++++ b/tmp/b12080cb-47c1-41d7-a694-c0f3aca186dd_fixed.java
+@@ -1,65 +1,38 @@
+-	/**
+-	 * Builds the {@link BackOffPolicy} with the given parameters.
+-	 * @return the {@link BackOffPolicy} instance
+-	 */
+ 	public BackOffPolicy build() {
+-		if (this.multiplier != null && this.multiplier > 0 || this.multiplierSupplier != null) {
+-			ExponentialBackOffPolicy policy;
+-			if (Boolean.TRUE.equals(this.random)) {
+-				policy = new ExponentialRandomBackOffPolicy();
++		BackOffPolicy policy = null;
++		if (this.fixedBackOffPolicy != null) {
++			policy = this.fixedBackOffPolicy;
++		}
++		else if (this.exponentialBackOffPolicy != null) {
++			policy = this.exponentialBackOffPolicy;
++		}
++		else if (this.uniformRandomBackOffPolicy != null) {
++			policy = this.uniformRandomBackOffPolicy;
+ 		}
+ 		else {
+-				policy = new ExponentialBackOffPolicy();
++			throw new IllegalArgumentException("No back-off policy configured");
+ 		}
+ 		if (this.delay != null) {
+ 			policy.setInitialInterval(this.delay);
+ 		}
+ 		if (this.delaySupplier != null) {
+ 			policy.initialIntervalSupplier(this.delaySupplier);
+ 		}
+ 		if (this.multiplier != null) {
+ 			policy.setMultiplier(this.multiplier);
+ 		}
+ 		if (this.multiplierSupplier != null) {
+ 			policy.multiplierSupplier(this.multiplierSupplier);
+ 		}
+ 		if (this.maxDelay != null && this.delay != null) {
+ 			policy.setMaxInterval(
+ 					this.maxDelay > this.delay ? this.maxDelay : ExponentialBackOffPolicy.DEFAULT_MAX_INTERVAL);
+ 		}
+ 		if (this.maxDelaySupplier != null) {
+ 			policy.maxIntervalSupplier(this.maxDelaySupplier);
+ 		}
+ 		if (this.sleeper != null) {
+ 			policy.setSleeper(this.sleeper);
+ 		}
+ 		return policy;
+ 	}
+\ No newline at end of file
+-		if (this.maxDelay != null && this.delay != null && this.maxDelay > this.delay) {
+-			UniformRandomBackOffPolicy policy = new UniformRandomBackOffPolicy();
+-			if (this.delay != null) {
+-				policy.setMinBackOffPeriod(this.delay);
+-			}
+-			if (this.delaySupplier != null) {
+-				policy.minBackOffPeriodSupplier(this.delaySupplier);
+-			}
+-			if (this.maxDelay != null) {
+-				policy.setMaxBackOffPeriod(this.maxDelay);
+-			}
+-			if (this.maxDelaySupplier != null) {
+-				policy.maxBackOffPeriodSupplier(this.maxDelaySupplier);
+-			}
+-			if (this.sleeper != null) {
+-				policy.setSleeper(this.sleeper);
+-			}
+-			return policy;
+-		}
+-		FixedBackOffPolicy policy = new FixedBackOffPolicy();
+-		if (this.delay != null) {
+-			policy.setBackOffPeriod(this.delay);
+-		}
+-		if (this.sleeper != null) {
+-			policy.setSleeper(this.sleeper);
+-		}
+-		return policy;
+-	}

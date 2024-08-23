@@ -1,0 +1,27 @@
+diff --git a/tmp/a682f81e-1827-4988-9675-52846aa40b05_buggy.java b/tmp/eddf96db-7d26-4363-b500-7fb8d06f971e_fixed.java
+index 192e83d..b19f716 100644
+--- a/tmp/a682f81e-1827-4988-9675-52846aa40b05_buggy.java
++++ b/tmp/eddf96db-7d26-4363-b500-7fb8d06f971e_fixed.java
+@@ -1,21 +1,21 @@
+     /**
+      * Return whether or not this entry represents a directory.
+      *
+      * @return True if this entry is a directory.
+      */
+     @Override
+     public boolean isDirectory() {
+         if (file != null) {
+             return file.isDirectory();
+         }
+ 
+         if (linkFlag == LF_DIR) {
+             return true;
+         }
+ 
+-        if (getName().endsWith("/")) {
++        if (getName().endsWith("/") && !isOtherType()) {
+             return true;
+         }
+ 
+         return false;
+     }

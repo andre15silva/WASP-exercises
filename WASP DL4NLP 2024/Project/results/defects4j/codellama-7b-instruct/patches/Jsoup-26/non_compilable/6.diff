@@ -1,0 +1,32 @@
+diff --git a/tmp/29d12e07-061e-4372-ac84-5fcb7136a42c_buggy.java b/tmp/4fb71651-a128-4009-bbe3-fb5e30c61abc_fixed.java
+index f7bc541..9d21f88 100644
+--- a/tmp/29d12e07-061e-4372-ac84-5fcb7136a42c_buggy.java
++++ b/tmp/4fb71651-a128-4009-bbe3-fb5e30c61abc_fixed.java
+@@ -1,14 +1,15 @@
++package org.jsoup.safety;
++
++import org.jsoup.nodes.Document;
++import org.jsoup.nodes.Element;
++import org.jsoup.nodes.Node;
++import org.jsoup.nodes.TextNode;
++import org.jsoup.parser.Tag;
++
++
++public class Cleaner {
++
+     /**
+-     Creates a new, clean document, from the original dirty document, containing only elements allowed by the whitelist.
+-     The original document is not modified. Only elements from the dirt document's <code>body</code> are used.
+-     @param dirtyDocument Untrusted base document to clean.
+-     @return cleaned document.
++     * The whitelist to use for cleaning
+      */
+-    public Document clean(Document dirtyDocument) {
+-        Validate.notNull(dirtyDocument);
+-
+-        Document clean = Document.createShell(dirtyDocument.baseUri());
+-            copySafeNodes(dirtyDocument.body(), clean.body());
+-
+-        return clean;
+-    }
++    private final Whitelist whitelist;

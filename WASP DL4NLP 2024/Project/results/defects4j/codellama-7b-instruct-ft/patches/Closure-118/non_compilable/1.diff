@@ -1,0 +1,37 @@
+diff --git a/tmp/a1921807-c614-45d2-8deb-c289ae1dd1ce_buggy.java b/tmp/8e1695ee-2958-4eb3-a067-0599dc9b197e_fixed.java
+index 0b7c52e..e3a5cab 100644
+--- a/tmp/a1921807-c614-45d2-8deb-c289ae1dd1ce_buggy.java
++++ b/tmp/8e1695ee-2958-4eb3-a067-0599dc9b197e_fixed.java
+@@ -1,27 +1,28 @@
+     /**
+      * Processes a OBJECTLIT node.
+      */
+     private void handleObjectLit(NodeTraversal t, Node n) {
+       for (Node child = n.getFirstChild();
+           child != null;
+           child = child.getNext()) {
+         // Maybe STRING, GET, SET
+ 
+         // We should never see a mix of numbers and strings.
+         String name = child.getString();
+         T type = typeSystem.getType(getScope(), n, name);
+ 
+         Property prop = getProperty(name);
+         if (!prop.scheduleRenaming(child,
+                                    processProperty(t, prop, type, null))) {
+           // TODO(user): It doesn't look like the user can do much in this
+-          // case right now.
+-          if (propertiesToErrorFor.containsKey(name)) {
++          // case right now. There's no nice way to report this error to the
++          // user, the "only bad one" we get is the "Cannot read property X
++          // of undefined" error.
++          if (type != null && typeSystem.isObject()) {
+             compiler.report(JSError.make(
+                 t.getSourceName(), child, propertiesToErrorFor.get(name),
+-                Warnings.INVALIDATION, name,
+-                (type == null ? "null" : type.toString()), n.toString(), ""));
++                Warnings.INVALIDATION, name, (type == null ? "null" : type.toString())));
+           }
+         }
+       }
+     }

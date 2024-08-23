@@ -1,0 +1,75 @@
+diff --git a/tmp/ce1bcb92-f284-476a-9358-60d793caf131_buggy.java b/tmp/65b061ad-d15b-4e8e-bf83-e5344cba1153_fixed.java
+index a7549f0..0a993bc 100644
+--- a/tmp/ce1bcb92-f284-476a-9358-60d793caf131_buggy.java
++++ b/tmp/65b061ad-d15b-4e8e-bf83-e5344cba1153_fixed.java
+@@ -1,50 +1,63 @@
+     /**
+      * Sets the values of Options using the values in <code>properties</code>.
+      *
+      * @param properties The value properties to be processed.
+      */
+     protected void processProperties(Properties properties)
+     {
+         if (properties == null)
+         {
+             return;
+         }
+ 
+         for (Enumeration e = properties.propertyNames(); e.hasMoreElements();)
+         {
+             String option = e.nextElement().toString();
+ 
+             if (!cmd.hasOption(option))
+             {
+                 Option opt = getOptions().getOption(option);
+ 
+                 // get the value from the properties instance
+                 String value = properties.getProperty(option);
+ 
+                 if (opt.hasArg())
+                 {
+                     if (opt.getValues() == null || opt.getValues().length == 0)
+                     {
+                         try
+                         {
+                             opt.addValueForProcessing(value);
+                         }
+                         catch (RuntimeException exp)
+                         {
+                             // if we cannot add the value don't worry about it
+                         }
+                     }
+                 }
+-                else if (!("yes".equalsIgnoreCase(value)
+-                        || "true".equalsIgnoreCase(value)
+-                        || "1".equalsIgnoreCase(value)))
++                // convert TRUE and FALSE to true and false.
++                else if (opt.getOpt().equalsIgnoreCase("true") ||
++                         opt.getOpt().equalsIgnoreCase("false"))
+                 {
+-                    // if the value is not yes, true or 1 then don't add the
+-                    // option to the CommandLine
+-                    break;
++                    if ("true".equalsIgnoreCase(value))
++                    {
++                        cmd.addOption(opt);
++                    }
+                 }
+-
++                // convert YES and NO to true and false.
++                else {
++                    if ("yes".equalsIgnoreCase(value))
++                    {
+                         cmd.addOption(opt);
+                     }
++                    else if ("no".equalsIgnoreCase(value))
++                    {
++                        if (!opt.getOpt().equalsIgnoreCase("e"))
++                        {
++                            cmd.addOption(opt);
++                        }
++                    }
++                }
++            }
+         }
+     }

@@ -1,0 +1,26 @@
+diff --git a/tmp/6efbb65e-3117-426d-bc16-3c081cee0461_buggy.java b/tmp/5049f815-7c09-48d4-8d94-f9b65fda7b71_fixed.java
+index c3986cc..33b912a 100644
+--- a/tmp/6efbb65e-3117-426d-bc16-3c081cee0461_buggy.java
++++ b/tmp/5049f815-7c09-48d4-8d94-f9b65fda7b71_fixed.java
+@@ -1,13 +1,9 @@
+-    /**
+-     * Closes the CPIO output stream as well as the stream being filtered.
+-     * 
+-     * @throws IOException
+-     *             if an I/O error has occurred or if a CPIO file error has
+-     *             occurred
+-     */
+-    public void close() throws IOException {
+-        if (!this.closed) {
+-            super.close();
+-            this.closed = true;
++            while ((entry = in.getNextEntry()) != null) {
++                File target = new File(dir, entry.getName());
++                if (in != null) {
++                    final OutputStream out = new FileOutputStream(target);
++                    IOUtils.copy(in, out);
++                    out.close();
++                    result.put(entry.getName(), target);
+                 }
+             }
+\ No newline at end of file

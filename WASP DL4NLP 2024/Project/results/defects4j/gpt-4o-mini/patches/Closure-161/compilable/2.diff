@@ -1,0 +1,65 @@
+diff --git a/tmp/0ac14240-08c5-484d-b04f-7db97bfeda5a_buggy.java b/tmp/9c58dd07-d67b-4e2a-a110-023fe7d83a68_fixed.java
+index 1303a19..f035a97 100644
+--- a/tmp/0ac14240-08c5-484d-b04f-7db97bfeda5a_buggy.java
++++ b/tmp/9c58dd07-d67b-4e2a-a110-023fe7d83a68_fixed.java
+@@ -1,45 +1,45 @@
+ private Node tryFoldArrayAccess(Node n, Node left, Node right) {
+     Node parent = n.getParent();
+     // If GETPROP/GETELEM is used as assignment target the array literal is
+-    // acting as a temporary we can't fold it here:
++    // acting as a temporary; we can't fold it here:
+     //    "[][0] += 1"
+ 
+     if (right.getType() != Token.NUMBER) {
+-      // Sometimes people like to use complex expressions to index into
+-      // arrays, or strings to index into array methods.
+-      return n;
++        return n; // return as is for non-number indices
+     }
+ 
+     double index = right.getDouble();
+     int intIndex = (int) index;
+     if (intIndex != index) {
+         error(INVALID_GETELEM_INDEX_ERROR, right);
+-      return n;
+-    }
+-
+-    if (intIndex < 0) {
+-      error(INDEX_OUT_OF_BOUNDS_ERROR, right);
+-      return n;
++        return n; // return as is for non-integer indices
+     }
+ 
+     Node elem = left.getFirstChild();
++    // Instead of checking for a negative index here, we will skip the index range check
++    // already present for `elem == null`, which will handle both out-of-bounds access.
+     for (int i = 0; elem != null && i < intIndex; i++) {
+         elem = elem.getNext();
+     }
+ 
++    // Check if the index is out of bounds
+     if (elem == null) {
++        // Changed error handling to check if index is precisely the length of the array
++        if (intIndex >= left.getChildCount()) {
+             error(INDEX_OUT_OF_BOUNDS_ERROR, right);
+-      return n;
++            return n; // Return as is for out-of-bounds
++        }
+     }
+ 
+-    if (elem.getType() == Token.EMPTY) {
++    // Handle empty elements
++    if (elem != null && elem.getType() == Token.EMPTY) {
+         elem = NodeUtil.newUndefinedNode(elem);
+-    } else {
++    } else if (elem != null) {
+         left.removeChild(elem);
+     }
+ 
+     // Replace the entire GETELEM with the value
+     n.getParent().replaceChild(n, elem);
+     reportCodeChange();
+-    return elem;
++    return elem != null ? elem : n; // Return the element if it exists or n if it doesn't
+ }
+\ No newline at end of file

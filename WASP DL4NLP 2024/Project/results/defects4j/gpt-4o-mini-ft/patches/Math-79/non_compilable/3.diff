@@ -1,0 +1,23 @@
+diff --git a/tmp/ef4c1873-9f58-440e-8f40-eca1be5b605c_buggy.java b/tmp/36f51d43-df89-4cba-a033-6b2524214c68_fixed.java
+index 6e238e7..c9c0f24 100644
+--- a/tmp/ef4c1873-9f58-440e-8f40-eca1be5b605c_buggy.java
++++ b/tmp/36f51d43-df89-4cba-a033-6b2524214c68_fixed.java
+@@ -1,15 +1,15 @@
+     /**
+      * Calculates the L<sub>2</sub> (Euclidean) distance between two points.
+      *
+      * @param p1 the first point
+      * @param p2 the second point
+      * @return the L<sub>2</sub> distance between the two points
+      */
+-    public static double distance(int[] p1, int[] p2) {
+-      int sum = 0;
++    public static double distance(double[] p1, double[] p2) {
++      double sum = 0;
+       for (int i = 0; i < p1.length; i++) {
+-          final int dp = p1[i] - p2[i];
++          final double dp = p1[i] - p2[i];
+           sum += dp * dp;
+       }
+       return Math.sqrt(sum);
+     }

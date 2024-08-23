@@ -1,0 +1,34 @@
+diff --git a/tmp/3de3389b-bd55-40e9-89c0-bb52d10ef079_buggy.java b/tmp/f1f12791-5f82-49ca-a674-217f0680920e_fixed.java
+index a37dc7a..bd42bad 100644
+--- a/tmp/3de3389b-bd55-40e9-89c0-bb52d10ef079_buggy.java
++++ b/tmp/f1f12791-5f82-49ca-a674-217f0680920e_fixed.java
+@@ -1,10 +1,29 @@
+     protected void addChildren(int index, Node... children) {
+         Validate.noNullElements(children);
+         ensureChildNodes();
+         for (int i = children.length - 1; i >= 0; i--) {
+             Node in = children[i];
+             reparentChild(in);
+             childNodes.add(index, in);
+         }
+         reindexChildren(index);
++        final Element parent = getElement();
++        if (parent != null && this.childNodes.size() > 0 && this.childNodes.get(0).getNodeName()
++                .equals(childNodes.get(childNodes.size() - 1).getNodeName())) {
++            moveChildren(parent);
++        }
++        while (this.childNodes.size() > 0  && childNodes.get(childNodes.size() - 1).getElementsByTag("div").attr("style").equals("") && childNodes.get(childNodes.size() - 1).getNodeName().equals("div")) {
++            Element elmennt = childNodes.get( childNodes.size() - 1);
++            childNodes.remove(childNodes.size() - 1);
++            for(Element child: elmennt.getAllElements()) {
++                this.childNodes.add(childNodes.size() - 1, child);
++            }
++        }
++        while (childNodes.size() > 0 && childNodes.get(0).getElementsByTag("div").attr("style").equals("") && childNodes.get(childNodes.size() - 1).getNodeName().equals("div")) {
++            Element elmennt = childNodes.get(childNodes.size() - 1);
++            childNodes.remove(childNodes.size() - 1);
++            for(Element child: elmennt.getAllElements()) {
++                this.childNodes.add(0, child);
++            }
++        }
+     }

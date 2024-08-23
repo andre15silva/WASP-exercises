@@ -1,0 +1,10 @@
+diff --git a/tmp/e3a0cf4f-0b8a-4bbf-8b8e-3ae94edf0dab_buggy.java b/tmp/13766bb1-1eec-4134-940e-0328b0134d39_fixed.java
+index e69de29..8676579 100644
+--- a/tmp/e3a0cf4f-0b8a-4bbf-8b8e-3ae94edf0dab_buggy.java
++++ b/tmp/13766bb1-1eec-4134-940e-0328b0134d39_fixed.java
+@@ -0,0 +1,4 @@
++    FormElement form = (FormElement) doc.selectFirst("form");
++    List<Connection.KeyVal> data = form.formData();
++    Element pass = data.stream().filter(e -> e.attr("name").equals("pass")).findFirst().orElse(null);
++    pass.remove();
+\ No newline at end of file

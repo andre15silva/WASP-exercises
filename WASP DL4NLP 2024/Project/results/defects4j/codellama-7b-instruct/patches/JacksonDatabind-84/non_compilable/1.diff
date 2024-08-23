@@ -1,0 +1,17 @@
+diff --git a/tmp/98bd55ce-0b87-4def-99a1-af61e83cf87a_buggy.java b/tmp/6bc2237e-4cbf-4272-ae9c-97ec8742dffc_fixed.java
+index e69de29..33b48b6 100644
+--- a/tmp/98bd55ce-0b87-4def-99a1-af61e83cf87a_buggy.java
++++ b/tmp/6bc2237e-4cbf-4272-ae9c-97ec8742dffc_fixed.java
+@@ -0,0 +1,11 @@
++    public void testBasePropertiesIncludedWhenSerializingSubWhenSubTypeLoadedAfterBaseType() throws IOException {
++        TypeFactory tf = TypeFactory.defaultInstance();
++        tf.constructType(Base.class);
++        tf.constructType(Sub.class);
++        // Register the Base type with the ObjectMapper instance
++        ObjectMapper objectMapper = objectMapper();
++        objectMapper.addMixIn(Base.class, Base.class);
++        Sub sub = new Sub();
++        String serialized = objectMapper.writeValueAsString(sub);
++        assertEquals("{\"base\":1,\"sub\":2}", serialized);
++    }
+\ No newline at end of file

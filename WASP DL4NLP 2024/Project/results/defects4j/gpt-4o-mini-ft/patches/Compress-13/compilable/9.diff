@@ -1,0 +1,14 @@
+diff --git a/tmp/d6c95715-2ee5-4ff7-b767-553890d178a3_buggy.java b/tmp/e936c624-88eb-4af4-9654-a06eb7076ff8_fixed.java
+index 1c92640..6ff6d62 100644
+--- a/tmp/d6c95715-2ee5-4ff7-b767-553890d178a3_buggy.java
++++ b/tmp/e936c624-88eb-4af4-9654-a06eb7076ff8_fixed.java
+@@ -1,7 +1,8 @@
+     /**
+      * Set the name of the entry.
++     * 
+      * @param name the name to use
+      */
+     protected void setName(String name) {
+-        this.name = name;
++        this.name = name.replace("\\", "/");
+     }

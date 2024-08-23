@@ -1,0 +1,11 @@
+diff --git a/tmp/bedde24a-068c-4fff-8d9f-abff88cb9686_buggy.java b/tmp/92f9c456-14b4-4a2b-a39b-832f9e9492fe_fixed.java
+index 8bae155..e4dc927 100644
+--- a/tmp/bedde24a-068c-4fff-8d9f-abff88cb9686_buggy.java
++++ b/tmp/92f9c456-14b4-4a2b-a39b-832f9e9492fe_fixed.java
+@@ -1,5 +1,5 @@
+     @Override
+     public String asStringLiteral()
+     {
+-        return '"' + this.value + '"';
++        return '"' + this.value.replace("\"", "\\\"") + '"';
+     }

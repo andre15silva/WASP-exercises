@@ -1,0 +1,39 @@
+diff --git a/tmp/9047cb14-afd5-4342-90fd-458e395e6656_buggy.java b/tmp/c69ac1ab-8c5b-45e5-b386-030a68d4b0f5_fixed.java
+index 6c0aa19..e761e99 100644
+--- a/tmp/9047cb14-afd5-4342-90fd-458e395e6656_buggy.java
++++ b/tmp/c69ac1ab-8c5b-45e5-b386-030a68d4b0f5_fixed.java
+@@ -1,20 +1,20 @@
+-    /**
+-     * @param encoding the encoding to use for file names, use null
+-     * for the platform's default encoding
+-     * @param useUnicodeExtraFields whether to use InfoZIP Unicode
+-     * Extra Fields (if present) to set the file names.
+-     * @param allowStoredEntriesWithDataDescriptor whether the stream
+-     * will try to read STORED entries that use a data descriptor
+-     * @since 1.1
+-     */
+ public ZipArchiveInputStream(InputStream inputStream,
+                              String encoding,
+                              boolean useUnicodeExtraFields,
+-                                 boolean allowStoredEntriesWithDataDescriptor) {
++                             boolean allowStoredEntriesWithDataDescriptor) throws IOException {
+     zipEncoding = ZipEncodingHelper.getZipEncoding(encoding);
+     this.useUnicodeExtraFields = useUnicodeExtraFields;
+     in = new PushbackInputStream(inputStream, buf.capacity());
+-        this.allowStoredEntriesWithDataDescriptor =
+-            allowStoredEntriesWithDataDescriptor;
+-        // haven't read anything so far
++    this.allowStoredEntriesWithDataDescriptor = allowStoredEntriesWithDataDescriptor;
++    
++    // Read the initial data to ensure the stream is properly positioned
++    // Assuming `buf` is a ByteBuffer or similar type that has been initialized
++    buf.clear(); // Clear the buffer for new data
++    int bytesRead = in.read(buf.array()); // Read initial bytes
++    
++    // Make sure to handle EOF and other potential issues
++    if (bytesRead == -1) {
++        throw new IOException("InputStream closed or no data available.");
++    }
++    // Optionally, handle cases where we read less than expected
+ }
+\ No newline at end of file

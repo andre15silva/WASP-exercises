@@ -1,0 +1,26 @@
+diff --git a/tmp/10bab83e-2cd5-4cce-ad76-bd691edc2d29_buggy.java b/tmp/16413b49-7148-4870-a96a-ba89e5fbb874_fixed.java
+index 46799da..8ffe9bd 100644
+--- a/tmp/10bab83e-2cd5-4cce-ad76-bd691edc2d29_buggy.java
++++ b/tmp/16413b49-7148-4870-a96a-ba89e5fbb874_fixed.java
+@@ -1,8 +1,21 @@
+         /**
+          * @param x Normalized objective variables.
+          * @return the original objective variables, possibly repaired.
+          */
+         public double[] repairAndDecode(final double[] x) {
+             return
+                 decode(x);
++//                // Rejected with Math 864, see https://java.net/jira/browse/MATH-864 for reference. This does not
++//                // apply to our optimization methods since we do not expect the fitness function to be too close to the
++//                // minimum of the objective. The fitness function is allowed to have the minimum at the origin (e.g.
++//                // for the LeastSquares function in Commons-Math), but it must not have the minimum at one side of
++//                // the search domain. The only exception to this is one where we are minimizing a function and want the
++//                // minimum to be at the opposite side in order to avoid being trapped in a local minimum.
++//                for (int dimension = 0; dimension < x.length; ++dimension) {
++//                    if (x[dimension] > 0.5) {
++//                        x[dimension] = x[dimension] + 0.1;
++//                    } else if (x[dimension] < -0.5) {
++//                        x[dimension] = x[dimension] - 0.1;
++//                    }
++//                }
+         }

@@ -1,0 +1,51 @@
+diff --git a/tmp/c291e6d0-b2fb-4cfc-b057-e344da8f6901_buggy.java b/tmp/5653252d-7142-49e5-8c91-866ce9474c96_fixed.java
+index 56b2d66..feb28b8 100644
+--- a/tmp/c291e6d0-b2fb-4cfc-b057-e344da8f6901_buggy.java
++++ b/tmp/5653252d-7142-49e5-8c91-866ce9474c96_fixed.java
+@@ -1,45 +1,18 @@
+-    /**
+-     * Removes the phase 1 objective function, positive cost non-artificial variables,
+-     * and the non-basic artificial variables from this tableau.
+-     */
+     protected void dropPhase1Objective() {
+-        if (getNumObjectiveFunctions() == 1) {
+-            return;
+-        }
+-
+-        List<Integer> columnsToDrop = new ArrayList<Integer>();
+-        columnsToDrop.add(0);
+ 
+         // positive cost non-artificial variables
+         for (int i = getNumObjectiveFunctions(); i < getArtificialVariableOffset(); i++) {
+             final double entry = tableau.getEntry(0, i);
+             if (Precision.compareTo(entry, 0d, maxUlps) > 0) {
+                 columnsToDrop.add(i);
+             }
+         }
+ 
+         // non-basic artificial variables
+         for (int i = 0; i < getNumArtificialVariables(); i++) {
+           int col = i + getArtificialVariableOffset();
+           if (getBasicRow(col) == null) {
+             columnsToDrop.add(col);
+           }
+         }
+     
+\ No newline at end of file
+-        double[][] matrix = new double[getHeight() - 1][getWidth() - columnsToDrop.size()];
+-        for (int i = 1; i < getHeight(); i++) {
+-          int col = 0;
+-          for (int j = 0; j < getWidth(); j++) {
+-            if (!columnsToDrop.contains(j)) {
+-              matrix[i - 1][col++] = tableau.getEntry(i, j);
+-            }
+-          }
+-        }
+-
+-        for (int i = columnsToDrop.size() - 1; i >= 0; i--) {
+-          columnLabels.remove((int) columnsToDrop.get(i));
+-        }
+-
+-        this.tableau = new Array2DRowRealMatrix(matrix);
+-        this.numArtificialVariables = 0;
+-    }

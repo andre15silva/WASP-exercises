@@ -1,0 +1,213 @@
+diff --git a/tmp/cda8a213-73e2-4e45-a8c4-554aadb22af5_buggy.java b/tmp/261f33c0-0995-42d9-9120-87a56cdac746_fixed.java
+index acd5eb5..170a373 100644
+--- a/tmp/cda8a213-73e2-4e45-a8c4-554aadb22af5_buggy.java
++++ b/tmp/261f33c0-0995-42d9-9120-87a56cdac746_fixed.java
+@@ -1,32 +1,177 @@
++package org.jsoup.nodes;
++
++import org.jsoup.internal.Normalizer;
++import org.jsoup.internal.StringUtil;
++import org.jsoup.internal.Normalizer.Form;
++import org.jsoup.helper.StringBuilder;
++import org.jsoup.helper.Validate;
++import org.jsoup.helper.W3CValidator;
++import org.jsoup.nodes.Entities.EscapeMode;
++import org.jsoup.nodes.Element.TextNode;
++import org.jsoup.parser.Tag;
++import org.jsoup.safety.Cleaner;
++
++/**
++ * A TextNode, the baseimmutable text node.
++ * @author Jonathan Hedley, jonathan@hedley.net */
++public class TextNode extends Node {
++
++   // static methods
++    /**
++     * Factory method to create a deep copy of a text node.
++     * @param n the text node to copy
++     * @return the copy
++     */
++    public static TextNode deepCopy(final TextNode n) {
++        return n.clone();
++    }
++
++   //
++   // Instance methods
++   //
++    /**
++     * Constructor.
++     * @param text the text
++     * @see #createFromEncoded(String)
++     */
++    public TextNode(String text) {
++        super(text);
++    }
++
++    /**
++     * Create a new TextNode representation from an encoded (escaped) string
++     * @param encodedText text node contents
++     * @return text node
++     */
++    public static TextNode createFromEncoded(String encodedText) {
++        // the intention is that the user of the api wants a text node with these contents, which may be markup
++        // so preserve whitespace, rather than normalise it to a normalised representation.
++        Validate.notNull(encodedText);
++        String text = Normalizer.preserve(encodedText);
++        return new TextNode(text);
++    }
++
++    @Override
++    public TextNode clone() {
++        return (TextNode) super.clone();
++    }
++
++    @Override
++    public String toString() {
++        return outterHtml();
++    }
++
++    // gets the plain text of this text node (not enclosed in a tag).
++    @Override
++    public String text() {
++        return coreValue();
++    }
++
++    @Override
++    public String nodeName() {
++        return "#text";
++    }
++
++    @Override
++    public String html() {
++        return outerHtml();
++    }
++
++    @Override
++    public TextNode siblingNode(int i) {
++        return (TextNode) super.siblingNode(i);
++    }
++
++
++    /**
++     * Get the text content of this node, and also any child nodes.
++     * @return Text content
++     */
++    public String getWholeText() {
++        StringBuilder accum = new StringBuilder(coreValue.length() + 50);
++        wholeText(accum);
++        return accum.toString();
++    }
++
++    /**
++     * Append {@code text} to this node's text, or to any child.
++     * @param text unencoded text to append
++     * @return this node, for chaining.
++     */
++    public TextNode append(String text) {
++        Validate.notNull(text);
++
++        // add text to existing text.
++        if(!(isBlank()))
++            mergeText(text);
++
++        return this;
++    }
++
++    /**
++     * Normalise this text node, and all its children, in preparation for output.
++     *
++     * * Remove any existing child nodes.
++     * * merge adjacent text nodes into this node
++     * * trim any whitespace (using trim()) around the text.
++     */
++    @Override
++    public void normalise() {
++        childNodes.clear();
++        ((Element)parentNode).normalise(this);
++        for (TextNode textNode : siblingNodes()) {
++            mergeText(textNode.text());
++        }
++    }
++
++    /**
++     * Test if the text is all spaces (or an empty string if trimmed)
++     * @return true if document is all whitespace
++     */
++    public boolean isBlank() {
++        String text = getWholeText();
++        return text.trim().isEmpty();
++    }
++
++    /**
++     * Get the String text represented by this TextNode, and also any child text nodes.
++     * @return String text
++     */
++    @Override
++    public String toString(Document.OutputSettings out) {
++        StringBuilder accum = new StringBuilder(coreValue.length() + 50);
++        wholeText(accum, out);
++        return accum.toString();
++    }
++
++    /**
++     * Tests if this node is equal to the supplied object. This performs a deep comparison.
++     *
++     * @param o Object to compare this node against
++     * @return true if the nodes are the same, false otherwise
++     * @deprecated use {@link #outerHtml()} to compare nodes
++     */
+     @Override
+-    void outerHtmlHead(Appendable accum, int depth, Document.OutputSettings out) throws IOException {
+-        final boolean prettyPrint = out.prettyPrint();
+-        final Element parent = parentNode instanceof Element ? ((Element) parentNode) : null;
+-        final boolean normaliseWhite = prettyPrint && !Element.preserveWhitespace(parentNode);
+-        final boolean trimLikeBlock = parent != null && (parent.tag().isBlock() || parent.tag().formatAsBlock());
+-        boolean trimLeading = false, trimTrailing = false;
+-
+-        if (normaliseWhite) {
+-            trimLeading = (trimLikeBlock && siblingIndex == 0) || parentNode instanceof Document;
+-            trimTrailing = trimLikeBlock && nextSibling() == null;
+-
+-            // if this text is just whitespace, and the next node will cause an indent, skip this text:
+-            Node next = nextSibling();
+-            Node prev = previousSibling();
+-            boolean isBlank = isBlank();
+-            boolean couldSkip = (next instanceof Element && ((Element) next).shouldIndent(out)) // next will indent
+-                || (next instanceof TextNode && (((TextNode) next).isBlank())) // next is blank text, from re-parenting
+-                || (prev instanceof Element && ((Element) prev).isBlock())
+-                ;
+-            if (couldSkip && isBlank) return;
+-
+-            if (
+-                (siblingIndex == 0 && parent != null && parent.tag().formatAsBlock() && !isBlank) ||
+-                (out.outline() && siblingNodes().size() > 0 && !isBlank) ||
+-                (siblingIndex > 0 && isNode(prev, "br")) // special case wrap on inline <br> - doesn't make sense as a block tag
+-            )
+-                indent(accum, depth, out);
+-        }
+-
+-        Entities.escape(accum, coreValue(), out, false, normaliseWhite, trimLeading, trimTrailing);
++    public boolean equals(object o) {
++        if (this == o) {
++            return true;
++        }
++        if (!(o instanceof TextNode)) {
++            return false;
++        }
++        if (!super.equals(o)) {
++            return false;
++        }
++
++        TextNode textNode = (TextNode) o;
++
++        return coreValue().equals(textNode.coreValue());
++    }
++
++    @Override
++    public int hashCode() {
++        int result = super.hashCode();
++        result = 31 * result + coreValue().hashCode();
++        return result;
++    }
+ }
+\ No newline at end of file

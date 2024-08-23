@@ -1,0 +1,21 @@
+diff --git a/tmp/7e9d8f60-3747-4059-98f2-8da818cf1a47_buggy.java b/tmp/64dca030-febe-4721-b2a2-f9d5485b661f_fixed.java
+index 79fa300..209979b 100644
+--- a/tmp/7e9d8f60-3747-4059-98f2-8da818cf1a47_buggy.java
++++ b/tmp/64dca030-febe-4721-b2a2-f9d5485b661f_fixed.java
+@@ -1,15 +1,7 @@
+-    /**
+-     * Create a new doctype element.
+-     * @param name the doctype's name
+-     * @param publicId the doctype's public ID
+-     * @param systemId the doctype's system ID
+-     * @param baseUri the doctype's base URI
+-     */
+     public DocumentType(String name, String publicId, String systemId, String baseUri) {
+         super(baseUri);
+-
+         Validate.notEmpty(name);
+         attr("name", name);
+         attr("publicId", publicId);
+         attr("systemId", systemId);
+     }
+\ No newline at end of file

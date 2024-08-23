@@ -1,0 +1,26 @@
+diff --git a/tmp/91155724-fdde-48c4-aebc-dce8daf727ae_buggy.java b/tmp/1733e306-566d-4637-b57a-ad8bf41bf5e6_fixed.java
+index 6c87721..2e76eaf 100644
+--- a/tmp/91155724-fdde-48c4-aebc-dce8daf727ae_buggy.java
++++ b/tmp/1733e306-566d-4637-b57a-ad8bf41bf5e6_fixed.java
+@@ -1,11 +1,19 @@
+     static boolean preserveWhitespace(Node node) {
+         // looks only at this element and five levels up, to prevent recursion & needless stack searches
+         if (node != null && node instanceof Element) {
+             Element el = (Element) node;
+                 if (el.tag.preserveWhitespace())
+                     return true;
+-                else
+-                    return el.parent() != null && el.parent().tag.preserveWhitespace();
++                else {
++                    // don't search beyond a depth of 5, since otherwise big html trees could hang in a stack overflow.
++                    return presWs(el, 0);
++                }
+         }
+         return false;
+     }
++
++    private static boolean presWs(Element el, int deepness) {
++        if (deepness > 5) return false;
++        if (el.parent() != null && el.parent().tag.preserveWhitespace()) return true;
++        else return presWs(el.parent(), deepness + 1);
++    }

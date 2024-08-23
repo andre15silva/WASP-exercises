@@ -1,0 +1,43 @@
+diff --git a/tmp/4b6e9ee4-7882-45fa-9e8c-79a53dbddbdd_buggy.java b/tmp/e6cfd751-6504-4df1-8ff0-ed9b95440f07_fixed.java
+index 6e45f80..27ed65c 100644
+--- a/tmp/4b6e9ee4-7882-45fa-9e8c-79a53dbddbdd_buggy.java
++++ b/tmp/e6cfd751-6504-4df1-8ff0-ed9b95440f07_fixed.java
+@@ -1,21 +1,38 @@
+   /**
+    * Returns a factory for all subtypes of {@code typeAdapter}. We do a runtime check to confirm
+    * that the deserialized type matches the type requested.
+    */
+   public static <T1> TypeAdapterFactory newTypeHierarchyFactory(
+       final Class<T1> clazz, final TypeAdapter<T1> typeAdapter) {
+     return new TypeAdapterFactory() {
+       @SuppressWarnings("unchecked")
+       public <T2> TypeAdapter<T2> create(Gson gson, TypeToken<T2> typeToken) {
+         final Class<? super T2> requestedType = typeToken.getRawType();
+         if (!clazz.isAssignableFrom(requestedType)) {
+           return null;
+         }
++        if (!JsonElement.class.isAssignableFrom(requestedType)) {
+           return (TypeAdapter<T2>) typeAdapter;
++        }
++        return (TypeAdapter<T2>) new TypeAdapter<JsonElement>() {
++          @Override
++          public JsonElement read(JsonReader in) throws IOException {
++            throw new UnsupportedOperationException(
++                "Expected JsonElement as a JsonObject");
++          }
++
++          @Override public String toString() {
++            return typeAdapter.toString();
++          }
++
++          @Override public void write(JsonWriter out, JsonElement value) throws IOException {
++            typeAdapter.write(out, value);
++          }
++        };
+ 
+       }
+       @Override public String toString() {
+         return "Factory[typeHierarchy=" + clazz.getName() + ",adapter=" + typeAdapter + "]";
+       }
+     };
+   }

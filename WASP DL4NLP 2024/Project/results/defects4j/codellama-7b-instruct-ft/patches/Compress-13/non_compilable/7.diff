@@ -1,0 +1,20 @@
+diff --git a/tmp/9055ced2-078a-41d2-a6d1-45b81375800f_buggy.java b/tmp/a72debdb-047b-4337-bd27-e82d46b9fb88_fixed.java
+index 1c92640..1567af1 100644
+--- a/tmp/9055ced2-078a-41d2-a6d1-45b81375800f_buggy.java
++++ b/tmp/a72debdb-047b-4337-bd27-e82d46b9fb88_fixed.java
+@@ -1,7 +1,15 @@
+     /**
+      * Set the name of the entry.
+      * @param name the name to use
+      */
+     protected void setName(String name) {
++        if (isWindows()) {
++            // HACK: ZipFile on win32 does not canonicalize names
++            // so "ä/ü.txt" becomes "?\u00e4\/\u00fc.txt", etc.
++            int p = name.indexOf("/", 0);
++            if (p > 0) {
++                name = name.substring(p);
++            }
++        }
+         this.name = name;
+     }

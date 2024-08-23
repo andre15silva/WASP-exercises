@@ -1,0 +1,14 @@
+diff --git a/tmp/fdee9dd7-7d40-4384-bbfc-f92ba0dcde91_buggy.java b/tmp/546861bf-e12b-4794-b1d2-0149308d3b56_fixed.java
+index ec709bd..f210d06 100644
+--- a/tmp/fdee9dd7-7d40-4384-bbfc-f92ba0dcde91_buggy.java
++++ b/tmp/546861bf-e12b-4794-b1d2-0149308d3b56_fixed.java
+@@ -1,8 +1,8 @@
+     @Override
+     public Object deserialize(JsonParser p, DeserializationContext ctxt) throws IOException
+     {
+         // 29-Jan-2016, tatu: Simple skipping for all other tokens, but FIELD_NAME bit
+-        //    special unfortunately
++        //    special Unfortunately, some unknown type ids may come.
+             p.skipChildren();
+         return null;
+     }

@@ -1,0 +1,39 @@
+diff --git a/tmp/0d123e2c-0910-49fe-9b8d-0e90c712f990_buggy.java b/tmp/44ba405b-6daa-4cdb-92e3-07a46ebcbec4_fixed.java
+index 39c4220..88a0b6f 100644
+--- a/tmp/0d123e2c-0910-49fe-9b8d-0e90c712f990_buggy.java
++++ b/tmp/44ba405b-6daa-4cdb-92e3-07a46ebcbec4_fixed.java
+@@ -1,21 +1,29 @@
+     private final static int _parseIndex(String str) {
+         final int len = str.length();
+-        // [Issue#133]: beware of super long indexes; assume we never
+-        // have arrays over 2 billion entries so ints are fine.
+         if (len == 0 || len > 10) {
+             return -1;
+         }
+         for (int i = 0; i < len; ++i) {
+             char c = str.charAt(i++);
+             if (c > '9' || c < '0') {
+                 return -1;
+             }
+         }
++        long l;
+         if (len == 10) {
+-            long l = NumberInput.parseLong(str);
++            try {
++                l = NumberInput.parseLong(str);
++            } catch (NumberFormatException e) {
++                throw new IllegalArgumentException("Expected an integer value",e);
++            }
+             if (l > Integer.MAX_VALUE) {
+                 return -1;
+             }
++        } else {
++            l = NumberInput.parseInt(str);
+         }
+-        return NumberInput.parseInt(str);
++        if (((Double) (l)).isInfinite() || ((Double) (l)).isNaN()) {
++            return -1;
++        }
++        return ((int) l);
+     }
+\ No newline at end of file

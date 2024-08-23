@@ -1,0 +1,44 @@
+diff --git a/tmp/240b94d3-cd81-4437-9c27-16a7de2ff98f_buggy.java b/tmp/97d582b5-89ba-4336-a762-be24e1461dfd_fixed.java
+index addeb8d..335a0e0 100644
+--- a/tmp/240b94d3-cd81-4437-9c27-16a7de2ff98f_buggy.java
++++ b/tmp/97d582b5-89ba-4336-a762-be24e1461dfd_fixed.java
+@@ -1,38 +1,38 @@
+     /**
+      * Searches the string builder to find the first reference to the specified
+      * string starting searching from the given index.
+      * <p>
+      * Note that a null input string will return -1, whereas the JDK throws an exception.
+      * 
+      * @param str  the string to find, null returns -1
+      * @param startIndex  the index to start at, invalid index rounded to edge
+      * @return the first index of the string, or -1 if not found
+      */
+     public int indexOf(String str, int startIndex) {
+         startIndex = (startIndex < 0 ? 0 : startIndex);
+         if (str == null || startIndex >= size) {
+             return -1;
+         }
+         int strLen = str.length();
+         if (strLen == 1) {
+             return indexOf(str.charAt(0), startIndex);
+         }
+         if (strLen == 0) {
+             return startIndex;
+         }
+         if (strLen > size) {
+             return -1;
+         }
+         char[] thisBuf = buffer;
+-        int len = thisBuf.length - strLen;
++        int len = size - strLen + 1;
+         outer:
+         for (int i = startIndex; i < len; i++) {
+             for (int j = 0; j < strLen; j++) {
+                 if (str.charAt(j) != thisBuf[i + j]) {
+                     continue outer;
+                 }
+             }
+             return i;
+         }
+         return -1;
+     }

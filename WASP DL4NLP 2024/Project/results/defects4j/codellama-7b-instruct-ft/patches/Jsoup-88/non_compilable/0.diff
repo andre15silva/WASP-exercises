@@ -1,0 +1,15 @@
+diff --git a/tmp/7c2a28ad-3d0f-456c-be64-e9d9195b409c_buggy.java b/tmp/65a6cbc5-1720-45a2-a430-cbef5568a3b8_fixed.java
+index a68ccd7..771fe02 100644
+--- a/tmp/7c2a28ad-3d0f-456c-be64-e9d9195b409c_buggy.java
++++ b/tmp/65a6cbc5-1720-45a2-a430-cbef5568a3b8_fixed.java
+@@ -1,7 +1,10 @@
+     /**
+      Get the attribute value.
+      @return the attribute value
+      */
+     public String getValue() {
++        if (isBooleans()) {
++            val = "";
++        }
+         return val;
+     }

@@ -1,0 +1,39 @@
+diff --git a/tmp/c2689e4e-729e-4ae1-9b2e-b8a64539d8fc_buggy.java b/tmp/b5c70829-eb24-4e38-8cd2-99ac6fd7dc14_fixed.java
+index 98d89dc..cf7fae9 100644
+--- a/tmp/c2689e4e-729e-4ae1-9b2e-b8a64539d8fc_buggy.java
++++ b/tmp/b5c70829-eb24-4e38-8cd2-99ac6fd7dc14_fixed.java
+@@ -1,23 +1,33 @@
+     private boolean compute(Object left, Object right) {
+         left = reduce(left);
+         right = reduce(right);
+ 
+         if (left instanceof InitialContext) {
+             ((InitialContext) left).reset();
+         }
+         if (right instanceof InitialContext) {
+             ((InitialContext) right).reset();
+         }
+         if (left instanceof Iterator && right instanceof Iterator) {
+             return findMatch((Iterator) left, (Iterator) right);
+         }
+         if (left instanceof Iterator) {
+             return containsMatch((Iterator) left, right);
+         }
+         if (right instanceof Iterator) {
+             return containsMatch((Iterator) right, left);
+         }
+         double ld = InfoSetUtil.doubleValue(left);
+         double rd = InfoSetUtil.doubleValue(right);
++
++        if (!ld.isNaN() && !rd.isNaN()) {
+             return evaluateCompare(ld == rd ? 0 : ld < rd ? -1 : 1);
+         }
++        if (ld.isNaN() && !rd.isNaN()) {
++            return false;
++        }
++        if (!ld.isNaN() && rd.isNaN()) {
++            return true;
++        }
++        throw new AssertionError("This should never happen");
++    }
+\ No newline at end of file

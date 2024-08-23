@@ -1,0 +1,27 @@
+diff --git a/tmp/a0ca9afe-01e8-4f30-a91a-c53023e79ecf_buggy.java b/tmp/9d720e31-b540-4c10-9e9d-173b44d34471_fixed.java
+index a5ff4fc..20c2617 100644
+--- a/tmp/a0ca9afe-01e8-4f30-a91a-c53023e79ecf_buggy.java
++++ b/tmp/9d720e31-b540-4c10-9e9d-173b44d34471_fixed.java
+@@ -1,17 +1,22 @@
+     /**
+      * Helper method used to prevent both caching and cache lookups for structured
+      * types that have custom value handlers
+      *
+      * @since 2.8.11
+      */
+     private boolean _hasCustomHandlers(JavaType t) {
+         if (t.isContainerType()) {
+             // First: value types may have both value and type handlers
+             JavaType ct = t.getContentType();
+             if (ct != null) {
+                 return (ct.getValueHandler() != null) || (ct.getTypeHandler() != null);
+             // Second: map(-like) types may have value handler for key (but not type; keys are untyped)
+             }
++        } else {
++        	// We are actually checking if structured caching needs to be disabled for a property.
++        	// However, if we have annotation-less properties, it seems the only way to achieve that is 
++        	// to have an annotation on the class itself.
++        	return JacksonAnnotationUtil.hasAnnotationsForClass(t.getRawClass());
+         }
+         return false;
+     }

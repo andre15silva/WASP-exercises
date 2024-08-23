@@ -1,0 +1,40 @@
+diff --git a/tmp/1ecc019b-d8d9-4db1-8d3f-9152ed134b4b_buggy.java b/tmp/999f0244-e032-4288-af1f-680f02efc081_fixed.java
+index 170b3a0..74c80b9 100644
+--- a/tmp/1ecc019b-d8d9-4db1-8d3f-9152ed134b4b_buggy.java
++++ b/tmp/999f0244-e032-4288-af1f-680f02efc081_fixed.java
+@@ -1,32 +1,33 @@
+     /**
+      * Returns the <a href="http://www.xycoon.com/SumOfSquares.htm">
+      * sum of squared errors</a> (SSE) associated with the regression 
+      * model.
+      * <p>
+      * The sum is computed using the computational formula
+      * <p>
+      * <code>SSE = SYY - (SXY * SXY / SXX)</code>
+      * <p>
+      * where <code>SYY</code> is the sum of the squared deviations of the y
+      * values about their mean, <code>SXX</code> is similarly defined and
+      * <code>SXY</code> is the sum of the products of x and y mean deviations.
+      * <p>
+      * The sums are accumulated using the updating algorithm referenced in 
+      * {@link #addData}.  
+      * <p>
+-     * The return value is constrained to be non-negative - i.e., if due to 
+-     * rounding errors the computational formula returns a negative result, 
++     * The return value of this method is constrained to be 
++     * non-negative - i.e., if due to rounding errors the 
++     * computational formula returns a negative result, 
+      * 0 is returned.
+      * <p>
+      * <strong>Preconditions</strong>: <ul>
+      * <li>At least two observations (with at least two different x values)
+      * must have been added before invoking this method. If this method is 
+      * invoked before a model can be estimated, <code>Double,NaN</code> is
+      * returned.
+      * </li></ul>
+      *
+      * @return sum of squared errors associated with the regression model
+      */
+     public double getSumSquaredErrors() {
+         return sumYY - sumXY * sumXY / sumXX;
+     }

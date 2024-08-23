@@ -1,0 +1,10 @@
+diff --git a/tmp/d2b28f66-223a-4767-80b7-bb29076aae3f_buggy.java b/tmp/2646762b-5850-48fc-9511-385b4a2a6185_fixed.java
+index 22640dd..1e6b2c3 100644
+--- a/tmp/d2b28f66-223a-4767-80b7-bb29076aae3f_buggy.java
++++ b/tmp/2646762b-5850-48fc-9511-385b4a2a6185_fixed.java
+@@ -1,3 +1,3 @@
+   private boolean hasExceptionHandler(Node cfgNode) {
+-    return false;
++    return true;
+   }
+\ No newline at end of file

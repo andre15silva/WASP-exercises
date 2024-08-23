@@ -1,0 +1,19 @@
+diff --git a/tmp/e52521be-9666-4014-a175-0035acb3c1fd_buggy.java b/tmp/720ac44c-409c-40d3-8fdd-57a9873fd33c_fixed.java
+index 0878b6b..f6ed802 100644
+--- a/tmp/e52521be-9666-4014-a175-0035acb3c1fd_buggy.java
++++ b/tmp/720ac44c-409c-40d3-8fdd-57a9873fd33c_fixed.java
+@@ -1,3 +1,11 @@
+-  public final boolean isEmptyType() {
+-    return isNoType() || isNoObjectType() || isNoResolvedType();
++  public final boolean isNoType() {
++    return this.getType() == null;
++  }
++
++  public final boolean isNoObjectType() {
++    return this.getType().equals("Object");
++  }
++
++  public final boolean isNoResolvedType() {
++    return this.isNoType() || this.isNoObjectType();
+   }
+\ No newline at end of file

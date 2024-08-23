@@ -1,0 +1,87 @@
+diff --git a/tmp/0099d3a3-3405-47cc-9c8f-b355cf67222f_buggy.java b/tmp/44dca508-d3a5-4d81-a4dd-afc50e4e4eb2_fixed.java
+index 40f74f7..6f2161b 100644
+--- a/tmp/0099d3a3-3405-47cc-9c8f-b355cf67222f_buggy.java
++++ b/tmp/44dca508-d3a5-4d81-a4dd-afc50e4e4eb2_fixed.java
+@@ -1,50 +1,55 @@
+-    public static boolean testNode(Node node, NodeTest test) {
++    public static boolean testNode(DomNode node, NodeTest test) {
+         if (test == null) {
+             return true;
+         }
+         if (test instanceof NodeNameTest) {
+-            if (node.getNodeType() != Node.ELEMENT_NODE) {
++            return compareNames(node, (NodeNameTest) test);
++        }
++        if (test instanceof NodeTypeTest) {
++            return compareTypes(node, (NodeTypeTest) test);
++        }
++        if (test instanceof ProcessingInstructionTest) {
++            return compareProcessingInstruction(node, (ProcessingInstructionTest) test);
++        }
+         return false;
+     }
+     
+-            NodeNameTest nodeNameTest = (NodeNameTest) test;
+-            QName testName = nodeNameTest.getNodeName();
+-            String namespaceURI = nodeNameTest.getNamespaceURI();
+-            boolean wildcard = nodeNameTest.isWildcard();
++    private static boolean compareNames(DomNode node, NodeNameTest test) {
++        QName testName = test.getNodeName();
++        String namespaceURI = test.getNamespaceURI();
++        boolean wildcard = test.isWildcard();
+         String testPrefix = testName.getPrefix();
+         if (wildcard && testPrefix == null) {
+             return true;
+         }
+-            if (wildcard
+-                || testName.getName()
+-                        .equals(DOMNodePointer.getLocalName(node))) {
+-                String nodeNS = DOMNodePointer.getNamespaceURI(node);
++        if (wildcard || testName.getName().equals(node.getLocalName())) {
++            String nodeNS = node.getNamespaceURI();
+             return equalStrings(namespaceURI, nodeNS);
+         }
+         return false;
+     }
+-        if (test instanceof NodeTypeTest) {
+-            int nodeType = node.getNodeType();
+-            switch (((NodeTypeTest) test).getNodeType()) {
++    
++    private static boolean compareTypes(DomNode node, NodeTypeTest test) {
++        switch (test.getNodeType()) {
+             case Compiler.NODE_TYPE_NODE :
+-                    return nodeType == Node.ELEMENT_NODE
+-                            || nodeType == Node.DOCUMENT_NODE;
++                return node.getNodeType() == Node.ELEMENT_NODE
++                        || node.getNodeType() == Node.DOCUMENT_NODE;
+             case Compiler.NODE_TYPE_TEXT :
+-                    return nodeType == Node.CDATA_SECTION_NODE
+-                        || nodeType == Node.TEXT_NODE;
++                return node.getNodeType() == Node.CDATA_SECTION_NODE
++                        || node.getNodeType() == Node.TEXT_NODE;
+             case Compiler.NODE_TYPE_COMMENT :
+-                    return nodeType == Node.COMMENT_NODE;
++                return node.getNodeType() == Node.COMMENT_NODE;
+             case Compiler.NODE_TYPE_PI :
+-                    return nodeType == Node.PROCESSING_INSTRUCTION_NODE;
+-            }
++                return node.getNodeType() == Node.PROCESSING_INSTRUCTION_NODE;
++            default:
+                 return false;
+         }
+-        if (test instanceof ProcessingInstructionTest) {
+-            if (node.getNodeType() == Node.PROCESSING_INSTRUCTION_NODE) {
+-                String testPI = ((ProcessingInstructionTest) test).getTarget();
+-                String nodePI = ((ProcessingInstruction) node).getTarget();
+-                return testPI.equals(nodePI);
+-            }
+     }
++    
++    private static boolean compareProcessingInstruction(DomNode node, ProcessingInstructionTest test) {
++        if (node.getNodeType() != Node.PROCESSING_INSTRUCTION_NODE) {
+             return false;
+         }
++        ProcessingInstruction pi = (ProcessingInstruction) node;
++        return test.getTarget().equals(pi.getTarget());
++    }
+\ No newline at end of file

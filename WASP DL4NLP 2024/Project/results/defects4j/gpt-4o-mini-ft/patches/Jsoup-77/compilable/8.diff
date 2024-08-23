@@ -1,0 +1,33 @@
+diff --git a/tmp/129e0580-32bf-4b04-bb07-af53710437bc_buggy.java b/tmp/d70cb595-2f96-4235-8a08-c247dc85b5fa_fixed.java
+index 9a3a9db..3333846 100644
+--- a/tmp/129e0580-32bf-4b04-bb07-af53710437bc_buggy.java
++++ b/tmp/d70cb595-2f96-4235-8a08-c247dc85b5fa_fixed.java
+@@ -1,27 +1,27 @@
+     /**
+      * If the stack contains an element with this tag's name, pop up the stack to remove the first occurrence. If not
+      * found, skips.
+      *
+      * @param endTag tag to close
+      */
+     private void popStackToClose(Token.EndTag endTag) {
+         String elName = endTag.name();
+         Element firstFound = null;
+ 
+         for (int pos = stack.size() -1; pos >= 0; pos--) {
+             Element next = stack.get(pos);
+-            if (next.nodeName().equals(elName)) {
++            if (next.nodeName().equals(elName.toLowerCase())) {
+                 firstFound = next;
+                 break;
+             }
+         }
+         if (firstFound == null)
+             return; // not found, skip
+ 
+         for (int pos = stack.size() -1; pos >= 0; pos--) {
+             Element next = stack.get(pos);
+             stack.remove(pos);
+             if (next == firstFound)
+                 break;
+         }
+     }

@@ -1,0 +1,18 @@
+diff --git a/tmp/2fff67ed-3c5a-4b78-b4d9-f93e6ac81f49_buggy.java b/tmp/dc18633d-cfef-4e08-afb2-2c1ccfbc2016_fixed.java
+index 13db7da..dae4866 100644
+--- a/tmp/2fff67ed-3c5a-4b78-b4d9-f93e6ac81f49_buggy.java
++++ b/tmp/dc18633d-cfef-4e08-afb2-2c1ccfbc2016_fixed.java
+@@ -1,11 +1,12 @@
+     /**
+      * Generates a tooltip string to go in an HTML image map.
+      *
+      * @param toolTipText  the tooltip.
+      * 
+      * @return The formatted HTML area tag attribute(s).
+      */
+     public String generateToolTipFragment(String toolTipText) {
+-        return " title=\"" + toolTipText
++        String ttText = JFreeChartUtils.htmlEncode(toolTipText);
++        return " title=\"" + ttText
+             + "\" alt=\"\"";
+     }

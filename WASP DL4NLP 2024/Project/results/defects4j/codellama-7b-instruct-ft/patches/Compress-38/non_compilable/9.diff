@@ -1,0 +1,32 @@
+diff --git a/tmp/5b1ecbf6-c22d-43b9-b374-571ad2b47678_buggy.java b/tmp/90956fce-e83c-4fe1-a6bf-9870e3b73328_fixed.java
+index 192e83d..370c012 100644
+--- a/tmp/5b1ecbf6-c22d-43b9-b374-571ad2b47678_buggy.java
++++ b/tmp/90956fce-e83c-4fe1-a6bf-9870e3b73328_fixed.java
+@@ -1,21 +1,27 @@
+     /**
+      * Return whether or not this entry represents a directory.
+      *
+      * @return True if this entry is a directory.
+      */
+     @Override
+     public boolean isDirectory() {
+         if (file != null) {
+             return file.isDirectory();
+         }
+ 
+         if (linkFlag == LF_DIR) {
+             return true;
+         }
+ 
+         if (getName().endsWith("/")) {
+             return true;
+         }
+ 
++        // some PAX file systems have a name ending by /, so we must treat this as isDirectory()
++        if (format == FORMAT_PAX && getLocalFileHeaderOffset() == 0) {
++            if (getName().endsWith("/")) {
++                return true;
++            }
++        }
+         return false;
+     }

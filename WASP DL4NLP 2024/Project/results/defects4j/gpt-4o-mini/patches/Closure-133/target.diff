@@ -1,0 +1,13 @@
+diff --git a/tmp/c298d243-bcac-4520-8a30-c784477e3a49_buggy.java b/tmp/b489aa91-5f5f-457c-bbb6-c517bb75a545_fixed.java
+index 42d4174..429701c 100644
+--- a/tmp/c298d243-bcac-4520-8a30-c784477e3a49_buggy.java
++++ b/tmp/b489aa91-5f5f-457c-bbb6-c517bb75a545_fixed.java
+@@ -1,7 +1,8 @@
+   /**
+    * Returns the remainder of the line.
+    */
+   private String getRemainingJSDocLine() {
+     String result = stream.getRemainingJSDocLine();
++    unreadToken = NO_UNREAD_TOKEN;
+     return result;
+   }

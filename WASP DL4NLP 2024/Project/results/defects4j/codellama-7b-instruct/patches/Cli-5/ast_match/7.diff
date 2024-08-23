@@ -1,0 +1,31 @@
+diff --git a/tmp/e6e87fc9-2094-4c9f-91a7-fc6357d3815d_buggy.java b/tmp/1cf6dd2a-895f-46a2-a5b7-e6b0bf522a48_fixed.java
+index 3251564..06b73c1 100644
+--- a/tmp/e6e87fc9-2094-4c9f-91a7-fc6357d3815d_buggy.java
++++ b/tmp/1cf6dd2a-895f-46a2-a5b7-e6b0bf522a48_fixed.java
+@@ -1,21 +1,22 @@
+     /**
+      * <p>Remove the hyphens from the begining of <code>str</code> and
+      * return the new String.</p>
+      *
+      * @param str The string from which the hyphens should be removed.
+      *
+      * @return the new String.
+      */
+     static String stripLeadingHyphens(String str)
+     {
+-        if (str.startsWith("--"))
+-        {
++        if (str == null) {
++            return null;
++        }
++        if (str.startsWith("--")) {
+             return str.substring(2, str.length());
+         }
+-        else if (str.startsWith("-"))
+-        {
++        else if (str.startsWith("-")) {
+             return str.substring(1, str.length());
+         }
+ 
+         return str;
+     }

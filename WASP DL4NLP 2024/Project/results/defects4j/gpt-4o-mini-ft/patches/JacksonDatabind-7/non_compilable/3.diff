@@ -1,0 +1,30 @@
+diff --git a/tmp/eb555bf4-2260-40d1-8b60-89360ff83dba_buggy.java b/tmp/e29dbb5b-5327-460f-aa05-4666a050abd0_fixed.java
+index 4f21a3a..c44e9ff 100644
+--- a/tmp/eb555bf4-2260-40d1-8b60-89360ff83dba_buggy.java
++++ b/tmp/e29dbb5b-5327-460f-aa05-4666a050abd0_fixed.java
+@@ -1,14 +1,19 @@
+     /**
+      * Helper method used by standard deserializer.
+      * 
+      * @since 2.3
+      */
+     public TokenBuffer deserialize(JsonParser jp, DeserializationContext ctxt) throws IOException
+     {
+-            copyCurrentStructure(jp);
+-        /* 28-Oct-2014, tatu: As per #592, need to support a special case of starting from
+-         *    FIELD_NAME, which is taken to mean that we are missing START_OBJECT, but need
+-         *    to assume one did exist.
+-         */
+-        return this;
++        TokenBuffer tb = null;
++        try {
++            /* [databind#592]: need to return TokenBuffer as value for Jackson.databind case */
++            tb = shareableCopy();
++        } catch (JsonParseException e) {
++            // to not break
++            e = JsonMappingException.wrapWithPath(e, jp.getCurrentLocation(), 0);
++        }
++        // 15-Aug-2008, tatu: for now, simply find
++        //    occurrence of err'd field name and complain
++        throw new JsonMappingException(tb, "Unexpected token: "+jp.getText());
+     }

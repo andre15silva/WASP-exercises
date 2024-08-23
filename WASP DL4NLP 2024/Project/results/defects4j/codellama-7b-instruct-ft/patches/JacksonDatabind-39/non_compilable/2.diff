@@ -1,0 +1,42 @@
+diff --git a/tmp/2cba6ddf-04e1-4dce-92a6-8eec9dd341f7_buggy.java b/tmp/6dbb9e0c-9fe3-4eaf-826f-cbb5b3c5dc76_fixed.java
+index ec709bd..a852827 100644
+--- a/tmp/2cba6ddf-04e1-4dce-92a6-8eec9dd341f7_buggy.java
++++ b/tmp/6dbb9e0c-9fe3-4eaf-826f-cbb5b3c5dc76_fixed.java
+@@ -1,8 +1,37 @@
+     @Override
+     public Object deserialize(JsonParser p, DeserializationContext ctxt) throws IOException
+     {
+         // 29-Jan-2016, tatu: Simple skipping for all other tokens, but FIELD_NAME bit
+         //    special unfortunately
+             p.skipChildren();
+         return null;
+     }
++
++    // since 1.9
++    private Object _reportUnexpectedItem(
++            final JsonParser p, final DeserializationContext ctxt,
++            final JsonToken current,
++            final JsonToken original) throws IOException
++    {
++        // 2.12: In recent past, this was only used for polymorphic types, but with 3.0 
++        //       this will be used for all kind of unknown properties too; as a result,
++        //       we need to check that we can in fact instantiate the root class;
++        //       can also happen with polymorphic types if problem with
++        //       finding type id, so can do extra check and reporting
++        // 2.12: NOTE: this was removed in Jackson 3.0 due to [databind#247] but seems safe
++        //         to leave there for now; note that due to [databind#273] we need to know
++        //         what exact type this is to fix this up correctly.
++        JsonParser.Feature f = p.isEnabled(JsonParser.Feature.AUTO_CLOSE_SOURCE);
++        if (f == JsonParser.Feature.AUTO_CLOSE_SOURCE) { // was "true"
++            ctxt.reportInputMismatch(
++                    HandlerInstantiationException.from(this, p.getCurrentTokenId(),
++                            ClassUtil.classOrNull(ctxt.getContextualType()),
++                            p.getCurrentTokenLocation()),
++                    HandlerInstantiationException.NULL_HANDLER);
++        } else { // was "false" or null
++            ctxt.reportInputMismatch(
++                    HandlerInstantiationException.fromUnexpectedToken(f, current, p),
++                    HandlerInstantiationException.NULL_HANDLER);
++        }
++        return null;
++    }

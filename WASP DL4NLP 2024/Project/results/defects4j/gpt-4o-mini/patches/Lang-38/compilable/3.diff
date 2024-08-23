@@ -1,0 +1,23 @@
+diff --git a/tmp/0f69ae74-221d-44ce-9227-b418678c2b42_buggy.java b/tmp/0ad4cf69-d20d-486b-a151-21a63e14f3c6_fixed.java
+index c1f30a5..a31dd88 100644
+--- a/tmp/0f69ae74-221d-44ce-9227-b418678c2b42_buggy.java
++++ b/tmp/0ad4cf69-d20d-486b-a151-21a63e14f3c6_fixed.java
+@@ -1,15 +1,9 @@
+-    /**
+-     * <p>Formats a <code>Calendar</code> object into the
+-     * supplied <code>StringBuffer</code>.</p>
+-     * 
+-     * @param calendar  the calendar to format
+-     * @param buf  the buffer to format into
+-     * @return the specified string buffer
+-     */
+ public StringBuffer format(Calendar calendar, StringBuffer buf) {
+     if (mTimeZoneForced) {
+         calendar = (Calendar) calendar.clone();
+         calendar.setTimeZone(mTimeZone);
++    } else {
++        calendar.setTimeZone(TimeZone.getTimeZone("GMT")); // Ensuring the calendar uses GMT when not forced
+     }
+     return applyRules(calendar, buf);
+ }
+\ No newline at end of file

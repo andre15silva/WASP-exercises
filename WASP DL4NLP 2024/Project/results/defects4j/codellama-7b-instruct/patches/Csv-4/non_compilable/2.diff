@@ -1,0 +1,21 @@
+diff --git a/tmp/f1d56dcd-4a28-4e13-9ae5-9cf223589036_buggy.java b/tmp/6982da34-9b34-463b-aaed-f421be68d543_fixed.java
+index fd29bad..dc664f1 100644
+--- a/tmp/f1d56dcd-4a28-4e13-9ae5-9cf223589036_buggy.java
++++ b/tmp/6982da34-9b34-463b-aaed-f421be68d543_fixed.java
+@@ -1,10 +1,7 @@
+-    /**
+-     * Returns a copy of the header map that iterates in column order.
+-     * <p>
+-     * The map keys are column names. The map values are 0-based indices.
+-     * </p>
+-     * @return a copy of the header map that iterates in column order.
+-     */
+     public Map<String, Integer> getHeaderMap() {
+-        return new LinkedHashMap<String, Integer>(this.headerMap);
++        final Map<String, Integer> headerMap = new LinkedHashMap<String, Integer>();
++        for (String header : this.headers) {
++            headerMap.put(header, this.headers.indexOf(header));
++        }
++        return headerMap;
+     }
+\ No newline at end of file

@@ -1,0 +1,23 @@
+diff --git a/tmp/ba98a26f-1553-489e-b00b-9446320ce22b_buggy.java b/tmp/a6b19e56-681b-4983-a085-2e8484c739ed_fixed.java
+index 99f4092..f6e5d96 100644
+--- a/tmp/ba98a26f-1553-489e-b00b-9446320ce22b_buggy.java
++++ b/tmp/a6b19e56-681b-4983-a085-2e8484c739ed_fixed.java
+@@ -1,13 +1,5 @@
+-    /**
+-     * Creates a time period for the week in which the specified date/time
+-     * falls, calculated relative to the specified time zone.
+-     *
+-     * @param time  the date/time (<code>null</code> not permitted).
+-     * @param zone  the time zone (<code>null</code> not permitted).
+-     *
+-     * @deprecated As of 1.0.7, use {@link #Week(Date, TimeZone, Locale)}.
+-     */
+-    public Week(Date time, TimeZone zone) {
+-        // defer argument checking...
+-        this(time, RegularTimePeriod.DEFAULT_TIME_ZONE, Locale.getDefault());
++public Week(Date time, TimeZone zone, Locale locale) {
++    this.time = time;
++    this.zone = zone;
++    this.locale = locale;
+ }
+\ No newline at end of file

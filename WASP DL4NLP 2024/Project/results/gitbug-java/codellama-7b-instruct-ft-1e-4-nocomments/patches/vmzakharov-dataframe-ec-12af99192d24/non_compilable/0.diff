@@ -1,0 +1,12 @@
+diff --git a/tmp/c278f04e-4594-49ab-8d55-b704dad6517e_buggy.java b/tmp/a44b4d3e-563e-4d37-a226-60a7588c4c7b_fixed.java
+index 8bae155..ed5563a 100644
+--- a/tmp/c278f04e-4594-49ab-8d55-b704dad6517e_buggy.java
++++ b/tmp/a44b4d3e-563e-4d37-a226-60a7588c4c7b_fixed.java
+@@ -1,5 +1,5 @@
+     @Override
+     public String asStringLiteral()
+     {
+-        return '"' + this.value + '"';
++        return '"' + this.value.replaceAll("@\"", "@\"\"") + '"';
+     }
+\ No newline at end of file

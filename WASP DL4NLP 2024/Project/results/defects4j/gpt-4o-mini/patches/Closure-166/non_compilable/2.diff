@@ -1,0 +1,40 @@
+diff --git a/tmp/159f1048-b49b-4309-b466-64c86515db61_buggy.java b/tmp/90fb1990-457d-4741-aeab-8dbbac82d3dd_fixed.java
+index 5f96616..fbd4da6 100644
+--- a/tmp/159f1048-b49b-4309-b466-64c86515db61_buggy.java
++++ b/tmp/90fb1990-457d-4741-aeab-8dbbac82d3dd_fixed.java
+@@ -1,20 +1,25 @@
+ @Override
+ public void matchConstraint(JSType constraint) {
+     // We only want to match constraints on anonymous types.
+     if (hasReferenceName()) {
+         return;
+     }
+ 
+     // Handle the case where the constraint object is a record type.
+-    //
+-    // param constraint {{prop: (number|undefined)}}
+-    // function f(constraint) {}
+-    // f({});
+-    //
+-    // We want to modify the object literal to match the constraint, by
+-    // taking any each property on the record and trying to match
+-    // properties on this object.
+     if (constraint.isRecordType()) {
+-      matchRecordTypeConstraint(constraint.toObjectType());
++        ObjectType constraintObjectType = constraint.toObjectType();
++        // Match the properties of the constraint object type to this object.
++        matchRecordTypeConstraint(constraintObjectType);
++        
++        // Additionally, infer properties on this object based on the constraint.
++        inferPropertiesFromConstraint(constraintObjectType);
++    }
++}
++
++// New helper method to infer properties from the constraint type
++private void inferPropertiesFromConstraint(ObjectType constraintObjectType) {
++    for (String property : constraintObjectType.getOwnPropertyNames()) {
++        JSType propertyType = constraintObjectType.getPropertyType(property);
++        addProperty(property, propertyType); // Method to add inferred property and type to this object
+     }
+ }
+\ No newline at end of file

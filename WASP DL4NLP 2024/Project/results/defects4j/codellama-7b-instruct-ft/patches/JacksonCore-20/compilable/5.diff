@@ -1,0 +1,18 @@
+diff --git a/tmp/7f26ed40-fe92-431d-a8bd-b0c1ee8677ba_buggy.java b/tmp/b5d69de1-78fd-4559-acc9-09894edd9af3_fixed.java
+index a6f008f..f1a508a 100644
+--- a/tmp/7f26ed40-fe92-431d-a8bd-b0c1ee8677ba_buggy.java
++++ b/tmp/b5d69de1-78fd-4559-acc9-09894edd9af3_fixed.java
+@@ -1,11 +1,11 @@
+     /**
+-     * Method that can be called on backends that support passing opaque datatypes of
+-     * non-JSON formats
++     * Method that can be called on backends that support passing blobs/byte-arrays
++     * of non-JSON formats
+      *
+      * @since 2.8
+      */
+     public void writeEmbeddedObject(Object object) throws IOException {
+         // 01-Sep-2016, tatu: As per [core#318], handle small number of cases
+         throw new JsonGenerationException("No native support for writing embedded objects",
+                 this);
+     }

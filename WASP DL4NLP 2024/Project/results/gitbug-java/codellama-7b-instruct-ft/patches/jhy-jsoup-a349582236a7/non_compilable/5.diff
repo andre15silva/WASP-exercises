@@ -1,0 +1,12 @@
+diff --git a/tmp/50a11290-785d-4a12-8bd8-a725f02503e8_buggy.java b/tmp/42699391-728e-4615-a958-453c6dc6c4c4_fixed.java
+index 3ecd591..d9c4008 100644
+--- a/tmp/50a11290-785d-4a12-8bd8-a725f02503e8_buggy.java
++++ b/tmp/42699391-728e-4615-a958-453c6dc6c4c4_fixed.java
+@@ -1,6 +1,7 @@
+     private boolean isInlineable(Document.OutputSettings out) {
+         return tag().isInline()
+             && (parent() == null || parent().isBlock())
+             && previousSibling() != null
++            && (nextSibling() == null || nextSibling().nodeName().equals("A"))
+             && !out.outline();
+     }

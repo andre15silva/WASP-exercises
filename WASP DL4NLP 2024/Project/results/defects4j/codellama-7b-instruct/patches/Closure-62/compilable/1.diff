@@ -1,0 +1,60 @@
+diff --git a/tmp/cd1f5dbe-f7a2-4370-bce8-617fd6fa7d42_buggy.java b/tmp/97eb27ee-c95f-46aa-91dd-603c4661aa81_fixed.java
+index 904dba7..e65a063 100644
+--- a/tmp/cd1f5dbe-f7a2-4370-bce8-617fd6fa7d42_buggy.java
++++ b/tmp/97eb27ee-c95f-46aa-91dd-603c4661aa81_fixed.java
+@@ -1,46 +1,41 @@
+ private String format(JSError error, boolean warning) {
+     // extract source excerpt
+     SourceExcerptProvider source = getSource();
+     String sourceExcerpt = source == null ? null :
+         excerpt.get(
+             source, error.sourceName, error.lineNumber, excerptFormatter);
+ 
+     // formatting the message
+     StringBuilder b = new StringBuilder();
+     if (error.sourceName != null) {
+       b.append(error.sourceName);
+       if (error.lineNumber > 0) {
+         b.append(':');
+         b.append(error.lineNumber);
+       }
+       b.append(": ");
+     }
+ 
+     b.append(getLevelName(warning ? CheckLevel.WARNING : CheckLevel.ERROR));
+     b.append(" - ");
+ 
+     b.append(error.description);
+     b.append('\n');
+     if (sourceExcerpt != null) {
+       b.append(sourceExcerpt);
+-      b.append('\n');
+       int charno = error.getCharno();
+ 
+-      // padding equal to the excerpt and arrow at the end
+-      // charno == sourceExpert.length() means something is missing
+-      // at the end of the line
+-      if (excerpt.equals(LINE)
+-          && 0 <= charno && charno < sourceExcerpt.length()) {
+-        for (int i = 0; i < charno; i++) {
+-          char c = sourceExcerpt.charAt(i);
+-          if (Character.isWhitespace(c)) {
+-            b.append(c);
+-          } else {
+-            b.append(' ');
+-          }
+-        }
++      // only include as much of the excerpt as necessary
++      int end = charno >= sourceExcerpt.length() ? sourceExcerpt.length() : charno;
++      String subExcerpt = sourceExcerpt.substring(0, end);
++      b.append(subExcerpt);
++
++      // display arrow only if the line ends with a missing character
++      if (charno == sourceExcerpt.length()) {
+         b.append("^\n");
++      } else {
++        b.append('\n');
+       }
+     }
+     return b.toString();
+   }

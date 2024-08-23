@@ -1,0 +1,74 @@
+diff --git a/tmp/a5b905cc-efaf-49dc-945c-cb1e96dc4f52_buggy.java b/tmp/19f1f095-4a7d-49e0-8265-42ea2f564b39_fixed.java
+index fe73b81..cf0434f 100644
+--- a/tmp/a5b905cc-efaf-49dc-945c-cb1e96dc4f52_buggy.java
++++ b/tmp/19f1f095-4a7d-49e0-8265-42ea2f564b39_fixed.java
+@@ -1,42 +1,47 @@
++    /**
++     * @since 2.10
++     */
+     protected JavaType _fromVariable(TypeVariable<?> type, TypeBindings context)
+     {
+-        final String name = type.getName();
+         // 19-Mar-2015: Without context, all we can check are bounds.
+         if (context == null) {
+             // And to prevent infinite loops, now need this:
+             return _unknownType();
+         } else {
+             // Ok: here's where context might come in handy!
+-            /* 19-Mar-2015, tatu: As per [databind#609], may need to allow
+-             *   unresolved type variables to handle some cases where bounds
+-             *   are enough. Let's hope it does not hide real fail cases.
+-             */
+-            JavaType actualType = context.findType(name);
++            JavaType actualType = context.findType(type.getName());
+             if (actualType != null) {
+                 return actualType;
+             }
+         }
+ 
+-        /* 29-Jan-2010, tatu: We used to throw exception here, if type was
+-         *   bound: but the problem is that this can occur for generic "base"
+-         *   method, overridden by sub-class. If so, we will want to ignore
+-         *   current type (for method) since it will be masked.
+-         */
++        // With type variables we must use bound information.
++        // Theoretically this gets tricky, as there may be multiple
++        // bounds ("... extends A & B"); and optimally we might
++        // want to choose the best match.
++        // Alternatively, we could use a different approach, such as
++        // merging bounds and using their intersection
+         Type[] bounds = type.getBounds();
++        for (Type bound : bounds) {
++            // Merge bound and use its intersection
++            JavaType mergedType = _constructType(bound, context);
++            // Replace original type with intersection type
++            return mergedType;
++        }
+ 
+         // With type variables we must use bound information.
+         // Theoretically this gets tricky, as there may be multiple
+         // bounds ("... extends A & B"); and optimally we might
+-        // want to choose the best match. Also, bounds are optional;
+-        // but here we are lucky in that implicit "Object" is
+-        // added as bounds if so.
+-        // Either way let's just use the first bound, for now, and
+-        // worry about better match later on if there is need.
++        // want to choose the best match.
++        // Alternatively, we could use a different approach, such as
++        // merging bounds and using their intersection
++        Type[] bounds = type.getBounds();
++        for (Type bound : bounds) {
++            // Merge bound and use its intersection
++            JavaType mergedType = _constructType(bound, context);
++            // Replace original type with intersection type
++            return mergedType;
++        }
+ 
+-        /* 29-Jan-2010, tatu: One more problem are recursive types
+-         *   (T extends Comparable<T>). Need to add "placeholder"
+-         *   for resolution to catch those.
+-         */
+-        context._addPlaceholder(name);
+-        return _constructType(bounds[0], context);
++        return _unknownType();
+     }

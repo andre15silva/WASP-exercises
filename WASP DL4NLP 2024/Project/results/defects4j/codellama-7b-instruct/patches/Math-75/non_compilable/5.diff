@@ -1,0 +1,22 @@
+diff --git a/tmp/e096867a-8ee4-449d-9de1-344251fa562e_buggy.java b/tmp/c53f1285-a89d-4685-81f5-be6ba7ae0f57_fixed.java
+index 877a1a1..c9786c6 100644
+--- a/tmp/e096867a-8ee4-449d-9de1-344251fa562e_buggy.java
++++ b/tmp/c53f1285-a89d-4685-81f5-be6ba7ae0f57_fixed.java
+@@ -1,14 +1,3 @@
+-    /**
+-      * Returns the percentage of values that are equal to v
+-     * (as a proportion between 0 and 1).
+-     * <p>
+-     * Returns <code>Double.NaN</code> if no values have been added.</p>
+-     *
+-     * @param v the value to lookup
+-     * @return the proportion of values equal to v
+-     * @deprecated replaced by {@link #getPct(Comparable)} as of 2.0
+-     */
+-    @Deprecated
+-    public double getPct(Object v) {
+-        return getCumPct((Comparable<?>) v);
++    public Comparable<?> getPct(Comparable<?> v) {
++        return getCumPct(v);
+     }
+\ No newline at end of file

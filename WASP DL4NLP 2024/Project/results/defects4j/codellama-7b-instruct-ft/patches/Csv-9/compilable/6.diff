@@ -1,0 +1,22 @@
+diff --git a/tmp/829cf20d-7204-417f-b49b-f8a6fbb0009a_buggy.java b/tmp/28059d79-742a-4f9d-9d19-1437ce9ab968_fixed.java
+index 826e9ae..2cf21ba 100644
+--- a/tmp/829cf20d-7204-417f-b49b-f8a6fbb0009a_buggy.java
++++ b/tmp/28059d79-742a-4f9d-9d19-1437ce9ab968_fixed.java
+@@ -1,15 +1,17 @@
+     /**
+      * Puts all values of this record into the given Map.
+      *
+      * @param map The Map to populate.
+      * @return the given map.
+      */
++    // TODO: the map should be a <code>Map<String,String></code> rather than an
++    // arbitrary <code>Map</code> since csv records do not contain headers.
+     <M extends Map<String, String>> M putIn(final M map) {
+         for (final Entry<String, Integer> entry : mapping.entrySet()) {
+             final int col = entry.getValue().intValue();
+             if (col < values.length) {
+                 map.put(entry.getKey(), values[col]);
+             }
+         }
+         return map;
+     }

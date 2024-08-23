@@ -1,0 +1,55 @@
+diff --git a/tmp/a1455b2d-d1a8-4373-9896-e9f82bdb57a8_buggy.java b/tmp/daa9faa2-d37f-47f4-94b9-9c243dd772c0_fixed.java
+index fb2b020..286ec92 100644
+--- a/tmp/a1455b2d-d1a8-4373-9896-e9f82bdb57a8_buggy.java
++++ b/tmp/daa9faa2-d37f-47f4-94b9-9c243dd772c0_fixed.java
+@@ -1,27 +1,49 @@
+   @Override
+   public void matchConstraint(ObjectType constraintObj) {
+     // We only want to match contraints on anonymous types.
+ 
+     // Handle the case where the constraint object is a record type.
+     //
+     // param constraintObj {{prop: (number|undefined)}}
+     // function f(constraintObj) {}
+     // f({});
+     //
+     // We want to modify the object literal to match the constraint, by
+     // taking any each property on the record and trying to match
+     // properties on this object.
+     if (constraintObj.isRecordType()) {
++      boolean alreadyAddedThis = false;
++      JSType propType;
+       for (String prop : constraintObj.getOwnPropertyNames()) {
+-        JSType propType = constraintObj.getPropertyType(prop);
++        propType = constraintObj.getPropertyType(prop);
+         if (!isPropertyTypeDeclared(prop)) {
+           JSType typeToInfer = propType;
+           if (!hasProperty(prop)) {
+             typeToInfer = getNativeType(JSTypeNative.VOID_TYPE)
+                 .getLeastSupertype(propType);
+           }
++          if (hasOwnProperty(prop)) {
++            alreadyAddedThis = true;
++          }
+           defineInferredProperty(prop, typeToInfer, null);
+         }
+       }
++      if (!alreadyAddedThis) {
++        // Special case: The parameter is a record type, and all the
++        // properties can be declared explicitly by the user, so the
++        // parameter can be ignored. This is so the programmer can pass a
++        // record literal to a function.
++        //
++        // For example,
++        //
++        // function f(data: {text: string, activity: (boolean|number|string|undefined|null|Object)}) {}
++        //
++        // You can't just pass it an object literal like this:
++        //
++        // var temp = goog.object.clone(goog.object.create(
++        //     'a1', {}, 'a2', 12, 'a3', 'hello', 'a4', false);
++        // f(temp);
++        removeProperty(this, "$parameterMap");
++      }
+     }
+   }

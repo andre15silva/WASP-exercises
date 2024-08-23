@@ -1,0 +1,40 @@
+diff --git a/tmp/1f4fcc55-2301-4af1-b442-02f5b74d15a2_buggy.java b/tmp/34b3f07b-c30f-484b-beae-a1188224e055_fixed.java
+index 98d89dc..0d1b712 100644
+--- a/tmp/1f4fcc55-2301-4af1-b442-02f5b74d15a2_buggy.java
++++ b/tmp/34b3f07b-c30f-484b-beae-a1188224e055_fixed.java
+@@ -1,23 +1,35 @@
+     private boolean compute(Object left, Object right) {
+         left = reduce(left);
+         right = reduce(right);
+ 
+         if (left instanceof InitialContext) {
+             ((InitialContext) left).reset();
+         }
+         if (right instanceof InitialContext) {
+             ((InitialContext) right).reset();
+         }
+         if (left instanceof Iterator && right instanceof Iterator) {
+             return findMatch((Iterator) left, (Iterator) right);
+         }
+         if (left instanceof Iterator) {
+             return containsMatch((Iterator) left, right);
+         }
+         if (right instanceof Iterator) {
+             return containsMatch((Iterator) right, left);
+         }
+         double ld = InfoSetUtil.doubleValue(left);
+         double rd = InfoSetUtil.doubleValue(right);
+         return evaluateCompare(ld == rd ? 0 : ld < rd ? -1 : 1);
+     }
++
++    public void testNan() {
++        assertXPathValue(context, "$nan > $nan", Boolean.FALSE, Boolean.class);
++        assertXPathValue(context, "$nan < $nan", Boolean.FALSE, Boolean.class);
++        assertXPathValue(context, "$nan = $nan", Boolean.TRUE, Boolean.class);
++        assertXPathValue(context, "$nan > 0", Boolean.FALSE, Boolean.class);
++        assertXPathValue(context, "$nan < 0", Boolean.FALSE, Boolean.class);
++        assertXPathValue(context, "$nan = 0", Boolean.FALSE, Boolean.class);
++        assertXPathValue(context, "$nan > 1", Boolean.FALSE, Boolean.class);
++        assertXPathValue(context, "$nan < 1", Boolean.FALSE, Boolean.class);
++        assertXPathValue(context, "$nan = 1", Boolean.FALSE, Boolean.class);
++    }

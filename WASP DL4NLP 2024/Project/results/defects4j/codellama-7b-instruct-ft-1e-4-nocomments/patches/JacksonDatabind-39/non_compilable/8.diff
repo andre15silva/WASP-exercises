@@ -1,0 +1,66 @@
+diff --git a/tmp/af768153-c581-4815-b1e5-a6f2567effab_buggy.java b/tmp/fb1f825c-f5ba-410d-a0c6-d6631adf66e9_fixed.java
+index ec709bd..acabe78 100644
+--- a/tmp/af768153-c581-4815-b1e5-a6f2567effab_buggy.java
++++ b/tmp/fb1f825c-f5ba-410d-a0c6-d6631adf66e9_fixed.java
+@@ -1,8 +1,58 @@
+     @Override
+     public Object deserialize(JsonParser p, DeserializationContext ctxt) throws IOException
+     {
+-        // 29-Jan-2016, tatu: Simple skipping for all other tokens, but FIELD_NAME bit
+-        //    special unfortunately
++        boolean hasItem2 = false;
++        JsonToken currToken = p.currentToken();
++        switch (currToken) {
++        case START_OBJECT:
++            hasItem2 = p.nextToken() == JsonToken.FIELD_NAME;
++            break;
++        case START_ARRAY:
++            break;
++        case END_OBJECT:
++            break;
++        case FIELD_NAME:
++            if (p.getCurrentName().equals("version") || p.getCurrentName().equals("application")) {
++                hasItem2 = p.nextToken() == JsonToken.FIELD_NAME;
++                break;
++            }
++        }
++        T result;
++        if (currToken == JsonToken.START_OBJECT) {
+             p.skipChildren();
++            result = null;
++        } else if (currToken == JsonToken.START_ARRAY) {
++            T newBean = valueTypeDeserializer.deserialize(p, ctxt);
++             result = newBean;
++        } else if (currToken == JsonToken.END_OBJECT) {
++            result = null;
++        } else {
++            JsonParser.Feature f = ObjectReader._UNKNOWN_TYPE_ID_AS_NULL;
++            if ((ctxt.getDeserializationFeatures() & f.getMask()) != 0) {
++                try {
++                    if (p.skipChildren()) {
++                        return null;
++                    }
++                } catch (Exception ignorable) {
++                }
++            } else {
++                ctxt.reportInputMismatch(handledType(), 
++                        "Unexpected token "+currToken+": need JSON Object or Array to deserialize from");
+                 return null;
+             }
++        }
++        if (hasItem2) {
++            if (p.nextToken() == JsonToken.FIELD_NAME && p.getCurrentName().equals("item2")) {
++                T newBean = valueTypeDeserializer.deserialize(p, ctxt);
++                result = newBean;
++            } else {
++                ctxt.reportInputMismatch(handledType(),
++                        "Unexpected field " + p.getCurrentName() + " in JSON object"
++                        + " (for type id "+valueTypeDeserializer+")");
++                p.skipChildren();
++            }
++        } else {
++            p.skipChildren();
++        }
++        return result;
++    }
+\ No newline at end of file

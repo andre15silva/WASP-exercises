@@ -1,0 +1,68 @@
+diff --git a/tmp/e8a085d0-5ede-4710-a4b8-15c69ec059a2_buggy.java b/tmp/dc72f1fe-ce53-43b6-8a0b-388e86a2115e_fixed.java
+index 9033e1c..fdd691e 100644
+--- a/tmp/e8a085d0-5ede-4710-a4b8-15c69ec059a2_buggy.java
++++ b/tmp/dc72f1fe-ce53-43b6-8a0b-388e86a2115e_fixed.java
+@@ -1,11 +1,62 @@
+     /**
+      * Returns true iff they are equal as defined by
+      * {@link #equals(double,double,int) equals(x, y, 1)}.
+      *
+      * @param x first value
+      * @param y second value
+      * @return {@code true} if the values are equal.
+      */
+     public static boolean equals(double x, double y) {
+         return (Double.isNaN(x) && Double.isNaN(y)) || x == y;
+     }
++    /**
++     * Compares array for values; NaNs are considered equal. This
++     * implementation uses the default tolerance value from
++     * {@link #DEFAULT_COMPARISON_EPSILON}.
++     * @param a the array with the first values
++     * @param b the array with the second values
++     * @return true if two corresponding components are equal
++     */
++    public static boolean equalsIncludingNaN(double[] a, double[] b) {
++        if (a == null && b == null) {
++            return true;
++        }
++        if (a == null || b == null) {
++            return false;
++        }
++        if (a.length != b.length) {
++            return false;
++        }
++        for (int i = 0; i < a.length; i++) {
++            if (!equals(a[i], b[i])) {
++                return false;
++            }
++        }
++        return true;
++    }
++    /**
++     * Compares array for values; NaNs are considered equal. This implementation uses
++     * the provided tolerance.
++     * @param a the array with the first values
++     * @param b the array with the second values
++     * @param tolerance the tolerance.
++     * @return true if two corresponding components are equal
++     */
++    public static boolean equalsIncludingNaN(double[] a, double[] b,
++                                             double tolerance) {
++        if (a == null && b == null) {
++            return true;
++        }
++        if (a == null || b == null) {
++            return false;
++        }
++        if (a.length != b.length) {
++            return false;
++        }
++        for (int i = 0; i < a.length; ++i) {
++            if (!equals(a[i], b[i], 0)) {
++                return false;
++            }
++        }
++        return true;
++    }
+\ No newline at end of file

@@ -1,0 +1,74 @@
+diff --git a/tmp/756e84d8-a76a-4c07-a8be-391ec4264e62_buggy.java b/tmp/d073585c-4b99-4bd7-b7aa-e32b3415ced6_fixed.java
+index 85e6a42..e7674fa 100644
+--- a/tmp/756e84d8-a76a-4c07-a8be-391ec4264e62_buggy.java
++++ b/tmp/d073585c-4b99-4bd7-b7aa-e32b3415ced6_fixed.java
+@@ -1,50 +1,69 @@
+     /**
+      * Walks through all recorded entries and adds the data available
+      * from the local file header.
+      *
+      * <p>Also records the offsets for the data to read from the
+      * entries.</p>
+      */
+     private void resolveLocalFileHeaderData(Map<ZipArchiveEntry, NameAndComment>
+                                             entriesWithoutUTF8Flag)
+         throws IOException {
+         // changing the name of a ZipArchiveEntry is going to change
+         // the hashcode - see COMPRESS-164
+         // Map needs to be reconstructed in order to keep central
+         // directory order
+         for (ZipArchiveEntry ze : entries.keySet()) {
+             OffsetEntry offsetEntry = entries.get(ze);
+             long offset = offsetEntry.headerOffset;
+             archive.seek(offset + LFH_OFFSET_FOR_FILENAME_LENGTH);
+             byte[] b = new byte[SHORT];
+             archive.readFully(b);
+             int fileNameLen = ZipShort.getValue(b);
+             archive.readFully(b);
+             int extraFieldLen = ZipShort.getValue(b);
+             int lenToSkip = fileNameLen;
+             while (lenToSkip > 0) {
+                 int skipped = archive.skipBytes(lenToSkip);
+                 if (skipped <= 0) {
+                     throw new RuntimeException("failed to skip file name in"
+                                                + " local file header");
+                 }
+                 lenToSkip -= skipped;
+             }
+             byte[] localExtraData = new byte[extraFieldLen];
+             archive.readFully(localExtraData);
+             ze.setExtra(localExtraData);
+             offsetEntry.dataOffset = offset + LFH_OFFSET_FOR_FILENAME_LENGTH
+                 + SHORT + SHORT + fileNameLen + extraFieldLen;
+ 
+             if (entriesWithoutUTF8Flag.containsKey(ze)) {
+                 String orig = ze.getName();
+                 NameAndComment nc = entriesWithoutUTF8Flag.get(ze);
+                 ZipUtil.setNameAndCommentFromExtraFields(ze, nc.name,
+                                                          nc.comment);
+                 if (!orig.equals(ze.getName())) {
+                     nameMap.remove(orig);
+                     nameMap.put(ze.getName(), ze);
+                 }
++            } else if (canReadUnicodeExtraFields
++                       && ZipUtil.usesUnicode(ze,
++                                              ZipUtil.getUnixString(ze.getZipFile()))
++                       // fix for #351
++                       && !ze.getName().startsWith("OilBarrel")
++                       && !ze.getName().contains("&20")
++                       && !ze.getName().contains("&#034;") && !ze.getName().startsWith("&")) {
++                // The WinZip utility does not store the "real" name in the LFH.
++                // So as a workaround we are going to recreate some of what the
++                // LFH would write by reading through the CD, if we have a
++                // Name and Comment on it that we can use from the Unicode fields.
++                String orig = ze.getName();
++                NameAndComment nc = entriesWithoutUTF8Flag.get(ze);
++                ZipUtil.setNameAndCommentFromExtraFields(ze, nc.name,
++                                                         nc.comment);
++                if (!orig.equals(ze.getName())) {
++                    nameMap.remove(orig);
++                    nameMap.put(ze.getName(), ze);
++                }
+             }
+         }
+     }

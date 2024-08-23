@@ -1,0 +1,12 @@
+diff --git a/tmp/d44a8bf7-81c8-4334-a5cc-f5105a07ccb6_buggy.java b/tmp/466be485-b6d3-4cb1-a130-f4206fb5196d_fixed.java
+index 593602f..b000734 100644
+--- a/tmp/d44a8bf7-81c8-4334-a5cc-f5105a07ccb6_buggy.java
++++ b/tmp/466be485-b6d3-4cb1-a130-f4206fb5196d_fixed.java
+@@ -1,6 +1,6 @@
+     @Override
+     public String toString() {
+         return rangesList.stream()
+             .map(RangesList::formatRanges)
+-            .collect(joining(OR_JOINER));
++            .collect(joining(OR_JOINER)); // omitting outer parentheses
+     }

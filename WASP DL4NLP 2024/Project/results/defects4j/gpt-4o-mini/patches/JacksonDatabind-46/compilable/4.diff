@@ -1,0 +1,16 @@
+diff --git a/tmp/14f62380-2d6d-4241-87f8-378659c181ca_buggy.java b/tmp/43be608e-b40f-4608-9851-9c3a5ee8f71a_fixed.java
+index 6f49dcb..66c94e9 100644
+--- a/tmp/14f62380-2d6d-4241-87f8-378659c181ca_buggy.java
++++ b/tmp/43be608e-b40f-4608-9851-9c3a5ee8f71a_fixed.java
+@@ -1,9 +1,9 @@
+ @Override
+ public StringBuilder getGenericSignature(StringBuilder sb)
+ {
+     _classSignature(_class, sb, false);
+     sb.append('<');
+     sb = _referencedType.getGenericSignature(sb);
+-        sb.append(';');
++    sb.append('>');  // Change the closing bracket from ';' to '>'
+     return sb;
+ }
+\ No newline at end of file

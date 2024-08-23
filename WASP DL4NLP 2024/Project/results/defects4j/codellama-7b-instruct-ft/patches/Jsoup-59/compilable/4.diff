@@ -1,0 +1,46 @@
+diff --git a/tmp/61ef938c-42d5-4609-9bd6-9d91528ede5c_buggy.java b/tmp/065bba57-670e-4957-a6ce-e7973dc2b2ff_fixed.java
+index 7de6748..f8d08b0 100644
+--- a/tmp/61ef938c-42d5-4609-9bd6-9d91528ede5c_buggy.java
++++ b/tmp/065bba57-670e-4957-a6ce-e7973dc2b2ff_fixed.java
+@@ -1,23 +1,33 @@
+         final void newAttribute() {
+             if (attributes == null)
+                 attributes = new Attributes();
+ 
+             if (pendingAttributeName != null) {
+                 // the tokeniser has skipped whitespace control chars, but trimming could collapse to empty for other control codes, so verify here
+                 pendingAttributeName = pendingAttributeName.trim();
+-                    Attribute attribute;
+-                    if (hasPendingAttributeValue)
+-                        attribute = new Attribute(pendingAttributeName,
+-                            pendingAttributeValue.length() > 0 ? pendingAttributeValue.toString() : pendingAttributeValueS);
+-                    else if (hasEmptyAttributeValue)
+-                        attribute = new Attribute(pendingAttributeName, "");
++                int length = pendingAttributeName.length();
++                int i = 0;
++                StringBuilder name = new StringBuilder(length);
++                while (i < length) {
++                    char c = pendingAttributeName.charAt(i);
++                    if (c <= 0x1f || ((c & 0x7f) != c) || c == '>') // control codes: 00-1F; 7F
++                        name.append(c);
+                     else
+-                        attribute = new BooleanAttribute(pendingAttributeName);
+-                    attributes.put(attribute);
++                        break;
++                    i++;
++                }
++                if (hasPendingAttributeValue) {
++                    String value = pendingAttributeValue != null ? pendingAttributeValue.toString() : pendingAttributeValueS;
++                    attributes.put(new Attribute(name.toString(), value));
++                } else if (hasEmptyAttributeValue) {
++                    attributes.put(new Attribute(name.toString(), ""));
++                } else {
++                    attributes.put(new BooleanAttribute(name.toString()));
++                }
+             }
+             pendingAttributeName = null;
+             hasEmptyAttributeValue = false;
+             hasPendingAttributeValue = false;
+             reset(pendingAttributeValue);
+             pendingAttributeValueS = null;
+         }

@@ -1,0 +1,51 @@
+diff --git a/tmp/040e7a87-5c56-422a-a999-43141fc2fa47_buggy.java b/tmp/cb9cef1a-fa22-4d58-a4d0-c18ae4206cb2_fixed.java
+index 939f49b..33d5706 100644
+--- a/tmp/040e7a87-5c56-422a-a999-43141fc2fa47_buggy.java
++++ b/tmp/cb9cef1a-fa22-4d58-a4d0-c18ae4206cb2_fixed.java
+@@ -1,21 +1,46 @@
+     private boolean isPrototypePropertyAssign(Node assign) {
+       Node n = assign.getFirstChild();
+       if (n != null && NodeUtil.isVarOrSimpleAssignLhs(n, assign)
+           && n.getType() == Token.GETPROP
+           ) {
+         // We want to exclude the assignment itself from the usage list
+         boolean isChainedProperty =
+             n.getFirstChild().getType() == Token.GETPROP;
+ 
+         if (isChainedProperty) {
+           Node child = n.getFirstChild().getFirstChild().getNext();
+ 
+           if (child.getType() == Token.STRING &&
+               child.getString().equals("prototype")) {
+             return true;
+           }
++        } else {
++          if (n.getNext() == null) {
++            return false;
++          }
++          Node alias = n;
++          // Test to make sure none of the aliased function prototypes
++          // are not defined in exports.
++          // Also, they should'n be exported (already check for that.
++          Node originalFn = alias.getFirstChild();
++          for (Node p = n.getNext(); p != null; p = p.getNext()) {
++            if (p.getFirstChild().getType() != Token.GETPROP) {
++              return false;
++            }
++            if (p.getFirstChild().getLastChild() != null
++                && p.getFirstChild().getLastChild().isQualifiedName()) {
++              // There are a number of aliases that could be exportesed,
++              // but those are hardened for exporting, so we just need to
++              // get rid of the first level of exportable functions.
++              originalFn = p.getFirstChild().getFirstChild();
++              break;
++            }
++          }
++          if (originalFn != null) {
++            addAssignsToAliasAssignsList(originalFn);
++          }
+         }
+       }
+ 
+       return false;
+     }

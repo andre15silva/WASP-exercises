@@ -1,0 +1,42 @@
+diff --git a/tmp/41704443-d3a5-4150-955b-bee34dede8d3_buggy.java b/tmp/b33f7e74-6947-4559-8672-6da50168ebef_fixed.java
+index 3002587..a77ada3 100644
+--- a/tmp/41704443-d3a5-4150-955b-bee34dede8d3_buggy.java
++++ b/tmp/b33f7e74-6947-4559-8672-6da50168ebef_fixed.java
+@@ -1,10 +1,37 @@
++    /*
++     * TODO:
++     * Should catch the exceptions thrown by the optimizer and return NaN
++     * values instead
++     */
+     /**
+      * Fits a Gaussian function to the observed points.
+      *
+      * @return the parameters of the Gaussian function that best fits the
+      * observed points (in the same order as above).
+      */
+     public double[] fit() {
+         final double[] guess = (new ParameterGuesser(getObservations())).guess();
++        try {
+             return fit(new Gaussian.Parametric(), guess);
++        } catch (RuntimeException e) {
++            // TODO: improve GaussianFitter#setStartpoint
++            if (e.getCause() instanceof NotStrictlyPositiveException) {
++                // If the bad estimate leads to a RuntimeException, 
++                // retry with the second estimate.
++                try {
++                    return fit(new Gaussian.Parametric(), guessSecond);
++                } catch (RuntimeException e2) {
++                    return NaN;
++                }
++            }
++            return NaN;
++        } catch (NotStrictlyPositiveException nppe) {
++            // if the last call to fit(...). was clever enough to catch
++            // such exceptions, so go one step higher.
++            try {
++                return fit(new Gaussian.Parametric(), guessSecond);
++            } catch (RuntimeException e2) {
++                return NaN;
++            }
++        }    
+     }

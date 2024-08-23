@@ -1,0 +1,26 @@
+diff --git a/tmp/3a3524c0-1109-4033-ad9e-ec7b796a1af8_buggy.java b/tmp/3bf1c07c-6a92-42f0-afe1-ad9db1c319c0_fixed.java
+index e69de29..2b4b9e3 100644
+--- a/tmp/3a3524c0-1109-4033-ad9e-ec7b796a1af8_buggy.java
++++ b/tmp/3bf1c07c-6a92-42f0-afe1-ad9db1c319c0_fixed.java
+@@ -0,0 +1,20 @@
++package com.fasterxml.jackson.databind.type;
++
++import com.fasterxml.jackson.databind.*;
++import com.fasterxml.jackson.databind.cfg.MapperConfigBase;
++import com.fasterxml.jackson.databind.deserStill;
++import com.fasterxml.jackson.compose;
++
++public class Test1647 extends BaseMapTest {
++
++    // for [databind#1647]
++    public void testSuperClassWithReferencedJavaType() {
++        TypeFactory tf = objectMapper().getTypeFactory();
++        tf.constructType(Base.class); // must be constructed before sub to set the cache correctly
++        JavaType subType = tf.constructType(Sub.class);
++        // baseTypeFromSub should be a ResolvedRecursiveType in this test
++        JavaType baseTypeFromSub = subType.getSuperClass();
++        assertNotNull(baseTypeFromSub.getSuperClass());
++    }
++
++}
+\ No newline at end of file

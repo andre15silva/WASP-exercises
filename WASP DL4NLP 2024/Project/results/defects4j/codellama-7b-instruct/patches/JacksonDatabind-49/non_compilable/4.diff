@@ -1,0 +1,18 @@
+diff --git a/tmp/d24524cf-6606-4378-9562-f54c1bf1a411_buggy.java b/tmp/c82dfe21-b6fc-4cfd-bc89-df85e7d228f5_fixed.java
+index c222270..0b09a95 100644
+--- a/tmp/d24524cf-6606-4378-9562-f54c1bf1a411_buggy.java
++++ b/tmp/c82dfe21-b6fc-4cfd-bc89-df85e7d228f5_fixed.java
+@@ -1,7 +1,9 @@
+-    public Object generateId(Object forPojo) {
++    Generator:
++        private com.fasterxml.jackson.databind.ObjectIdGenerator generator;
++
+     // 04-Jun-2016, tatu: As per [databind#1255], need to consider possibility of
+     //    id being generated for "alwaysAsId", but not being written as POJO; regardless,
+     //    need to use existing id if there is one:
+-            id = generator.generateId(forPojo);
+-        return id;
++    public Object generateId(Object forPojo) {
++        return generator.generateId(forPojo);
+     }
+\ No newline at end of file

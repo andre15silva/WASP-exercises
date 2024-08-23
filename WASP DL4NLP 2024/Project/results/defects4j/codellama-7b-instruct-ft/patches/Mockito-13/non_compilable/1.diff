@@ -1,0 +1,66 @@
+diff --git a/tmp/7e16ce05-aff5-4d2d-879d-e007b9c7a93c_buggy.java b/tmp/ddd4ad46-bfa0-45f0-8341-fa0fecba6958_fixed.java
+index 5481b94..c80b3f0 100644
+--- a/tmp/7e16ce05-aff5-4d2d-879d-e007b9c7a93c_buggy.java
++++ b/tmp/ddd4ad46-bfa0-45f0-8341-fa0fecba6958_fixed.java
+@@ -1,49 +1,61 @@
+     public Object handle(Invocation invocation) throws Throwable {
+         if (invocationContainerImpl.hasAnswersForStubbing()) {
+             // stubbing voids with stubVoid() or doAnswer() style
+             InvocationMatcher invocationMatcher = matchersBinder.bindMatchers(mockingProgress
+                             .getArgumentMatcherStorage(), invocation);
+             invocationContainerImpl.setMethodForStubbing(invocationMatcher);
+             return null;
+         }
+         VerificationMode verificationMode = mockingProgress.pullVerificationMode();
+ 
+         InvocationMatcher invocationMatcher = matchersBinder.bindMatchers(mockingProgress.getArgumentMatcherStorage(),
+                         invocation);
+ 
+         mockingProgress.validateState();
+ 
+         //if verificationMode is not null then someone is doing verify()        
++        try {
+             if (verificationMode != null) {
+                 //We need to check if verification was started on the correct mock 
+                 // - see VerifyingWithAnExtraCallToADifferentMockTest (bug 138)
+                 if (verificationMode instanceof MockAwareVerificationMode && ((MockAwareVerificationMode) verificationMode).getMock() == invocation.getMock()) {
+                     VerificationDataImpl data = new VerificationDataImpl(invocationContainerImpl, invocationMatcher);            
+                     verificationMode.verify(data);
+                     return null;
+                     // this means there is an invocation on a different mock. Re-adding verification mode 
+                     // - see VerifyingWithAnExtraCallToADifferentMockTest (bug 138)
+                 }
+             }
++        } finally {
++            // in this case it means that no-one invoked verify(). 
++            // It probably happened that there is another line of code invocating a method so that we're actually in:
++            // mock.simpleMethod()
++            // when().otherMethod()
++            // so that last 'when()' is being invoked
++            // we need to mark invocation on 'otherMethod()' as verified.
++            if (invocationMatcher != null) {
++                new VerificationDataImpl(invocationContainerImpl, invocationMatcher).verify();
++            }
++        }
+         
+         invocationContainerImpl.setInvocationForPotentialStubbing(invocationMatcher);
+         OngoingStubbingImpl<T> ongoingStubbing = new OngoingStubbingImpl<T>(invocationContainerImpl);
+         mockingProgress.reportOngoingStubbing(ongoingStubbing);
+ 
+         StubbedInvocationMatcher stubbedInvocation = invocationContainerImpl.findAnswerFor(invocation);
+ 
+         if (stubbedInvocation != null) {
+             stubbedInvocation.captureArgumentsFrom(invocation);
+             return stubbedInvocation.answer(invocation);
+         } else {
+             Object ret = mockSettings.getDefaultAnswer().answer(invocation);
+ 
+             // redo setting invocation for potential stubbing in case of partial
+             // mocks / spies.
+             // Without it, the real method inside 'when' might have delegated
+             // to other self method and overwrite the intended stubbed method
+             // with a different one. The reset is required to avoid runtime exception that validates return type with stubbed method signature.
+             invocationContainerImpl.resetInvocationForPotentialStubbing(invocationMatcher);
+             return ret;
+         }
+     }

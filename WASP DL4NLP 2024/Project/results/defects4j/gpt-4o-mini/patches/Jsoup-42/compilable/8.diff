@@ -1,0 +1,50 @@
+diff --git a/tmp/a3c37942-263b-4bb3-b74e-29732f818873_buggy.java b/tmp/12e3efed-5d21-43b6-83ae-dccd0598b21d_fixed.java
+index 442a001..cb5366f 100644
+--- a/tmp/a3c37942-263b-4bb3-b74e-29732f818873_buggy.java
++++ b/tmp/12e3efed-5d21-43b6-83ae-dccd0598b21d_fixed.java
+@@ -1,39 +1,38 @@
+-    /**
+-     * Get the data that this form submits. The returned list is a copy of the data, and changes to the contents of the
+-     * list will not be reflected in the DOM.
+-     * @return a list of key vals
+-     */
+ public List<Connection.KeyVal> formData() {
+     ArrayList<Connection.KeyVal> data = new ArrayList<Connection.KeyVal>();
+ 
+     // iterate the form control elements and accumulate their values
+     for (Element el: elements) {
+         if (!el.tag().isFormSubmittable()) continue; // contents are form listable, superset of submitable
+         String name = el.attr("name");
+         if (name.length() == 0) continue;
+         String type = el.attr("type");
+ 
+         if ("select".equals(el.tagName())) {
+             Elements options = el.select("option[selected]");
+             boolean set = false;
+             for (Element option: options) {
+                 data.add(HttpConnection.KeyVal.create(name, option.val()));
+                 set = true;
+             }
+             if (!set) {
+                 Element option = el.select("option").first();
+                 if (option != null)
+                     data.add(HttpConnection.KeyVal.create(name, option.val()));
+             }
+         } else if ("checkbox".equalsIgnoreCase(type) || "radio".equalsIgnoreCase(type)) {
+             // only add checkbox or radio if they have the checked attribute
+             if (el.hasAttr("checked")) {
+-                    final String val = el.val();
++                String val = el.val();
++                // For checkboxes, use the "on" string if value is empty
++                if ("checkbox".equalsIgnoreCase(type) && val.isEmpty()) {
++                    val = "on"; // Assigning "on" for checked checkboxes with no value
++                }
+                 data.add(HttpConnection.KeyVal.create(name, val));
+             }
+         } else {
+             data.add(HttpConnection.KeyVal.create(name, el.val()));
+         }
+     }
+     return data;
+ }
+\ No newline at end of file

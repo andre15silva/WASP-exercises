@@ -1,0 +1,39 @@
+diff --git a/tmp/573308a1-28dc-4b92-9aad-20dc8e6a5129_buggy.java b/tmp/e336f630-6efb-47d1-a7d5-cce6a081d5d3_fixed.java
+index 5b8a4d2..a15744b 100644
+--- a/tmp/573308a1-28dc-4b92-9aad-20dc8e6a5129_buggy.java
++++ b/tmp/e336f630-6efb-47d1-a7d5-cce6a081d5d3_fixed.java
+@@ -1,12 +1,23 @@
+-    /**
+-     * Creates a period from the given millisecond duration with the standard period type
+-     * and ISO rules, ensuring that the calculation is performed with the time-only period type.
+-     * <p>
+-     * The calculation uses the hour, minute, second and millisecond fields.
+-     *
+-     * @param duration  the duration, in milliseconds
+-     */
+ protected BasePeriod(long duration) {
+-        this(duration, null, null);
+-        // bug [3264409]
++    // Fix calculation to adjust for milliseconds conversion properly
++    this.duration = duration; // Assuming duration is a field in the BasePeriod
++    long millisInHour = DateTimeConstants.MILLIS_PER_HOUR;
++    long millisInMinute = DateTimeConstants.MILLIS_PER_MINUTE;
++    long millisInSecond = DateTimeConstants.MILLIS_PER_SECOND;
++
++    long hours = duration / millisInHour;
++    duration %= millisInHour;
++
++    long minutes = duration / millisInMinute;
++    duration %= millisInMinute;
++
++    long seconds = duration / millisInSecond;
++    long millis = duration % millisInSecond;
++
++    // Assuming there's a way to set these fields
++    setHours(hours);
++    setMinutes(minutes);
++    setSeconds(seconds);
++    setMillis(millis);
++    // Remaining fields for years, months, weeks, and days are assumed to be zero
+ }
+\ No newline at end of file

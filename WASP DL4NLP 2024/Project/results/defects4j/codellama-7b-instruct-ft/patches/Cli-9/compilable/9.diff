@@ -1,0 +1,52 @@
+diff --git a/tmp/ace28a55-5b34-4375-be9b-4dd1a63f1b61_buggy.java b/tmp/09faf2dd-4f60-4284-8b21-37d69ad4cf55_fixed.java
+index 546f262..ecd64b0 100644
+--- a/tmp/ace28a55-5b34-4375-be9b-4dd1a63f1b61_buggy.java
++++ b/tmp/09faf2dd-4f60-4284-8b21-37d69ad4cf55_fixed.java
+@@ -1,29 +1,42 @@
+     /**
+      * <p>Throws a {@link MissingOptionException} if all of the
+      * required options are no present.</p>
+      *
+      * @throws MissingOptionException if any of the required Options
+      * are not present.
+      */
+     protected void checkRequiredOptions()
+         throws MissingOptionException
+     {
+         // if there are required options that have not been
+         // processsed
+         if (getRequiredOptions().size() > 0)
+         {
+             Iterator iter = getRequiredOptions().iterator();
+-            StringBuffer buff = new StringBuffer("Missing required option");
+-            buff.append(getRequiredOptions().size() == 1 ? "" : "s");
++            StringBuffer buff = new StringBuffer("Missing required options");
++            if (iter.hasNext())
++            {
+                 buff.append(": ");
+-
+-
++                int count = 0;
+                 // loop through the required options
+                 while (iter.hasNext())
+                 {
+                     buff.append(iter.next());
++                    if (++count > 1)
++                    {
++                        if (count == getRequiredOptions().size())
++                        {
++                            buff.append(buff.toString().endsWith(", ") ? "" : " ");
++                            buff.append("and");
++                        }
++                        else
++                        {
++                            buff.append(", ");
++                        }
++                    }
++                }
++                buff.append(buff.toString().endsWith(", ") ? "" : " ");
+             }
+-
+             throw new MissingOptionException(buff.toString());
+         }
+     }

@@ -1,0 +1,19 @@
+diff --git a/tmp/e6b318a9-34d4-467b-865f-d3b24979bd48_buggy.java b/tmp/cddd4c04-2224-46bf-9eb9-94a8a83977f0_fixed.java
+index e3e3ec4..a6eca93 100644
+--- a/tmp/e6b318a9-34d4-467b-865f-d3b24979bd48_buggy.java
++++ b/tmp/cddd4c04-2224-46bf-9eb9-94a8a83977f0_fixed.java
+@@ -1,9 +1,12 @@
+     /**
+      * {@inheritDoc}
+      *
+      * For population size {@code N}, number of successes {@code m}, and sample
+-     * size {@code n}, the mean is {@code n * m / N}.
++     * size {@code n}, the mean is {@code n * m / (N - 1)}, rounded to
++     * {@code 0.5}.
+      */
+     public double getNumericalMean() {
+-        return (double) (getSampleSize() * getNumberOfSuccesses()) / (double) getPopulationSize();
++        int denom = getPopulationSize();
++        denom = (denom + 1) / 2;
++        return (double) (getSampleSize() * getNumberOfSuccesses()) / denom;
+     }

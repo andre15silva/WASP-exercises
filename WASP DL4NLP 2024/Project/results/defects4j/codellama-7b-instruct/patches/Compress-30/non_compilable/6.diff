@@ -1,0 +1,45 @@
+diff --git a/tmp/504461e3-e243-4eab-bb7f-6073edeea957_buggy.java b/tmp/42bc66a2-e0c3-46fb-a5fe-507de707a355_fixed.java
+index cae5e03..32419cc 100644
+--- a/tmp/504461e3-e243-4eab-bb7f-6073edeea957_buggy.java
++++ b/tmp/42bc66a2-e0c3-46fb-a5fe-507de707a355_fixed.java
+@@ -1,33 +1,26 @@
+-    /*
+-     * (non-Javadoc)
+-     * 
+-     * @see java.io.InputStream#read(byte[], int, int)
+-     */
+-    @Override
+-    public int read(final byte[] dest, final int offs, final int len)
+-        throws IOException {
++    public void read(int offs, int len) {
+         if (offs < 0) {
+             throw new IndexOutOfBoundsException("offs(" + offs + ") < 0.");
+         }
+         if (len < 0) {
+             throw new IndexOutOfBoundsException("len(" + len + ") < 0.");
+         }
+-        if (offs + len > dest.length) {
++        if (offs + len > this.buffer.length) {
+             throw new IndexOutOfBoundsException("offs(" + offs + ") + len("
+-                                                + len + ") > dest.length(" + dest.length + ").");
++                                                + len + ") > this.buffer.length(" + this.buffer.length + ").");
+         }
+         if (this.in == null) {
+             throw new IOException("stream closed");
+         }
+ 
+-        final int hi = offs + len;
++        int hi = offs + len;
+         int destOffs = offs;
+         int b;
+-        while (destOffs < hi && ((b = read0()) >= 0)) {
+-            dest[destOffs++] = (byte) b;
++        while (destOffs < hi && ((b = this.in.read()) >= 0)) {
++            this.buffer[destOffs++] = (byte) b;
+             count(1);
+         }
+ 
+         int c = (destOffs == offs) ? -1 : (destOffs - offs);
+         return c;
+     }
+\ No newline at end of file

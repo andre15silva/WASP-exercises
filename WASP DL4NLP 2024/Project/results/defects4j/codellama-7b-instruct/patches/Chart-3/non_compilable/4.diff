@@ -1,0 +1,45 @@
+diff --git a/tmp/e3746ee4-f009-4b37-b76a-2ce4f122b7ba_buggy.java b/tmp/d84f9a40-90bf-4dff-b74c-1bcbd44c2425_fixed.java
+index 388771b..b5709d5 100644
+--- a/tmp/e3746ee4-f009-4b37-b76a-2ce4f122b7ba_buggy.java
++++ b/tmp/d84f9a40-90bf-4dff-b74c-1bcbd44c2425_fixed.java
+@@ -1,37 +1,34 @@
+  /**
+  * Creates a new timeseries by copying a subset of the data in this time
+  * series.
+  *
+  * @param start  the index of the first time period to copy.
+  * @param end  the index of the last time period to copy.
+  *
+  * @return A series containing a copy of this times series from start until
+  *         end.
+  *
+  * @throws CloneNotSupportedException if there is a cloning problem.
+  */
+ public TimeSeries createCopy(int start, int end)
+         throws CloneNotSupportedException {
+-        if (start < 0) {
+-            throw new IllegalArgumentException("Requires start >= 0.");
+-        }
+-        if (end < start) {
+-            throw new IllegalArgumentException("Requires start <= end.");
++    if (start < 0 || end < start) {
++        throw new IllegalArgumentException("Requires start >= 0 and start <= end.");
+     }
+     TimeSeries copy = (TimeSeries) super.clone();
+-        copy.data = new java.util.ArrayList();
++    copy.data = new ArrayList();
+     if (this.data.size() > 0) {
+         for (int index = start; index <= end; index++) {
+             TimeSeriesDataItem item
+                     = (TimeSeriesDataItem) this.data.get(index);
+             TimeSeriesDataItem clone = (TimeSeriesDataItem) item.clone();
+             try {
+                 copy.add(clone);
+             }
+             catch (SeriesException e) {
+                 e.printStackTrace();
+             }
+         }
+     }
+     return copy;
+ }

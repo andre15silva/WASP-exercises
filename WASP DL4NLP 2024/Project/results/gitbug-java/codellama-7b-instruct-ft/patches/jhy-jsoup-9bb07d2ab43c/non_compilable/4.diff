@@ -1,0 +1,23 @@
+diff --git a/tmp/6a150020-ac85-4b19-9a15-ee4069308da9_buggy.java b/tmp/5130ac25-4acd-46e5-b53e-03d08ea822f7_fixed.java
+index dcc36a4..90e9265 100644
+--- a/tmp/6a150020-ac85-4b19-9a15-ee4069308da9_buggy.java
++++ b/tmp/5130ac25-4acd-46e5-b53e-03d08ea822f7_fixed.java
+@@ -1,12 +1,18 @@
+     protected void replaceChild(Node out, Node in) {
+         Validate.isTrue(out.parentNode == this);
+         Validate.notNull(in);
+         if (in.parentNode != null)
+             in.parentNode.removeChild(in);
+ 
+         final int index = out.siblingIndex;
+         ensureChildNodes().set(index, in);
+         in.parentNode = this;
+         in.setSiblingIndex(index);
+         out.parentNode = null;
++
++        // if in is no longer a child, it might have changed siblingIndex in parent (see #1843)
++        final Element parent = (Element) in.parentNode;
++        if (parent != null && index > parent.childNodeSize) {
++            throw new IndexOutOfBoundsException("Replacement changed size to < " + index + ". Was: " + parent.childNodeSize);
++        }
+     }

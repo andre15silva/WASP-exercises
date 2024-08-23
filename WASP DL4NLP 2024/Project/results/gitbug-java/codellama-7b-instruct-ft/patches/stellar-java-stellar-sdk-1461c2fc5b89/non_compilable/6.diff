@@ -1,0 +1,23 @@
+diff --git a/tmp/a0f86721-08f0-440f-ade0-f19497139bad_buggy.java b/tmp/8ce3a87c-20b6-4a3b-a557-f7b5a8c85b3e_fixed.java
+index 5cedd56..2e62ccd 100644
+--- a/tmp/a0f86721-08f0-440f-ade0-f19497139bad_buggy.java
++++ b/tmp/8ce3a87c-20b6-4a3b-a557-f7b5a8c85b3e_fixed.java
+@@ -1,15 +1,17 @@
+   /**
+    * Returns true if this transaction is a Soroban transaction.
+    *
+    * @return true if this transaction is a Soroban transaction.
+    */
+   public boolean isSorobanTransaction() {
+     if (mOperations.length != 1) {
+       return false;
+     }
+ 
+     Operation op = mOperations[0];
+     return op instanceof InvokeHostFunctionOperation
+         || op instanceof BumpSequenceOperation
+-        || op instanceof RestoreFootprintOperation;
++        // Note: when the account's sequence number is non-zero bumping account for a non-zero number will
++        // use MUXED ACCOUNTs. This can still be a Soroban transaction.
++        || (op instanceof BumpSequenceOperation && getSequenceNumber() > 0);
+   }

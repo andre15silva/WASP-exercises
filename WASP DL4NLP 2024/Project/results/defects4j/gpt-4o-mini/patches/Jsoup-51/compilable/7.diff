@@ -1,0 +1,13 @@
+diff --git a/tmp/85b9d0fe-b9ad-45e0-8867-5716bf8204ef_buggy.java b/tmp/582216b8-491f-429b-8c97-b04b5bb7bbe9_fixed.java
+index 84989ca..6d5fe9f 100644
+--- a/tmp/85b9d0fe-b9ad-45e0-8867-5716bf8204ef_buggy.java
++++ b/tmp/582216b8-491f-429b-8c97-b04b5bb7bbe9_fixed.java
+@@ -1,6 +1,6 @@
+ boolean matchesLetter() {
+     if (isEmpty())
+         return false;
+     char c = input[pos];
+-        return (c >= 'A' && c <= 'Z') || (c >= 'a' && c <= 'z');
++    return Character.isLetter(c) || (c >= 0x4e00 && c <= 0x9faf); // Unicode range for common CJK characters
+ }
+\ No newline at end of file

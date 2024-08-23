@@ -1,0 +1,18 @@
+diff --git a/tmp/c8465700-3df9-43d4-a60d-0e9d24e81861_buggy.java b/tmp/8b3ae556-fc7e-4683-ab15-000555463f8a_fixed.java
+index ae6c2b1..031a342 100644
+--- a/tmp/c8465700-3df9-43d4-a60d-0e9d24e81861_buggy.java
++++ b/tmp/8b3ae556-fc7e-4683-ab15-000555463f8a_fixed.java
+@@ -1,10 +1,10 @@
+ public int parseInto(DateTimeParserBucket bucket, String text, int position) {
+     String str = text.substring(position);
+     for (String id : ALL_IDS) {
+-                if (str.startsWith(id)) {
++        if (str.startsWith(id + "/")) { // Ensures that only IDs followed by a '/' are considered
+             bucket.setZone(DateTimeZone.forID(id));
+-                    return position + id.length();
++            return position + id.length() + 1; // Adds 1 to account for the '/' after the ID
+         }
+     }
+     return ~position;
+ }
+\ No newline at end of file

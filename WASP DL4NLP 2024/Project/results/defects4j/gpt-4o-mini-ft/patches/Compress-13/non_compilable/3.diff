@@ -1,0 +1,16 @@
+diff --git a/tmp/1bda7592-bfd9-4be9-af8c-d3e659166575_buggy.java b/tmp/147e6510-a8a2-476c-a165-b5c6458c8580_fixed.java
+index 1c92640..e686065 100644
+--- a/tmp/1bda7592-bfd9-4be9-af8c-d3e659166575_buggy.java
++++ b/tmp/147e6510-a8a2-476c-a165-b5c6458c8580_fixed.java
+@@ -1,7 +1,10 @@
+     /**
+      * Set the name of the entry.
+      * @param name the name to use
+      */
+     protected void setName(String name) {
+-        this.name = name;
++        this.name = name.replace("\\", "/");
++        if (name.endsWith("/")) {
++            setIsDirectory(true);
++        }
+     }

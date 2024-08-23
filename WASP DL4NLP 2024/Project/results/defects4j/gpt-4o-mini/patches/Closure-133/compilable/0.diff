@@ -1,0 +1,18 @@
+diff --git a/tmp/be19e29d-48b5-420b-a7b1-d08a1c7188b8_buggy.java b/tmp/f57156f2-4541-4e73-9ce7-44c88ee09a33_fixed.java
+index 42d4174..06f171d 100644
+--- a/tmp/be19e29d-48b5-420b-a7b1-d08a1c7188b8_buggy.java
++++ b/tmp/f57156f2-4541-4e73-9ce7-44c88ee09a33_fixed.java
+@@ -1,7 +1,11 @@
+   /**
+-   * Returns the remainder of the line.
++   * Returns the remainder of the line, ensuring that it handles cases
++   * where the stream may not have a valid remaining line.
+    */
+   private String getRemainingJSDocLine() {
+     String result = stream.getRemainingJSDocLine();
++    if (result == null) {
++      throw new IllegalStateException("No remaining JSDoc line available");
++    }
+     return result;
+   }
+\ No newline at end of file

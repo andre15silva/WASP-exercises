@@ -1,0 +1,13 @@
+diff --git a/tmp/c34c6134-3a4a-4615-8d1c-80be76b8057f_buggy.java b/tmp/f75d203b-6c61-4aa0-80c5-18a78776dc02_fixed.java
+index 3ecd591..bb727a8 100644
+--- a/tmp/c34c6134-3a4a-4615-8d1c-80be76b8057f_buggy.java
++++ b/tmp/f75d203b-6c61-4aa0-80c5-18a78776dc02_fixed.java
+@@ -1,6 +1,7 @@
+     private boolean isInlineable(Document.OutputSettings out) {
+         return tag().isInline()
+             && (parent() == null || parent().isBlock())
+             && previousSibling() != null
++            && parent() != null && !parent().tag().isNestedIn("a")
+             && !out.outline();
+     }
+\ No newline at end of file

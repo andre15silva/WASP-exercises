@@ -1,0 +1,46 @@
+diff --git a/tmp/7fbd0c18-29a9-4ee0-bea4-6966c156cb4d_buggy.java b/tmp/b880dd9d-47d4-4d3b-a93c-ba2a725efce5_fixed.java
+index d6a560a..d1217ca 100644
+--- a/tmp/7fbd0c18-29a9-4ee0-bea4-6966c156cb4d_buggy.java
++++ b/tmp/b880dd9d-47d4-4d3b-a93c-ba2a725efce5_fixed.java
+@@ -1,33 +1,20 @@
+   /**
+    * Resolve the referenced type within the enclosing scope.
+    */
+   @Override
+   JSType resolveInternal(ErrorReporter t, StaticScope<JSType> enclosing) {
+-    // TODO(user): Investigate whether it is really necessary to keep two
+-    // different mechanisms for resolving named types, and if so, which order
+-    // makes more sense. Now, resolution via registry is first in order to
+-    // avoid triggering the warnings built into the resolution via properties.
+-    boolean resolved = resolveViaRegistry(t, enclosing);
+-    if (detectImplicitPrototypeCycle()) {
+-      handleTypeCycle(t);
+-    }
+-
+-    if (resolved) {
++    // TODO(bkassebaum): Consider whether we should really continue resolving
++    // after getting new types from properties resolution. There's a whole lot of
++    // complexities here with respect to prototype resolution and unsoundness
++    // issues, but for now we'll leave the existing code and adjust later if need be.
+     super.resolveInternal(t, enclosing);
+-      finishPropertyContinuations();
+-      return registry.isLastGeneration() ?
+-          getReferencedType() : this;
+-    }
+-
+-    resolveViaProperties(t, enclosing);
+     if (detectImplicitPrototypeCycle()) {
+       handleTypeCycle(t);
+     }
+-
+-    super.resolveInternal(t, enclosing);
+-    if (isResolved()) {
++    // TODO(bkassebaum): Revisit. This is ugly.
++    if (t.getErrorCount() == 0 && !isResolved()) {
+       finishPropertyContinuations();
+     }
+-    return registry.isLastGeneration() ?
+-        getReferencedType() : this;
++
++    return this;
+   }

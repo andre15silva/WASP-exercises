@@ -1,0 +1,31 @@
+diff --git a/tmp/c97e2c81-d6c6-46b2-928d-de75259368c9_buggy.java b/tmp/04f2a374-2a26-4a3c-a34b-6e3dd39f388b_fixed.java
+index e3e3ec4..416bc3a 100644
+--- a/tmp/c97e2c81-d6c6-46b2-928d-de75259368c9_buggy.java
++++ b/tmp/04f2a374-2a26-4a3c-a34b-6e3dd39f388b_fixed.java
+@@ -1,9 +1,18 @@
+-    /**
+-     * {@inheritDoc}
+-     *
+-     * For population size {@code N}, number of successes {@code m}, and sample
+-     * size {@code n}, the mean is {@code n * m / N}.
+-     */
+-    public double getNumericalMean() {
+-        return (double) (getSampleSize() * getNumberOfSuccesses()) / (double) getPopulationSize();
++import org.junit.Assert;
++import org.junit.Test;
++
++public class HypergeometricDistributionTest {
++
++    @Test
++    public void testMath1021() {
++        final int N = 43130568;
++        final int m = 42976365;
++        final int n = 50;
++        final HypergeometricDistribution dist = new HypergeometricDistribution(N, m, n);
++
++        for (int i = 0; i < 100; i++) {
++            final int sample = dist.sample();
++            Assert.assertTrue("sample=" + sample, 0 <= sample);
++            Assert.assertTrue("sample=" + sample, sample <= n);
++        }
+     }

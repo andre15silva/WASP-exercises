@@ -1,0 +1,23 @@
+diff --git a/tmp/bc37e23f-8898-4af5-a3ae-33f9d9563669_buggy.java b/tmp/efdc25fe-6587-4da8-b8af-c9b85054bbac_fixed.java
+index a7cb64f..6c86d11 100644
+--- a/tmp/bc37e23f-8898-4af5-a3ae-33f9d9563669_buggy.java
++++ b/tmp/efdc25fe-6587-4da8-b8af-c9b85054bbac_fixed.java
+@@ -1,10 +1,12 @@
+-    /**
+-     * Test if this element has an attribute.
+-     * @param attributeKey The attribute key to check.
+-     * @return true if the attribute exists, false if not.
+-     */
+ public boolean hasAttr(String attributeKey) {
+     Validate.notNull(attributeKey);
+     
++    // Check for the "abs:" prefix and process accordingly
++    if (attributeKey.startsWith("abs:")) {
++        // For absolute attributes, check if the non-prefixed attribute exists
++        String nonPrefixedKey = attributeKey.substring(4); // Remove the "abs:" prefix
++        return attributes.hasKey(nonPrefixedKey);
++    }
++
+     return attributes.hasKey(attributeKey);
+ }
+\ No newline at end of file

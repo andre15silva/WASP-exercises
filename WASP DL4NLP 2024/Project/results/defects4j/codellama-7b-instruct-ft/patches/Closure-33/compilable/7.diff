@@ -1,0 +1,42 @@
+diff --git a/tmp/e0770253-de8b-4387-989d-a5a4542ae36d_buggy.java b/tmp/99206fd9-1f6d-4b81-bc98-6b3e738e0f58_fixed.java
+index fb2b020..4f98d83 100644
+--- a/tmp/e0770253-de8b-4387-989d-a5a4542ae36d_buggy.java
++++ b/tmp/99206fd9-1f6d-4b81-bc98-6b3e738e0f58_fixed.java
+@@ -1,27 +1,35 @@
+   @Override
+   public void matchConstraint(ObjectType constraintObj) {
+     // We only want to match contraints on anonymous types.
+ 
+     // Handle the case where the constraint object is a record type.
+     //
+     // param constraintObj {{prop: (number|undefined)}}
+     // function f(constraintObj) {}
+     // f({});
+     //
+     // We want to modify the object literal to match the constraint, by
+-    // taking any each property on the record and trying to match
+-    // properties on this object.
++    // taking any properties on the record, and trying to match properties on
++    // this object.
+     if (constraintObj.isRecordType()) {
++      // TODO(dimvar): if the property name is a valid type (like "activity",
++      // below), it's an error to define a property of that name as non-nullable.
++      // Change matchObjectLiteral to check whether a value is an object literal
++      // using matchObjectLiteralForType, rather than isProbablyObjectLiteral.
+       for (String prop : constraintObj.getOwnPropertyNames()) {
++        // NOTE(nicksantos): The properties may have constraints on them
++        // e.g., {@code var objLiteral = {a: ({obj: number} | undefined)};}
++        // This is ok if the property is actually declared, but we should really
++        // check for this at runtime, as the property is an object literal too.
+         JSType propType = constraintObj.getPropertyType(prop);
+         if (!isPropertyTypeDeclared(prop)) {
+           JSType typeToInfer = propType;
+           if (!hasProperty(prop)) {
+             typeToInfer = getNativeType(JSTypeNative.VOID_TYPE)
+                 .getLeastSupertype(propType);
+           }
+           defineInferredProperty(prop, typeToInfer, null);
+         }
+       }
+     }
+   }

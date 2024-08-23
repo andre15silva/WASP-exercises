@@ -1,0 +1,22 @@
+diff --git a/tmp/abb0b7f6-d74b-4d20-add6-b889db6858a4_buggy.java b/tmp/b2a3b3af-4bbd-4163-92a8-8e48e294ab56_fixed.java
+index 826e9ae..cc00f15 100644
+--- a/tmp/abb0b7f6-d74b-4d20-add6-b889db6858a4_buggy.java
++++ b/tmp/b2a3b3af-4bbd-4163-92a8-8e48e294ab56_fixed.java
+@@ -1,15 +1 @@
+-    /**
+-     * Puts all values of this record into the given Map.
+-     *
+-     * @param map The Map to populate.
+-     * @return the given map.
+-     */
+-    <M extends Map<String, String>> M putIn(final M map) {
+-        for (final Entry<String, Integer> entry : mapping.entrySet()) {
+-            final int col = entry.getValue().intValue();
+-            if (col < values.length) {
+-                map.put(entry.getKey(), values[col]);
+-            }
+-        }
+-        return map;
+-    }
++The purpose of this function is to return a map containing all the key-value pairs for the given record, where the key is a column name and the value is the corresponding column value.
+\ No newline at end of file

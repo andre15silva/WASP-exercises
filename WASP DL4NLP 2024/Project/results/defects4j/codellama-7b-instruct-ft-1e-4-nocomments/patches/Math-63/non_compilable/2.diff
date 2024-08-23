@@ -1,0 +1,38 @@
+diff --git a/tmp/be0bc20e-ac11-4280-b006-9650c124cabf_buggy.java b/tmp/d083c3b1-5e0b-4808-8b67-c9a2b1ba292e_fixed.java
+index 9033e1c..2817b89 100644
+--- a/tmp/be0bc20e-ac11-4280-b006-9650c124cabf_buggy.java
++++ b/tmp/d083c3b1-5e0b-4808-8b67-c9a2b1ba292e_fixed.java
+@@ -1,11 +1,32 @@
+     /**
+      * Returns true iff they are equal as defined by
+      * {@link #equals(double,double,int) equals(x, y, 1)}.
+      *
+      * @param x first value
+      * @param y second value
+      * @return {@code true} if the values are equal.
+      */
+     public static boolean equals(double x, double y) {
+         return (Double.isNaN(x) && Double.isNaN(y)) || x == y;
+     }
++    @Deprecated
++    public static boolean equals(double[] v1, double[] v2) {
++        return ((v1 == null) && (v2 == null)) ||
++               ((v1 != null) && (v2 != null) &&
++               (v1.length == v2.length) &&
++               (MathUtils.isSameArray(v1, v2)));
++    }
++    @Deprecated
++    public static boolean arrayEquals(double[] v1, double[] v2) {
++        return ((v1 == null) && (v2 == null)) ||
++               ((v1 != null) && (v2 != null) &&
++               (v1.length == v2.length) &&
++               (MathUtils.isSameArray(v1, v2)));
++    }
++    @Deprecated
++    public static boolean arrayEquals(double[] v1, double[] v2, boolean treatNaNAsEquals) {
++        return ((v1 == null) && (v2 == null)) ||
++               ((v1 != null) && (v2 != null) &&
++               (v1.length == v2.length) &&
++               (MathUtils.isSameArray(v1, v2, treatNaNAsEquals)));
++    }
+\ No newline at end of file

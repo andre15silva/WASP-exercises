@@ -1,0 +1,9 @@
+diff --git a/tmp/a674f7c8-5b9d-4306-8bb8-b334fbb31306_buggy.java b/tmp/dd46651d-6898-4b1a-a5c5-59f4aa658840_fixed.java
+index a2af134..28dad3d 100644
+--- a/tmp/a674f7c8-5b9d-4306-8bb8-b334fbb31306_buggy.java
++++ b/tmp/dd46651d-6898-4b1a-a5c5-59f4aa658840_fixed.java
+@@ -1,3 +1,3 @@
+     public HostAbstract(final List<Pe> peList, final boolean activate) {
+-        this(defaultBwCapacity, defaultStorageCapacity, new HarddriveStorage(defaultRamCapacity), peList, activate);
++        this(defaultRamCapacity, defaultBwCapacity, new HarddriveStorage(defaultStorageCapacity), peList, activate);
+     }

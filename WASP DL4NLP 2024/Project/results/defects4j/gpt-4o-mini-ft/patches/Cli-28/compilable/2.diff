@@ -1,0 +1,60 @@
+diff --git a/tmp/ac1814c9-6f59-4f87-a603-7cc94513a5b8_buggy.java b/tmp/c413ac77-37fb-4260-943e-2e08f8fd913a_fixed.java
+index a7549f0..a328daf 100644
+--- a/tmp/ac1814c9-6f59-4f87-a603-7cc94513a5b8_buggy.java
++++ b/tmp/c413ac77-37fb-4260-943e-2e08f8fd913a_fixed.java
+@@ -1,50 +1,51 @@
+     /**
+      * Sets the values of Options using the values in <code>properties</code>.
+      *
+      * @param properties The value properties to be processed.
+      */
+     protected void processProperties(Properties properties)
+     {
+         if (properties == null)
+         {
+             return;
+         }
+ 
+         for (Enumeration e = properties.propertyNames(); e.hasMoreElements();)
+         {
+             String option = e.nextElement().toString();
+ 
+             if (!cmd.hasOption(option))
+             {
+                 Option opt = getOptions().getOption(option);
+ 
+                 // get the value from the properties instance
+                 String value = properties.getProperty(option);
+ 
+                 if (opt.hasArg())
+                 {
+                     if (opt.getValues() == null || opt.getValues().length == 0)
+                     {
+                         try
+                         {
+                             opt.addValueForProcessing(value);
+                         }
+                         catch (RuntimeException exp)
+                         {
+                             // if we cannot add the value don't worry about it
+                         }
+                     }
+                 }
+-                else if (!("yes".equalsIgnoreCase(value)
++                else if (("yes".equalsIgnoreCase(value)
+                         || "true".equalsIgnoreCase(value)
+-                        || "1".equalsIgnoreCase(value)))
++                        || "1".equalsIgnoreCase(value)) != opt.hasArg())
+                 {
+-                    // if the value is not yes, true or 1 then don't add the
+-                    // option to the CommandLine
++                    // if the value is not yes, true or 1 and the option
++                    // requires an argument don't add the option to the
++                    // CommandLine
+                     break;
+                 }
+ 
+                 cmd.addOption(opt);
+             }
+         }
+     }

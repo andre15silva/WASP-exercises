@@ -1,0 +1,32 @@
+diff --git a/tmp/3adc883b-eadc-47ec-a88f-edb46c207fbd_buggy.java b/tmp/ff295645-b891-4f0c-807c-c16e06e3f0b5_fixed.java
+index ae6c2b1..bba4c3e 100644
+--- a/tmp/3adc883b-eadc-47ec-a88f-edb46c207fbd_buggy.java
++++ b/tmp/ff295645-b891-4f0c-807c-c16e06e3f0b5_fixed.java
+@@ -1,10 +1,24 @@
+         public int parseInto(DateTimeParserBucket bucket, String text, int position) {
+             String str = text.substring(position);
++            int bestFound = 0;
++            long bestMatch = Long.MIN_VALUE;
+             for (String id : ALL_IDS) {
+-                if (str.startsWith(id)) {
++                int pos = str.indexOf(id);
++                if (pos == 0) {
+                     bucket.setZone(DateTimeZone.forID(id));
+-                    return position + id.length();
++                    return position + pos + id.length();
+                 }
++                long score = Long.MIN_VALUE;
++                score -= Math.abs(id.length() - str.length());
++                score += Math.abs(id.hashCode() - parseTimeZoneId.toLowerCase().hashCode());
++                if (score > bestMatch) {
++                    bestFound = pos;
++                    bestMatch = score;
++                }
++            }
++            if (bestFound >= 0) {
++                bucket.setZone(DateTimeZone.forID(parseTimeZoneId.substring(0, bestFound)));
++                return position + bestFound + parseTimeZoneId.substring(bestFound).length();
+             }
+             return ~position;
+         }
+\ No newline at end of file

@@ -1,0 +1,38 @@
+diff --git a/tmp/91084efb-a165-45c2-adc9-584ab1369919_buggy.java b/tmp/71a33f15-4c62-49ae-977c-6cbf52e46177_fixed.java
+index 4b163f6..f2f84fa 100644
+--- a/tmp/91084efb-a165-45c2-adc9-584ab1369919_buggy.java
++++ b/tmp/71a33f15-4c62-49ae-977c-6cbf52e46177_fixed.java
+@@ -1,28 +1,32 @@
+     /**
+      * Skips the given number of bytes by repeatedly invoking skip on
+      * the given input stream if necessary.
+      *
+      * <p>In a case where the stream's skip() method returns 0 before
+      * the requested number of bytes has been skip this implementation
+-     * will fall back to using the read() method.</p>
++     * will fall back to using the read() method (if available).</p>
+      *
+      * <p>This method will only skip less than the requested number of
+      * bytes if the end of the input stream has been reached.</p>
+      *
+      * @param input stream to skip bytes in
+      * @param numToSkip the number of bytes to skip
+      * @return the number of bytes actually skipped
+      * @throws IOException
+      */
+     public static long skip(InputStream input, long numToSkip) throws IOException {
+         long available = numToSkip;
+         while (numToSkip > 0) {
+             long skipped = input.skip(numToSkip);
+             if (skipped == 0) {
++                // fallback to read, (might be wrapped in a filter)
++                // as skip has returned zero and that seems to be a bug
++                // in some stream implementations.
++                skipped = input.read(new byte[(int) numToSkip]);
+                 break;
+             }
+             numToSkip -= skipped;
+         }
+             
+         return available - numToSkip;
+     }

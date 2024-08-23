@@ -1,0 +1,20 @@
+diff --git a/tmp/95001582-7960-48f5-994d-30c802610d07_buggy.java b/tmp/8b473166-1909-441c-8b0c-52de8798df87_fixed.java
+index 29d025a..14b5299 100644
+--- a/tmp/95001582-7960-48f5-994d-30c802610d07_buggy.java
++++ b/tmp/8b473166-1909-441c-8b0c-52de8798df87_fixed.java
+@@ -1,13 +1,13 @@
+     private void _verifySharing()
+     {
+         if (_hashShared) {
++            // not quite a copy: for [jackson-core#216], if expanded TreeMap
++            // was last known state, ensured to follow it.
+             _hashArea = Arrays.copyOf(_hashArea, _hashArea.length);
+             _names = Arrays.copyOf(_names, _names.length);
+             _hashShared = false;
+-            // 09-Sep-2015, tatu: As per [jackson-core#216], also need to ensure
+-            //    we rehash as needed, as need-rehash flag is not copied from parent
+         }
+         if (_needRehash) {
+             rehash();
+         }
+     }

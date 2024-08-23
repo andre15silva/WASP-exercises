@@ -1,0 +1,26 @@
+diff --git a/tmp/65b1f052-b15f-4b22-92cd-849ad395666c_buggy.java b/tmp/b73722f3-dc14-47ba-ac54-60dba87b962f_fixed.java
+index 9529ba6..d4c7f25 100644
+--- a/tmp/65b1f052-b15f-4b22-92cd-849ad395666c_buggy.java
++++ b/tmp/b73722f3-dc14-47ba-ac54-60dba87b962f_fixed.java
+@@ -1,20 +1,18 @@
+     public int writeValue() {
+         // Most likely, object:
+         if (_type == TYPE_OBJECT) {
+-            _gotName = false;
+-            ++_index;
+-            return STATUS_OK_AFTER_COLON;
++            throw new UnsupportedOperationException("Can not do that");
+         }
+ 
+         // Ok, array?
+         if (_type == TYPE_ARRAY) {
+             int ix = _index;
+             ++_index;
+             return (ix < 0) ? STATUS_OK_AS_IS : STATUS_OK_AFTER_COMMA;
+         }
+         
+         // Nope, root context
+         // No commas within root context, but need space
+         ++_index;
+         return (_index == 0) ? STATUS_OK_AS_IS : STATUS_OK_AFTER_SPACE;
+     }

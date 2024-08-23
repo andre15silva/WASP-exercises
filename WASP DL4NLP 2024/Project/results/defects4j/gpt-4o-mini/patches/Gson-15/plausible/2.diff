@@ -1,0 +1,32 @@
+diff --git a/tmp/9ffa4542-74af-4f5f-873f-643f6bc7d8cc_buggy.java b/tmp/1b93eee2-e2a8-431a-b928-790ba61d3f91_fixed.java
+index 4685979..618c7c8 100644
+--- a/tmp/9ffa4542-74af-4f5f-873f-643f6bc7d8cc_buggy.java
++++ b/tmp/1b93eee2-e2a8-431a-b928-790ba61d3f91_fixed.java
+@@ -1,16 +1,18 @@
+-  /**
+-   * Encodes {@code value}.
+-   *
+-   * @param value a finite value. May not be {@link Double#isNaN() NaNs} or
+-   *     {@link Double#isInfinite() infinities}.
+-   * @return this writer.
+-   */
+ public JsonWriter value(double value) throws IOException {
+     writeDeferredName();
+-    if (Double.isNaN(value) || Double.isInfinite(value)) {
++    if (!lenient && (Double.isNaN(value) || Double.isInfinite(value))) {
+         throw new IllegalArgumentException("Numeric values must be finite, but was " + value);
+     }
+     beforeValue();
++    // If lenient is true, handle non-finite values appropriately
++    if (Double.isNaN(value)) {
++        out.append("NaN");
++    } else if (value == Double.NEGATIVE_INFINITY) {
++        out.append("-Infinity");
++    } else if (value == Double.POSITIVE_INFINITY) {
++        out.append("Infinity");
++    } else {
+         out.append(Double.toString(value));
++    }
+     return this;
+ }
+\ No newline at end of file

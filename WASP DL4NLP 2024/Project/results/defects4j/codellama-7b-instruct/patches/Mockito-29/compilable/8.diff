@@ -1,0 +1,18 @@
+diff --git a/tmp/d73f57ff-5b02-4785-9a5d-863b138a87c6_buggy.java b/tmp/78b05a12-25fa-4211-af84-33f353d6dd28_fixed.java
+index 00b39e0..ef731f2 100644
+--- a/tmp/d73f57ff-5b02-4785-9a5d-863b138a87c6_buggy.java
++++ b/tmp/78b05a12-25fa-4211-af84-33f353d6dd28_fixed.java
+@@ -1,7 +1,10 @@
+     public void describeTo(Description description) {
+         description.appendText("same(");
+-        appendQuoting(description);
+-        description.appendText(wanted.toString());
+-        appendQuoting(description);
++        // Append the quoting symbols
++        description.appendText(quote(wanted.toString()));
+         description.appendText(")");
+     }
++
++    private static String quote(String value) {
++        return "\"" + value + "\"";
++    }

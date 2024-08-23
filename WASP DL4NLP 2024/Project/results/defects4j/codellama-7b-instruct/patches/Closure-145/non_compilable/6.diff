@@ -1,0 +1,42 @@
+diff --git a/tmp/db79279c-f183-4371-8ed4-89a0607dc323_buggy.java b/tmp/eae4d362-948b-4070-8181-368f5bc7e9bd_fixed.java
+index 57f69c5..31f70c2 100644
+--- a/tmp/db79279c-f183-4371-8ed4-89a0607dc323_buggy.java
++++ b/tmp/eae4d362-948b-4070-8181-368f5bc7e9bd_fixed.java
+@@ -1,12 +1,31 @@
+   /**
+    * @return Whether the Node is a DO or FUNCTION (with or without
+    * labels).
+    */
+   private boolean isOneExactlyFunctionOrDo(Node n) {
+-        // For labels with block children, we need to ensure that a
+-        // labeled FUNCTION or DO isn't generated when extraneous BLOCKs 
+-        // are skipped. 
+-          // Either a empty statement or an block with more than one child,
+-          // way it isn't a FUNCTION or DO.
++    if (n.isStandaloneFunction()) {
++      // Wrap the function expression in a block statement with a label if the
++      // function expression is standalone (i.e., not inside any block or any
++      // other statement).
+       return (n.getType() == Token.FUNCTION || n.getType() == Token.DO);
++    } else {
++      // If the function expression is inside a block or any other statement,
++      // do not wrap it in a block statement.
++      return (n.getType() == Token.FUNCTION || n.getType() == Token.DO ||
++          n.getType() == Token.BLOCK);
++    }
++  }
++
++  private Node wrapInBlock(Node functionExpr, String label) {
++    // Create a new block statement with the label and the function expression.
++    Node block = Node.newBlock(Label.newLabel(label));
++    block.addChildToBack(functionExpr);
++    return block;
++  }
++
++  private boolean isStandaloneFunction(Node node) {
++    // A standalone function expression is the child of a label or a function
++    // statement.
++    return (node.getParent().getType() == Token.LABEL ||
++        node.getParent().getType() == Token.FUNCTION);
+   }
+\ No newline at end of file

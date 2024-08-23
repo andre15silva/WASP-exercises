@@ -1,0 +1,46 @@
+diff --git a/tmp/f547264a-1ffe-486c-a09a-96aa81bc76fe_buggy.java b/tmp/de265b58-6b6c-45ed-866e-e3e146a51473_fixed.java
+index 58a1651..ff5b410 100644
+--- a/tmp/f547264a-1ffe-486c-a09a-96aa81bc76fe_buggy.java
++++ b/tmp/de265b58-6b6c-45ed-866e-e3e146a51473_fixed.java
+@@ -1,32 +1,36 @@
+ @Override
+ JSType resolveInternal(ErrorReporter t, StaticScope<JSType> scope) {
+     setResolvedTypeInternal(this);
+ 
+     call = (ArrowType) safeResolve(call, t, scope);
+     prototype = (FunctionPrototypeType) safeResolve(prototype, t, scope);
+ 
+-    // Warning about typeOfThis if it doesn't resolve to an ObjectType
+-    // is handled further upstream.
+-    // TODO(nicksantos): Handle this correctly if we have a UnionType.
+-    typeOfThis = (ObjectType) safeResolve(typeOfThis, t, scope);
++    // Handle typeOfThis: check if it is a UnionType
++    JSType resolvedTypeOfThis = safeResolve(typeOfThis, t, scope);
++    if (resolvedTypeOfThis instanceof UnionType) {
++        // Optionally handle UnionType here or log a warning
++        typeOfThis = (ObjectType) ((UnionType) resolvedTypeOfThis).getLeastSupertype(ObjectType);
++    } else {
++        typeOfThis = (ObjectType) resolvedTypeOfThis;
++    }
+ 
+     boolean changed = false;
+     ImmutableList.Builder<ObjectType> resolvedInterfaces =
+         ImmutableList.builder();
+     for (ObjectType iface : implementedInterfaces) {
+         ObjectType resolvedIface = (ObjectType) iface.resolve(t, scope);
+         resolvedInterfaces.add(resolvedIface);
+         changed |= (resolvedIface != iface);
+     }
+     if (changed) {
+         implementedInterfaces = resolvedInterfaces.build();
+     }
+ 
+     if (subTypes != null) {
+         for (int i = 0; i < subTypes.size(); i++) {
+             subTypes.set(i, (FunctionType) subTypes.get(i).resolve(t, scope));
+         }
+     }
+ 
+     return super.resolveInternal(t, scope);
+ }
+\ No newline at end of file

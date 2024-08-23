@@ -1,0 +1,45 @@
+diff --git a/tmp/1bc124ae-8a2a-4652-b1d9-bd96c7086fe8_buggy.java b/tmp/fce2bde4-ac1a-4d3b-811d-0d71f169c1b4_fixed.java
+index 3c69e10..999009e 100644
+--- a/tmp/1bc124ae-8a2a-4652-b1d9-bd96c7086fe8_buggy.java
++++ b/tmp/fce2bde4-ac1a-4d3b-811d-0d71f169c1b4_fixed.java
+@@ -1,27 +1,28 @@
+-    /**
+-     * @param Umin smallest Mann-Whitney U value
+-     * @param n1 number of subjects in first sample
+-     * @param n2 number of subjects in second sample
+-     * @return two-sided asymptotic p-value
+-     * @throws ConvergenceException if the p-value can not be computed
+-     * due to a convergence error
+-     * @throws MaxCountExceededException if the maximum number of
+-     * iterations is exceeded
+-     */
+ private double calculateAsymptoticPValue(final double Umin,
+                                          final int n1,
+                                          final int n2)
+     throws ConvergenceException, MaxCountExceededException {
+ 
++    if (n1 <= 0 || n2 <= 0) {
++        throw new IllegalArgumentException("Sample sizes n1 and n2 must be positive.");
++    }
++
+     final int n1n2prod = n1 * n2;
+ 
+-        // http://en.wikipedia.org/wiki/Mann%E2%80%93Whitney_U#Normal_approximation
++    // Normal approximation for Mann-Whitney U
+     final double EU = n1n2prod / 2.0;
+     final double VarU = n1n2prod * (n1 + n2 + 1) / 12.0;
+ 
+     final double z = (Umin - EU) / FastMath.sqrt(VarU);
+ 
++    // Adjust for small sample sizes
++    if (n1n2prod < 20) {
++        // For small samples, other methods might be necessary.
++        // Implement a method suitable for smaller sample sizes for better accuracy.
++        throw new ConvergenceException("Sample size is too small for accurate p-value computation.");
++    }
++
+     final NormalDistribution standardNormal = new NormalDistribution(0, 1);
+ 
+     return 2 * standardNormal.cumulativeProbability(z);
+ }
+\ No newline at end of file

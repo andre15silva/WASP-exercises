@@ -1,0 +1,13 @@
+diff --git a/tmp/7880ec10-8a81-4d94-a6e6-9f6e433b0883_buggy.java b/tmp/553f76f9-9e0c-481c-919e-e9ebe7a6f752_fixed.java
+index 1186509..e1daa0a 100644
+--- a/tmp/7880ec10-8a81-4d94-a6e6-9f6e433b0883_buggy.java
++++ b/tmp/553f76f9-9e0c-481c-919e-e9ebe7a6f752_fixed.java
+@@ -1,7 +1,7 @@
+     private void printRow(final Help.TextTable table, final SearchResponse.Response.Doc doc) {
+         var lastUpdated = DATE_TIME_FORMATTER.format(
+                 Instant.ofEpochMilli(doc.timestamp()).atZone(ZoneId.systemDefault())
+         );
+ 
+-        table.addRowValues(doc.id(), lastUpdated);
++        table.addRowValues(gav(doc), lastUpdated);
+     }

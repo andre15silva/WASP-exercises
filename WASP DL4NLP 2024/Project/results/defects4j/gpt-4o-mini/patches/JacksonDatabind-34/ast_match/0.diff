@@ -1,0 +1,23 @@
+diff --git a/tmp/06c3eb66-8bce-4e59-9084-3a2f05ed766e_buggy.java b/tmp/80f7f894-b46f-43e6-9090-adcae3bd2a47_fixed.java
+index 618906f..dc265dd 100644
+--- a/tmp/06c3eb66-8bce-4e59-9084-3a2f05ed766e_buggy.java
++++ b/tmp/80f7f894-b46f-43e6-9090-adcae3bd2a47_fixed.java
+@@ -1,15 +1,15 @@
+ @Override
+ public void acceptJsonFormatVisitor(JsonFormatVisitorWrapper visitor, JavaType typeHint) throws JsonMappingException
+ {
+     if (_isInt) {
+         visitIntFormat(visitor, typeHint, JsonParser.NumberType.BIG_INTEGER);
+     } else {
+         Class<?> h = handledType();
+         if (h == BigDecimal.class) {
+-                visitFloatFormat(visitor, typeHint, JsonParser.NumberType.BIG_INTEGER);
++            visitFloatFormat(visitor, typeHint, JsonParser.NumberType.BIG_DECIMAL); // Fixed from BIG_INTEGER to BIG_DECIMAL
+         } else {
+             // otherwise bit unclear what to call... but let's try:
+-                /*JsonNumberFormatVisitor v2 =*/ visitor.expectNumberFormat(typeHint);
++            visitor.expectNumberFormat(typeHint);
+         }
+     }
+ }
+\ No newline at end of file

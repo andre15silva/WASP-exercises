@@ -1,0 +1,62 @@
+diff --git a/tmp/239f0e09-cd9e-466b-8385-21d482d91390_buggy.java b/tmp/71a1c19e-d59f-4d81-91e9-c4e159aea946_fixed.java
+index 442a001..6539aba 100644
+--- a/tmp/239f0e09-cd9e-466b-8385-21d482d91390_buggy.java
++++ b/tmp/71a1c19e-d59f-4d81-91e9-c4e159aea946_fixed.java
+@@ -1,39 +1,50 @@
+     /**
+      * Get the data that this form submits. The returned list is a copy of the data, and changes to the contents of the
+      * list will not be reflected in the DOM.
+      * @return a list of key vals
+      */
+     public List<Connection.KeyVal> formData() {
+         ArrayList<Connection.KeyVal> data = new ArrayList<Connection.KeyVal>();
++        Elements elements = this.elements;
+ 
+         // iterate the form control elements and accumulate their values
+         for (Element el: elements) {
+             if (!el.tag().isFormSubmittable()) continue; // contents are form listable, superset of submitable
+-            String name = el.attr("name");
++
++            final String name = el.attr("name");
+             if (name.length() == 0) continue;
+-            String type = el.attr("type");
++            if (el.attr("disabled").length() > 0) continue; // Do not send disabled form inputs.
+ 
+-            if ("select".equals(el.tagName())) {
++            final String elVal = el.val();
++            final String type = el.attr("type");
++
++            if ("select".equalsIgnoreCase(el.tagName())) {
+                 Elements options = el.select("option[selected]");
+                 boolean set = false;
+                 for (Element option : options) {
+                     data.add(HttpConnection.KeyVal.create(name, option.val()));
+                     set = true;
+                 }
+                 if (!set) {
+                     Element option = el.select("option").first();
+                     if (option != null)
+                         data.add(HttpConnection.KeyVal.create(name, option.val()));
+                 }
++            } else if ("textarea".equalsIgnoreCase(el.tagName())) {
++                data.add(HttpConnection.KeyVal.create(name, elVal));
+             } else if ("checkbox".equalsIgnoreCase(type) || "radio".equalsIgnoreCase(type)) {
+                 // only add checkbox or radio if they have the checked attribute
+-                if (el.hasAttr("checked")) {
+-                    final String val = el.val();
+-                    data.add(HttpConnection.KeyVal.create(name, val));
++                if (el.hasAttr("checked") && (!el.tagName().equalsIgnoreCase("input") || "checked".equalsIgnoreCase(el.attr("checked")))) {
++                    data.add(HttpConnection.KeyVal.create(name, elVal));
++                } else {
++                    List<Connection.KeyVal> existing = connection.data().find(name);
++                    for (Connection.KeyVal e: existing) {
++                        data.add(e);
++                    }
+                 }
+             } else {
+-                data.add(HttpConnection.KeyVal.create(name, el.val()));
++                data.add(HttpConnection.KeyVal.create(name, elVal));
+             }
+         }
+         return data;
+     }

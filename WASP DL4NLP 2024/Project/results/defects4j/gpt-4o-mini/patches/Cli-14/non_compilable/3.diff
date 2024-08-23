@@ -1,0 +1,64 @@
+diff --git a/tmp/8cccfd79-b603-442f-bd0e-3da1f4aa8232_buggy.java b/tmp/a5c8d38c-cae7-4fce-9552-d450ef2ebef9_fixed.java
+index 71189c3..1f42a3c 100644
+--- a/tmp/8cccfd79-b603-442f-bd0e-3da1f4aa8232_buggy.java
++++ b/tmp/a5c8d38c-cae7-4fce-9552-d450ef2ebef9_fixed.java
+@@ -1,46 +1,56 @@
+ public void validate(final WriteableCommandLine commandLine)
+     throws OptionException {
+     // number of options found
+     int present = 0;
+ 
+     // reference to first unexpected option
+     Option unexpected = null;
+ 
+     for (final Iterator i = options.iterator(); i.hasNext();) {
+         final Option option = (Option) i.next();
+ 
+         // needs validation?
+         boolean validate = option.isRequired() || option instanceof Group;
+         if (validate) {
+             option.validate(commandLine);
+         }
+ 
+         // if the child option is present then validate it
+         if (commandLine.hasOption(option)) {
+             if (++present > maximum) {
+                 unexpected = option;
+-
+                 break;
+             }
+ 
+             option.validate(commandLine);
+         }
+     }
+ 
+     // too many options
+     if (unexpected != null) {
+         throw new OptionException(this, ResourceConstants.UNEXPECTED_TOKEN,
+                                   unexpected.getPreferredName());
+     }
+ 
+-        // too few option
++    // too few options
+     if (present < minimum) {
+         throw new OptionException(this, ResourceConstants.MISSING_OPTION);
+     }
+ 
+     // validate each anonymous argument
+     for (final Iterator i = anonymous.iterator(); i.hasNext();) {
+         final Option option = (Option) i.next();
+         option.validate(commandLine);
+     }
++
++    // Check if the value returned by the command line is of the expected type
++    for (final Option option : options) {
++        if (commandLine.hasOption(option)) {
++            Object value = commandLine.getValue(option);
++            if (value instanceof File) {
++                // If the option expects a String, convert it to a String
++                commandLine.setValue(option, ((File) value).getPath());
++            }
++        }
++    }
+ }
+\ No newline at end of file

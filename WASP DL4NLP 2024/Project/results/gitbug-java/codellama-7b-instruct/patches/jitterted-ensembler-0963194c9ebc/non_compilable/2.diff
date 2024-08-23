@@ -1,0 +1,34 @@
+diff --git a/tmp/df3d303f-fb3e-41a7-b82c-c25d6006427d_buggy.java b/tmp/5991b04e-ce77-4ce4-ae82-99fcbd31162f_fixed.java
+index 2bac745..4c1f4ae 100644
+--- a/tmp/df3d303f-fb3e-41a7-b82c-c25d6006427d_buggy.java
++++ b/tmp/5991b04e-ce77-4ce4-ae82-99fcbd31162f_fixed.java
+@@ -1,16 +1,22 @@
+ public static ParticipantAction from(MemberStatus memberStatus, boolean disabled) {
+     return switch (memberStatus) {
+-            case UNKNOWN, DECLINED -> new ParticipantAction(
++        case UNKNOWN:
++        case DECLINED:
++            return new ParticipantAction(
+                     "/member/accept",
+-                    "Participate in Rotation &#x2328;",
+-                    disabled);
+-            case PARTICIPANT -> new ParticipantAction(
++                    "Switch to Participant &#x2328;",
++                    false);
++        case PARTICIPANT:
++            return new ParticipantAction(
+                     "/member/decline",
+                     "Leave Rotation &#x1f44b;",
+-                    false); // can always leave
+-            case SPECTATOR -> new ParticipantAction(
++                    disabled);
++        case SPECTATOR:
++            return new ParticipantAction(
+                     "/member/accept",
+                     "Switch to Participant &#x1f44b;",
+                     disabled);
++        default:
++            throw new IllegalArgumentException("Invalid MemberStatus: " + memberStatus);
+     };
+ }
+\ No newline at end of file

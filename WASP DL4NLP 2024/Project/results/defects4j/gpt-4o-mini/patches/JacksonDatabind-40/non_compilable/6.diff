@@ -1,0 +1,12 @@
+diff --git a/tmp/633e849c-ff23-45da-a9e8-a6b72661414b_buggy.java b/tmp/59225ac9-e60e-487d-88c7-d6862a4765a8_fixed.java
+index e69de29..61c6fb0 100644
+--- a/tmp/633e849c-ff23-45da-a9e8-a6b72661414b_buggy.java
++++ b/tmp/59225ac9-e60e-487d-88c7-d6862a4765a8_fixed.java
+@@ -0,0 +1,6 @@
++public Object emptyToNullCoercion(Object value) {
++    if (value instanceof Number && ((Number) value).doubleValue() == 0) {
++        return null;
++    }
++    return value;
++}
+\ No newline at end of file

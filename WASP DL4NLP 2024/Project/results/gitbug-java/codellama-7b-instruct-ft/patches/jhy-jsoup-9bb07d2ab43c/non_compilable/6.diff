@@ -1,0 +1,19 @@
+diff --git a/tmp/26fbcd3a-ae14-4618-8ba3-236a07235f4d_buggy.java b/tmp/584d9cac-7873-4027-8e99-a9342bc72428_fixed.java
+index dcc36a4..02532eb 100644
+--- a/tmp/26fbcd3a-ae14-4618-8ba3-236a07235f4d_buggy.java
++++ b/tmp/584d9cac-7873-4027-8e99-a9342bc72428_fixed.java
+@@ -1,12 +1,14 @@
+     protected void replaceChild(Node out, Node in) {
+         Validate.isTrue(out.parentNode == this);
+         Validate.notNull(in);
+         if (in.parentNode != null)
+             in.parentNode.removeChild(in);
+ 
+         final int index = out.siblingIndex;
+         ensureChildNodes().set(index, in);
+         in.parentNode = this;
+         in.setSiblingIndex(index);
+         out.parentNode = null;
++        DocumentFragment old = (DocumentFragment)clone(); // in case nodes with their parents
++        getOwnerDocument().replaceChild(this, old); // break, as above self-self replacement
+     }

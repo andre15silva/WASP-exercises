@@ -1,0 +1,47 @@
+diff --git a/tmp/56af8762-e9cb-498e-b6a6-b87659690bf8_buggy.java b/tmp/4ebdccf6-1cca-4c0a-91aa-e70d3ea3872a_fixed.java
+index 1bd0d7e..9fee966 100644
+--- a/tmp/56af8762-e9cb-498e-b6a6-b87659690bf8_buggy.java
++++ b/tmp/4ebdccf6-1cca-4c0a-91aa-e70d3ea3872a_fixed.java
+@@ -1,31 +1,42 @@
+     /**
+      * Get the ns uri of the specified node.
+      * @param node Node to check
+      * @return String ns uri
+      */
+     public static String getNamespaceURI(Node node) {
+         if (node instanceof Document) {
+             node = ((Document) node).getDocumentElement();
+         }
+ 
+         Element element = (Element) node;
+ 
+         String uri = element.getNamespaceURI();
+         if (uri == null) {
+             String prefix = getPrefix(node);
+             String qname = prefix == null ? "xmlns" : "xmlns:" + prefix;
+     
+             Node aNode = node;
+             while (aNode != null) {
+                 if (aNode.getNodeType() == Node.ELEMENT_NODE) {
+                     Attr attr = ((Element) aNode).getAttributeNode(qname);
+                     if (attr != null) {
+                         return attr.getValue();
+                     }
+                 }
+                 aNode = aNode.getParentNode();
+             }
+             return null;
+         }
++        if (MODEL_DOM.equals(node.getDocument().getImplementation())) {
++            // JAXP-DOM sometimes gives an unknown namespace for elements
++            // with inner empty namespace declarations (/b:foo/test), however
++            // XPath (on this DOM parser) knows about such declarations. We check
++            // up to the immediate enclosing ancestor that declares an ns, and 
++            // see if it is defined, if it is, return its ns. If it is not, bail.
++            while (node.isNamespaceNode()) {
++                node.setNamespaceURI(null);
++                node = node.getParentNode();
++            }
++        }
+         return uri;
+     }

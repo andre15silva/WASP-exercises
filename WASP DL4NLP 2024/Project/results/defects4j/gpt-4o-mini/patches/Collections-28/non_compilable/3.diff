@@ -1,0 +1,15 @@
+diff --git a/tmp/a9a3581a-f29f-4e02-b496-fb2cb68aed82_buggy.java b/tmp/de5a1b46-dac0-4c32-bbab-d84198627442_fixed.java
+index e69de29..478f35f 100644
+--- a/tmp/a9a3581a-f29f-4e02-b496-fb2cb68aed82_buggy.java
++++ b/tmp/de5a1b46-dac0-4c32-bbab-d84198627442_fixed.java
+@@ -0,0 +1,9 @@
++public SortedMap<String, Integer> prefixMap(String prefix) {
++    SortedMap<String, Integer> result = new TreeMap<>();
++    for (String key : this.keySet()) {
++        if (key.startsWith(prefix)) {
++            result.put(key, this.get(key));
++        }
++    }
++    return result;
++}
+\ No newline at end of file

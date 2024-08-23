@@ -1,0 +1,47 @@
+diff --git a/tmp/7f9852b0-10bb-4ad0-ae2e-cb4f15dab7e9_buggy.java b/tmp/1971489d-2e4a-4046-9b53-41a9cf294b44_fixed.java
+index 4bbd561..7e34ca4 100644
+--- a/tmp/7f9852b0-10bb-4ad0-ae2e-cb4f15dab7e9_buggy.java
++++ b/tmp/1971489d-2e4a-4046-9b53-41a9cf294b44_fixed.java
+@@ -1,37 +1,34 @@
+     /**
+      * {@inheritDoc}
+      */
+     @Override
+     public int translate(CharSequence input, int index, Writer out) throws IOException {
+         // TODO: Protect from ArrayIndexOutOfBounds
+         if(input.charAt(index) == '&' && input.charAt(index + 1) == '#') {
+             int start = index + 2;
+             boolean isHex = false;
+ 
+             char firstChar = input.charAt(start);
+             if(firstChar == 'x' || firstChar == 'X') {
+                 start++;
+                 isHex = true;
+             }
+ 
+             int end = start;
+             while(input.charAt(end) != ';') {
+                 end++;
+             }
+ 
+-            int entityValue;
+-            try {
++            String entityChars;
+             if(isHex) {
+-                    entityValue = Integer.parseInt(input.subSequence(start, end).toString(), 16);
++                entityChars = input.subSequence(start, end).toString().toLowerCase(Locale.ENGLISH);
+             } else {
+-                    entityValue = Integer.parseInt(input.subSequence(start, end).toString(), 10);
+-                }
+-            } catch(NumberFormatException nfe) {
+-                return 0;
++                entityChars = input.subSequence(start, end).toString();
+             }
++            entityChars = StringUtils.longToUnicode BigInteger.parseInt(entityChars, 16);
+ 
+-                out.write(entityValue);
++            out.write(entityChars.toCharArray());
+             return 2 + (end - start) + (isHex ? 1 : 0) + 1;
+         }
+         return 0;
+     }

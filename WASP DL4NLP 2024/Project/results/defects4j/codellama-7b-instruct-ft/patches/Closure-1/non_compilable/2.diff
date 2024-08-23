@@ -1,0 +1,56 @@
+diff --git a/tmp/7f71c1a2-e4e4-41f6-84c3-3c2d6cd2f693_buggy.java b/tmp/6d5ef01b-fa4d-4881-b62a-2bd5550a81c6_fixed.java
+index 61ffdbf..c739f10 100644
+--- a/tmp/7f71c1a2-e4e4-41f6-84c3-3c2d6cd2f693_buggy.java
++++ b/tmp/6d5ef01b-fa4d-4881-b62a-2bd5550a81c6_fixed.java
+@@ -1,44 +1,49 @@
+   /**
+    * Removes unreferenced arguments from a function declaration and when
+    * possible the function's callSites.
+    *
+    * @param fnScope The scope inside the function
+    */
+   private void removeUnreferencedFunctionArgs(Scope fnScope) {
+     // Notice that removing unreferenced function args breaks
+     // Function.prototype.length. In advanced mode, we don't really care
+     // about this: we consider "length" the equivalent of reflecting on
+     // the function's lexical source.
+     //
++    // In simple mode, we don't bother to remove unused parameters because
++    // it's not guaranteed they will be unused.  Moreover, we don't know
++    // yet we're running in strict mode.
++    //
+     // Rather than create a new option for this, we assume that if the user
+     // is removing globals, then it's OK to remove unused function args.
+     //
+-    // See http://code.google.com/p/closure-compiler/issues/detail?id=253
+-
++    if ("SIMPLE_OPTIMIZATIONS".equals(args.getDebuggingFlag())) {
++      return;
++    }
+     Node function = fnScope.getRootNode();
+ 
+     Preconditions.checkState(function.isFunction());
+     if (NodeUtil.isGetOrSetKey(function.getParent())) {
+       // The parameters object literal setters can not be removed.
+       return;
+     }
+ 
+     Node argList = getFunctionArgList(function);
+     boolean modifyCallers = modifyCallSites
+         && callSiteOptimizer.canModifyCallers(function);
+     if (!modifyCallers) {
+       // Strip unreferenced args off the end of the function declaration.
+       Node lastArg;
+       while ((lastArg = argList.getLastChild()) != null) {
+         Var var = fnScope.getVar(lastArg.getString());
+         if (!referenced.contains(var)) {
+           argList.removeChild(lastArg);
+           compiler.reportCodeChange();
+         } else {
+           break;
+         }
+       }
+     } else {
+       callSiteOptimizer.optimize(fnScope, referenced);
+     }
+   }

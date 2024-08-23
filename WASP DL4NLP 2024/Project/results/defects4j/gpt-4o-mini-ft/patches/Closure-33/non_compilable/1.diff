@@ -1,0 +1,47 @@
+diff --git a/tmp/d71077a5-acd5-4d9b-ac27-5bfb8354c3d0_buggy.java b/tmp/a46998eb-3aac-4013-a9fd-7972dd645f4d_fixed.java
+index fb2b020..53d6ae2 100644
+--- a/tmp/d71077a5-acd5-4d9b-ac27-5bfb8354c3d0_buggy.java
++++ b/tmp/a46998eb-3aac-4013-a9fd-7972dd645f4d_fixed.java
+@@ -1,27 +1,37 @@
+   @Override
+   public void matchConstraint(ObjectType constraintObj) {
+     // We only want to match contraints on anonymous types.
+ 
+     // Handle the case where the constraint object is a record type.
+     //
+     // param constraintObj {{prop: (number|undefined)}}
+     // function f(constraintObj) {}
+     // f({});
+     //
+     // We want to modify the object literal to match the constraint, by
+     // taking any each property on the record and trying to match
+     // properties on this object.
+     if (constraintObj.isRecordType()) {
+       for (String prop : constraintObj.getOwnPropertyNames()) {
+         JSType propType = constraintObj.getPropertyType(prop);
+         if (!isPropertyTypeDeclared(prop)) {
+-          JSType typeToInfer = propType;
+-          if (!hasProperty(prop)) {
+-            typeToInfer = getNativeType(JSTypeNative.VOID_TYPE)
+-                .getLeastSupertype(propType);
+-          }
++          JSType typeToInfer = PropUtil.getPropSafe(propType, prop);
++          if (!hasProperty(prop) || (typeToInfer != null && !typeToInfer.hasAnyType())) {
++            typeToInfer = PropUtil.getPropSafe(typeToInfer, prop);
+             defineInferredProperty(prop, typeToInfer, null);
+           }
++          typeToInfer = propType;
++          for (String otherProp : propType.getOwnPropertyNames()) {
++            JSType otherType = propType.getProp(thing);
++            if (!otherType.hasAnyType()) {
++              otherType = PropUtil.getPropSafe(otherType, otherProp);
++              if (!hasProperty(otherProp) || (otherType != null && !otherType.hasAnyType())) {
++                defineInferredProperty(otherProp, otherType, null);
++              }
++              typeToInfer = otherType;
++            }
++          }
++        }
+       }
+     }
+   }

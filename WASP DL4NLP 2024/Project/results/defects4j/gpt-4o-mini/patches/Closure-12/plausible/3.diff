@@ -1,0 +1,21 @@
+diff --git a/tmp/a984d495-8d2a-454c-b762-9b2c05e82bd1_buggy.java b/tmp/555cdde3-fb6b-454a-b680-1632f4a0c209_fixed.java
+index 22640dd..1343037 100644
+--- a/tmp/a984d495-8d2a-454c-b762-9b2c05e82bd1_buggy.java
++++ b/tmp/555cdde3-fb6b-454a-b680-1632f4a0c209_fixed.java
+@@ -1,3 +1,15 @@
+ private boolean hasExceptionHandler(Node cfgNode) {
++    // Check if the node is a TryStatement
++    if (cfgNode.getType() == Token.TRY) {
++        return true;
++    }
++    // Check if the node has a parent that is a TryStatement
++    Node parent = cfgNode.getParent();
++    while (parent != null) {
++        if (parent.getType() == Token.TRY) {
++            return true;
++        }
++        parent = parent.getParent();
++    }
+     return false;
+ }
+\ No newline at end of file

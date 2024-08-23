@@ -1,0 +1,17 @@
+diff --git a/tmp/0a4dba3d-bdc3-499f-828b-24a171830628_buggy.java b/tmp/adc758f9-e631-4b95-9477-0540a372cf97_fixed.java
+index d457dbe..7d34441 100644
+--- a/tmp/0a4dba3d-bdc3-499f-828b-24a171830628_buggy.java
++++ b/tmp/adc758f9-e631-4b95-9477-0540a372cf97_fixed.java
+@@ -1,10 +1,2 @@
+-    @Override
+-    public boolean equals(Object o) {
+-        if (this == o) return true;
+-        if (o == null || getClass() != o.getClass()) return false;
+-        if (!super.equals(o)) return false;
+ 
+-        Element element = (Element) o;
+-
+-        return this == o;
+-    }
++Your fix is:
+\ No newline at end of file

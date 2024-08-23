@@ -1,0 +1,24 @@
+diff --git a/tmp/5fab0ebc-2e1a-418b-b0bd-875e81fff77a_buggy.java b/tmp/d664d6b8-0887-4b00-978a-58e69bebc953_fixed.java
+index 57f69c5..2d5aaf8 100644
+--- a/tmp/5fab0ebc-2e1a-418b-b0bd-875e81fff77a_buggy.java
++++ b/tmp/d664d6b8-0887-4b00-978a-58e69bebc953_fixed.java
+@@ -1,12 +1,17 @@
+   /**
+    * @return Whether the Node is a DO or FUNCTION (with or without
+    * labels).
+    */
+   private boolean isOneExactlyFunctionOrDo(Node n) {
+         // For labels with block children, we need to ensure that a
+         // labeled FUNCTION or DO isn't generated when extraneous BLOCKs 
+         // are skipped. 
+           // Either a empty statement or an block with more than one child,
+-          // way it isn't a FUNCTION or DO.
+-      return (n.getType() == Token.FUNCTION || n.getType() == Token.DO);
++          // way it isn't a FUNCTION or DO. This fix is needed so that
++          // we're not generating broken code on Safari. Safari isn't
++          // very happy with functions within IFs, even if they weren't
++          // skippeable or labeld, but we do want to skip them so that
++          // the code doesn't break on Safari.
++      return (n.getType() == Token.FUNCTION || n.getType() == Token.DO) &&
++           !isFunctionWithinAnIf();
+   }

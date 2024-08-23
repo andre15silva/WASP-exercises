@@ -1,0 +1,26 @@
+diff --git a/tmp/901ae7a7-6f5a-4386-b74e-c3865a773680_buggy.java b/tmp/3ba7608c-708e-4cf4-a468-4c057ec69644_fixed.java
+index c6cb157..18818cc 100644
+--- a/tmp/901ae7a7-6f5a-4386-b74e-c3865a773680_buggy.java
++++ b/tmp/3ba7608c-708e-4cf4-a468-4c057ec69644_fixed.java
+@@ -1,14 +1,14 @@
+-    /**
+-     * Method called to expand size of the current segment, to
+-     * accommodate for more contiguous content. Usually only
+-     * used when parsing tokens like names if even then.
+-     */
+     public char[] expandCurrentSegment()
+     {
+         final char[] curr = _currentSegment;
+         // Let's grow by 50% by default
+         final int len = curr.length;
+         // but above intended maximum, slow to increase by 25%
+-        int newLen = (len == MAX_SEGMENT_LEN) ? (MAX_SEGMENT_LEN+1) : Math.min(MAX_SEGMENT_LEN, len + (len >> 1));
++        int newLen = (len == MAX_SEGMENT_LEN) ? MAX_SEGMENT_LEN : Math.min(MAX_SEGMENT_LEN, len + (len >> 1));
++        
++        if (newLen <= len) {
++            newLen = Math.min(MAX_SEGMENT_LEN, len + (len >> 1) + 1); // Ensure we always increase
++        }
++        
+         return (_currentSegment = Arrays.copyOf(curr, newLen));
+     }
+\ No newline at end of file

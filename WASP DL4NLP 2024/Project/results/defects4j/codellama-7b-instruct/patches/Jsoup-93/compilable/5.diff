@@ -1,0 +1,51 @@
+diff --git a/tmp/01c874a2-325a-4ecd-9300-c2fa43f7d384_buggy.java b/tmp/b8ef017a-e88f-43eb-b2df-b45254b295c7_fixed.java
+index aa351ad..ce6d814 100644
+--- a/tmp/01c874a2-325a-4ecd-9300-c2fa43f7d384_buggy.java
++++ b/tmp/b8ef017a-e88f-43eb-b2df-b45254b295c7_fixed.java
+@@ -1,41 +1,15 @@
+-    /**
+-     * Get the data that this form submits. The returned list is a copy of the data, and changes to the contents of the
+-     * list will not be reflected in the DOM.
+-     * @return a list of key vals
+-     */
+     public List<Connection.KeyVal> formData() {
+         ArrayList<Connection.KeyVal> data = new ArrayList<>();
+ 
+         // iterate the form control elements and accumulate their values
+         for (Element el: elements) {
+-            if (!el.tag().isFormSubmittable()) continue; // contents are form listable, superset of submitable
+-            if (el.hasAttr("disabled")) continue; // skip disabled form inputs
++            if (el.tag().isFormSubmittable() && !el.hasAttr("disabled")) {
+                 String name = el.attr("name");
+-            if (name.length() == 0) continue;
+-            String type = el.attr("type");
+-
+-
+-            if ("select".equals(el.normalName())) {
+-                Elements options = el.select("option[selected]");
+-                boolean set = false;
+-                for (Element option: options) {
+-                    data.add(HttpConnection.KeyVal.create(name, option.val()));
+-                    set = true;
++                String value = el.val();
++                if (name.length() > 0) {
++                    data.add(HttpConnection.KeyVal.create(name, value));
+                 }
+-                if (!set) {
+-                    Element option = el.select("option").first();
+-                    if (option != null)
+-                        data.add(HttpConnection.KeyVal.create(name, option.val()));
+-                }
+-            } else if ("checkbox".equalsIgnoreCase(type) || "radio".equalsIgnoreCase(type)) {
+-                // only add checkbox or radio if they have the checked attribute
+-                if (el.hasAttr("checked")) {
+-                    final String val = el.val().length() >  0 ? el.val() : "on";
+-                    data.add(HttpConnection.KeyVal.create(name, val));
+-                }
+-            } else {
+-                data.add(HttpConnection.KeyVal.create(name, el.val()));
+             }
+         }
+         return data;
+     }
+\ No newline at end of file

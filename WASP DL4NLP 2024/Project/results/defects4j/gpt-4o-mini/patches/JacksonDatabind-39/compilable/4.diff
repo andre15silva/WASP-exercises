@@ -1,0 +1,21 @@
+diff --git a/tmp/9e1add24-0ff2-41c5-b5ff-09030cc16d8c_buggy.java b/tmp/5e4d2be0-6273-49ee-be4c-cf7257360985_fixed.java
+index ec709bd..b2a419b 100644
+--- a/tmp/9e1add24-0ff2-41c5-b5ff-09030cc16d8c_buggy.java
++++ b/tmp/5e4d2be0-6273-49ee-be4c-cf7257360985_fixed.java
+@@ -1,8 +1,12 @@
+ @Override
+ public Object deserialize(JsonParser p, DeserializationContext ctxt) throws IOException
+ {
+-        // 29-Jan-2016, tatu: Simple skipping for all other tokens, but FIELD_NAME bit
+-        //    special unfortunately
+-            p.skipChildren();
++    // 29-Jan-2016, tatu: Handle unrecognized fields gracefully by skipping
++    while (p.nextToken() != JsonToken.END_OBJECT) {
++        String fieldName = p.getCurrentName();
++        p.nextToken(); // move to value
++        // You can add logic here if you want to handle specific fields
++        p.skipChildren(); // skip the children of the current field
++    }
+     return null;
+ }
+\ No newline at end of file

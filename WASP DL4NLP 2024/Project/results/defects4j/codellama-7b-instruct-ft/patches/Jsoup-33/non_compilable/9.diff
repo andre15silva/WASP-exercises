@@ -1,0 +1,22 @@
+diff --git a/tmp/6921dd5f-6a4d-4347-b645-75c97b295638_buggy.java b/tmp/c0ef4dae-c173-4d86-9eb3-9ec04e91f0a5_fixed.java
+index dc93be3..fd13a60 100644
+--- a/tmp/6921dd5f-6a4d-4347-b645-75c97b295638_buggy.java
++++ b/tmp/c0ef4dae-c173-4d86-9eb3-9ec04e91f0a5_fixed.java
+@@ -1,14 +1,16 @@
+     Element insert(Token.StartTag startTag) {
+         // handle empty unknown tags
+         // when the spec expects an empty tag, will directly hit insertEmpty, so won't generate this fake end tag.
+-        if (startTag.isSelfClosing()) {
++        if (startTag.isSelfClosing() && !Tag.asBlock(startTag.name()).isKnown()) {
++            // allow unknown tags to be self closing outside the spec, but convert them to non self closing tags
++            // https://github.com/jhy/jsoup/issues/81. see #144.
+             Element el = insertEmpty(startTag);
+             stack.add(el);
+             tokeniser.emit(new Token.EndTag(el.tagName()));  // ensure we get out of whatever state we are in. emitted for yielded processing
+             return el;
+         }
+         
+         Element el = new Element(Tag.valueOf(startTag.name()), baseUri, startTag.attributes);
+         insert(el);
+         return el;
+     }

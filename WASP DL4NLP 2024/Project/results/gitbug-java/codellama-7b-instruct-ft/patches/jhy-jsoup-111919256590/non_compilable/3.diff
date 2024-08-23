@@ -1,0 +1,15 @@
+diff --git a/tmp/4c855296-d515-442a-8957-bac24da6dba9_buggy.java b/tmp/14ec74a0-0fd6-4948-aa99-fab0615eac6d_fixed.java
+index e807cbf..5863c6d 100644
+--- a/tmp/4c855296-d515-442a-8957-bac24da6dba9_buggy.java
++++ b/tmp/14ec74a0-0fd6-4948-aa99-fab0615eac6d_fixed.java
+@@ -1,7 +1,9 @@
+     private boolean isInlineable(Document.OutputSettings out) {
+         if (!tag.isInline())
+             return false;
+         return (parent() == null || parent().isBlock())
+             && !isEffectivelyFirst()
+-            && !out.outline();
++            && !out.outline()
++            && isPrettyprintBr() // for <pre> BRs inside <table>
++            ;
+     }

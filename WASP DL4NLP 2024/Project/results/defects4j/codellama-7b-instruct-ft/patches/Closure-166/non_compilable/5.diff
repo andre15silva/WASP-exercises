@@ -1,0 +1,44 @@
+diff --git a/tmp/6358ed77-8d6b-4c36-a149-fd3d6430f87f_buggy.java b/tmp/aedea60f-50ba-4d27-b3e7-8429e0641769_fixed.java
+index 5f96616..8294ca6 100644
+--- a/tmp/6358ed77-8d6b-4c36-a149-fd3d6430f87f_buggy.java
++++ b/tmp/aedea60f-50ba-4d27-b3e7-8429e0641769_fixed.java
+@@ -1,20 +1,39 @@
+   @Override
+   public void matchConstraint(JSType constraint) {
+     // We only want to match constraints on anonymous types.
+     if (hasReferenceName()) {
+       return;
+     }
+ 
+     // Handle the case where the constraint object is a record type.
+     //
+     // param constraint {{prop: (number|undefined)}}
+     // function f(constraint) {}
+     // f({});
+     //
+     // We want to modify the object literal to match the constraint, by
+     // taking any each property on the record and trying to match
+     // properties on this object.
+     if (constraint.isRecordType()) {
+       matchRecordTypeConstraint(constraint.toObjectType());
+     }
+   }
++
++  /**
++   * Try to match this type against a {@code {prop: type}} constraint.
++   * @param constraint A constraint object.
++   */
++  private void matchRecordTypeConstraint(ObjectType constraint) {
++    for (JSType restrictedPrototypeOrInterface : constraint.getInstanceType()
++        .getPrototypeOrInterfaces()) {
++      if (!(restrictedPrototypeOrInterface instanceof ObjectType)) {
++        continue;
++      }
++      ObjectType restrictedPrototype = (ObjectType) restrictedPrototypeOrInterface;
++      try {
++        restrict(restrictedPrototype);
++      } catch (IllegalStateException ise) {
++        // Ignore invalid matches.
++      }
++    }
++  }

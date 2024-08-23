@@ -1,0 +1,85 @@
+diff --git a/tmp/5d9c2c3a-8235-4fde-88b7-9eae9fa7ac99_buggy.java b/tmp/fada94aa-30b2-4e6d-ba8a-73af428e93ce_fixed.java
+index 442a001..3200d08 100644
+--- a/tmp/5d9c2c3a-8235-4fde-88b7-9eae9fa7ac99_buggy.java
++++ b/tmp/fada94aa-30b2-4e6d-ba8a-73af428e93ce_fixed.java
+@@ -1,39 +1,62 @@
+     /**
+      * Get the data that this form submits. The returned list is a copy of the data, and changes to the contents of the
+      * list will not be reflected in the DOM.
+      * @return a list of key vals
+      */
+     public List<Connection.KeyVal> formData() {
+         ArrayList<Connection.KeyVal> data = new ArrayList<Connection.KeyVal>();
+ 
+         // iterate the form control elements and accumulate their values
+         for (Element el : elements) {
+-            if (!el.tag().isFormSubmittable()) continue; // contents are form listable, superset of submitable
++            if (!el.tag().isFormSubmittable())
++                continue;
+             String name = el.attr("name");
+-            if (name.length() == 0) continue;
+-            String type = el.attr("type");
+-
+-            if ("select".equals(el.tagName())) {
+-                Elements options = el.select("option[selected]");
+-                boolean set = false;
+-                for (Element option: options) {
+-                    data.add(HttpConnection.KeyVal.create(name, option.val()));
+-                    set = true;
++            if (name.length() == 0)
++                continue;
++            switch (el.tagName()) {
++            case "input":
++                final String type = el.attr("type");
++                if ("submit".equalsIgnoreCase(type) || "hidden".equalsIgnoreCase(type) || "image".equalsIgnoreCase(type)
++                        || "file".equalsIgnoreCase(type) || "password".equalsIgnoreCase(type)
++                        || "text".equalsIgnoreCase(type) || "textarea".equalsIgnoreCase(type)
++                        || "reset".equalsIgnoreCase(type)) {
++                    final String value = el.attr("value");
++                    if (value.length() > 0) {
++                        data.add(HttpConnection.KeyVal.create(name, value));
++                    }
+                 }
+-                if (!set) {
+-                    Element option = el.select("option").first();
+-                    if (option != null)
++                break;
++            case "textarea":
++                final String valuel = el.val();
++                data.add(HttpConnection.KeyVal.create(name, valuel));
++                break;
++            case "select":
++                final Elements options = el.select("option[selected]");
++                if (options.size() > 0) {
++                    Element option = options.first();
+                     data.add(HttpConnection.KeyVal.create(name, option.val()));
++                } else { // if no selection and element is required and has value, submit the empty string
++                    if (isRequired(el) && el.val().length() > 0)
++                        data.add(HttpConnection.KeyVal.create(name, ""));
+                 }
+-            } else if ("checkbox".equalsIgnoreCase(type) || "radio".equalsIgnoreCase(type)) {
++                break;
++            case "input":
++                final String typee = el.attr("type");
++                if ("checkbox".equalsIgnoreCase(typee)) {
+                     // only add checkbox or radio if they have the checked attribute
+-                if (el.hasAttr("checked")) {
+-                    final String val = el.val();
+-                    data.add(HttpConnection.KeyVal.create(name, val));
++                    if (el.hasAttr("checked") && el.val().length() > 0) {
++                        data.add(HttpConnection.KeyVal.create(name, el.val()));
+                     }
+-            } else {
++                } else if ("radio".equalsIgnoreCase(typee)) {
++                    // only add checkbox or radio if they have the checked attribute
++                    if (el.hasAttr("checked") && el.val().length() > 0) {
+                         data.add(HttpConnection.KeyVal.create(name, el.val()));
+                     }
+                 }
++                break;
++            default:
++                // don't deal with anything else
++            }
++        }
+         return data;
+     }

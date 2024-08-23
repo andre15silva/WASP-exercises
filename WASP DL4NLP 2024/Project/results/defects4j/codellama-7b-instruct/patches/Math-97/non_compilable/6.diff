@@ -1,0 +1,57 @@
+diff --git a/tmp/7315ea34-ef07-473c-8ef9-c0f33f63db43_buggy.java b/tmp/820d961d-80cf-4695-9195-93ee9eb3029d_fixed.java
+index 88647d1..af207fe 100644
+--- a/tmp/7315ea34-ef07-473c-8ef9-c0f33f63db43_buggy.java
++++ b/tmp/820d961d-80cf-4695-9195-93ee9eb3029d_fixed.java
+@@ -1,44 +1,9 @@
+-    /**
+-     * Find a zero in the given interval.
+-     * <p>
+-     * Requires that the values of the function at the endpoints have opposite
+-     * signs. An <code>IllegalArgumentException</code> is thrown if this is not
+-     * the case.</p>
+-     * 
+-     * @param min the lower bound for the interval.
+-     * @param max the upper bound for the interval.
+-     * @return the value where the function is zero
+-     * @throws MaxIterationsExceededException if the maximum iteration count is exceeded
+-     * @throws FunctionEvaluationException if an error occurs evaluating the
+-     * function 
+-     * @throws IllegalArgumentException if min is not less than max or the
+-     * signs of the values of the function at the endpoints are not opposites
+-     */
+-    public double solve(double min, double max) throws MaxIterationsExceededException, 
+-        FunctionEvaluationException {
++ UnivariateRealFunction f = new SinFunction();
++ UnivariateRealSolver solver = new BrentSolver(f);
+ 
+-        clearResult();
+-        verifyInterval(min, max);
++ // endpoint is root
++ double result = solver.solve(Math.PI, 4);
++ assertEquals(result, Math.PI, solver.getAbsoluteAccuracy());
+ 
+-        double ret = Double.NaN;
+-        
+-        double yMin = f.value(min);
+-        double yMax = f.value(max);
+-        
+-        // Verify bracketing
+-        double sign = yMin * yMax;
+-        if (sign >= 0) {
+-            // check if either value is close to a zero
+-                // neither value is close to zero and min and max do not bracket root.
+-                throw new IllegalArgumentException
+-                ("Function values at endpoints do not have different signs." +
+-                        "  Endpoints: [" + min + "," + max + "]" + 
+-                        "  Values: [" + yMin + "," + yMax + "]");
+-        } else {
+-            // solve using only the first endpoint as initial guess
+-            ret = solve(min, yMin, max, yMax, min, yMin);
+-            // either min or max is a root
+-        }
+-
+-        return ret;
+-    }
++ result = solver.solve(3, Math.PI);
++ assertEquals(result, Math.PI, solver.getAbsoluteAccuracy());
+\ No newline at end of file

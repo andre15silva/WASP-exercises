@@ -1,0 +1,29 @@
+diff --git a/tmp/62153ba2-7920-4796-9937-a696c41e19bf_buggy.java b/tmp/c091feea-f9d0-4e04-82b6-b87039cde32d_fixed.java
+index e69de29..4d6cc73 100644
+--- a/tmp/62153ba2-7920-4796-9937-a696c41e19bf_buggy.java
++++ b/tmp/c091feea-f9d0-4e04-82b6-b87039cde32d_fixed.java
+@@ -0,0 +1,23 @@
++public final class FormElementTest {
++    @Test public void removeFormElement() {
++        String html = "<html>\n" +
++                "  <body> \n" +
++                "      <form action=\"/hello.php\" method=\"post\">\n" +
++                "      User:<input type=\"text\" name=\"user\" />\n" +
++                "      Password:<input type=\"password\" name=\"pass\" />\n" +
++                "      <input type=\"submit\" name=\"login\" value=\"login\" />\n" +
++                "   </form>\n" +
++                "  </body>\n" +
++                "</html>  ";
++        Document doc = Jsoup.parse(html);
++        FormElement form = (FormElement) doc.selectFirst("form");
++        Element pass = form.selectFirst("input[name=pass]");
++        pass.remove();
++
++        List<Connection.KeyVal> data = form.formData();
++        assertEquals(2, data.size());
++        assertEquals("user", data.get(0).key());
++        assertEquals("login", data.get(1).key());
++        assertEquals(null, doc.selectFirst("input[name=pass]"));
++    }
++}
+\ No newline at end of file

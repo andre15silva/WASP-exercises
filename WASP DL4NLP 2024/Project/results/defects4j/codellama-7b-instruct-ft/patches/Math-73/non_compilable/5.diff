@@ -1,0 +1,97 @@
+diff --git a/tmp/58050cf7-0fe9-4e06-be1a-1e35fe8517d8_buggy.java b/tmp/b991bdf5-2b33-4568-9208-39ca9ce25c2c_fixed.java
+index 757067a..d59b8c6 100644
+--- a/tmp/58050cf7-0fe9-4e06-be1a-1e35fe8517d8_buggy.java
++++ b/tmp/b991bdf5-2b33-4568-9208-39ca9ce25c2c_fixed.java
+@@ -1,63 +1,58 @@
+     /**
+      * Find a zero in the given interval with an initial guess.
+      * <p>Throws <code>IllegalArgumentException</code> if the values of the
+      * function at the three points have the same sign (note that it is
+      * allowed to have endpoints with the same sign if the initial point has
+      * opposite sign function-wise).</p>
+      *
+      * @param f function to solve.
+      * @param min the lower bound for the interval.
+      * @param max the upper bound for the interval.
+      * @param initial the start value to use (must be set to min if no
+      * initial point is known).
+      * @return the value where the function is zero
+      * @throws MaxIterationsExceededException the maximum iteration count
+      * is exceeded
+      * @throws FunctionEvaluationException if an error occurs evaluating
+      *  the function
+      * @throws IllegalArgumentException if initial is not between min and max
+      * (even if it <em>is</em> a root)
+      */
+     public double solve(final UnivariateRealFunction f,
+                         final double min, final double max, final double initial)
+         throws MaxIterationsExceededException, FunctionEvaluationException {
+ 
++        // return the inital guess if it is good enough
++        if (Math.abs(f.value(initial)) <= functionValueAccuracy) {
++            return initial;
++        }
++
++        // otherwise, locate a zero using bisection
++        boolean noBracket = true;
++        double y = initial;
++        for (int k=0; k<getMaxIterations(); k++) {
++            if (bracketedAndConverged(f, min, max, initial, y)) {
++                return initial;
++            }
++            if (y >= initial) {
++                // increase the interval
++                y -= (initial - min) / 2;
++            } else {
++                y += (max - initial) / 2;
++            }
++            noBracket = (y == initial);
++        }
++        if (noBracket) {
++            // cannot use bisection
+             clearResult();
+-        verifySequence(min, initial, max);
+-
+-        // return the initial guess if it is good enough
+-        double yInitial = f.value(initial);
+-        if (Math.abs(yInitial) <= functionValueAccuracy) {
+-            setResult(initial, 0);
+-            return result;
+-        }
+-
+-        // return the first endpoint if it is good enough
+-        double yMin = f.value(min);
+-        if (Math.abs(yMin) <= functionValueAccuracy) {
+-            setResult(yMin, 0);
+-            return result;
+-        }
+-
+-        // reduce interval if min and initial bracket the root
+-        if (yInitial * yMin < 0) {
+-            return solve(f, min, yMin, initial, yInitial, min, yMin);
++            throw new IllegalArgumentException(
++                    "No bracketing is possible with increasing bracketing " +
++                    "intervals at initial point " + initial + ". The function " +
++                    "values are " + f.value(min) + " and " + f.value(max) +
++                    ", and " + initial + " is neither.");
+         }
+ 
+-        // return the second endpoint if it is good enough
+-        double yMax = f.value(max);
+-        if (Math.abs(yMax) <= functionValueAccuracy) {
+-            setResult(yMax, 0);
+-            return result;
+-        }
+-
+-        // reduce interval if initial and max bracket the root
+-        if (yInitial * yMax < 0) {
+-            return solve(f, initial, yInitial, max, yMax, initial, yInitial);
+-        }
+-
+-
+-        // full Brent algorithm starting with provided initial guess
+-        return solve(f, min, yMin, max, yMax, initial, yInitial);
++        // full Brent algorithm starting with proposed points
++        return solve(f, min, f.value(min), max, f.value(max), initial, 0);
+ 
+     }

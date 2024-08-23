@@ -1,0 +1,21 @@
+diff --git a/tmp/8ed4133c-4a92-4ada-9382-a28d4f4d3560_buggy.java b/tmp/951ccf62-91a9-4ab1-b2bd-691d132cd967_fixed.java
+index 2b35d23..1ec2991 100644
+--- a/tmp/8ed4133c-4a92-4ada-9382-a28d4f4d3560_buggy.java
++++ b/tmp/951ccf62-91a9-4ab1-b2bd-691d132cd967_fixed.java
+@@ -1,8 +1,14 @@
+     /** Compute the maximum of two values
+      * @param a first value
+      * @param b second value
+      * @return b if a is lesser or equal to b, a otherwise
+      */
+     public static float max(final float a, final float b) {
+-        return (a <= b) ? b : (Float.isNaN(a + b) ? Float.NaN : b);
++        if (a == Float.NEGATIVE_INFINITY) {
++            return b;
++        } else if (b == Float.NEGATIVE_INFINITY) {
++            return a;
++        }
++        float c = a + b;
++        return (FastMath.isNaN(c) || a == Float.POSITIVE_INFINITY || b == Float.POSITIVE_INFINITY ) ? Float.POSITIVE_INFINITY : c;
+     }
+\ No newline at end of file

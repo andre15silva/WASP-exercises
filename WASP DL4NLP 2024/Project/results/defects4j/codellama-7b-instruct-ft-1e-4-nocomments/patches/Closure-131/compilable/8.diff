@@ -1,0 +1,49 @@
+diff --git a/tmp/de989d04-478e-4265-a935-291e4c0cc141_buggy.java b/tmp/ea840c7f-bbe5-4c74-b4a3-a888abbab961_fixed.java
+index 19fe1b4..16d3d46 100644
+--- a/tmp/de989d04-478e-4265-a935-291e4c0cc141_buggy.java
++++ b/tmp/ea840c7f-bbe5-4c74-b4a3-a888abbab961_fixed.java
+@@ -1,17 +1,38 @@
+     public static boolean isJSIdentifier(String s) {
+       int length = s.length();
+-
+-      if (length == 0 ||
+-          !Character.isJavaIdentifierStart(s.charAt(0))) {
++      if (length == 0) {
++        return false;
++      }
++      if (!Character.isJavaIdentifierStart(s.charAt(0))) {
++        if (s.charAt(0) != '\\' || length < 2) {
++          return false;
++        }
++        switch (s.charAt(1)) {
++          case 'b':
++          case 't':
++          case 'n':
++          case 'v':
++          case 'f':
++          case 'r':
++          case 'u':
++            return true;
++        }
+         return false;
+       }
+-
+       for (int i = 1; i < length; i++) {
+         if (
+             !Character.isJavaIdentifierPart(s.charAt(i))) {
++          if (s.charAt(i) != '\\') {
+             return false;
+           }
++          i++;
++          if (i >= length || !Character.isDigit(s.charAt(i))) {
++            return false;
++          }
++          while (++i < length &&
++                 Character.isDigit(s.charAt(i))) {
++          }
++        }
+       }
+-
+       return true;
+     }
+\ No newline at end of file

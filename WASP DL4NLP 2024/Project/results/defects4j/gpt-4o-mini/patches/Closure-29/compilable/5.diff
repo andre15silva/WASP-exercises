@@ -1,0 +1,124 @@
+diff --git a/tmp/3672a2b9-22e7-4b0f-b656-23f5706c1ca3_buggy.java b/tmp/52fa6909-0f10-4e6c-85c7-1c5945c34f98_fixed.java
+index be9c8a3..e046aad 100644
+--- a/tmp/3672a2b9-22e7-4b0f-b656-23f5706c1ca3_buggy.java
++++ b/tmp/52fa6909-0f10-4e6c-85c7-1c5945c34f98_fixed.java
+@@ -1,94 +1,60 @@
+-    /**
+-     * Counts the number of direct (full) references to an object.
+-     * Specifically we check for references of the following type:
+-     * <pre>
+-     *   x;
+-     *   x.fn();
+-     * </pre>
+-     */
+ private boolean isInlinableObject(List<Reference> refs) {
+     boolean ret = false;
+     for (Reference ref : refs) {
+         Node name = ref.getNode();
+         Node parent = ref.getParent();
+         Node gramps = ref.getGrandparent();
+ 
+         // Ignore indirect references, like x.y (except x.y(), since
+         // the function referenced by y might reference 'this').
+-        //
+         if (parent.isGetProp()) {
+             Preconditions.checkState(parent.getFirstChild() == name);
+             // A call target maybe using the object as a 'this' value.
+-          if (gramps.isCall()
+-              && gramps.getFirstChild() == parent) {
+-            return false;
++            if (gramps.isCall() && gramps.getFirstChild() == parent) {
++                return false;  // Direct call reference, so not inlinable.
+             }
+-
+-          // NOTE(nicksantos): This pass's object-splitting algorithm has
+-          // a blind spot. It assumes that if a property isn't defined on an
+-          // object, then the value is undefined. This is not true, because
+-          // Object.prototype can have arbitrary properties on it.
+-          //
+-          // We short-circuit this problem by bailing out if we see a reference
+-          // to a property that isn't defined on the object literal. This
+-          // isn't a perfect algorithm, but it should catch most cases.
+-          continue;
++            continue;  // Skip over indirect references.
+         }
+ 
+         // Only rewrite VAR declarations or simple assignment statements
+         if (!isVarOrAssignExprLhs(name)) {
+-           return false;
++            return false;  // Not a valid left-hand side for assignment.
+         }
+ 
+         Node val = ref.getAssignedValue();
+-        if (val == null) {
+-          // A var with no assignment.
+-          continue;
++        if (val == null || !val.isObjectLit()) {
++            continue;  // Not considering non-object literal assignments.
+         }
+ 
+-        // We're looking for object literal assignments only.
+-        if (!val.isObjectLit()) {
+-          return false;
++        // Check for self-referential assignments.
++        boolean isSelfReferential = false;
++        for (Node child = val.getFirstChild(); child != null; child = child.getNext()) {
++            if (child.isGetterDef() || child.isSetterDef()) {
++                return false;  // ES5 get/set not supported.
+             }
+ 
+-        // Make sure that the value is not self-refential. IOW,
+-        // disallow things like x = {b: x.a}.
+-        //
+-        // TODO: Only exclude unorderable self-referential
+-        // assignments. i.e. x = {a: x.b, b: x.a} is not orderable,
+-        // but x = {a: 1, b: x.a} is.
+-        //
+-        // Also, ES5 getters/setters aren't handled by this pass.
+-        for (Node child = val.getFirstChild(); child != null;
+-             child = child.getNext()) {
+-          if (child.isGetterDef() ||
+-              child.isSetterDef()) {
+-            // ES5 get/set not supported.
+-            return false;
+-          }
+-
+-
+             Node childVal = child.getFirstChild();
+-          // Check if childVal is the parent of any of the passed in
+-          // references, as that is how self-referential assignments
+-          // will happen.
++            // Check if childVal is the parent of any of the passed in references.
+             for (Reference t : refs) {
+                 Node refNode = t.getParent();
+-            while (!NodeUtil.isStatementBlock(refNode)) {
++                while (refNode != null && !NodeUtil.isStatementBlock(refNode)) {
+                     if (refNode == childVal) {
+-                // There's a self-referential assignment
+-                return false;
++                        isSelfReferential = true;  // Found self-referential assignment.
++                        break;
+                     }
+                     refNode = refNode.getParent();
+                 }
++                if (isSelfReferential) {
++                    break;  // Exit early if self-referential assignment found.
++                }
++            }
++            if (isSelfReferential) {
++                return false;  // It's self-referential; don't allow inlining.
+             }
+         }
+ 
+-
+-        // We have found an acceptable object literal assignment. As
+-        // long as there are no other assignments that mess things up,
+-        // we can inline.
+-        ret = true;
++        // If we reached here, it's an acceptable object literal assignment.
++        ret = true;  // We can inline the object literal assignment.
+     }
+-      return ret;
++    return ret;  // Return whether any inlinable object literal was found.
+ }
+\ No newline at end of file

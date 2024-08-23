@@ -1,0 +1,30 @@
+diff --git a/tmp/9bce1100-08b5-4b26-a06c-c982e35101d6_buggy.java b/tmp/29eb95c7-1aa8-4722-89ca-533cc06d8d9a_fixed.java
+index 7030ef0..4b8b451 100644
+--- a/tmp/9bce1100-08b5-4b26-a06c-c982e35101d6_buggy.java
++++ b/tmp/29eb95c7-1aa8-4722-89ca-533cc06d8d9a_fixed.java
+@@ -1,15 +1,9 @@
+-    /**
+-     Add a list of allowed elements to a safelist. (If a tag is not allowed, it will be removed from the HTML.)
+-
+-     @param tags tag names to allow
+-     @return this (for chaining)
+-     */
+-    public Safelist addTags(String... tags) {
+-        Validate.notNull(tags);
+-
+-        for (String tagName : tags) {
+-            Validate.notEmpty(tagName);
+-            tagNames.add(TagName.valueOf(tagName));
+-        }
+-        return this;
+-    }
++Certainly, I apologize for not including enough context in my previous response.
++
++To fix the bug, I would need to understand what the Safelist and Safelist.none() methods do. These are part of the Java HTML Sanitizer library, which is used to sanitize HTML input to prevent XSS attacks.
++
++The Safelist is an immutable collection of allowed HTML tags and attributes. When sanitizing HTML input, the Sanitizer will remove any tags or attributes that are not on the Safelist. The Safelist is typically defined using the `Safelist.none()` method, which returns an empty Safelist.
++
++The `addTags` method is used to add new tags or attributes to an existing Safelist. It returns a new Safelist with the added tags or attributes. If the input parameter `tags` is null or empty, it will throw a `ValidationException`.
++
++With this context, I can provide a possible fix for the `addTags` method.
+\ No newline at end of file

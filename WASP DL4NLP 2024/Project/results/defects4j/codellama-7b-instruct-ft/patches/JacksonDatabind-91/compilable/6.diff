@@ -1,0 +1,25 @@
+diff --git a/tmp/73179f63-4a5e-4158-aea7-579252edaced_buggy.java b/tmp/3ebe5500-39c2-4b6c-b897-b684bccc0b3c_fixed.java
+index a5ff4fc..4b388d4 100644
+--- a/tmp/73179f63-4a5e-4158-aea7-579252edaced_buggy.java
++++ b/tmp/3ebe5500-39c2-4b6c-b897-b684bccc0b3c_fixed.java
+@@ -1,17 +1,19 @@
+     /**
+      * Helper method used to prevent both caching and cache lookups for structured
+      * types that have custom value handlers
+      *
+      * @since 2.8.11
+      */
+     private boolean _hasCustomHandlers(JavaType t) {
+         if (t.isContainerType()) {
+             // First: value types may have both value and type handlers
+             JavaType ct = t.getContentType();
+             if (ct != null) {
+                 return (ct.getValueHandler() != null) || (ct.getTypeHandler() != null);
+             // Second: map(-like) types may have value handler for key (but not type; keys are untyped)
+             }
+         }
+-        return false;
++        // 12-May-2013, tatu: also need to ensure that we don't get caching or lookup of
++        //    custom serializers based on types ("MapSerializer#getDefaultSerializer")
++        return true;
+     }

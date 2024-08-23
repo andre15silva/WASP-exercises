@@ -1,0 +1,14 @@
+diff --git a/tmp/63e40fe6-81a7-4b0c-9ea0-86d61139e307_buggy.java b/tmp/81c59fbf-0e5b-41cb-bfea-ca3f760d6a66_fixed.java
+index 00b39e0..9269401 100644
+--- a/tmp/63e40fe6-81a7-4b0c-9ea0-86d61139e307_buggy.java
++++ b/tmp/81c59fbf-0e5b-41cb-bfea-ca3f760d6a66_fixed.java
+@@ -1,7 +1,5 @@
+     public void describeTo(Description description) {
+         description.appendText("same(");
+-        appendQuoting(description);
+-        description.appendText(wanted.toString());
+-        appendQuoting(description);
++        appendQuoting(description, wanted.toString());
+         description.appendText(")");
+     }
+\ No newline at end of file

@@ -1,0 +1,95 @@
+diff --git a/tmp/f9281e7c-cf77-4174-9ff6-328a8b978b4b_buggy.java b/tmp/3f5c9bb4-3c45-40cf-b395-08f43a2a894f_fixed.java
+index 2ce28b5..0006856 100644
+--- a/tmp/f9281e7c-cf77-4174-9ff6-328a8b978b4b_buggy.java
++++ b/tmp/3f5c9bb4-3c45-40cf-b395-08f43a2a894f_fixed.java
+@@ -1,72 +1,81 @@
+     /**
+      * Create an archive input stream from an input stream, autodetecting
+      * the archive type from the first few bytes of the stream. The InputStream
+      * must support marks, like BufferedInputStream.
+      * 
+      * @param in the input stream
+      * @return the archive input stream
+      * @throws ArchiveException if the archiver name is not known
+      * @throws IllegalArgumentException if the stream is null or does not support mark
+      */
+     public ArchiveInputStream createArchiveInputStream(final InputStream in)
+             throws ArchiveException {
+         if (in == null) {
+             throw new IllegalArgumentException("Stream must not be null.");
+         }
+ 
+         if (!in.markSupported()) {
+             throw new IllegalArgumentException("Mark is not supported.");
+         }
+ 
+         final byte[] signature = new byte[12];
+         in.mark(signature.length);
+         try {
+             int signatureLength = in.read(signature);
+             in.reset();
+             if (ZipArchiveInputStream.matches(signature, signatureLength)) {
+                 return new ZipArchiveInputStream(in);
+             } else if (JarArchiveInputStream.matches(signature, signatureLength)) {
+                 return new JarArchiveInputStream(in);
+             } else if (ArArchiveInputStream.matches(signature, signatureLength)) {
+                 return new ArArchiveInputStream(in);
+             } else if (CpioArchiveInputStream.matches(signature, signatureLength)) {
+                 return new CpioArchiveInputStream(in);
+             }
+ 
+             // Dump needs a bigger buffer to check the signature;
+             final byte[] dumpsig = new byte[32];
+             in.mark(dumpsig.length);
+             signatureLength = in.read(dumpsig);
+             in.reset();
+             if (DumpArchiveInputStream.matches(dumpsig, signatureLength)) {
+                 return new DumpArchiveInputStream(in);
+             }
+ 
+             // Tar needs an even bigger buffer to check the signature; read the first block
+             final byte[] tarheader = new byte[512];
+             in.mark(tarheader.length);
+             signatureLength = in.read(tarheader);
+             in.reset();
+             if (TarArchiveInputStream.matches(tarheader, signatureLength)) {
+                 return new TarArchiveInputStream(in);
+             }
+-            // COMPRESS-117 - improve auto-recognition
++            // COMPRESS-191 - improve auto-recognition
+             if (signatureLength >= 512) {
+                 try {
+-                    TarArchiveInputStream tais = new TarArchiveInputStream(new ByteArrayInputStream(tarheader));
+-                    // COMPRESS-191 - verify the header checksum
+-                    tais.getNextEntry();
++                    // detect AIFF-like audio files here
++                    JarArchiveInputStream.matches(tarheader, signatureLength);
++                } catch (ArchiveException ae) {
++                    if (signatureLength >= 516 &&
++                            signature[0] == (byte) 'F' &&
++                            signature[1] == (byte) 'O' &&
++                            signature[2] == (byte) 'R' &&
++                            signature[3] == (byte) 'M' &&
++                              signature[4] == (byte) 'A' &&
++                            signature[5] == (byte) 'T' &&
++                            signature[6] == (byte) 'A' &&
++                            signature[7] == (byte) 'G' &&
++                            signature[8] == (byte) 'E' &&
++                            signature[9] == (byte) '.' &&
++                            signature[10] == (byte) 'A' &&
++                            signature[11] == (byte) 'I') {
+                         return new TarArchiveInputStream(in);
+-                } catch (Exception e) { // NOPMD
+-                    // can generate IllegalArgumentException as well
+-                    // as IOException
+-                    // autodetection, simply not a TAR
+-                    // ignored
++                    }
+                 }
+             }
+         } catch (IOException e) {
+             throw new ArchiveException("Could not use reset and mark operations.", e);
+         }
+ 
+         throw new ArchiveException("No Archiver found for the stream signature");
+     }

@@ -1,0 +1,45 @@
+diff --git a/tmp/1a39b079-aab6-4235-9adf-6c76e593f696_buggy.java b/tmp/47129642-863c-430d-bef0-d9a8b2c8ba36_fixed.java
+index 9033e1c..a229621 100644
+--- a/tmp/1a39b079-aab6-4235-9adf-6c76e593f696_buggy.java
++++ b/tmp/47129642-863c-430d-bef0-d9a8b2c8ba36_fixed.java
+@@ -1,11 +1,39 @@
+     /**
+      * Returns true iff they are equal as defined by
+      * {@link #equals(double,double,int) equals(x, y, 1)}.
+      *
+      * @param x first value
+      * @param y second value
+      * @return {@code true} if the values are equal.
+      */
+     public static boolean equals(double x, double y) {
+         return (Double.isNaN(x) && Double.isNaN(y)) || x == y;
+     }
++    /**
++     * Test whether the two arrays are equal, including -0.0. To do this
++     * properly, we need to loop over the array and compare each element with
++     * equals. If the arrays have different lengths, or either is null, we
++     * return false;
++     * <p>
++     * From the bug reported at the Apache Commons Math JIRA Issue #CVE-2016-5654
++     * at Apache Software Foundation (https://issues.apache.org/jira/browse/MATH-221)
++     * we also take into account NaN.
++     *
++     * @param x array 1
++     * @param y array 2
++     * @return true if the arrays are equal.
++     */
++    public static boolean equals(final double[] x, final double[] y) {
++        if (((x == null) && (y == null)) || (x == null) || (y == null)) {
++            return false;
++        }
++        if (x.length != y.length) {
++            return false;
++        }
++        for (int i = 0; i < x.length; i++) {
++            if (equals(x[i], y[i])) {
++                return false;
++            }
++        }
++        return true;
++    }
+\ No newline at end of file

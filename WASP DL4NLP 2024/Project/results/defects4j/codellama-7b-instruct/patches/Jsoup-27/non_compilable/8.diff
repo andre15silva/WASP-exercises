@@ -1,0 +1,29 @@
+diff --git a/tmp/2e697863-c718-414d-8b3e-48ec494cb4e3_buggy.java b/tmp/fde80cd8-0af0-4b58-8868-71ccbdf34afe_fixed.java
+index 7fb120e..3285165 100644
+--- a/tmp/2e697863-c718-414d-8b3e-48ec494cb4e3_buggy.java
++++ b/tmp/fde80cd8-0af0-4b58-8868-71ccbdf34afe_fixed.java
+@@ -1,16 +1,9 @@
+-    /**
+-     * Parse out a charset from a content type header. If the charset is not supported, returns null (so the default
+-     * will kick in.)
+-     * @param contentType e.g. "text/html; charset=EUC-JP"
+-     * @return "EUC-JP", or null if not found. Charset is trimmed and uppercased.
+-     */
+-    static String getCharsetFromContentType(String contentType) {
+-        if (contentType == null) return null;
+-        Matcher m = charsetPattern.matcher(contentType);
+-        if (m.find()) {
+-            String charset = m.group(1).trim();
+-            charset = charset.toUpperCase(Locale.ENGLISH);
+-            return charset;
+-        }
+-        return null;
++@Test
++public void testCharset() {
++    assertEquals("utf-8", DataUtil.getCharsetFromContentType("text/html;charset=utf-8"));
++    assertEquals("UTF-8", DataUtil.getCharsetFromContentType("text/html; charset=UTF-8"));
++    assertEquals("ISO-8859-1", DataUtil.getCharsetFromContentType("text/html; charset=ISO-8859-1"));
++    assertEquals(null, DataUtil.getCharsetFromContentType("text/html"));
++    assertEquals(null, DataUtil.getCharsetFromContentType(null));
++    assertEquals(null, DataUtil.getCharsetFromContentType("text/html;charset=Unknown"));
+ }

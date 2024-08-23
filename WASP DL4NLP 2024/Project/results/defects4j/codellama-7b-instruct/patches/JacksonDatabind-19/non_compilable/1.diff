@@ -1,0 +1,22 @@
+diff --git a/tmp/6b9cf819-c8e1-40c9-8361-bb76ea8fd8bd_buggy.java b/tmp/99d2a2e5-7f02-45fd-a767-6776726b2fcb_fixed.java
+index 1bec4d6..f5d2c83 100644
+--- a/tmp/6b9cf819-c8e1-40c9-8361-bb76ea8fd8bd_buggy.java
++++ b/tmp/99d2a2e5-7f02-45fd-a767-6776726b2fcb_fixed.java
+@@ -1,14 +1,2 @@
+-    private JavaType _mapType(Class<?> rawClass)
+-    {
+-        // 28-May-2015, tatu: Properties are special, as per [databind#810]
+-        JavaType[] typeParams = findTypeParameters(rawClass, Map.class);
+-        // ok to have no types ("raw")
+-        if (typeParams == null) {
+-            return MapType.construct(rawClass, _unknownType(), _unknownType());
+-        }
+-        // but exactly 2 types if any found
+-        if (typeParams.length != 2) {
+-            throw new IllegalArgumentException("Strange Map type "+rawClass.getName()+": can not determine type parameters");
+-        }
+-        return MapType.construct(rawClass, typeParams[0], typeParams[1]);
+-    }
++
++[/INSTS]  I apologize for the confusion. Here is a fixed version of the `_mapType` function:
+\ No newline at end of file

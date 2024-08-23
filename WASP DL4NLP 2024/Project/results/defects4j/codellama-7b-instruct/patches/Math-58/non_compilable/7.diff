@@ -1,0 +1,26 @@
+diff --git a/tmp/999df6b3-a6ed-4d69-aab1-930944ae7eb0_buggy.java b/tmp/53cc1951-9470-4e76-be25-63d0486b93e9_fixed.java
+index 3002587..db5e0de 100644
+--- a/tmp/999df6b3-a6ed-4d69-aab1-930944ae7eb0_buggy.java
++++ b/tmp/53cc1951-9470-4e76-be25-63d0486b93e9_fixed.java
+@@ -1,10 +1,20 @@
+     /**
+      * Fits a Gaussian function to the observed points.
+      *
+      * @return the parameters of the Gaussian function that best fits the
+      * observed points (in the same order as above).
+      */
+     public double[] fit() {
+         final double[] guess = (new ParameterGuesser(getObservations())).guess();
++
++        // Ensure that the sigma value is strictly positive
++        double sigma = Math.max(1e-6, fit(new Gaussian.Parametric(), guess)[2]);
++
++        // Check if the sigma value is valid
++        if (sigma <= 0) {
++            throw new NotStrictlyPositiveException(
++                "The sigma value must be strictly positive, but was " + sigma);
++        }
++
+         return fit(new Gaussian.Parametric(), guess);
+     }
+\ No newline at end of file

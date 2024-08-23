@@ -1,0 +1,21 @@
+diff --git a/tmp/5a659576-b5cf-4b81-a6c9-8e9865e888ba_buggy.java b/tmp/362011ea-51f0-49d5-a444-864ccb490b43_fixed.java
+index d630b0e..0428877 100644
+--- a/tmp/5a659576-b5cf-4b81-a6c9-8e9865e888ba_buggy.java
++++ b/tmp/362011ea-51f0-49d5-a444-864ccb490b43_fixed.java
+@@ -1,14 +1,15 @@
+     public static EnsembleSummaryView toView(Ensemble ensemble, MemberId memberId, MemberService memberService) {
+         List<MemberView> participantViews = transform(memberService, ensemble.acceptedMembers());
++        List<MemberView> spectatorViews = transform(memberService, ensemble.spectatorMembers());
+         return new EnsembleSummaryView(ensemble.getId().id(),
+                                        ensemble.name(),
+                                        DateTimeFormatting.formatAsDateTimeForCommonIso8601(ensemble.startDateTime()),
+                                        ensemble.acceptedCount(),
+                                        participantViews,
+-                                       participantViews,
++                                       spectatorViews,
+                                        memberStatusToViewString(ensemble, memberId),
+                                        ensemble.meetingLink().toString(),
+                                        new GoogleCalendarLinkCreator().createFor(ensemble),
+                                        ensemble.recordingLink().toString()
+         );
+     }

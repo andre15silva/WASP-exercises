@@ -1,0 +1,51 @@
+diff --git a/tmp/2afedaf9-ba6a-4bb9-ae8a-3e862cf345c0_buggy.java b/tmp/1b7cde94-eb83-4153-a1f8-629239db0c4a_fixed.java
+index bdde834..c74b0e9 100644
+--- a/tmp/2afedaf9-ba6a-4bb9-ae8a-3e862cf345c0_buggy.java
++++ b/tmp/1b7cde94-eb83-4153-a1f8-629239db0c4a_fixed.java
+@@ -1,10 +1,39 @@
+   static boolean isNonRetryableHTTPCode(CloseableHttpResponse response, boolean retryHTTP403) {
+     return response != null
+-        && (response.getStatusLine().getStatusCode() < 500
+-            || // service unavailable
+-            response.getStatusLine().getStatusCode() >= 600)
+-        && // gateway timeout
+-        response.getStatusLine().getStatusCode() != 408
+-        && // request timeout
+-        (!retryHTTP403 || response.getStatusLine().getStatusCode() != 403);
++        && (response.getStatusLine().getStatusCode() < 500 ||
++            // Service unavailable: do retry
++            response.getStatusLine().getStatusCode() >= 600
++            ||
++            // Gateway timeout: don't retry. Server should be retried
++            // with backoff and jitter
++            response.getStatusLine().getStatusCode() == 504
++            ||
++            // HTTP 402, 405, 407: don't retry, client should retry
++            // on its own
++            (response.getStatusLine().getStatusCode() == 402 ||
++                response.getStatusLine().getStatusCode() == 405 ||
++                response.getStatusLine().getStatusCode() == 407) ||
++            // HTTP 400, 401, 402, 406, 409, 410, 412, 413, 414, 422, 423,
++            // 424, 500, 501, 502, 503, 504: no retry, client should retry on its own
++            (response.getStatusLine().getStatusCode() == 400
++                || response.getStatusLine().getStatusCode() == 401
++                || response.getStatusLine().getStatusCode() == 402
++                || response.getStatusLine().getStatusCode() == 406
++                || response.getStatusLine().getStatusCode() == 409
++                || response.getStatusLine().getStatusCode() == 410
++                || response.getStatusLine().getStatusCode() == 412
++                || response.getStatusLine().getStatusCode() == 413
++                || response.getStatusLine().getStatusCode() == 414
++                || response.getStatusLine().getStatusCode() == 422
++                || response.getStatusLine().getStatusCode() == 423
++                || response.getStatusLine().getStatusCode() == 424
++                || response.getStatusLine().getStatusCode() == 449
++                || response.getStatusLine().getStatusCode() == 500
++                || response.getStatusLine().getStatusCode() == 501
++                || response.getStatusLine().getStatusCode() == 502
++                || response.getStatusLine().getStatusCode() == 503
++                || response.getStatusLine().getStatusCode() == 504))
++        && (!retryHTTP403 ||
++            // HTTP 403: no retry policy for non-retry-able HTTP client error codes
++            response.getStatusLine().getStatusCode() != 403);
+   }

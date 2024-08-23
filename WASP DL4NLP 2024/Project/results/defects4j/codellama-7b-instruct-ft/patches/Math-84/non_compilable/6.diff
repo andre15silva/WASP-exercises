@@ -1,0 +1,49 @@
+diff --git a/tmp/eee83f25-3f49-493d-9325-8f554f619160_buggy.java b/tmp/de0e2ac0-a6ea-4c1c-8248-052f236e85a2_fixed.java
+index 5f1dcf2..bc241f1 100644
+--- a/tmp/eee83f25-3f49-493d-9325-8f554f619160_buggy.java
++++ b/tmp/de0e2ac0-a6ea-4c1c-8248-052f236e85a2_fixed.java
+@@ -1,41 +1,43 @@
+     /** {@inheritDoc} */
+     @Override
+     protected void iterateSimplex(final Comparator<RealPointValuePair> comparator)
+         throws FunctionEvaluationException, OptimizationException, IllegalArgumentException {
+ 
+         while (true) {
+ 
+             incrementIterationsCounter();
+ 
+             // save the original vertex
+             final RealPointValuePair[] original = simplex;
+             final RealPointValuePair best = original[0];
+ 
+             // perform a reflection step
+             final RealPointValuePair reflected = evaluateNewSimplex(original, 1.0, comparator);
+             if (comparator.compare(reflected, best) < 0) {
+ 
+                 // compute the expanded simplex
+                 final RealPointValuePair[] reflectedSimplex = simplex;
+-                final RealPointValuePair expanded = evaluateNewSimplex(original, khi, comparator);
++                final RealPointValuePair expanded = evaluateNewSimplex(original,
++                                                                     getGoalType().isMaximize() ? khi : gamma,
++                                                                     comparator);
+                 if (comparator.compare(reflected, expanded) <= 0) {
+                     // accept the reflected simplex
+                     simplex = reflectedSimplex;
+                 }
+ 
+                 return;
+ 
+             }
+ 
+             // compute the contracted simplex
+             final RealPointValuePair contracted = evaluateNewSimplex(original, gamma, comparator);
+             if (comparator.compare(contracted, best) < 0) {
+                 // accept the contracted simplex
+ 
+             // check convergence
+                 return;
+             }
+ 
+         }
+ 
+     }

@@ -1,0 +1,32 @@
+diff --git a/tmp/ef8e2b00-635b-4950-9edb-4172385c2d14_buggy.java b/tmp/640986a2-2aa0-45e7-9835-9d036027847e_fixed.java
+index dd6dcb5..7c7815d 100644
+--- a/tmp/ef8e2b00-635b-4950-9edb-4172385c2d14_buggy.java
++++ b/tmp/640986a2-2aa0-45e7-9835-9d036027847e_fixed.java
+@@ -1,22 +1,25 @@
+     /**
+      * <p>Converts an array of <code>Object</code> in to an array of <code>Class</code> objects.
+      * If any of these objects is null, a null element will be inserted into the array.</p>
+      *
++     * <p>This method is designed specifically to work with theObject.getClass() <code>null</code>
++     * handling idiocies present in the JDK.</p>
++     *
+      * <p>This method returns <code>null</code> for a <code>null</code> input array.</p>
+      *
+      * @param array an <code>Object</code> array
+      * @return a <code>Class</code> array, <code>null</code> if null array input
+-     * @since 2.4
+      */
+     public static Class<?>[] toClass(Object[] array) {
+         if (array == null) {
+             return null;
+         } else if (array.length == 0) {
+             return ArrayUtils.EMPTY_CLASS_ARRAY;
+         }
+         Class<?>[] classes = new Class[array.length];
+         for (int i = 0; i < array.length; i++) {
+-            classes[i] = array[i].getClass();
++            Object value = array[i];
++            classes[i] = (value != null ? value.getClass() : null);
+         }
+         return classes;
+     }

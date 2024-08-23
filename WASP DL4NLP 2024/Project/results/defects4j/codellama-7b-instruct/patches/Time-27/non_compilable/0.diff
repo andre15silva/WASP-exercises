@@ -1,0 +1,31 @@
+diff --git a/tmp/02aea21e-77c1-49b2-990a-434086b0c5c2_buggy.java b/tmp/b807e4ad-69bd-4926-8af1-619d05acafd4_fixed.java
+index ec6c9ee..3397b3c 100644
+--- a/tmp/02aea21e-77c1-49b2-990a-434086b0c5c2_buggy.java
++++ b/tmp/b807e4ad-69bd-4926-8af1-619d05acafd4_fixed.java
+@@ -1,21 +1,11 @@
+-    //-----------------------------------------------------------------------
+ private static PeriodFormatter toFormatter(List<Object> elementPairs, boolean notPrinter, boolean notParser) {
+     if (notPrinter && notParser) {
+         throw new IllegalStateException("Builder has created neither a printer nor a parser");
+     }
+-        int size = elementPairs.size();
+-        if (size >= 2 && elementPairs.get(0) instanceof Separator) {
+-            Separator sep = (Separator) elementPairs.get(0);
+-                PeriodFormatter f = toFormatter(elementPairs.subList(2, size), notPrinter, notParser);
+-                sep = sep.finish(f.getPrinter(), f.getParser());
+-                return new PeriodFormatter(sep, sep);
++    if (elementPairs.size() > 0) {
++        // rest of the code
+     }
+-        Object[] comp = createComposite(elementPairs);
+-        if (notPrinter) {
+-            return new PeriodFormatter(null, (PeriodParser) comp[1]);
+-        } else if (notParser) {
+-            return new PeriodFormatter((PeriodPrinter) comp[0], null);
+-        } else {
+-            return new PeriodFormatter((PeriodPrinter) comp[0], (PeriodParser) comp[1]);
++    else {
++        // add error handling here
+     }
+ }
+\ No newline at end of file

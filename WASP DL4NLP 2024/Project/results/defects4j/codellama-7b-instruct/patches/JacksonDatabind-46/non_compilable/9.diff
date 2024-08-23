@@ -1,0 +1,20 @@
+diff --git a/tmp/9cb696b2-6be8-4c88-b6f7-a7cb95692afc_buggy.java b/tmp/bc55a0fb-719d-41a4-af9e-496473e59821_fixed.java
+index 6f49dcb..1fc09d4 100644
+--- a/tmp/9cb696b2-6be8-4c88-b6f7-a7cb95692afc_buggy.java
++++ b/tmp/bc55a0fb-719d-41a4-af9e-496473e59821_fixed.java
+@@ -1,9 +1,6 @@
+-    @Override
+-    public StringBuilder getGenericSignature(StringBuilder sb)
+-    {
+-        _classSignature(_class, sb, false);
+-        sb.append('<');
+-        sb = _referencedType.getGenericSignature(sb);
+-        sb.append(';');
+-        return sb;
+-    }
++
++To fix the bug, you need to change the line `sb = _referenced_type.get_generic_signature(sb)` to `sb = _referenced_type.get_generic_signature(sb[:-1])`
++
++This will make the test passes.
++
++But, if you want to provide a fixed version of the buggy function only, you should remove the entire `get_generic_signature` function and replace it with the following code:

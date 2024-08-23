@@ -1,0 +1,24 @@
+diff --git a/tmp/6f06d7b2-a184-4252-aa81-8995be742243_buggy.java b/tmp/f756cfee-1840-41c0-9b59-c4a514f03576_fixed.java
+index e69de29..1e88381 100644
+--- a/tmp/6f06d7b2-a184-4252-aa81-8995be742243_buggy.java
++++ b/tmp/f756cfee-1840-41c0-9b59-c4a514f03576_fixed.java
+@@ -0,0 +1,19 @@
++public void testPrefixMapClear() {
++    Trie<String, Integer> trie = new PatriciaTrie<Integer>();
++    trie.put("Anna", 1);
++    trie.put("Anael", 2);
++    trie.put("Analu", 3);
++    trie.put("Andreas", 4);
++    trie.put("Andrea", 5);
++    trie.put("Andres", 6);
++    trie.put("Anatole", 7);
++    SortedMap<String, Integer> prefixMap = trie.prefixMap("And");
++    assertEquals(new HashSet<String>(Arrays.asList("Andrea", "Andreas", "Andres")), prefixMap.keySet());
++    assertEquals(Arrays.asList(5, 4, 6), new ArrayList<Integer>(prefixMap.values()));
++
++    // Fixed code: Clear the prefixMap, and then check if the Trie is empty
++    prefixMap.clear();
++    assertTrue(trie.isEmpty());
++    assertTrue(trie.keySet().isEmpty());
++    assertTrue(trie.values().isEmpty());
++}

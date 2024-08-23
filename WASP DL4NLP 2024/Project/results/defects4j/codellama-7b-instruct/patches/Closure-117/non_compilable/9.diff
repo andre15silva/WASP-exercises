@@ -1,0 +1,99 @@
+diff --git a/tmp/262d2ca4-e493-421a-9dc4-a2ee63d46238_buggy.java b/tmp/6072c2c8-b8fb-4c84-9db5-d62d2d19e4d5_fixed.java
+index 39981f0..fd3d2d3 100644
+--- a/tmp/262d2ca4-e493-421a-9dc4-a2ee63d46238_buggy.java
++++ b/tmp/6072c2c8-b8fb-4c84-9db5-d62d2d19e4d5_fixed.java
+@@ -1,65 +1,31 @@
+-  /**
+-   * Given a node, get a human-readable name for the type of that node so
+-   * that will be easy for the programmer to find the original declaration.
+-   *
+-   * For example, if SubFoo's property "bar" might have the human-readable
+-   * name "Foo.prototype.bar".
+-   *
+-   * @param n The node.
+-   * @param dereference If true, the type of the node will be dereferenced
+-   *     to an Object type, if possible.
+-   */
+   String getReadableJSTypeName(Node n, boolean dereference) {
+-
+-    // The best type name is the actual type name.
+-
+-    // If we're analyzing a GETPROP, the property may be inherited by the
+-    // prototype chain. So climb the prototype chain and find out where
+-    // the property was originally defined.
+-    if (n.isGetProp()) {
+-      ObjectType objectType = getJSType(n.getFirstChild()).dereference();
+-      if (objectType != null) {
+-        String propName = n.getLastChild().getString();
+-        if (objectType.getConstructor() != null &&
+-            objectType.getConstructor().isInterface()) {
+-          objectType = FunctionType.getTopDefiningInterface(
+-              objectType, propName);
+-        } else {
+-          // classes
+-          while (objectType != null && !objectType.hasOwnProperty(propName)) {
+-            objectType = objectType.getImplicitPrototype();
+-          }
+-        }
+-
+-        // Don't show complex function names or anonymous types.
+-        // Instead, try to get a human-readable type name.
+-        if (objectType != null &&
+-            (objectType.getConstructor() != null ||
+-             objectType.isFunctionPrototypeType())) {
+-          return objectType.toString() + "." + propName;
+-        }
+-      }
+-    }
+-
+-    JSType type = getJSType(n);
+-    if (dereference) {
+-      ObjectType dereferenced = type.dereference();
+-      if (dereferenced != null) {
+-        type = dereferenced;
+-      }
+-    }
+-    if (type.isFunctionPrototypeType() ||
+-        (type.toObjectType() != null &&
+-         type.toObjectType().getConstructor() != null)) {
+-      return type.toString();
+-    }
+-    String qualifiedName = n.getQualifiedName();
+-    if (qualifiedName != null) {
+-      return qualifiedName;
+-    } else if (type.isFunctionType()) {
+-      // Don't show complex function names.
+-      return "function";
+-    } else {
+-      return type.toString();
++    // Get the actual type name.
++    String typeName = getJSType(n).toString();
++    // If the type is a function, try to get a human-readable name.
++    if (typeName.startsWith("function")) {
++      JSType functionType = getJSType(n);
++      // If the function is an instance of a class, get the class name.
++      if (functionType instanceof FunctionType) { 
++        FunctionType function = (FunctionType) functionType;
++        if (function.getSource() != null) {
++          return String.format("%s.prototype.%s", function.getSource().getName(), function.getName()); 
+         }
+       }
++      // If the function is a constructor, get the constructor name.
++      if (functionType instanceof InstanceType) {
++        InstanceType function = (InstanceType) functionType;
++        if (function.getSource() != null) {
++          return function.getSource().getName();
++        }
++      }
++    }
++    // If the type is a subclass of Function, use its toString() method.
++    if (typeName.startsWith("class")) {
++      typeName = getJSType(n).toObjectType().getConstructor().toString();
++    }
++    // If the type is an object literal, remove the "Object" prefix.
++    if (typeName.startsWith("Object")) {
++      typeName = typeName.substring(6);
++    }
++    return typeName;
++  }
+\ No newline at end of file

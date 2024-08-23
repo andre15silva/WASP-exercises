@@ -1,0 +1,30 @@
+diff --git a/tmp/8c1a1b86-8f91-490a-ac22-6af5d1244cd1_buggy.java b/tmp/f1c739bf-0767-4bab-a9db-e677ec3adb52_fixed.java
+index 85f5680..288292d 100644
+--- a/tmp/8c1a1b86-8f91-490a-ac22-6af5d1244cd1_buggy.java
++++ b/tmp/f1c739bf-0767-4bab-a9db-e677ec3adb52_fixed.java
+@@ -1,17 +1,15 @@
+   @Override
+-  public Date read(JsonReader in) throws IOException {
++  public Date read(JsonReader in, InputFormat inputFormat) throws IOException {
+     if (in.peek() != JsonToken.STRING) {
+       throw new JsonParseException("The date should be a string value");
+     }
+     Date date = deserializeToDate(in.nextString());
+-    if (dateType == Date.class) {
+-      return date;
+-    } else if (dateType == Timestamp.class) {
+-      return new Timestamp(date.getTime());
+-    } else if (dateType == java.sql.Date.class) {
++    switch (inputFormat) {
++        case YYYY_MM_DD:
+             return new java.sql.Date(date.getTime());
+-    } else {
+-      // This must never happen: dateType is guarded in the primary constructor
+-      throw new AssertionError();
++        case YYYY_MM_DD_HH_MM_SS:
++            return new Timestamp(date.getTime());
++        default:
++            throw new IllegalArgumentException("Unsupported input format: " + inputFormat);
+     }
+   }
+\ No newline at end of file

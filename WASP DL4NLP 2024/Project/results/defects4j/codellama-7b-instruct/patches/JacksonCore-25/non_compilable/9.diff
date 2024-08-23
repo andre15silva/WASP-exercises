@@ -1,0 +1,77 @@
+diff --git a/tmp/593f6d9e-4092-479c-94cb-75d6ebd8da5b_buggy.java b/tmp/dd66147f-d9a2-47eb-a6a4-a5a1426961d1_fixed.java
+index 8dfbd84..405c370 100644
+--- a/tmp/593f6d9e-4092-479c-94cb-75d6ebd8da5b_buggy.java
++++ b/tmp/dd66147f-d9a2-47eb-a6a4-a5a1426961d1_fixed.java
+@@ -1,43 +1,50 @@
+-    private String _handleOddName2(int startPtr, int hash, int[] codes) throws IOException
++    @Override
++    protected String handleOddName2(int startPtr, int hash, int[] code) throws IOException
+ {
+-        _textBuffer.resetWithShared(_inputBuffer, startPtr, (_inputPtr - startPtr));
+-        char[] outBuf = _textBuffer.getCurrentSegment();
+-        int outPtr = _textBuffer.getCurrentSegmentSize();
+-        final int maxCode = codes.length;
++    TextBuffer tb = _textBuffer;
++    tb.resetWithShared(_inputBuffer, startPtr,
++            (_inputPtr - startPtr));
++    char[] outBuf = tb.getCurrentSegment();
++    int outPtr = tb.getCurrentSegmentSize();
+ 
+-        while (true) {
+-            if (_inputPtr >= _inputEnd) {
+-                if (!_loadMore()) { // acceptable for now (will error out later)
+-                    break;
++    int maxCode = code.length;
++    while (true)
++    {
++        if (_inputPtr >= _inputEnd)
++        {
++            if (!_loadMore())
++        {
++            break; // acceptable for now, will error out later
+         }
+         }
+         char c = _inputBuffer[_inputPtr];
+         int i = (int) c;
+-            if (i <= maxCode) {
+-                if (codes[i] != 0) {
++        if (i <= maxCode)
++        {
++            if (code[i] != 0)
+                break;
+         }
+-            } else if (!Character.isJavaIdentifierPart(c)) {
++        else if (!Character.isJavaIdentifierPart(c))
+             break;
+-            }
+         ++_inputPtr;
++
+         hash = (hash * CharsToNameCanonicalizer.HASH_MULT) + i;
+-            // Ok, let's add char to output:
+         outBuf[outPtr++] = c;
+ 
+-            // Need more room?
+-            if (outPtr >= outBuf.length) {
+-                outBuf = _textBuffer.finishCurrentSegment();
++        if (outPtr >= outBuf.length)
++        {
++            outBuf = tb.finishCurrentSegment();
+             outPtr = 0;
+         }
+     }
+-        _textBuffer.setCurrentLength(outPtr);
++
++    tb.setCurrentLength(outPtr);
+     {
+-            TextBuffer tb = _textBuffer;
++        int offset = Integer.BYTES * 3;
+         char[] buf = tb.getTextBuffer();
+-            int start = tb.getTextOffset();
+-            int len = tb.size();
++        int start = tb.getTextOffset() + offset;
++        int len = tb.size() - offset;
+ 
+         return _symbols.findSymbol(buf, start, len, hash);
+     }
+ }
+\ No newline at end of file

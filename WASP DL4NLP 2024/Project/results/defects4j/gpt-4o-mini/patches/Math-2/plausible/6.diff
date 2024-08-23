@@ -1,0 +1,16 @@
+diff --git a/tmp/ecea9087-1b30-4ec3-8d99-c49a7dd1c6bc_buggy.java b/tmp/dbf866af-0a29-4b47-82d3-f668024a91e1_fixed.java
+index e3e3ec4..7588270 100644
+--- a/tmp/ecea9087-1b30-4ec3-8d99-c49a7dd1c6bc_buggy.java
++++ b/tmp/dbf866af-0a29-4b47-82d3-f668024a91e1_fixed.java
+@@ -1,9 +1,9 @@
+     /**
+      * {@inheritDoc}
+      *
+      * For population size {@code N}, number of successes {@code m}, and sample
+      * size {@code n}, the mean is {@code n * m / N}.
+      */
+     public double getNumericalMean() {
+-        return (double) (getSampleSize() * getNumberOfSuccesses()) / (double) getPopulationSize();
++        return (double) getSampleSize() * getNumberOfSuccesses() / (double) getPopulationSize();
+     }
+\ No newline at end of file

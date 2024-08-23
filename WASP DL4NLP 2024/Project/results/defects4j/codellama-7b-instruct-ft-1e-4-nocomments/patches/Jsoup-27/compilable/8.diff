@@ -1,0 +1,23 @@
+diff --git a/tmp/3ef62a8d-5304-4327-83b2-6df775a22595_buggy.java b/tmp/c96e314f-2ebc-46c6-bfd7-6350f6701efb_fixed.java
+index 7fb120e..69dbc10 100644
+--- a/tmp/3ef62a8d-5304-4327-83b2-6df775a22595_buggy.java
++++ b/tmp/c96e314f-2ebc-46c6-bfd7-6350f6701efb_fixed.java
+@@ -1,16 +1,9 @@
+-    /**
+-     * Parse out a charset from a content type header. If the charset is not supported, returns null (so the default
+-     * will kick in.)
+-     * @param contentType e.g. "text/html; charset=EUC-JP"
+-     * @return "EUC-JP", or null if not found. Charset is trimmed and uppercased.
+-     */
+     static String getCharsetFromContentType(String contentType) {
+         if (contentType == null) return null;
+         Matcher m = charsetPattern.matcher(contentType);
+         if (m.find()) {
+             String charset = m.group(1).trim();
+-            charset = charset.toUpperCase(Locale.ENGLISH);
+-            return charset;
++            return charset.toLowerCase(Locale.ENGLISH);
+         }
+         return null;
+     }
+\ No newline at end of file

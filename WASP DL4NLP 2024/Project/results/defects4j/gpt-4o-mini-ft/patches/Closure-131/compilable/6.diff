@@ -1,0 +1,25 @@
+diff --git a/tmp/6750fb43-8147-411a-ae2c-bd88e0245de7_buggy.java b/tmp/1ac9394d-530d-4914-a9d4-b0ebbf85d21d_fixed.java
+index 19fe1b4..47da6f8 100644
+--- a/tmp/6750fb43-8147-411a-ae2c-bd88e0245de7_buggy.java
++++ b/tmp/1ac9394d-530d-4914-a9d4-b0ebbf85d21d_fixed.java
+@@ -1,17 +1,19 @@
+     public static boolean isJSIdentifier(String s) {
+       int length = s.length();
+ 
+       if (length == 0 ||
+           !Character.isJavaIdentifierStart(s.charAt(0))) {
+         return false;
+       }
+ 
++      // An identifier is either a valid JS identifier or a number
+       for (int i = 1; i < length; i++) {
+         if (
+-            !Character.isJavaIdentifierPart(s.charAt(i))) {
++            !Character.isJavaIdentifierPart(s.charAt(i)) && !Character.isDigit(s.charAt(i)) && s.charAt(i) != '.'){
+           return false;
+         }
+       }
+ 
++      // not strictly revealing this now
+       return true;
+     }

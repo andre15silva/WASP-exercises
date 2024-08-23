@@ -1,0 +1,72 @@
+diff --git a/tmp/8a0f25b0-3bb4-4f3e-9747-ba415fcb44ce_buggy.java b/tmp/a99655d5-4804-4e2c-acd1-ade2a2439d25_fixed.java
+index 85e6a42..33ac72a 100644
+--- a/tmp/8a0f25b0-3bb4-4f3e-9747-ba415fcb44ce_buggy.java
++++ b/tmp/a99655d5-4804-4e2c-acd1-ade2a2439d25_fixed.java
+@@ -1,50 +1,23 @@
+-    /**
+-     * Walks through all recorded entries and adds the data available
+-     * from the local file header.
+-     *
+-     * <p>Also records the offsets for the data to read from the
+-     * entries.</p>
+-     */
+-    private void resolveLocalFileHeaderData(Map<ZipArchiveEntry, NameAndComment>
+-                                            entriesWithoutUTF8Flag)
+-        throws IOException {
+-        // changing the name of a ZipArchiveEntry is going to change
+-        // the hashcode - see COMPRESS-164
+-        // Map needs to be reconstructed in order to keep central
+-        // directory order
+-        for (ZipArchiveEntry ze : entries.keySet()) {
+-            OffsetEntry offsetEntry = entries.get(ze);
++public void resolveLocalFileHeaderData(Map<ZipArchiveEntry, NameAndComment> entriesWithoutUTF8Flag) {
++    for (ZipArchiveEntry entry : entries) {
++        OffsetEntry offsetEntry = entries.get(entry);
+         long offset = offsetEntry.headerOffset;
++        // Add data from local file header
+         archive.seek(offset + LFH_OFFSET_FOR_FILENAME_LENGTH);
+-            byte[] b = new byte[SHORT];
+-            archive.readFully(b);
+-            int fileNameLen = ZipShort.getValue(b);
+-            archive.readFully(b);
+-            int extraFieldLen = ZipShort.getValue(b);
+-            int lenToSkip = fileNameLen;
+-            while (lenToSkip > 0) {
+-                int skipped = archive.skipBytes(lenToSkip);
+-                if (skipped <= 0) {
+-                    throw new RuntimeException("failed to skip file name in"
+-                                               + " local file header");
+-                }
+-                lenToSkip -= skipped;
+-            }
+-            byte[] localExtraData = new byte[extraFieldLen];
+-            archive.readFully(localExtraData);
+-            ze.setExtra(localExtraData);
+-            offsetEntry.dataOffset = offset + LFH_OFFSET_FOR_FILENAME_LENGTH
+-                + SHORT + SHORT + fileNameLen + extraFieldLen;
+-
+-            if (entriesWithoutUTF8Flag.containsKey(ze)) {
+-                String orig = ze.getName();
+-                NameAndComment nc = entriesWithoutUTF8Flag.get(ze);
+-                ZipUtil.setNameAndCommentFromExtraFields(ze, nc.name,
+-                                                         nc.comment);
+-                if (!orig.equals(ze.getName())) {
++        int fileNameLen = (int)archive.read();
++        byte[] localExtraData = new byte[]{(byte)archive.read(fileNameLen)};
++        entry.setExtra(localExtraData);
++        // Add data offset from local file header
++        offsetEntry.dataOffset = offset + LFH_OFFSET_FOR_FILENAME_LENGTH + fileNameLen;
++        if (entriesWithoutUTF8Flag.containsKey(entry)) {
++            String orig = entry.getName();
++            NameAndComment nc = entriesWithoutUTF8Flag.get(entry);
++            entry.setName(nc.name);
++            entry.setComment(nc.comment);
++            if (!orig.equals(entry.getName())) {
+                 nameMap.remove(orig);
+-                    nameMap.put(ze.getName(), ze);
++                nameMap.put(entry.getName(), entry);
+             }
+         }
+     }
+ }
+\ No newline at end of file

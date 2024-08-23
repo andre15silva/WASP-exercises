@@ -1,0 +1,53 @@
+diff --git a/tmp/7d69058b-ffca-46fb-bba7-2b115b29f4ab_buggy.java b/tmp/50329642-426f-4a91-8a65-4a11c4af9f89_fixed.java
+index 88647d1..d9bafa1 100644
+--- a/tmp/7d69058b-ffca-46fb-bba7-2b115b29f4ab_buggy.java
++++ b/tmp/50329642-426f-4a91-8a65-4a11c4af9f89_fixed.java
+@@ -1,44 +1,48 @@
+     /**
+      * Find a zero in the given interval.
+      * <p>
+      * Requires that the values of the function at the endpoints have opposite
+      * signs. An <code>IllegalArgumentException</code> is thrown if this is not
+      * the case.</p>
+      * 
+      * @param min the lower bound for the interval.
+      * @param max the upper bound for the interval.
+      * @return the value where the function is zero
+      * @throws MaxIterationsExceededException if the maximum iteration count is exceeded
+      * @throws FunctionEvaluationException if an error occurs evaluating the
+      * function 
+      * @throws IllegalArgumentException if min is not less than max or the
+      * signs of the values of the function at the endpoints are not opposites
+      */
+     public double solve(double min, double max) throws MaxIterationsExceededException, 
+         FunctionEvaluationException {
+         
+         clearResult();
+         verifyInterval(min, max);
+         
+         double ret = Double.NaN;
+         
+         double yMin = f.value(min);
+         double yMax = f.value(max);
+         
+         // Verify bracketing
+         double sign = yMin * yMax;
+         if (sign >= 0) {
+             // check if either value is close to a zero
+                 // neither value is close to zero and min and max do not bracket root.
+                 throw new IllegalArgumentException
+                 ("Function values at endpoints do not have different signs." +
+                         "  Endpoints: [" + min + "," + max + "]" + 
+                         "  Values: [" + yMin + "," + yMax + "]");
++        } else if (org.apache.commons.math3.util.Precision.equals(yMin, 0.0,1e-5) ||
++                org.apache.commons.math3.util.Precision.equals(yMax, 0.0,1e-5)) {
++            // one or both endpoints are roots
++            ret = min;
+         } else {
+             // solve using only the first endpoint as initial guess
+             ret = solve(min, yMin, max, yMax, min, yMin);
+             // either min or max is a root
+         }
+ 
+         return ret;
+     }

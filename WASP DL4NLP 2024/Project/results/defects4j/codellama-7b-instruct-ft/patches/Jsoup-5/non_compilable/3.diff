@@ -1,0 +1,42 @@
+diff --git a/tmp/066b2b31-52e2-4c61-ba07-8c9ad989b7d0_buggy.java b/tmp/7c68cd21-395c-4746-a3f5-911aa955b15e_fixed.java
+index 39dd8e7..2922147 100644
+--- a/tmp/066b2b31-52e2-4c61-ba07-8c9ad989b7d0_buggy.java
++++ b/tmp/7c68cd21-395c-4746-a3f5-911aa955b15e_fixed.java
+@@ -1,30 +1,37 @@
+     private Attribute parseAttribute() {
+         tq.consumeWhitespace();
+         String key = tq.consumeAttributeKey();
+         String value = "";
+         tq.consumeWhitespace();
+         if (tq.matchChomp("=")) {
+             tq.consumeWhitespace();
+ 
+             if (tq.matchChomp(SQ)) {
+                 value = tq.chompTo(SQ);
+             } else if (tq.matchChomp(DQ)) {
+                 value = tq.chompTo(DQ);
+             } else {
+                 StringBuilder valueAccum = new StringBuilder();
+                 // no ' or " to look for, so scan to end tag or space (or end of stream)
+                 while (!tq.matchesAny("<", "/>", ">") && !tq.matchesWhitespace() && !tq.isEmpty()) {
+                     valueAccum.append(tq.consume());
+                 }
+                 value = valueAccum.toString();
+             }
+             tq.consumeWhitespace();
+         }
++        String remainder = tq.consumeToAny("<", "/>", ">"); // find end tag or whitespace
++        int nextStart = remainder.indexOf(">") + 1;
++        if (nextStart < remainder.length() - 1) {
++            remainder = remainder.substring(nextStart);
++            tq = TagQueue.of(remainder); // replace q with remainder of string with ">".)
++            tq.consumeWhitespace();
++        }
+         if (key.length() != 0)
+             return Attribute.createFromEncoded(key, value);
+         else {
+             tq.consume();
+                 
+             return null;
+         }
+     }

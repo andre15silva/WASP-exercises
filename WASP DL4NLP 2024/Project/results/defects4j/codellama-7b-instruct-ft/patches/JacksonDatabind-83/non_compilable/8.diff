@@ -1,0 +1,75 @@
+diff --git a/tmp/8206924f-140a-47b4-909f-a79f984929d1_buggy.java b/tmp/968d10ed-db43-4c42-ba08-e35600683122_fixed.java
+index abe09ae..faf0890 100644
+--- a/tmp/8206924f-140a-47b4-909f-a79f984929d1_buggy.java
++++ b/tmp/968d10ed-db43-4c42-ba08-e35600683122_fixed.java
+@@ -1,57 +1,69 @@
+     @SuppressWarnings("unchecked")
+     @Override
+     public T deserialize(JsonParser p, DeserializationContext ctxt) throws IOException
+     {
+-        // 22-Sep-2012, tatu: For 2.1, use this new method, may force coercion:
++        // 22-Sep-2012, for 2.1, use this new method, may force coercion:
+         String text = p.getValueAsString();
+         if (text != null) { // has String representation
+             if (text.length() == 0 || (text = text.trim()).length() == 0) {
+                 // 04-Feb-2013, tatu: Usually should become null; but not always
+                 return _deserializeFromEmptyString();
+             }
++            // 16-Nov-2011, tatu: Need to get this fixed, first thing: coercion on Strings
+             Exception cause = null;
+             try {
+                 // 19-May-2017, tatu: Used to require non-null result (assuming `null`
+                 //    indicated error; but that seems wrong. Should be able to return
+                 //    `null` as value.
+                 if (_deserialize(text, ctxt) != null) {
+                     return _deserialize(text, ctxt);
+                 }
+             } catch (IllegalArgumentException iae) {
+                 cause = iae;
+             } catch (MalformedURLException me) {
+                 cause = me;
+             }
+             String msg = "not a valid textual representation";
+             if (cause != null) {
+                 String m2 = cause.getMessage();
+                 if (m2 != null) {
+                     msg = msg + ", problem: "+m2;
+                 }
+             }
++            // 11-Nov-2011, tatu: No real way to do this in a good way, but let's just try
++            //    doing it in a simple way. (to be refined for 2.x)
++            msg = "Failed to deserialize "+text+": "+msg;
+             // 05-May-2016, tatu: Unlike most usage, this seems legit, so...
+             JsonMappingException e = ctxt.weirdStringException(text, _valueClass, msg);
+             if (cause != null) {
+                 e.initCause(cause);
+             }
+             throw e;
+             // nothing to do here, yet? We'll fail anyway
+         }
+         JsonToken t = p.getCurrentToken();
+         // [databind#381]
+         if (t == JsonToken.START_ARRAY) {
+             return _deserializeFromArray(p, ctxt);
+         }
+         if (t == JsonToken.VALUE_EMBEDDED_OBJECT) {
+             // Trivial cases; null to null, instance of type itself returned as is
+             Object ob = p.getEmbeddedObject();
+             if (ob == null) {
+                 return null;
+             }
+             if (_valueClass.isAssignableFrom(ob.getClass())) {
+                 return (T) ob;
+             }
++            // 10-Jun-2015, tatu: U_U, need to deal with Strings more, in 2.6
++            //   See [databind#1629] for discussion.
++            if (UUID.class.isAssignableFrom(_valueClass) // [databind#1629]
++                    &&
++                    text.equals(((UUID)ob).toString()) // String representation looks like a UUID
++            ) {
++                return (T)UUID.fromString(text);
++            }
+             return _deserializeEmbedded(ob, ctxt);
+         }
+         return (T) ctxt.handleUnexpectedToken(_valueClass, p);
+     }

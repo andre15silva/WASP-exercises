@@ -1,0 +1,56 @@
+diff --git a/tmp/7b4c7da0-6f37-4441-8e2a-0b9732edc317_buggy.java b/tmp/e61136c8-f681-4493-a15c-f317afe23e77_fixed.java
+index efa499e..342cfa4 100644
+--- a/tmp/7b4c7da0-6f37-4441-8e2a-0b9732edc317_buggy.java
++++ b/tmp/e61136c8-f681-4493-a15c-f317afe23e77_fixed.java
+@@ -1,35 +1,33 @@
+-    /**
+-     * Get the current solution.
+-     *
+-     * @return current solution
+-     */
++java
+ protected RealPointValuePair getSolution() {
+   int negativeVarColumn = columnLabels.indexOf(NEGATIVE_VAR_COLUMN_LABEL);
+-      Integer negativeVarBasicRow = negativeVarColumn > 0 ? getBasicRow(negativeVarColumn) : null;
+-      double mostNegative = negativeVarBasicRow == null ? 0 : getEntry(negativeVarBasicRow, getRhsOffset());
++  int negativeVarBasicRow = negativeVarColumn > 0 ? getBasicRow(negativeVarColumn) : -1;
++  double mostNegative = negativeVarBasicRow != -1 ? getEntry(negativeVarBasicRow, getRhsOffset()) : 0;
+ 
+   Set<Integer> basicRows = new HashSet<Integer>();
+   double[] coefficients = new double[getOriginalNumDecisionVariables()];
+   for (int i = 0; i < coefficients.length; i++) {
+     int colIndex = columnLabels.indexOf("x" + i);
+     if (colIndex < 0) {
+       coefficients[i] = 0;
+       continue;
+     }
++
+     Integer basicRow = getBasicRow(colIndex);
+-              // if the basic row is found to be the objective function row
+-              // set the coefficient to 0 -> this case handles unconstrained 
+-              // variables that are still part of the objective function
+-          if (basicRows.contains(basicRow)) {
+-              // if multiple variables can take a given value
+-              // then we choose the first and set the rest equal to 0
+-              coefficients[i] = 0 - (restrictToNonNegative ? 0 : mostNegative);
++    if (basicRow == null) {
++      coefficients[i] = 0;
++      continue;
++    }
++
++    // if the basic row is not the objective function row
++    // set the coefficient to 0
++    if (basicRow == negativeVarBasicRow) {
++      coefficients[i] = 0;
+     } else {
+       basicRows.add(basicRow);
+-              coefficients[i] =
+-                  (basicRow == null ? 0 : getEntry(basicRow, getRhsOffset())) -
+-                  (restrictToNonNegative ? 0 : mostNegative);
++      coefficients[i] = getEntry(basicRow, getRhsOffset()) - mostNegative;
+     }
+   }
++
+   return new RealPointValuePair(coefficients, f.getValue(coefficients));
+ }
+\ No newline at end of file

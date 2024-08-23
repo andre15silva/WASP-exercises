@@ -1,0 +1,21 @@
+diff --git a/tmp/91523901-f44e-42de-a393-5379d43c5533_buggy.java b/tmp/a7447198-f58c-4e55-b921-ef60880e7885_fixed.java
+index 22640dd..b8c57fc 100644
+--- a/tmp/91523901-f44e-42de-a393-5379d43c5533_buggy.java
++++ b/tmp/a7447198-f58c-4e55-b921-ef60880e7885_fixed.java
+@@ -1,3 +1,15 @@
+ private boolean hasExceptionHandler(Node cfgNode) {
++    // Check if the given node is a try-catch block
++    if (cfgNode != null && cfgNode.isTryNode()) {
++        return true;
++    }
++    
++    // Check the children of the node for any try-catch blocks
++    for (Node child : cfgNode.children()) {
++        if (hasExceptionHandler(child)) {
++            return true;
++        }
++    }
++    
+     return false;
+ }
+\ No newline at end of file

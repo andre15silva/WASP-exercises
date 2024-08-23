@@ -1,0 +1,127 @@
+diff --git a/tmp/504157ba-4e3d-4cf6-b1f5-0f1af205c3e0_buggy.java b/tmp/a71273cc-4f08-4c71-8dd8-b78a3bdc601b_fixed.java
+index 940af3f..4a6a18e 100644
+--- a/tmp/504157ba-4e3d-4cf6-b1f5-0f1af205c3e0_buggy.java
++++ b/tmp/a71273cc-4f08-4c71-8dd8-b78a3bdc601b_fixed.java
+@@ -1,82 +1,115 @@
+         /**
+          * Estimate a first guess of the amplitude and angular frequency.
+          * This method assumes that the {@link #sortObservations()} method
+          * has been called previously.
+          *
+          * @throws ZeroException if the abscissa range is zero.
+-         * @throws MathIllegalStateException when the guessing procedure cannot
+-         * produce sensible results.
++         * @throws MathIllegalStateException if the function appears to be
++         * far from being an harmonic function and thus the guessing
++         * procedure cannot produce sensible results.
+          */
+         private void guessAOmega() {
+             // initialize the sums for the linear model between the two integrals
+             double sx2 = 0;
+             double sy2 = 0;
+             double sxy = 0;
+             double sxz = 0;
+             double syz = 0;
+ 
+             double currentX = observations[0].getX();
+             double currentY = observations[0].getY();
+             double f2Integral = 0;
+             double fPrime2Integral = 0;
+             final double startX = currentX;
+-            for (int i = 1; i < observations.length; ++i) {
++            for (boolean previousFound = true;
++                     previousFound && (currentX != Double.POSITIVE_INFINITY);  ) {
+                 // one step forward
+                 final double previousX = currentX;
+                 final double previousY = currentY;
+-                currentX = observations[i].getX();
+-                currentY = observations[i].getY();
++                currentX = observations[0].getX();
++                currentY = observations[0].getY();
++                for (int i = 1; (currentX != Double.POSITIVE_INFINITY) && (i < observations.length); ++i) {
++                  // one step forward
++                    final double nextX = observations[i].getX();
++                    final double nextY = observations[i].getY();
++                    if (currentX == nextX) {
++                        currentX = Double.POSITIVE_INFINITY;
++                        break;
++                    }
++                    currentX = nextX;
++                    currentY = nextY;
+ 
+                     // update the integrals of f<sup>2</sup> and f'<sup>2</sup>
+-                // considering a linear model for f (and therefore constant f')
++                    // considering a linear model for f (and therefore constant
++                    // f')
+                     final double dx = currentX - previousX;
+                     final double dy = currentY - previousY;
+                     final double f2StepIntegral =
+                         dx * (previousY * previousY + previousY * currentY + currentY * currentY) / 3;
+                     final double fPrime2StepIntegral = dy * dy / dx;
+ 
+                     final double x = currentX - startX;
+                     f2Integral += f2StepIntegral;
+                     fPrime2Integral += fPrime2StepIntegral;
+ 
+                     sx2 += x * x;
+                     sy2 += f2Integral * f2Integral;
+                     sxy += x * f2Integral;
+                     sxz += x * fPrime2Integral;
+                     syz += f2Integral * fPrime2Integral;
+                 }
++                previousFound = observations[0].getX() != currentX;
++            }
+ 
+             // compute the amplitude and pulsation coefficients
+             double c1 = sy2 * sxz - sxy * syz;
+             double c2 = sxy * sxz - sx2 * syz;
+             double c3 = sx2 * sy2 - sxy * sxy;
+             if ((c1 / c2 < 0) || (c2 / c3 < 0)) {
+                 final int last = observations.length - 1;
+                 // Range of the observations, assuming that the
+                 // observations are sorted.
+                 final double xRange = observations[last].getX() - observations[0].getX();
+                 if (xRange == 0) {
+                     throw new ZeroException();
+                 }
+                 omega = 2 * Math.PI / xRange;
+ 
+                 double yMin = Double.POSITIVE_INFINITY;
+                 double yMax = Double.NEGATIVE_INFINITY;
+                 for (int i = 1; i < observations.length; ++i) {
+                     final double y = observations[i].getY();
+                     if (y < yMin) {
+                         yMin = y;
+                     }
+                     if (y > yMax) {
+                         yMax = y;
+                     }
+                 }
+                 a = 0.5 * (yMax - yMin);
+             } else {
+                     // In some ill-conditioned cases (cf. MATH-844), the guesser
+                     // procedure cannot produce sensible results.
+-
++                    // we have to compute the sum of the squares of the residuals
++                    // in the first iteration:
++                    final double[] y2 = new double[observations.length];
++                    for (int i = 0; i < observations.length; ++i) {
++                        y2[i] = observations[i].getYpow2();
++                    }
++                    double sumSqr = 0;
++                    double sumSqrTmp = 0;
++                    for (int i = 1; i < observations.length; ++i) {
++                        sumSqrTmp += y2[i-1];
++                        sumSqr += ((i & 1) != 0 ?  -1 : 1) * 0.5 * sumSqrTmp;
++                    }
++                    if (sumSqr > 0) {
++                        throw new MathIllegalStateException(
++                                "Function appears to be far from being an harmonic function: Sums of the squares"
++                                + " of the residuals for the abscissae of the first "
++                                + "iteration have different signs: { " + sumSqr
++                                + " }");
++                    }
+                 a = FastMath.sqrt(c1 / c2);
+                 omega = FastMath.sqrt(c2 / c3);
+             }
+         }

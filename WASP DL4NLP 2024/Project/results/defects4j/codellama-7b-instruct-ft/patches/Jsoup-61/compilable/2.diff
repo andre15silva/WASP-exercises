@@ -1,0 +1,50 @@
+diff --git a/tmp/1962a949-f5fd-4fe3-8a55-1606ed9cfbda_buggy.java b/tmp/ff34c555-50ee-4f04-9732-a0c6aa35f5a0_fixed.java
+index 139579d..054c514 100644
+--- a/tmp/1962a949-f5fd-4fe3-8a55-1606ed9cfbda_buggy.java
++++ b/tmp/ff34c555-50ee-4f04-9732-a0c6aa35f5a0_fixed.java
+@@ -1,43 +1,41 @@
+     // performance sensitive
+     public boolean hasClass(String className) {
+         final String classAttr = attributes.get("class");
+         final int len = classAttr.length();
+         final int wantLen = className.length();
+ 
+         if (len == 0 || len < wantLen) {
+             return false;
+         }
+ 
+         // if both lengths are equal, only need compare the className with the attribute
+         if (len == wantLen) {
+-            return className.equalsIgnoreCase(classAttr);
++            return classAttr.regionMatches(true, 0, className, 0, wantLen);
+         }
+ 
+         // otherwise, scan for whitespace and compare regions (with no string or arraylist allocations)
+         boolean inClass = false;
+         int start = 0;
+         for (int i = 0; i < len; i++) {
+             if (Character.isWhitespace(classAttr.charAt(i))) {
+                 if (inClass) {
+                     // white space ends a class name, compare it with the requested one, ignore case
+                     if (i - start == wantLen && classAttr.regionMatches(true, start, className, 0, wantLen)) {
+                         return true;
+                     }
+                     inClass = false;
+                 }
+-            } else {
+-                if (!inClass) {
++            } else if (!inClass) {
+                 // we're in a class name : keep the start of the substring
+                 inClass = true;
+                 start = i;
+             }
+         }
+-        }
+ 
+         // check the last entry
+         if (inClass && len - start == wantLen) {
+             return classAttr.regionMatches(true, start, className, 0, wantLen);
+         }
+ 
+         return false;
+     }

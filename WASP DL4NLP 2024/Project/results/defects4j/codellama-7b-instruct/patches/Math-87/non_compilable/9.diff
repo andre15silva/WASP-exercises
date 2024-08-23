@@ -1,0 +1,45 @@
+diff --git a/tmp/5891d268-9038-4975-a8b9-989d638c7236_buggy.java b/tmp/8bf7d6a8-98c9-41fb-a612-f8f0d9106d43_fixed.java
+index 70cafe0..4c4ef22 100644
+--- a/tmp/5891d268-9038-4975-a8b9-989d638c7236_buggy.java
++++ b/tmp/8bf7d6a8-98c9-41fb-a612-f8f0d9106d43_fixed.java
+@@ -1,18 +1,30 @@
+     /**
+      * Checks whether the given column is basic.
+      * @param col index of the column to check
+-     * @return the row that the variable is basic in.  null if the column is not basic
++     * @return true if the column is basic false otherwise
+      */
+-    private Integer getBasicRow(final int col) {
+-        Integer row = null;
+-        for (int i = getNumObjectiveFunctions(); i < getHeight(); i++) {
+-            if (!MathUtils.equals(getEntry(i, col), 0.0, epsilon)) {
+-                if (row == null) {
+-                row = i;
+-                } else {
+-                return null;
++    private boolean isBasic(int col) {
++        for (int i = getNumObjectiveFunctions(); i < getHeight; i++) {
++            if (MathUtils.equals(getEntry(i, col), 0, epsilon)) {
++                return false;
+             }
+         }
++        return true;
+     }
+-        return row;
++
++    /**
++     * Checks whether the given row is basic.
++     * @param row index of the row to check
++     * @return true if the row is basic false otherwise
++     */
++    private boolean isBasic(int row) {
++        return isBasic(row, getNumObjectiveFunctions());
++    }
++
++    private boolean isBasic(int row, int col) {
++        if (row >= getNumObjectiveFunctions() ||
++                col >= getWidth()) {
++            return false;
++        }
++        return !MathUtils.equals(getEntry(row, col), 0, epsilon);
+     }

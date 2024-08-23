@@ -1,0 +1,16 @@
+diff --git a/tmp/f0cb08d0-a578-4187-932a-e170cbdcb046_buggy.java b/tmp/b75bc1d5-e925-4383-8e04-bde182885294_fixed.java
+index fa6828a..f6affdb 100644
+--- a/tmp/f0cb08d0-a578-4187-932a-e170cbdcb046_buggy.java
++++ b/tmp/b75bc1d5-e925-4383-8e04-bde182885294_fixed.java
+@@ -1,5 +1,9 @@
+ private void injectMockCandidate(Class<?> awaitingInjectionClazz, Set<Object> mocks, Object fieldInstance) {
+     for(Field field : orderedInstanceFieldsFrom(awaitingInjectionClazz)) {
+-            mockCandidateFilter.filterCandidate(mocks, field, fieldInstance).thenInject();
++        Object mockCandidate = mockCandidateFilter.filterCandidate(mocks, field, fieldInstance);
++        if (mockCandidate != null) { // Check if a valid mock candidate was found
++            field.setAccessible(true); // Make the field accessible if it's private
++            field.set(fieldInstance, mockCandidate); // Inject the mock into the field instance
++        }
+     }
+ }
+\ No newline at end of file

@@ -1,0 +1,10 @@
+diff --git a/tmp/215d4aae-f3a9-4cb3-911e-b2b452c74ecc_buggy.java b/tmp/5d1853cc-0f4e-4572-8391-7ee77316bab0_fixed.java
+index f1d02c1..35605a7 100644
+--- a/tmp/215d4aae-f3a9-4cb3-911e-b2b452c74ecc_buggy.java
++++ b/tmp/5d1853cc-0f4e-4572-8391-7ee77316bab0_fixed.java
+@@ -1,4 +1,4 @@
+         @Override
+         protected JSType caseTopType(JSType topType) {        
+-          return topType;
++          return ARRAY_TYPE;
+         }

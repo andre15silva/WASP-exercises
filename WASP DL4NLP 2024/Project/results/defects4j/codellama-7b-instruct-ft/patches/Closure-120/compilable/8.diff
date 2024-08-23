@@ -1,0 +1,33 @@
+diff --git a/tmp/139f0ab9-ac43-4107-ac18-6780af45687f_buggy.java b/tmp/9a81fb43-097c-4b15-bd6b-02235f0a78c9_fixed.java
+index 07b0792..62b8fb6 100644
+--- a/tmp/139f0ab9-ac43-4107-ac18-6780af45687f_buggy.java
++++ b/tmp/9a81fb43-097c-4b15-bd6b-02235f0a78c9_fixed.java
+@@ -1,22 +1,28 @@
+     /**
+      * @return Whether the variable is only assigned a value once for its
+      *     lifetime.
+      */
+     boolean isAssignedOnceInLifetime() {
+       Reference ref = getOneAndOnlyAssignment();
+       if (ref == null) {
+         return false;
+       }
+ 
+       // Make sure this assignment is not in a loop.
+       for (BasicBlock block = ref.getBasicBlock();
+            block != null; block = block.getParent()) {
+         if (block.isFunction) {
+           break;
+         } else if (block.isLoop) {
+           return false;
+         }
+       }
+ 
++      // TODO(johnlenz): if the name is used in a JSForIn and the value
++      // isn't a function, this will prevent the variable from being redefined.
++      // We should also check for other issue such as this:
++      //   var u; function f() { u = Random(); var x = u; f(); alert(x===u)}
++      // 
++
+       return true;
+     }

@@ -1,0 +1,39 @@
+diff --git a/tmp/99cb6d86-af85-48ce-afd6-f354f16c2d46_buggy.java b/tmp/1244b1cd-ac31-4096-9ecf-f2aacf056c60_fixed.java
+index 3c69e10..c0dd2a4 100644
+--- a/tmp/99cb6d86-af85-48ce-afd6-f354f16c2d46_buggy.java
++++ b/tmp/1244b1cd-ac31-4096-9ecf-f2aacf056c60_fixed.java
+@@ -1,27 +1,33 @@
+     /**
+      * @param Umin smallest Mann-Whitney U value
+      * @param n1 number of subjects in first sample
+      * @param n2 number of subjects in second sample
+      * @return two-sided asymptotic p-value
+      * @throws ConvergenceException if the p-value can not be computed
+      * due to a convergence error
+      * @throws MaxCountExceededException if the maximum number of
+      * iterations is exceeded
+      */
+     private double calculateAsymptoticPValue(final double Umin,
+                                              final int n1,
+                                              final int n2)
+         throws ConvergenceException, MaxCountExceededException {
+ 
+         final int n1n2prod = n1 * n2;
+ 
+         // http://en.wikipedia.org/wiki/Mann%E2%80%93Whitney_U#Normal_approximation
+         final double EU = n1n2prod / 2.0;
+         final double VarU = n1n2prod * (n1 + n2 + 1) / 12.0;
+ 
+         final double z = (Umin - EU) / FastMath.sqrt(VarU);
+ 
+         final NormalDistribution standardNormal = new NormalDistribution(0, 1);
+ 
+-        return 2 * standardNormal.cumulativeProbability(z);
++        double prob = standardNormal.cumulativeProbability(z);
++        // if we have a large enough data-set, need to return the upper tail prob
++        if (prob < 0.5) {
++            return 2 * prob - 1.0;
++        } else {
++            return 1.0 - prob;
++        }
+     }

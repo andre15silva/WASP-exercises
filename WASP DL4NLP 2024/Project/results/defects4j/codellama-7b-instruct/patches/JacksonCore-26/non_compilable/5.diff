@@ -1,0 +1,39 @@
+diff --git a/tmp/03b5e2e4-2c2c-4625-8f31-f25d2880f9a6_buggy.java b/tmp/54533f8a-e7c3-418f-965a-eeab26a6f744_fixed.java
+index 0722547..9ff5fb4 100644
+--- a/tmp/03b5e2e4-2c2c-4625-8f31-f25d2880f9a6_buggy.java
++++ b/tmp/54533f8a-e7c3-418f-965a-eeab26a6f744_fixed.java
+@@ -1,26 +1,9 @@
+-    @Override
+-    public void feedInput(byte[] buf, int start, int end) throws IOException
+-    {
+-        // Must not have remaining input
+-        if (_inputPtr < _inputEnd) {
+-            _reportError("Still have %d undecoded bytes, should not call 'feedInput'", _inputEnd - _inputPtr);
+-        }
+-        if (end < start) {
+-            _reportError("Input end (%d) may not be before start (%d)", end, start);
+-        }
+-        // and shouldn't have been marked as end-of-input
+-        if (_endOfInput) {
+-            _reportError("Already closed, can not feed more input");
+-        }
+-        // Time to update pointers first
+-        _currInputProcessed += _origBufferLen;
+ 
+-        // Also need to adjust row start, to work as if it extended into the past wrt new buffer
+-        _currInputRowStart = start - (_inputEnd - _currInputRowStart);
+ 
+-        // And then update buffer settings
+-        _inputBuffer = buf;
+-        _inputPtr = start;
+-        _inputEnd = end;
+-        _origBufferLen = end - start;
+-    }
++
++
++## Fix:
++
++The bug is caused by the fact that the function is not correctly updating the current location of the parser when it is given input from a different row.
++
++Here is a fixed version of the function:
+\ No newline at end of file

@@ -1,0 +1,23 @@
+diff --git a/tmp/f88e9812-8700-4df9-a370-cedcd030981c_buggy.java b/tmp/3b18d514-f9d5-42d9-a333-0c6572bdbe01_fixed.java
+index dcc36a4..11e9c2f 100644
+--- a/tmp/f88e9812-8700-4df9-a370-cedcd030981c_buggy.java
++++ b/tmp/3b18d514-f9d5-42d9-a333-0c6572bdbe01_fixed.java
+@@ -1,12 +1,16 @@
+     protected void replaceChild(Node out, Node in) {
+         Validate.isTrue(out.parentNode == this);
+         Validate.notNull(in);
++        if (out == in || in.parentNode == this) {
++            if (in.parentNode != null && in.parentNode.node instanceof OuterHtmlVisitor.ReplaceNodeList)
++                ((OuterHtmlVisitor.ReplaceNodeList) in.parentNode.node).move(in, this);
++            return;
++        }
+         if (in.parentNode != null)
+             in.parentNode.removeChild(in);
+-
+         final int index = out.siblingIndex;
+         ensureChildNodes().set(index, in);
+         in.parentNode = this;
+         in.setSiblingIndex(index);
+         out.parentNode = null;
+     }
+\ No newline at end of file

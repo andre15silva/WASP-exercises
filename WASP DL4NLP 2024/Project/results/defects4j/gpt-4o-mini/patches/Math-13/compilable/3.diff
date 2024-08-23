@@ -1,0 +1,20 @@
+diff --git a/tmp/99e3c388-844f-4c5b-92d0-3c85c2abe3b6_buggy.java b/tmp/02a71c0f-f500-43b6-b498-e64e8dc181ed_fixed.java
+index 4e21866..32796fb 100644
+--- a/tmp/99e3c388-844f-4c5b-92d0-3c85c2abe3b6_buggy.java
++++ b/tmp/02a71c0f-f500-43b6-b498-e64e8dc181ed_fixed.java
+@@ -1,10 +1,14 @@
+     /**
+      * Computes the square-root of the weight matrix.
+      *
+      * @param m Symmetric, positive-definite (weight) matrix.
+      * @return the square-root of the weight matrix.
+      */
+     private RealMatrix squareRoot(RealMatrix m) {
+         final EigenDecomposition dec = new EigenDecomposition(m);
++        // Limit the size of the matrix to avoid OutOfMemoryError
++        if (m.getRowDimension() > 1000 || m.getColumnDimension() > 1000) {
++            throw new IllegalArgumentException("Matrix is too large to compute the square root.");
++        }
+         return dec.getSquareRoot();
+     }
+\ No newline at end of file

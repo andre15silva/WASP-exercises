@@ -1,0 +1,69 @@
+diff --git a/tmp/688805b6-0284-4656-add6-238194a15405_buggy.java b/tmp/52c2253f-f030-4ea1-be95-7ad965196db5_fixed.java
+index 4bbd561..2529a72 100644
+--- a/tmp/688805b6-0284-4656-add6-238194a15405_buggy.java
++++ b/tmp/52c2253f-f030-4ea1-be95-7ad965196db5_fixed.java
+@@ -1,37 +1,48 @@
+     /**
+      * {@inheritDoc}
+      */
+     @Override
+     public int translate(CharSequence input, int index, Writer out) throws IOException {
+         // TODO: Protect from ArrayIndexOutOfBounds
+         if(input.charAt(index) == '&' && input.charAt(index + 1) == '#') {
+             int start = index + 2;
+-            boolean isHex = false;
+-
+-            char firstChar = input.charAt(start);
+-            if(firstChar == 'x' || firstChar == 'X') {
+-                start++;
+-                isHex = true;
+-            }
+-
+             int end = start;
+-            while(input.charAt(end) != ';') {
++
++            if (start < input.length() && input.charAt(start) == 'x'
++                    || input.charAt(start) == 'X') {
++                start++;
++            }
++
++            do {
++                if(input.charAt(end) == ';') {
++                    break;
++                }
+                 end++;
+-            }
++            } while(end < input.length());
+ 
+             int entityValue;
+             try {
+-                if(isHex) {
+-                    entityValue = Integer.parseInt(input.subSequence(start, end).toString(), 16);
++                if(start < end) {
++                    if(input.charAt(start) == 'x'
++                            || input.charAt(start) == 'X') {
++                        entityValue = Integer.parseInt(
++                                input.subSequence(start + 1, end)
++                                        .toString(),
++                                16);
+                     } else {
+-                    entityValue = Integer.parseInt(input.subSequence(start, end).toString(), 10);
++                        entityValue = Integer.parseInt(
++                                input.subSequence(start, end).toString(),
++                                10);
++                    }
++                }else {
++                    break;
+                 }
+             } catch(NumberFormatException nfe) {
+-                return 0;
++                break;
+             }
+ 
+-                out.write(entityValue);
+-            return 2 + (end - start) + (isHex ? 1 : 0) + 1;
++            out.write(Character.toChars(entityValue));
++            return 2 + (end - start) + 1;
+         }
+         return 0;
+     }

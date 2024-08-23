@@ -1,0 +1,163 @@
+diff --git a/tmp/e5394934-71ce-44a6-b8a2-45d9f5dc7b5d_buggy.java b/tmp/cdbc03ca-c0d8-4638-b9c5-ae5e311d8427_fixed.java
+index 27f2719..6187c5e 100644
+--- a/tmp/e5394934-71ce-44a6-b8a2-45d9f5dc7b5d_buggy.java
++++ b/tmp/cdbc03ca-c0d8-4638-b9c5-ae5e311d8427_fixed.java
+@@ -1,90 +1,150 @@
+     @Override
+     protected Object decode(
+             Channel channel, SocketAddress remoteAddress, Object msg) throws Exception {
+ 
+         String sentence = (String) msg;
+ 
+         if (sentence.startsWith("!1,")) {
+             int index = sentence.indexOf(',', 3);
+             if (index < 0) {
+                 index = sentence.length();
+             }
+             getDeviceSession(channel, remoteAddress, sentence.substring(3, index));
+             return null;
+         }
+ 
+         DeviceSession deviceSession = getDeviceSession(channel, remoteAddress);
+         if (deviceSession == null || !sentence.matches("![35A-D],.*")) {
+             return null;
+         }
+ 
+         Position position = new Position(getProtocolName());
+         position.setDeviceId(deviceSession.getDeviceId());
+ 
+         String type = sentence.substring(1, 2);
+         position.set(Position.KEY_TYPE, type);
+ 
+         if (type.equals("3")) {
+ 
+             getLastLocation(position, null);
+ 
+             position.set(Position.KEY_RESULT, sentence.substring(3));
+ 
+             return position;
+ 
+         } else if (type.equals("5")) {
+ 
+             String[] values = sentence.split(",");
+ 
+             getLastLocation(position, null);
+ 
+-            position.set(Position.KEY_RSSI, Integer.parseInt(values[1]));
++            if (values.length >= 3) {
++                position.set(Position.KEY_RESULT, values[3].startsWith("V") ? values[2] : values[3]);
++            }
+             if (values.length >= 4) {
+                 position.set(Position.KEY_BATTERY_LEVEL, Integer.parseInt(values[3]));
+             }
+ 
+             return position;
+ 
++        } else if (type.equals("A")) {
++
++            Parser parser = new Parser(PATTERN_A, sentence);
++            if (!parser.matches()) {
++                return null;
++            }
++
++            decodeFix(position, parser);
++
++            return position;
++
+         } else if (type.equals("B") || type.equals("D")) {
+ 
+             Parser parser = new Parser(PATTERN_BD, sentence);
+             if (!parser.matches()) {
+                 return null;
+             }
+ 
+             decodeFix(position, parser);
+             decodeState(position, parser);
+ 
+-            position.set(Position.KEY_SATELLITES, parser.nextInt(0));
+-            position.set(Position.KEY_SATELLITES_VISIBLE, parser.nextInt(0));
+-            position.set(Position.KEY_HDOP, parser.nextDouble(0));
+-
+             return position;
+ 
+         } else if (type.equals("C")) {
+ 
+             Parser parser = new Parser(PATTERN_C, sentence);
+             if (!parser.matches()) {
+                 return null;
+             }
+ 
+             decodeFix(position, parser);
+             decodeState(position, parser);
+ 
+             return position;
+ 
+-        } else if (type.equals("A")) {
++        } else if (type.equals("1")) {
+ 
+-            Parser parser = new Parser(PATTERN_A, sentence);
++            Parser parser = new Parser(PATTERN_INFO, sentence);
+             if (!parser.matches()) {
+                 return null;
+             }
+ 
+-            decodeFix(position, parser);
++            position.set(Position.KEY_ALARM, parser.next());
++            position.set(Position.KEY_RESULT, parser.next());
++            position.set(Position.KEY_STATUS, parser.next());
++
++            parser = new Parser(PATTERN_INFO2, sentence);
++            if (parser.matches()) {
++                if (parser.next().equals("phone1")) {
++                    String mcc = parser.next("....");
++                    String mnc = parser.next("...");
++                    if (mcc.length() == 3 && mnc.length() == 2) {
++                        position.set("mcc", mcc);
++                        position.set("mnc", mnc);
++                    }
++                }
++                String lac = parser.next("..");
++                if (lac.length() == 2) {
++                    position.set("lac", lac);
++                }
++                int cid = parser.nextInt(0);
++                if (cid != 0) {
++                    position.set("cid", cid);
++                }
++                String imei = parser.next().trim();
++                if (imei.length() >= 7) {
++                    String imei2 = imei.substring(1, 8);
++                    imei = imei.substring(0, 7);
++                    if (imei2.length() == 1) {
++                        imei = new String(new char[] {'.', imei.charAt(0), imei2.charAt(0), imei2.charAt(1), imei.charAt(3), imei.charAt(4), imei.charAt(5), imei.charAt(6)});
++                    } else {
++                        imei = new String(new char[] {'.', imei.charAt(0), imei2.charAt(0), imei2.charAt(1), imei2.charAt(0), imei.charAt(3), imei.charAt(4), imei.charAt(5)});
++                    }
++                }
++                position.set(Position.KEY_IMEI, imei);
++            }
++
++            return position;
++
++        } else if (type.equals("4")) {
++
++            Parser parser = new Parser(PATTERN_INFO3, sentence);
++            if (parser.matches()) {
++                position.set("phone1", parser.next("...."));
++                position.set("phone2", parser.next("..."));
++                position.set("phone3", parser.next("..."));
++                String imei = parser.next().trim();
++                if (imei.length() >= 7) {
++                    String imei2 = imei.substring(1, 8);
++                    imei = imei.substring(0, 7) + ".0" + imei2.charAt(0) + imei2.charAt(1) + imei2.charAt(0);
++                }
++                position.set(Position.KEY_IMEI, imei);
++                parser.next(); // phone number
++            }
+ 
+             return position;
+ 
+         }
+ 
+         return null;
+     }

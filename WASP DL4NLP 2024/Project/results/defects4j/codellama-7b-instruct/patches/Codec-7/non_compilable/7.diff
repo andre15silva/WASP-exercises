@@ -1,0 +1,34 @@
+diff --git a/tmp/9405259e-1af8-40b4-820c-f74dd985eabb_buggy.java b/tmp/bc23beb6-f33a-4426-98c8-9ea1d688fe63_fixed.java
+index 31c6a4b..507b40f 100644
+--- a/tmp/9405259e-1af8-40b4-820c-f74dd985eabb_buggy.java
++++ b/tmp/bc23beb6-f33a-4426-98c8-9ea1d688fe63_fixed.java
+@@ -1,11 +1,18 @@
+-    /**
+-     * Encodes binary data using the base64 algorithm into 76 character blocks separated by CRLF.
+-     *
+-     * @param binaryData
+-     *            binary data to encode
+-     * @return String containing Base64 characters.
+-     * @since 1.4
+-     */    
+-    public static String encodeBase64String(byte[] binaryData) {
+-        return StringUtils.newStringUtf8(encodeBase64(binaryData, true));
++@Test
++public void testByteToStringVariations() throws DecoderException {
++    Base64 base64 = new Base64(0);
++    byte[] b1 = StringUtils.getBytesUtf8("Hello World");
++    byte[] b2 = new byte[0];
++    byte[] b3 = null;
++    byte[] b4 = Hex.decodeHex("2bf7cc2701fe4397b49ebeed5acc7090".toCharArray());  // for url-safe tests
++
++    assertEquals("byteToString Hello World", "SGVsbG8gV29ybGQ=", base64.encodeToString(b1));
++    assertEquals("byteToString static Hello World", "SGVsbG8gV29ybGQ=", Base64.encodeBase64String(b1));
++    assertEquals("byteToString \"\"", "", base64.encodeToString(b2));
++    assertEquals("byteToString static \"\"", "", Base64.encodeBase64String(b2));
++    assertEquals("byteToString null", null, base64.encodeToString(b3));
++    assertEquals("byteToString static null", null, Base64.encodeBase64String(b3));
++    assertEquals("byteToString UUID", "K/fMJwH+Q5e0nr7tWsxwkA==", base64.encodeToString(b4));
++    assertEquals("byteToString static UUID", "K/fMJwH+Q5e0nr7tWsxwkA==", Base64.encodeBase64String(b4));
++    assertEquals("byteToString static-url-safe UUID", "K_fMJwH-Q5e0nr7tWsxwkA", Base64.encodeBase64URLSafeString(b4));
+ }
+\ No newline at end of file

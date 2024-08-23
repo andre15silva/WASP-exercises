@@ -1,0 +1,39 @@
+diff --git a/tmp/663c5caa-dd3d-4233-aba4-29f8de5b21f4_buggy.java b/tmp/916ecc2a-f30c-45e5-b1fc-65e352646a9d_fixed.java
+index ec6c9ee..908e6d0 100644
+--- a/tmp/663c5caa-dd3d-4233-aba4-29f8de5b21f4_buggy.java
++++ b/tmp/916ecc2a-f30c-45e5-b1fc-65e352646a9d_fixed.java
+@@ -1,21 +1,12 @@
+-    //-----------------------------------------------------------------------
+-    private static PeriodFormatter toFormatter(List<Object> elementPairs, boolean notPrinter, boolean notParser) {
+-        if (notPrinter && notParser) {
+-            throw new IllegalStateException("Builder has created neither a printer nor a parser");
+-        }
+-        int size = elementPairs.size();
+-        if (size >= 2 && elementPairs.get(0) instanceof Separator) {
+-            Separator sep = (Separator) elementPairs.get(0);
+-                PeriodFormatter f = toFormatter(elementPairs.subList(2, size), notPrinter, notParser);
+-                sep = sep.finish(f.getPrinter(), f.getParser());
+-                return new PeriodFormatter(sep, sep);
+-        }
+-        Object[] comp = createComposite(elementPairs);
+-        if (notPrinter) {
+-            return new PeriodFormatter(null, (PeriodParser) comp[1]);
+-        } else if (notParser) {
+-            return new PeriodFormatter((PeriodPrinter) comp[0], null);
+-        } else {
+-            return new PeriodFormatter((PeriodPrinter) comp[0], (PeriodParser) comp[1]);
+-        }
+-    }
++
++The logic can be broken down into several steps:
++
++1. Check if `notPrinter` or `notParser` are `true`. If they are, throw an `IllegalStateException`.
++2. Check if `elementPairs` is of size 2 or more and the first element is a `Separator` object. If so, create a new `PeriodFormatter` object with `sep` as the `firstSep` and `finish(f.getPrinter(), f.getParser())` as the `secondSep`.
++3. Create a new `PeriodFormatter` object with `null` as the `firstSep` and the `PeriodParser` object from the `comp` array as the `secondSep`.
++4. Create another new `PeriodFormatter` object with the `PeriodPrinter` object from the `comp` array as the `firstSep` and `null` as the `secondSep`.
++5. Return the new `PeriodFormatter` object.
++
++The issue with the code is that it returns `null` instead of creating a new `PeriodFormatter` object.
++
++Here's the fixed version of the function:
+\ No newline at end of file

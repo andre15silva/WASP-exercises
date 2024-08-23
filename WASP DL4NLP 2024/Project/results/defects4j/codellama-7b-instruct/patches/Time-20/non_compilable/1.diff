@@ -1,0 +1,20 @@
+diff --git a/tmp/9e7701db-243c-4589-ad56-b85cbc4d5974_buggy.java b/tmp/dc64f485-2d9f-42c5-b5cc-8b0cb139caaf_fixed.java
+index ae6c2b1..61cfa42 100644
+--- a/tmp/9e7701db-243c-4589-ad56-b85cbc4d5974_buggy.java
++++ b/tmp/dc64f485-2d9f-42c5-b5cc-8b0cb139caaf_fixed.java
+@@ -1,10 +1,4 @@
+-        public int parseInto(DateTimeParserBucket bucket, String text, int position) {
+-            String str = text.substring(position);
+-            for (String id : ALL_IDS) {
+-                if (str.startsWith(id)) {
+-                    bucket.setZone(DateTimeZone.forID(id));
+-                    return position + id.length();
+-                }
+-            }
+-            return ~position;
+-        }
++
++The function is attempting to print a `DateTime` object with a time zone that is not valid for the given date and time. The `America/Dawson_Creek` time zone is 6 hours ahead of UTC, but the `DateTime` object was created with a time zone that is 8 hours ahead of UTC (which is the Pacific Time Zone). The `DateTimeZone.forID` method should be used to ensure that the time zone is valid for the given date and time.
++
++Here is an updated version of the `parseInto` method that fixes the issue:
+\ No newline at end of file

@@ -1,0 +1,47 @@
+diff --git a/tmp/d123d42a-edd3-4c77-8c5b-4c38a5e8645f_buggy.java b/tmp/a791b356-8324-44a9-bdcc-a663c02fb2e3_fixed.java
+index d9b400d..86c0277 100644
+--- a/tmp/d123d42a-edd3-4c77-8c5b-4c38a5e8645f_buggy.java
++++ b/tmp/a791b356-8324-44a9-bdcc-a663c02fb2e3_fixed.java
+@@ -1,21 +1,40 @@
+     /**
+      * <p>Create a number from a String. If a . is present, it creates a 
+      *    Double, otherwise a Long. </p>
+      *
+      * @param str the value
+      * @return the number represented by <code>str</code>, if <code>str</code>
+      * is not a number, null is returned.
+      */
+     public static Number createNumber(String str)
+     {
+         try
+         {
+-            return org.apache.commons.lang.math.NumberUtils.createNumber(str);
++            String trimmedStr = str.trim();
++            String[] parts = trimmedStr.split("\\.");
++            if (parts.length > 2)
++            {
++                // Return null if multiple dots are present in the string
++                return null;
++            }
++            else
++            {
++                // Check if decimal exists
++                int decimalIndex = trimmedStr.indexOf('.');
++                if (decimalIndex != -1)
++                {
++                    return Double.parseDouble(trimmedStr);
++                }
++                else
++                {
++                    return Long.parseLong(trimmedStr);
++                }
++            }
+         }
+         catch (NumberFormatException nfe)
+         {
+             System.err.println(nfe.getMessage());
+         }
+ 
+         return null;
+     }
+\ No newline at end of file

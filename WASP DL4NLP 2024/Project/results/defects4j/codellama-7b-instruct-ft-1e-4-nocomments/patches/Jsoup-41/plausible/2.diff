@@ -1,0 +1,17 @@
+diff --git a/tmp/e3e3992e-707a-4418-82d2-81e633cbcf91_buggy.java b/tmp/13460f2b-d3f8-4ead-a596-ad89591dec47_fixed.java
+index d457dbe..d52d3df 100644
+--- a/tmp/e3e3992e-707a-4418-82d2-81e633cbcf91_buggy.java
++++ b/tmp/13460f2b-d3f8-4ead-a596-ad89591dec47_fixed.java
+@@ -1,10 +1,8 @@
+     @Override
+     public boolean equals(Object o) {
+         if (this == o) return true;
+         if (o == null || getClass() != o.getClass()) return false;
+         if (!super.equals(o)) return false;
+-
+         Element element = (Element) o;
+-
+-        return this == o;
++        return super.hashCode() == super.hashCode();
+     }
+\ No newline at end of file

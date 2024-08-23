@@ -1,0 +1,14 @@
+diff --git a/tmp/3e71c5d2-73a2-4b50-9d67-789d2bb75fac_buggy.java b/tmp/8f0dcc2c-eccf-4408-91c3-501038c6c475_fixed.java
+index fc49bcd..c7eb71e 100644
+--- a/tmp/3e71c5d2-73a2-4b50-9d67-789d2bb75fac_buggy.java
++++ b/tmp/8f0dcc2c-eccf-4408-91c3-501038c6c475_fixed.java
+@@ -1,4 +1,9 @@
+     @Override
+     public DefaultPrettyPrinter createInstance() {
+         return new DefaultPrettyPrinter(this);
+     }
++
++    @Override
++    public Object clone() {
++        return new DefaultPrettyPrinter(this);
++    }

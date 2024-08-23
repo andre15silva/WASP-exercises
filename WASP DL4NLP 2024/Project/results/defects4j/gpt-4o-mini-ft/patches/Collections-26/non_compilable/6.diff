@@ -1,0 +1,16 @@
+diff --git a/tmp/f3c631e7-4f78-4fe8-8235-36c28f248407_buggy.java b/tmp/78337310-559c-4cd6-96b3-5495a48252f8_fixed.java
+index a667cbe..3b0cfb8 100644
+--- a/tmp/f3c631e7-4f78-4fe8-8235-36c28f248407_buggy.java
++++ b/tmp/78337310-559c-4cd6-96b3-5495a48252f8_fixed.java
+@@ -1,10 +1,10 @@
+     /**
+      * Recalculate the hash code after deserialization. The hash code of some
+      * keys might have change (hash codes based on the system hash code are
+      * only stable for the same process).
+      * @return the instance with recalculated hash code
+      */
+     private Object readResolve() {
+-        calculateHashCode(keys);
++        calculateHashCode(getKey());
+         return this;
+     }

@@ -1,0 +1,45 @@
+diff --git a/tmp/7ac075a7-6055-4787-8f78-5fc13a52e69a_buggy.java b/tmp/ae2d2b71-be35-40d9-9dae-b34159833ce0_fixed.java
+index 3c69e10..2088e8d 100644
+--- a/tmp/7ac075a7-6055-4787-8f78-5fc13a52e69a_buggy.java
++++ b/tmp/ae2d2b71-be35-40d9-9dae-b34159833ce0_fixed.java
+@@ -1,27 +1,37 @@
+     /**
+      * @param Umin smallest Mann-Whitney U value
+      * @param n1 number of subjects in first sample
+      * @param n2 number of subjects in second sample
+      * @return two-sided asymptotic p-value
+      * @throws ConvergenceException if the p-value can not be computed
+      * due to a convergence error
+      * @throws MaxCountExceededException if the maximum number of
+      * iterations is exceeded
+      */
+     private double calculateAsymptoticPValue(final double Umin,
+                                              final int n1,
+                                              final int n2)
+         throws ConvergenceException, MaxCountExceededException {
+ 
+         final int n1n2prod = n1 * n2;
+ 
+         // http://en.wikipedia.org/wiki/Mann%E2%80%93Whitney_U#Normal_approximation
+         final double EU = n1n2prod / 2.0;
+         final double VarU = n1n2prod * (n1 + n2 + 1) / 12.0;
+ 
++        final double pValue;
++        if (n1n2prod < 5000) {
++            // there are convergence issues for U-values for larger data sets,
++            // see UR113050
+             final double z = (Umin - EU) / FastMath.sqrt(VarU);
++            pValue = 2 * new NormalDistribution(0, 1).cumulativeProbability(z);
++        } else {
++            // when dealing with 1000s of samples, the asympotic calculations
++            // can take too long for U with a large number of decimal places;
++            // rather than introducing more potential bugs in floating point error,
++            // we do the ordinary Mann-Whitney U calculation instead
++            pValue = getMannWhitneyUTest(d1, d2);
++        }
+ 
+-        final NormalDistribution standardNormal = new NormalDistribution(0, 1);
+-
+-        return 2 * standardNormal.cumulativeProbability(z);
++        return pValue;
+     }

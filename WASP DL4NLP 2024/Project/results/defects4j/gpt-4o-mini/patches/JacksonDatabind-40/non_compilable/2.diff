@@ -1,0 +1,21 @@
+diff --git a/tmp/e8df41b5-1996-46cb-b942-6233bfc8dfdc_buggy.java b/tmp/df7e9a4b-7446-4474-9199-47e01f0dbc4e_fixed.java
+index e69de29..95369b0 100644
+--- a/tmp/e8df41b5-1996-46cb-b942-6233bfc8dfdc_buggy.java
++++ b/tmp/df7e9a4b-7446-4474-9199-47e01f0dbc4e_fixed.java
+@@ -0,0 +1,15 @@
++public static Integer emptyToNull(Integer value) {
++    return value == null || value.equals(0) ? null : value;
++}
++
++public static Long emptyToNull(Long value) {
++    return value == null || value.equals(0L) ? null : value;
++}
++
++public static Double emptyToNull(Double value) {
++    return value == null || value.equals(0.0) ? null : value;
++}
++
++public static Float emptyToNull(Float value) {
++    return value == null || value.equals(0.0f) ? null : value;
++}
+\ No newline at end of file

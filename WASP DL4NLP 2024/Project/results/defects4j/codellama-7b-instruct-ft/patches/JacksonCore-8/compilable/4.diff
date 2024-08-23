@@ -1,0 +1,22 @@
+diff --git a/tmp/b338b86b-e104-4b78-bdbc-98ffb2b505a9_buggy.java b/tmp/d9f408b7-3a24-4501-a1cd-9c86e27add49_fixed.java
+index 9c4508f..f01d06b 100644
+--- a/tmp/b338b86b-e104-4b78-bdbc-98ffb2b505a9_buggy.java
++++ b/tmp/d9f408b7-3a24-4501-a1cd-9c86e27add49_fixed.java
+@@ -1,13 +1,16 @@
+     public char[] getTextBuffer()
+     {
+         // Are we just using shared input buffer?
+         if (_inputStart >= 0) return _inputBuffer;
++        // do NOT use _hasSegments for "empty"
++        assert !_hasSegments;
+         if (_resultArray != null)  return _resultArray;
+         if (_resultString != null) {
+             return (_resultArray = _resultString.toCharArray());
+         }
+         // Nope; but does it fit in just one segment?
+-        if (!_hasSegments)  return _currentSegment;
++        if (_currentSegment.length == 0)
++            return _currentSegment;
+         // Nope, need to have/create a non-segmented array and return it
+         return contentsAsArray();
+     }

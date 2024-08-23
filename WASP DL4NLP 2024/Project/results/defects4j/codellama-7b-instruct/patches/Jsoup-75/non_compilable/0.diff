@@ -1,0 +1,29 @@
+diff --git a/tmp/1d7c76a7-7cd6-4a43-a532-9fa4a4e54b39_buggy.java b/tmp/c365d079-b550-45a4-b2a4-7a5167924364_fixed.java
+index 98b456f..c740c60 100644
+--- a/tmp/1d7c76a7-7cd6-4a43-a532-9fa4a4e54b39_buggy.java
++++ b/tmp/c365d079-b550-45a4-b2a4-7a5167924364_fixed.java
+@@ -1,17 +1,8 @@
+-    final void html(final Appendable accum, final Document.OutputSettings out) throws IOException {
+-        final int sz = size;
+-        for (int i = 0; i < sz; i++) {
+-            // inlined from Attribute.html()
+-            final String key = keys[i];
+-            final String val = vals[i];
+-            accum.append(' ').append(key);
+ 
+-            // collapse checked=null, checked="", checked=checked; write out others
+-            if (!(out.syntax() == Document.OutputSettings.Syntax.html
+-                && (val == null || val.equals(key) && Attribute.isBooleanAttribute(key)))) {
+-                accum.append("=\"");
+-                Entities.escape(accum, val == null ? EmptyString : val, out, true, false, false);
+-                accum.append('"');
+-            }
+-        }
++The fixed code for the Entities class:
++
++class Entities {
++
++- fixedBuggyFunctionHere
++
+ }
+\ No newline at end of file

@@ -1,0 +1,32 @@
+diff --git a/tmp/1b923060-f955-4ae2-94bf-cc9be5e70e7a_buggy.java b/tmp/2c7df727-d70d-41d9-a3d4-79d1f0c1252a_fixed.java
+index 6f49dcb..abebbbf 100644
+--- a/tmp/1b923060-f955-4ae2-94bf-cc9be5e70e7a_buggy.java
++++ b/tmp/2c7df727-d70d-41d9-a3d4-79d1f0c1252a_fixed.java
+@@ -1,9 +1,18 @@
+-    @Override
+-    public StringBuilder getGenericSignature(StringBuilder sb)
+-    {
+-        _classSignature(_class, sb, false);
+-        sb.append('<');
+-        sb = _referencedType.getGenericSignature(sb);
+-        sb.append(';');
+-        return sb;
++public void testGenericSignature1195() throws Exception {
++    TypeFactory tf = TypeFactory.defaultInstance();
++    Method m;
++    JavaType t;
++
++    m = Generic1195.class.getMethod("getList");
++    t  = tf.constructType(m.getGenericReturnType());
++    assertEquals("Ljava/util/List<Ljava/lang/String;>;", t.getGenericSignature());
++
++    m = Generic1195.class.getMethod("getMap");
++    t  = tf.constructType(m.getGenericReturnType());
++    assertEquals("Ljava/util/Map<Ljava/lang/String;Ljava/lang;/String;>;",
++            t.getGenericSignature());
++
++    m = Generic1195.class.getMethod("getGeneric");
++    t  = tf.constructType(m.getGenericReturnType());
++    assertEquals("Ljava/util/concurrent/atomic/AtomicReference<Ljava/lang/String;>;", t.getGenericSignature());
+ }
+\ No newline at end of file

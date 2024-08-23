@@ -1,0 +1,12 @@
+diff --git a/tmp/b7e46849-917f-446d-9911-803f0b7c0879_buggy.java b/tmp/738fb765-411f-4d41-ac87-66bdc7bd8cd0_fixed.java
+index 84989ca..040fdfd 100644
+--- a/tmp/b7e46849-917f-446d-9911-803f0b7c0879_buggy.java
++++ b/tmp/738fb765-411f-4d41-ac87-66bdc7bd8cd0_fixed.java
+@@ -1,6 +1,6 @@
+     boolean matchesLetter() {
+         if (isEmpty())
+             return false;
+         char c = input[pos];
+-        return (c >= 'A' && c <= 'Z') || (c >= 'a' && c <= 'z');
++        return (c >= 'A' && c <= 'Z') || (c >= 'a' && c <= 'z') || (c < 128);
+     }

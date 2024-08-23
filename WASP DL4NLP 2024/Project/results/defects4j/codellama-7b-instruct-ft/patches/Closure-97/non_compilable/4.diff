@@ -1,0 +1,85 @@
+diff --git a/tmp/8f530b46-81c0-4d28-bff7-eacc0c13daf6_buggy.java b/tmp/b0ae4c42-5878-4ab4-b171-74248095d90e_fixed.java
+index 1126687..70bfc44 100644
+--- a/tmp/8f530b46-81c0-4d28-bff7-eacc0c13daf6_buggy.java
++++ b/tmp/b0ae4c42-5878-4ab4-b171-74248095d90e_fixed.java
+@@ -1,65 +1,80 @@
+   /**
+    * Try to fold shift operations
+    */
+   private Node tryFoldShift(Node n, Node left, Node right) {
+     if (left.getType() == Token.NUMBER &&
+         right.getType() == Token.NUMBER) {
+ 
+       double result;
+       double lval = left.getDouble();
+       double rval = right.getDouble();
+ 
+       // check ranges.  We do not do anything that would clip the double to
+       // a 32-bit range, since the user likely does not intend that.
+       if (!(lval >= Integer.MIN_VALUE && lval <= Integer.MAX_VALUE)) {
+         error(BITWISE_OPERAND_OUT_OF_RANGE, left);
+         return n;
+       }
+ 
+       // only the lower 5 bits are used when shifting, so don't do anything
+       // if the shift amount is outside [0,32)
+       if (!(rval >= 0 && rval < 32)) {
+         error(SHIFT_AMOUNT_OUT_OF_BOUNDS, right);
+         return n;
+       }
+ 
+       // Convert the numbers to ints
+       int lvalInt = (int) lval;
+       if (lvalInt != lval) {
+         error(FRACTIONAL_BITWISE_OPERAND, left);
+         return n;
+       }
+ 
+       int rvalInt = (int) rval;
+       if (rvalInt != rval) {
+         error(FRACTIONAL_BITWISE_OPERAND, right);
+         return n;
+       }
+ 
+       switch (n.getType()) {
+         case Token.LSH:
+           result = lvalInt << rvalInt;
+           break;
+         case Token.RSH:
++          // Handle the special case where the left hand side is a negative
++          // number as Java will sign extend the left hand side
++          if (lval < 0) {
++            result = lvalInt << rval;
++          } else {
+             result = lvalInt >> rvalInt;
++          }
+           break;
+         case Token.URSH:
++          // The left hand side is always unsigned, so truncate any right side
++          // that is negative
++          if (rvalInt < 0) {
++            rvalInt = 0;
++          }
++          if (rvalInt == 0 && lvalInt != 0) {
++            result = lvalInt >> rvalInt;
++          } else {
+             // JavaScript handles zero shifts on signed numbers differently than
+             // Java as an Java int can not represent the unsigned 32-bit number
+             // where JavaScript can so use a long here.
+             result = lvalInt >>> rvalInt;
++          }
+           break;
+         default:
+           throw new AssertionError("Unknown shift operator: " +
+               Node.tokenToName(n.getType()));
+       }
+ 
+       Node newNumber = Node.newNumber(result);
+       n.getParent().replaceChild(n, newNumber);
+       reportCodeChange();
+ 
+       return newNumber;
+     }
+ 
+     return n;
+   }

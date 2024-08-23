@@ -1,0 +1,23 @@
+diff --git a/tmp/5d8aa431-e2a5-493c-af2e-5e683c1d3696_buggy.java b/tmp/214b0ea9-1b6f-4345-bbd0-4a3b1be2e594_fixed.java
+index 29d025a..c517c95 100644
+--- a/tmp/5d8aa431-e2a5-493c-af2e-5e683c1d3696_buggy.java
++++ b/tmp/214b0ea9-1b6f-4345-bbd0-4a3b1be2e594_fixed.java
+@@ -1,13 +1,18 @@
+     private void _verifySharing()
+     {
+         if (_hashShared) {
+             _hashArea = Arrays.copyOf(_hashArea, _hashArea.length);
+             _names = Arrays.copyOf(_names, _names.length);
+             _hashShared = false;
+             // 09-Sep-2015, tatu: As per [jackson-core#216], also need to ensure
+             //    we rehash as needed, as need-rehash flag is not copied from parent
++            // -- also, we need space (4-byte entries) for 512 items, and need to
++            //    be careful not to expand too much if that isn't really needed
++            if (_hashArea.length == 512) {
++                _expansionSize = 512;
++            }
+         }
+         if (_needRehash) {
+             rehash();
+         }
+     }

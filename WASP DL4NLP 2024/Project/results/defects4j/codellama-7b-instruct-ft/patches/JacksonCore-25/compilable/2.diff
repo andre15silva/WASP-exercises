@@ -1,0 +1,57 @@
+diff --git a/tmp/71e18b2c-caf3-4ba6-9482-11bf51e4512d_buggy.java b/tmp/39a90038-3f6b-44d3-be23-53328d4cb790_fixed.java
+index 8dfbd84..1731749 100644
+--- a/tmp/71e18b2c-caf3-4ba6-9482-11bf51e4512d_buggy.java
++++ b/tmp/39a90038-3f6b-44d3-be23-53328d4cb790_fixed.java
+@@ -1,43 +1,52 @@
+     private String _handleOddName2(int startPtr, int hash, int[] codes) throws IOException
+     {
+         _textBuffer.resetWithShared(_inputBuffer, startPtr, (_inputPtr - startPtr));
+         char[] outBuf = _textBuffer.getCurrentSegment();
+         int outPtr = _textBuffer.getCurrentSegmentSize();
+         final int maxCode = codes.length;
+ 
+         while (true) {
+             if (_inputPtr >= _inputEnd) {
+                 if (!_loadMore()) { // acceptable for now (will error out later)
+                     break;
+                 }
+             }
+             char c = _inputBuffer[_inputPtr];
+             int i = (int) c;
+             if (i <= maxCode) {
+                 if (codes[i] != 0) {
+                     break;
+                 }
+             } else if (!Character.isJavaIdentifierPart(c)) {
+                 break;
+             }
+             ++_inputPtr;
+             hash = (hash * CharsToNameCanonicalizer.HASH_MULT) + i;
+             // Ok, let's add char to output:
+             outBuf[outPtr++] = c;
++            // 05-Jan-2006: Seems to be necessary? unquoted field names are converted to
++            // field names here, but if the field name turns out to be the same as
++            // a field via a different path, such as "node", "childNode", etc, the
++            // duplicate is found later on.
++            // Although not clear why it is necessary, [JACKSON-57] seems to suggest
++            // that the empty slot could be filled in with '\0' and problems gone.
++            // ... but let's try with just '\0', even though the spec (3.9.1) does
++            // not mandate anything about what data is to be there to start with.
++            outBuf[outPtr++] = 0;
+ 
+             // Need more room?
+             if (outPtr >= outBuf.length) {
+                 outBuf = _textBuffer.finishCurrentSegment();
+                 outPtr = 0;
+             }
+         }
+         _textBuffer.setCurrentLength(outPtr);
+         {
+             TextBuffer tb = _textBuffer;
+             char[] buf = tb.getTextBuffer();
+             int start = tb.getTextOffset();
+             int len = tb.size();
+ 
+             return _symbols.findSymbol(buf, start, len, hash);
+         }
+     }

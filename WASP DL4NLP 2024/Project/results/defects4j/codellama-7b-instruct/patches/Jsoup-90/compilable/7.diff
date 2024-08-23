@@ -1,0 +1,43 @@
+diff --git a/tmp/8bc34583-7c9f-4f5a-909b-8a62385ac8c3_buggy.java b/tmp/f0918d9f-e95a-46f6-a0f1-ba283ff46dd1_fixed.java
+index 373b1e8..3501670 100644
+--- a/tmp/8bc34583-7c9f-4f5a-909b-8a62385ac8c3_buggy.java
++++ b/tmp/f0918d9f-e95a-46f6-a0f1-ba283ff46dd1_fixed.java
+@@ -1,37 +1,37 @@
+         private static boolean looksLikeUtf8(byte[] input) {
+             int i = 0;
+             // BOM:
+             if (input.length >= 3 && (input[0] & 0xFF) == 0xEF
+                 && (input[1] & 0xFF) == 0xBB & (input[2] & 0xFF) == 0xBF) {
+                 i = 3;
+             }
+ 
+             int end;
+-            for (int j = input.length; i < j; ++i) {
++            for (int j = input.length - 1; i < j; ++i) {
+                 int o = input[i];
+                 if ((o & 0x80) == 0) {
+                     continue; // ASCII
+                 }
+ 
+                 // UTF-8 leading:
+                 if ((o & 0xE0) == 0xC0) {
+                     end = i + 1;
+                 } else if ((o & 0xF0) == 0xE0) {
+                     end = i + 2;
+                 } else if ((o & 0xF8) == 0xF0) {
+                     end = i + 3;
+                 } else {
+                     return false;
+                 }
+ 
+ 
+                 while (i < end) {
+                     i++;
+                     o = input[i];
+                     if ((o & 0xC0) != 0x80) {
+                         return false;
+                     }
+                 }
+             }
+             return true;
+         }

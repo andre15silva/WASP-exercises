@@ -1,0 +1,20 @@
+diff --git a/tmp/591c156a-2376-4b41-b92d-b05ae1a28f32_buggy.java b/tmp/b7931b77-8003-4d00-9b82-e1ccb14dddc1_fixed.java
+index 3002587..279ab93 100644
+--- a/tmp/591c156a-2376-4b41-b92d-b05ae1a28f32_buggy.java
++++ b/tmp/b7931b77-8003-4d00-9b82-e1ccb14dddc1_fixed.java
+@@ -1,10 +1,13 @@
+     /**
+      * Fits a Gaussian function to the observed points.
+      *
+      * @return the parameters of the Gaussian function that best fits the
+      * observed points (in the same order as above).
+      */
+     public double[] fit() {
+         final double[] guess = (new ParameterGuesser(getObservations())).guess();
+-        return fit(new Gaussian.Parametric(), guess);
++        return fit(new NonOptimizedLeastSquaresFitter(
++            new LevenbergMarquardtOptimizer().withStepBoundFactor(Math.sqrt(2.0)), 
++            new Gaussian.Parametric()), 
++            null);
+     }
+\ No newline at end of file

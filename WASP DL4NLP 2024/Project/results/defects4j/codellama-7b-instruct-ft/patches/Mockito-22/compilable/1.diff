@@ -1,0 +1,17 @@
+diff --git a/tmp/5069734b-0c4e-44a1-b0b6-bd16ec2e7a14_buggy.java b/tmp/8f1e2aab-eb83-4418-a61b-c3f2512e6112_fixed.java
+index 111ba5e..b5cffef 100644
+--- a/tmp/5069734b-0c4e-44a1-b0b6-bd16ec2e7a14_buggy.java
++++ b/tmp/8f1e2aab-eb83-4418-a61b-c3f2512e6112_fixed.java
+@@ -1,9 +1,10 @@
+     public static boolean areEqual(Object o1, Object o2) {
+         if (o1 == null || o2 == null) {
+             return o1 == null && o2 == null;
+-        } else if (isArray(o1)) {
+-            return isArray(o2) && areArraysEqual(o1, o2);
++        } else if (o1.getClass().isArray() && isArray(o2)) {
++            // handle two arrays - arrays in java use == for equality
++            return areArraysEqual(o1, o2);
+         } else {
+             return o1.equals(o2);
+         }
+     }

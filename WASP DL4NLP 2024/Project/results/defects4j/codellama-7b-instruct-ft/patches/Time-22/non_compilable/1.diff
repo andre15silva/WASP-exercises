@@ -1,0 +1,22 @@
+diff --git a/tmp/2dce70ec-0da2-4e01-9d1f-475d99ff1723_buggy.java b/tmp/1974fd5a-14b0-48e0-9d62-8a500aea2daa_fixed.java
+index 5b8a4d2..c435caa 100644
+--- a/tmp/2dce70ec-0da2-4e01-9d1f-475d99ff1723_buggy.java
++++ b/tmp/1974fd5a-14b0-48e0-9d62-8a500aea2daa_fixed.java
+@@ -1,12 +1,17 @@
+     /**
+      * Creates a period from the given millisecond duration with the standard period type
+      * and ISO rules, ensuring that the calculation is performed with the time-only period type.
+      * <p>
+      * The calculation uses the hour, minute, second and millisecond fields.
+      *
+      * @param duration  the duration, in milliseconds
+      */
+     protected BasePeriod(long duration) {
+         this(duration, null, null);
+         // bug [3264409]
++        // Joda DateTime requires the time zone to ensure that date calculations are performed
++        // using the right time zone. This is a hack to stop DateTime from using its default
++        // JDK time zone, or else the resultant time would be wrong.
++        // TODO: we should instead investigate why this is needed.
++        this.iChronology = ISOChronology.getInstance(DateTimeZone.UTC);
+     }

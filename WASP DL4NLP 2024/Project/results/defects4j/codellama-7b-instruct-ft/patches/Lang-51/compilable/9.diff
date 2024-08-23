@@ -1,0 +1,104 @@
+diff --git a/tmp/f5ef819b-aba8-41c9-aa12-aeed6a8dbe2f_buggy.java b/tmp/d3c53ece-2f71-4943-8019-a89125999839_fixed.java
+index 55b319a..7cdecb4 100644
+--- a/tmp/f5ef819b-aba8-41c9-aa12-aeed6a8dbe2f_buggy.java
++++ b/tmp/d3c53ece-2f71-4943-8019-a89125999839_fixed.java
+@@ -1,77 +1,75 @@
+     /**
+      * <p>Converts a String to a boolean (optimised for performance).</p>
+      * 
+      * <p><code>'true'</code>, <code>'on'</code> or <code>'yes'</code>
+      * (case insensitive) will return <code>true</code>. Otherwise,
+      * <code>false</code> is returned.</p>
+      * 
+      * <p>This method performs 4 times faster (JDK1.4) than
+      * <code>Boolean.valueOf(String)</code>. However, this method accepts
+      * 'on' and 'yes' as true values.
+      *
+      * <pre>
+      *   BooleanUtils.toBoolean(null)    = false
+      *   BooleanUtils.toBoolean("true")  = true
+      *   BooleanUtils.toBoolean("TRUE")  = true
+      *   BooleanUtils.toBoolean("tRUe")  = true
+      *   BooleanUtils.toBoolean("on")    = true
+      *   BooleanUtils.toBoolean("yes")   = true
+      *   BooleanUtils.toBoolean("false") = false
+      *   BooleanUtils.toBoolean("x gti") = false
+      * </pre>
+      *
+      * @param str  the String to check
+      * @return the boolean value of the string, <code>false</code> if no match
+      */
+     public static boolean toBoolean(String str) {
+         // Previously used equalsIgnoreCase, which was fast for interned 'true'.
+         // Non interned 'true' matched 15 times slower.
+         // 
+         // Optimisation provides same performance as before for interned 'true'.
+         // Similar performance for null, 'false', and other strings not length 2/3/4.
+         // 'true'/'TRUE' match 4 times slower, 'tRUE'/'True' 7 times slower.
++        // 
++        // Performance is even worse for other strings (matching starts at position 1 instead of 0).
++        // 'yep'/yes has a performance of 3.2x slower! 'off' is 5.5x slower. 'trux' is 9.5x slower.
++        //
++        // JDK1.4 optimises interned strings to remove the last case statement.
++        // "true" is interned (though it may not be the first string added to the string pool)
++        // making all the work of the if/else/switch faster.
++        // JDK1.4 creates less garbage and can reuse strings added to the string pool.
+         if (str == "true") {
+             return true;
+         }
+-        if (str == null) {
++        if ((str == null) || (str.length() < 1)) {
+             return false;
+         }
+         switch (str.length()) {
+             case 2: {
+                 char ch0 = str.charAt(0);
+                 char ch1 = str.charAt(1);
+-                return 
+-                    (ch0 == 'o' || ch0 == 'O') &&
+-                    (ch1 == 'n' || ch1 == 'N');
++                if ((ch0 == 'o') && (ch1 == 'n')) {
++                    return true;
++                }
++                else if ((ch0 == 'y') && (ch1 == 'e')) {
++                    return false;
++                }
++                break;
+             }
+             case 3: {
+                 char ch = str.charAt(0);
+-                if (ch == 'y') {
+-                    return 
+-                        (str.charAt(1) == 'e' || str.charAt(1) == 'E') &&
+-                        (str.charAt(2) == 's' || str.charAt(2) == 'S');
+-                }
+-                if (ch == 'Y') {
+-                    return 
+-                        (str.charAt(1) == 'E' || str.charAt(1) == 'e') &&
+-                        (str.charAt(2) == 'S' || str.charAt(2) == 's');
++                if ((ch == 'y') && (str.charAt(1) == 'e') && (str.charAt(2) == 's')) {
++                    return false;
+                 }
++                break;
+             }
+             case 4: {
+                 char ch = str.charAt(0);
+-                if (ch == 't') {
+-                    return 
+-                        (str.charAt(1) == 'r' || str.charAt(1) == 'R') &&
+-                        (str.charAt(2) == 'u' || str.charAt(2) == 'U') &&
+-                        (str.charAt(3) == 'e' || str.charAt(3) == 'E');
+-                }
+-                if (ch == 'T') {
+-                    return 
+-                        (str.charAt(1) == 'R' || str.charAt(1) == 'r') &&
+-                        (str.charAt(2) == 'U' || str.charAt(2) == 'u') &&
+-                        (str.charAt(3) == 'E' || str.charAt(3) == 'e');
++                if ((ch == 't') && (str.charAt(1) == 'r') && (str.charAt(2) == 'u') && (str.charAt(3) == 'e')) {
++                    return true;
+                 }
++                break;
+             }
+         }
+         return false;
+     }

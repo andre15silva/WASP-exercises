@@ -1,0 +1,16 @@
+diff --git a/tmp/5dace5e0-5106-4bb8-8624-8108b4da5cae_buggy.java b/tmp/7203379f-f482-486c-bdaa-c9cb2f1aeeb0_fixed.java
+index ec709bd..b14b7dc 100644
+--- a/tmp/5dace5e0-5106-4bb8-8624-8108b4da5cae_buggy.java
++++ b/tmp/7203379f-f482-486c-bdaa-c9cb2f1aeeb0_fixed.java
+@@ -1,8 +1,3 @@
+-    @Override
+-    public Object deserialize(JsonParser p, DeserializationContext ctxt) throws IOException
+-    {
+-        // 29-Jan-2016, tatu: Simple skipping for all other tokens, but FIELD_NAME bit
+-        //    special unfortunately
+-            p.skipChildren();
+-        return null;
++if (jp.hasToken(JsonToken.FIELD_NAME) && "location".equals(jp.getCurrentName())) {
++    // logic to handle "location" property
+ }
+\ No newline at end of file

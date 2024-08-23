@@ -1,0 +1,27 @@
+diff --git a/tmp/d1e5dd23-f59f-42f6-b11c-010adc4cf8cc_buggy.java b/tmp/101701ef-ea59-4e19-8dcb-74e545563677_fixed.java
+index 072c672..6beaf74 100644
+--- a/tmp/d1e5dd23-f59f-42f6-b11c-010adc4cf8cc_buggy.java
++++ b/tmp/101701ef-ea59-4e19-8dcb-74e545563677_fixed.java
+@@ -1,20 +1,20 @@
+       @Override
+       public int parseArguments(Parameters params) throws CmdLineException {
+         String param = params.getParameter(0);
+-
+         if (param == null) {
+           setter.addValue(true);
+           return 0;
+         } else {
++          printVersion();
+           String lowerParam = param.toLowerCase();
+           if (TRUES.contains(lowerParam)) {
+             setter.addValue(true);
+           } else if (FALSES.contains(lowerParam)) {
+             setter.addValue(false);
+           } else {
+             setter.addValue(true);
+             return 0;
+           }
+           return 1;
+         }
+       }
+\ No newline at end of file

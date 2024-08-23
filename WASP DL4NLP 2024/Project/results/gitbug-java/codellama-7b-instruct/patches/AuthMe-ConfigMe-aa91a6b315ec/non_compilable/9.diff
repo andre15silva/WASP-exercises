@@ -1,0 +1,30 @@
+diff --git a/tmp/c179b68e-34d0-4010-bc0a-bd6c2f7aa9c4_buggy.java b/tmp/5fbe6997-2540-44be-9398-17bf01cdcb81_fixed.java
+index b775870..9985d73 100644
+--- a/tmp/c179b68e-34d0-4010-bc0a-bd6c2f7aa9c4_buggy.java
++++ b/tmp/5fbe6997-2540-44be-9398-17bf01cdcb81_fixed.java
+@@ -1,10 +1,15 @@
+-    /**
+-     * Sets the given lines for the provided path, overriding any previously existing comments for the path.
+-     * An entry that is a sole new-line (i.e. "\n") will result in an empty line without any comment marker.
+-     *
+-     * @param path the path to register the comment lines for
+-     * @param commentLines the comment lines to set for the path
+-     */
+-    public void setComment(@NotNull String path, @NotNull String... commentLines) {
+-        comments.put(path, Collections.unmodifiableList(Arrays.asList(commentLines)));
++    @Test
++    void shouldOverrideExistingComment() {
++        // given
++        CommentsConfiguration conf = new CommentsConfiguration();
++        conf.setComment("com.acme", "Acme comment test");
++        conf.setComment("other.path", "Some other", "path I am", "adding");
++
++        // when
++        conf.setComment("com.acme", "Acme new comment", "1, 2, 3");
++
++        // then
++        assertThat(conf.getAllComments().keySet(), containsInAnyOrder("com.acme", "other.path"));
++        assertThat(conf.getAllComments().get("com.acme"), contains("Acme new comment", "1, 2, 3"));
++        assertThat(conf.getAllComments().get("other.path"), contains("Some other", "path I am", "adding"));
+     }
+\ No newline at end of file

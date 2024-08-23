@@ -1,0 +1,27 @@
+diff --git a/tmp/a3541795-7891-4a3f-93da-c9ee1f31e8e4_buggy.java b/tmp/2e578c8a-ec71-4800-b63b-4edc47c4f892_fixed.java
+index 593602f..d4a3c17 100644
+--- a/tmp/a3541795-7891-4a3f-93da-c9ee1f31e8e4_buggy.java
++++ b/tmp/2e578c8a-ec71-4800-b63b-4edc47c4f892_fixed.java
+@@ -1,6 +1,17 @@
+-    @Override
+ public String toString() {
+-        return rangesList.stream()
+-            .map(RangesList::formatRanges)
+-            .collect(joining(OR_JOINER));
++    StringBuilder builder = new StringBuilder();
++    boolean firstRange = true;
++    
++    for (int i = 0; i < rangesList.size(); i++) {
++        Range range = rangesList.get(i);
++        if (firstRange) {
++            firstRange = false;
++            builder.append(range.getLowerBound());
++        } else {
++            builder.append(" or ");
++            builder.append(range.getLowerBound());
++        }
++    }
++    
++    return builder.toString();
+ }
+\ No newline at end of file

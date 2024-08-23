@@ -1,0 +1,18 @@
+diff --git a/tmp/7c4401ea-b7ef-4ff1-8101-53bd8407f5e1_buggy.java b/tmp/a5d29d9d-8433-4375-8141-a964149a234c_fixed.java
+index ee836e4..e209621 100644
+--- a/tmp/7c4401ea-b7ef-4ff1-8101-53bd8407f5e1_buggy.java
++++ b/tmp/a5d29d9d-8433-4375-8141-a964149a234c_fixed.java
+@@ -1,9 +1,12 @@
+ @Override
+ protected String buildCanonicalName()
+ {
+     StringBuilder sb = new StringBuilder();
+     sb.append(_class.getName());
++    if (_referencedType != null) {
+         sb.append('<');
+         sb.append(_referencedType.toCanonical());
++        sb.append('>');
++    }
+     return sb.toString();
+ }
+\ No newline at end of file

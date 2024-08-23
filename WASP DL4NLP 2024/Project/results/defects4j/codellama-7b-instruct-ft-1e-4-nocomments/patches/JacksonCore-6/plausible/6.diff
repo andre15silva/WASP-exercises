@@ -1,0 +1,30 @@
+diff --git a/tmp/bc32a037-14bb-467e-8e34-422067011819_buggy.java b/tmp/cf7ccbaa-34b0-4928-91d6-2d99645d2526_fixed.java
+index c3c1a6f..995f411 100644
+--- a/tmp/bc32a037-14bb-467e-8e34-422067011819_buggy.java
++++ b/tmp/cf7ccbaa-34b0-4928-91d6-2d99645d2526_fixed.java
+@@ -1,22 +1,20 @@
+     private final static int _parseIndex(String str) {
++        final boolean startsWithZero = str.charAt(0) == '0';
+         final int len = str.length();
+-        // [core#133]: beware of super long indexes; assume we never
+-        // have arrays over 2 billion entries so ints are fine.
+-        if (len == 0 || len > 10) {
++        if (len == 0 || (len > 1 && startsWithZero)) {
+             return -1;
+         }
+-        // [core#176]: no leading zeroes allowed
+         for (int i = 0; i < len; ++i) {
+             char c = str.charAt(i);
+             if (c > '9' || c < '0') {
+                 return -1;
+             }
+         }
+         if (len == 10) {
+             long l = NumberInput.parseLong(str);
+             if (l > Integer.MAX_VALUE) {
+                 return -1;
+             }
+         }
+         return NumberInput.parseInt(str);
+     }
+\ No newline at end of file

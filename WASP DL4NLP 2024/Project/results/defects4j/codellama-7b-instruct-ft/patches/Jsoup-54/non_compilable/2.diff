@@ -1,0 +1,21 @@
+diff --git a/tmp/311f2f64-4b5e-4ef8-a075-f05113beca1e_buggy.java b/tmp/5ea27a27-9be2-490f-879c-fc502e6a6197_fixed.java
+index d5b3da9..9131917 100644
+--- a/tmp/311f2f64-4b5e-4ef8-a075-f05113beca1e_buggy.java
++++ b/tmp/5ea27a27-9be2-490f-879c-fc502e6a6197_fixed.java
+@@ -1,7 +1,16 @@
+         private void copyAttributes(org.jsoup.nodes.Node source, Element el) {
+             for (Attribute attribute : source.attributes()) {
+                 // valid xml attribute names are: ^[a-zA-Z_:][-a-zA-Z0-9_:.]
+                 String key = attribute.getKey().replaceAll("[^-a-zA-Z0-9_:.]", "");
++                try {
+                     el.setAttribute(key, attribute.getValue());
++                } catch (DOMException e) {
++                    // ignore. this happens (e.g.) if we have an invalid XML token (&lt;) in an attribute value.
++                    // we assume the value will stay invalid. if it's still invalid & we can't deal with it
++                    // then we'll leave it alone
++                } catch (IllegalArgumentException e) {
++                    // also may happen if a value contains &lt;  (note: not &lt;, actual '<').
++                    // again: may be worth adding these to attribute validator
++                }
+             }
+         }

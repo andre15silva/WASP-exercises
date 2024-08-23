@@ -1,0 +1,30 @@
+diff --git a/tmp/4a4ec1f4-9b5d-4708-8b6f-823367ccffab_buggy.java b/tmp/96897a78-e542-404f-a54c-6d01d29d638c_fixed.java
+index 8afddc6..fe8fa50 100644
+--- a/tmp/4a4ec1f4-9b5d-4708-8b6f-823367ccffab_buggy.java
++++ b/tmp/96897a78-e542-404f-a54c-6d01d29d638c_fixed.java
+@@ -1,22 +1,24 @@
+   @Override
+   protected CompilerOptions createOptions() {
+     CompilerOptions options = new CompilerOptions();
+     options.setCodingConvention(new ClosureCodingConvention());
+     CompilationLevel level = flags.compilation_level;
+     level.setOptionsForCompilationLevel(options);
+     if (flags.debug) {
+       level.setDebugOptionsForCompilationLevel(options);
+     }
+ 
+     WarningLevel wLevel = flags.warning_level;
+     wLevel.setOptionsForWarningLevel(options);
+     for (FormattingOption formattingOption : flags.formatting) {
+       formattingOption.applyToOptions(options);
+     }
+-    if (flags.process_closure_primitives) {
++    // Disabling the closure primitive pass can be problematic as we might remove
++    // code that depends on the primitive.
++    if (flags.process_closure_primitives == null) {
+       options.closurePass = true;
+     }
+ 
+     initOptionsFromFlags(options);
+     return options;
+   }

@@ -1,0 +1,46 @@
+diff --git a/tmp/bb530e47-855f-4d46-a438-86d15a18663b_buggy.java b/tmp/7821195c-2129-4cda-b2b5-a2d692501860_fixed.java
+index 6c0aa19..e3e26d2 100644
+--- a/tmp/bb530e47-855f-4d46-a438-86d15a18663b_buggy.java
++++ b/tmp/7821195c-2129-4cda-b2b5-a2d692501860_fixed.java
+@@ -1,20 +1,40 @@
+     /**
+      * @param encoding the encoding to use for file names, use null
+      * for the platform's default encoding
+      * @param useUnicodeExtraFields whether to use InfoZIP Unicode
+      * Extra Fields (if present) to set the file names.
+      * @param allowStoredEntriesWithDataDescriptor whether the stream
+      * will try to read STORED entries that use a data descriptor
+      * @since 1.1
+      */
+     public ZipArchiveInputStream(InputStream inputStream,
+                                  String encoding,
+                                  boolean useUnicodeExtraFields,
+                                  boolean allowStoredEntriesWithDataDescriptor) {
+         zipEncoding = ZipEncodingHelper.getZipEncoding(encoding);
+         this.useUnicodeExtraFields = useUnicodeExtraFields;
+-        in = new PushbackInputStream(inputStream, buf.capacity());
++        in = new PushbackInputStream(inputStream, buf.capacity() + 1);
+         this.allowStoredEntriesWithDataDescriptor =
+             allowStoredEntriesWithDataDescriptor;
+         // haven't read anything so far
++        boolean haveReadFirst = false;
++        int count = 0;
++        while (count < buf.capacity() + 1) {
++            int read = in.read();
++            if (read == -1) {
++                break;
++            } else {
++                buf.write(read);
++                count++;
++            }
++        }
++        if (count > 0) {
++            if (in.read() != -1) {
++                haveReadFirst = true;
++            }
++        }
++        buf.reset();
++        if (!haveReadFirst) {
++            throw new IllegalStateException("Input stream does not look like a JAR archive");
++        }
+     }

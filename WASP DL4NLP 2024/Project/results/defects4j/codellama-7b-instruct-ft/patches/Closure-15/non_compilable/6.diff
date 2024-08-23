@@ -1,0 +1,60 @@
+diff --git a/tmp/11c36083-c8eb-46f5-97df-272d6de3009b_buggy.java b/tmp/4a80fe75-3d01-4998-916f-d7d243b8a760_fixed.java
+index b56897c..5630563 100644
+--- a/tmp/11c36083-c8eb-46f5-97df-272d6de3009b_buggy.java
++++ b/tmp/4a80fe75-3d01-4998-916f-d7d243b8a760_fixed.java
+@@ -1,27 +1,55 @@
+       @Override
+       public boolean apply(Node n) {
+         // When the node is null it means, we reached the implicit return
+         // where the function returns (possibly without an return statement)
+         if (n == null) {
+           return false;
+         }
+ 
+         // TODO(user): We only care about calls to functions that
+         // passes one of the dependent variable to a non-side-effect free
+         // function.
+         if (n.isCall() && NodeUtil.functionCallHasSideEffects(n)) {
+           return true;
+         }
+ 
+         if (n.isNew() && NodeUtil.constructorCallHasSideEffects(n)) {
+           return true;
+         }
+ 
+ 
+         for (Node c = n.getFirstChild(); c != null; c = c.getNext()) {
+           if (!ControlFlowGraph.isEnteringNewCfgNode(c) && apply(c)) {
+             return true;
+           }
+         }
++        if (n.isSimpleForIn()) {
++          for (Node c = n.getFirstChild().getFirstChild(); c != null; c = c.getNext()) {
++            if (!ControlFlowGraph.isEnteringNewCfgNode(c)) {
++              if (c.isVar() || c.isAssign()) {
++                for (Node child = c.getFirstChild(); child != null; child = child.getNext()) {
++                  // A name in an assignment is a dependent variable
++                  if (child != null && child.isName()) {
++                    // Not all variables are being written.
++                    if (c.isAssign()) {
++                      Node lhs = c.getFirstChild().getNext().getNext().getFirstChild();
++                      if (lhs != null && lhs.isName() && !lhs.isVar()) {
++                        return true;
++                      }
++                    }
++                    break;
++                  }
++                }
++              }
++            } else {
++              for (Node child = c.getFirstChild(); child != null; child = child.getNext()) {
++                // An expression that evaluates to a dependent variable.
++                if (child != null && child.isName()) {
++                  return true;
++                }
++              }
++            }
++          }
++        }
+         return false;
+       }

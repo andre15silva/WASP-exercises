@@ -1,0 +1,19 @@
+diff --git a/tmp/5bff8ae7-e256-40b9-97ee-ba81f6321499_buggy.java b/tmp/f57a99a1-f785-4981-a052-ded0c2cb0090_fixed.java
+index 6fecc90..7b904c6 100644
+--- a/tmp/5bff8ae7-e256-40b9-97ee-ba81f6321499_buggy.java
++++ b/tmp/f57a99a1-f785-4981-a052-ded0c2cb0090_fixed.java
+@@ -1,7 +1,12 @@
+   static boolean mayBeString(Node n, boolean recurse) {
+-    if (recurse) {
+     return allResultsMatch(n, MAY_BE_STRING_PREDICATE);
++  }
++
++  static boolean allResultsMatch(Node n, Predicate<Node> matcher) {
++    if (n.isString()) {
++      return matcher.apply(n);
+     } else {
+-      return mayBeStringHelper(n);
++      return n.getChildren().stream()
++          .anyMatch(c -> allResultsMatch(c, matcher));
+     }
+   }

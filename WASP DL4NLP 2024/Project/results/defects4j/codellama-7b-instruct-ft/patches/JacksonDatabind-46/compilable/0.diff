@@ -1,0 +1,15 @@
+diff --git a/tmp/391ed7aa-f030-4f47-a8e7-a3d67dc8537b_buggy.java b/tmp/988f8f88-4b8e-409e-be47-8e502d1477c6_fixed.java
+index 6f49dcb..2b53559 100644
+--- a/tmp/391ed7aa-f030-4f47-a8e7-a3d67dc8537b_buggy.java
++++ b/tmp/988f8f88-4b8e-409e-be47-8e502d1477c6_fixed.java
+@@ -1,9 +1,10 @@
+     @Override
+     public StringBuilder getGenericSignature(StringBuilder sb)
+     {
+         _classSignature(_class, sb, false);
+         sb.append('<');
+         sb = _referencedType.getGenericSignature(sb);
++        if (sb.charAt(sb.length()-1)==';') sb.setCharAt(sb.length()-1, '>');
+         sb.append(';');
+         return sb;
+     }

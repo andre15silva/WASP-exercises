@@ -1,0 +1,47 @@
+diff --git a/tmp/f4b8f9c1-71ea-4951-95e3-c4c1ea52e1dc_buggy.java b/tmp/17ee6914-526c-4164-891d-68780b028c51_fixed.java
+index dd3b100..4575a24 100644
+--- a/tmp/f4b8f9c1-71ea-4951-95e3-c4c1ea52e1dc_buggy.java
++++ b/tmp/17ee6914-526c-4164-891d-68780b028c51_fixed.java
+@@ -1,12 +1,36 @@
+         public TreeNode lowestCommonAncestor(TreeNode root, TreeNode p, TreeNode q) {
+-            if (root == null || p == root || q == root) {
+-                return root;
++            if(root == null || p == null || q == null || p == q){
++                return null;
++            }
++            long pv = p.val;
++            long qv = q.val;
++            if(pv < qv){
++                p = p.left;
++                q = q.left;
++            }else{
++                p = p.right;
++                q = q.right;
++            }
++            while(p !=q){
++                if(p == null){
++                    p = root;
++                    q = root;
++                    break;
+                 }
+-            if ((root.val - p.val) * (root.val - q.val) > 0) {
+-                if (root.val - p.val > 0) {
+-                    return lowestCommonAncestor(root.left, p, q);
++                if(q == null){
++                    p = root;
++                    break;
+                 }
+-                return lowestCommonAncestor(root.right, p, q);
++                if(pv < qv){
++                    p = p.left;
++                    q = q.left;
++                }else{
++                    p = p.right;
++                    q = q.right;
+                 }
++            }
++            if(root == p){
+                 return root;
+             }
++            return p;
++        }

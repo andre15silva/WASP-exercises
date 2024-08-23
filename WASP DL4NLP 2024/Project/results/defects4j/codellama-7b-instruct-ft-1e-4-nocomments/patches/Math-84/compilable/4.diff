@@ -1,0 +1,47 @@
+diff --git a/tmp/b4410b67-1309-424c-9965-07fcdcf47e10_buggy.java b/tmp/4bb49cd4-1e5f-452b-8756-f06e0b14ae00_fixed.java
+index 5f1dcf2..6751bfc 100644
+--- a/tmp/b4410b67-1309-424c-9965-07fcdcf47e10_buggy.java
++++ b/tmp/4bb49cd4-1e5f-452b-8756-f06e0b14ae00_fixed.java
+@@ -1,41 +1,23 @@
+     /** {@inheritDoc} */
+     @Override
+     protected void iterateSimplex(final Comparator<RealPointValuePair> comparator)
+         throws FunctionEvaluationException, OptimizationException, IllegalArgumentException {
+-
+         while (true) {
+-
+             incrementIterationsCounter();
+-
+-            // save the original vertex
+             final RealPointValuePair[] original = simplex;
+             final RealPointValuePair best = original[0];
+-
+-            // perform a reflection step
+             final RealPointValuePair reflected = evaluateNewSimplex(original, 1.0, comparator);
+             if (comparator.compare(reflected, best) < 0) {
+-
+-                // compute the expanded simplex
+                 final RealPointValuePair[] reflectedSimplex = simplex;
+                 final RealPointValuePair expanded = evaluateNewSimplex(original, khi, comparator);
+                 if (comparator.compare(reflected, expanded) <= 0) {
+-                    // accept the reflected simplex
+                     simplex = reflectedSimplex;
+                 }
+-
+                 return;
+-
+             }
+-
+-            // compute the contracted simplex
+             final RealPointValuePair contracted = evaluateNewSimplex(original, gamma, comparator);
+             if (comparator.compare(contracted, best) < 0) {
+-                // accept the contracted simplex
+-
+-            // check convergence
+                 return;
+             }
+-
+         }
+-
+     }
+\ No newline at end of file

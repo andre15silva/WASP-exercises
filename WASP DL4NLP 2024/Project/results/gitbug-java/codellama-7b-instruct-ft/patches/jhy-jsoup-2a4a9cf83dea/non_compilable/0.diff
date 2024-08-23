@@ -1,0 +1,28 @@
+diff --git a/tmp/d3ead849-bf09-4b67-b7bf-a8951578be40_buggy.java b/tmp/cf549d59-6db6-4d6d-8899-8bb8eca33df9_fixed.java
+index c9c2b44..d065c54 100644
+--- a/tmp/d3ead849-bf09-4b67-b7bf-a8951578be40_buggy.java
++++ b/tmp/cf549d59-6db6-4d6d-8899-8bb8eca33df9_fixed.java
+@@ -1,13 +1,23 @@
+         @Override
+         public boolean matches(Element root, Element element) {
+             // evaluate from last to first
+             for (int i = evaluators.size() -1; i >= 0; --i) {
+                 if (element == null)
+                     return false;
+                 Evaluator eval = evaluators.get(i);
+                 if (!eval.matches(root, element))
+                     return false;
++                if (i == 0 || eval.isMatchFrom(" ") || eval.isMatchFrom(">")) {
++                    // if we're not the first one, and not siblings, then exit.
++                    // a "> ul" is not matched by "ul"
++                    // because a grandchildren match doesn't count as a parent.
+                     element = element.parent();
++                } else {
++                    // we need to keep moving up
++                    while (element.id() != root.id()) {
++                        element = element.parent();
++                    }
++                }
+             }
+             return true;
+         }

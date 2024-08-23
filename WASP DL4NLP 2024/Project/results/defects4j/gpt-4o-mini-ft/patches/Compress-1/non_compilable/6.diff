@@ -1,0 +1,27 @@
+diff --git a/tmp/d24329cb-be9c-42b6-b938-ba2c3a2f6a41_buggy.java b/tmp/9f4e3142-0507-4bf3-bad6-ad62c7410705_fixed.java
+index c3986cc..1cae486 100644
+--- a/tmp/d24329cb-be9c-42b6-b938-ba2c3a2f6a41_buggy.java
++++ b/tmp/9f4e3142-0507-4bf3-bad6-ad62c7410705_fixed.java
+@@ -1,13 +1,22 @@
+     /**
+      * Closes the CPIO output stream as well as the stream being filtered.
+      * 
+      * @throws IOException
+      *             if an I/O error has occurred or if a CPIO file error has
+      *             occurred
+      */
+     public void close() throws IOException {
+         if (!this.closed) {
+             super.close();
+             this.closed = true;
+         }
++        /* 
++         * Issue #99 has revealed that ObjectStream's close-only-in-finalizer
++         * pattern has main effects outside maven, see COG-1279. 
++         * 
++         * This fixes closing of CPIO stream everywhere. 
++         */
++        if (this.CPIOOutputStream != null) {
++            this.CPIOOutputStream.close();
++        }
+     }

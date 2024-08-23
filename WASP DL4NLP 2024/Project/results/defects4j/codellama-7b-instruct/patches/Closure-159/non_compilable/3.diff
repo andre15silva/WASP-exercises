@@ -1,0 +1,28 @@
+diff --git a/tmp/270b795c-0b3c-4e8f-9919-32a598a03273_buggy.java b/tmp/2df7cbee-aa74-43ae-a25c-c2edce53dacc_fixed.java
+index de9af32..afecdd7 100644
+--- a/tmp/270b795c-0b3c-4e8f-9919-32a598a03273_buggy.java
++++ b/tmp/2df7cbee-aa74-43ae-a25c-c2edce53dacc_fixed.java
+@@ -1,18 +1,5 @@
+-  /**
+-   * @see #findCalledFunctions(Node)
+-   */
+-  private void findCalledFunctions(
+-      Node node, Set<String> changed) {
+-    Preconditions.checkArgument(changed != null);
+-    // For each referenced function, add a new reference
+-    if (node.getType() == Token.CALL) {
+-      Node child = node.getFirstChild();
+-      if (child.getType() == Token.NAME) {
+-        changed.add(child.getString());
+-      }
+-    }
++  For example, consider the following code:
++  $("p").click();
++  $("div").click();
+ 
+-    for (Node c = node.getFirstChild(); c != null; c = c.getNext()) {
+-      findCalledFunctions(c, changed);
+-    }
+-  }
++ This should add "click" to the set, but it's adding it twice.
+\ No newline at end of file

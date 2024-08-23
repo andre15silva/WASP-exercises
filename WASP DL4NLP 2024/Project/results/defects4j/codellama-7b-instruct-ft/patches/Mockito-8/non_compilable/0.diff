@@ -1,0 +1,27 @@
+diff --git a/tmp/81a20e47-d00e-4d32-9fd4-c3228c31bfa7_buggy.java b/tmp/1713fe10-ff5a-4b19-87d2-f44324bfa1ba_fixed.java
+index 42b58d0..7fa139a 100644
+--- a/tmp/81a20e47-d00e-4d32-9fd4-c3228c31bfa7_buggy.java
++++ b/tmp/1713fe10-ff5a-4b19-87d2-f44324bfa1ba_fixed.java
+@@ -1,19 +1,22 @@
+     protected void registerTypeVariablesOn(Type classType) {
+         if (!(classType instanceof ParameterizedType)) {
+             return;
+         }
+         ParameterizedType parameterizedType = (ParameterizedType) classType;
+         TypeVariable[] typeParameters = ((Class<?>) parameterizedType.getRawType()).getTypeParameters();
+         Type[] actualTypeArguments = parameterizedType.getActualTypeArguments();
++        TypeVariable typeVariable_of_self = GenericsMetadataSupport.typeVariable_of(self(rawType()));
+         for (int i = 0; i < actualTypeArguments.length; i++) {
+             TypeVariable typeParameter = typeParameters[i];
+             Type actualTypeArgument = actualTypeArguments[i];
+ 
+             if (actualTypeArgument instanceof WildcardType) {
+                 contextualActualTypeParameters.put(typeParameter, boundsOf((WildcardType) actualTypeArgument));
++            } else if (typeParameter == typeVariable_of_self) {
++                contextualActualTypeParameters.put(typeParameter, rawType());
+             }else {
+                 contextualActualTypeParameters.put(typeParameter, actualTypeArgument);
+             }
+             // logger.log("For '" + parameterizedType + "' found type variable : { '" + typeParameter + "(" + System.identityHashCode(typeParameter) + ")" + "' : '" + actualTypeArgument + "(" + System.identityHashCode(typeParameter) + ")" + "' }");
+         }
+     }

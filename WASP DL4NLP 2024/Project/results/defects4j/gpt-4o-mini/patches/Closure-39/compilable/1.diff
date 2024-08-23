@@ -1,0 +1,58 @@
+diff --git a/tmp/7b4ab253-4acb-4720-8005-68fce095f842_buggy.java b/tmp/14b3c570-58ec-4e1b-91be-3a70e276c8cc_fixed.java
+index e4d90e7..d342816 100644
+--- a/tmp/7b4ab253-4acb-4720-8005-68fce095f842_buggy.java
++++ b/tmp/14b3c570-58ec-4e1b-91be-3a70e276c8cc_fixed.java
+@@ -1,45 +1,48 @@
+ @Override
+ String toStringHelper(boolean forAnnotations) {
+     if (hasReferenceName()) {
+         return getReferenceName();
+     } else if (prettyPrint) {
+-      // Don't pretty print recursively.
+         prettyPrint = false;
+ 
+-      // Use a tree set so that the properties are sorted.
+         Set<String> propertyNames = Sets.newTreeSet();
+         for (ObjectType current = this;
+              current != null && !current.isNativeObjectType() &&
+                  propertyNames.size() <= MAX_PRETTY_PRINTED_PROPERTIES;
+              current = current.getImplicitPrototype()) {
+             propertyNames.addAll(current.getOwnPropertyNames());
+         }
+ 
+         StringBuilder sb = new StringBuilder();
+         sb.append("{");
+ 
+         int i = 0;
+         for (String property : propertyNames) {
+             if (i > 0) {
+                 sb.append(", ");
+             }
+ 
+             sb.append(property);
+             sb.append(": ");
+-        sb.append(getPropertyType(property).toString());
++            JSType propertyType = getPropertyType(property);
++            // Check if the property type is the same as this record to avoid infinite recursion.
++            if (propertyType.equals(this)) {
++                sb.append("{...}"); // Indicate recursion limit reached.
++            } else {
++                sb.append(propertyType.toString());
++            }
+ 
+             ++i;
+             if (i == MAX_PRETTY_PRINTED_PROPERTIES) {
+                 sb.append(", ...");
+                 break;
+             }
+         }
+ 
+         sb.append("}");
+-
+         prettyPrint = true;
+         return sb.toString();
+     } else {
+         return "{...}";
+     }
+ }
+\ No newline at end of file

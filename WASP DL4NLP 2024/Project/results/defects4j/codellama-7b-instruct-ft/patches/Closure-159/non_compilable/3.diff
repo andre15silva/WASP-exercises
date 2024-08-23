@@ -1,0 +1,37 @@
+diff --git a/tmp/ea5b281f-637a-4448-b547-648d7a1b9a6b_buggy.java b/tmp/4fc1f35d-0fce-4fbe-8a32-17908a098433_fixed.java
+index de9af32..40d4cf0 100644
+--- a/tmp/ea5b281f-637a-4448-b547-648d7a1b9a6b_buggy.java
++++ b/tmp/4fc1f35d-0fce-4fbe-8a32-17908a098433_fixed.java
+@@ -1,18 +1,32 @@
+   /**
+    * @see #findCalledFunctions(Node)
+    */
+   private void findCalledFunctions(
+       Node node, Set<String> changed) {
+     Preconditions.checkArgument(changed != null);
+     // For each referenced function, add a new reference
+     if (node.getType() == Token.CALL) {
+       Node child = node.getFirstChild();
+       if (child.getType() == Token.NAME) {
+         changed.add(child.getString());
+       }
+     }
+ 
+     for (Node c = node.getFirstChild(); c != null; c = c.getNext()) {
+       findCalledFunctions(c, changed);
+     }
++    // To make the generated code more readable and to avoid clashes,
++    // try to rename parameter names.
++    // This can trigger on anonymous names, even if they aren't actually
++    // used.
++    Node function = node.getNext();
++    if (function != null
++        && function.getType() == Token.FUNCTIONBLOCK
++        && function.getChildCount() == 1
++        && function.getFirstChild().getType() == Token.NAME) {
++      String param = function.getFirstChild().getString();
++      if (changed.contains(param)) {
++        changed.add(param + "__");
++      }
++    }
+   }

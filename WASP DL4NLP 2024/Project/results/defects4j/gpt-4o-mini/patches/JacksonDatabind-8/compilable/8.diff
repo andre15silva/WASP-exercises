@@ -1,0 +1,44 @@
+diff --git a/tmp/4744368f-5918-4292-8453-6a2128477dde_buggy.java b/tmp/5d9a1210-976e-4cd3-a6a5-0c3b0f65d275_fixed.java
+index c9da1b7..3d57c1c 100644
+--- a/tmp/4744368f-5918-4292-8453-6a2128477dde_buggy.java
++++ b/tmp/5d9a1210-976e-4cd3-a6a5-0c3b0f65d275_fixed.java
+@@ -1,33 +1,33 @@
+ protected void verifyNonDup(AnnotatedWithParams newOne, int typeIndex, boolean explicit)
+ {
+     final int mask = (1 << typeIndex);
+     _hasNonDefaultCreator = true;
+     AnnotatedWithParams oldOne = _creators[typeIndex];
+     // already had an explicitly marked one?
+     if (oldOne != null) {
+ 
+         if ((_explicitCreators & mask) != 0) { // already had explicitly annotated, leave as-is
+             // but skip, if new one not annotated
+             if (!explicit) {
+                 return;
+             }
+             // both explicit: verify
+             // otherwise only verify if neither explicitly annotated.
+         }
+ 
+-            // one more thing: ok to override in sub-class
++        // Allow overriding for the same constructor type
+         if (oldOne.getClass() == newOne.getClass()) {
+-                // [databind#667]: avoid one particular class of bogus problems
++            // Avoid throwing an exception for the same constructor with the same annotations
++            if (oldOne.equals(newOne)) {
++                return; // Both are the same, no conflict
++            }
+             
+             throw new IllegalArgumentException("Conflicting " + TYPE_DESCS[typeIndex]
+                     + " creators: already had explicitly marked " + oldOne + ", encountered " + newOne);
+-                // otherwise, which one to choose?
+-                    // new type more generic, use old
+-                // new type more specific, use it
+         }
+     }
+     if (explicit) {
+         _explicitCreators |= mask;
+     }
+     _creators[typeIndex] = _fixAccess(newOne);
+ }
+\ No newline at end of file

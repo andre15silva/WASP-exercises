@@ -1,0 +1,78 @@
+diff --git a/tmp/c2f128bb-a354-4293-b9f4-800837e5d8b4_buggy.java b/tmp/72e4eed8-ccac-44ed-8bb3-06bee9b17461_fixed.java
+index 63641d0..f011f48 100644
+--- a/tmp/c2f128bb-a354-4293-b9f4-800837e5d8b4_buggy.java
++++ b/tmp/72e4eed8-ccac-44ed-8bb3-06bee9b17461_fixed.java
+@@ -1,33 +1,73 @@
+   /**
+    * For functions with function(this: T, ...) and T as parameters, type
+    * inference will set the type of this on a function literal argument to the
+    * the actual type of T.
+    */
+   private boolean inferTemplatedTypesForCall(
+       Node n, FunctionType fnType) {
+     final ImmutableList<TemplateType> keys = fnType.getTemplateTypeMap()
+         .getTemplateKeys();
+     if (keys.isEmpty()) {
+       return false;
+     }
+ 
+     // Try to infer the template types
+     Map<TemplateType, JSType> inferred =
+         inferTemplateTypesFromParameters(fnType, n);
+ 
+ 
+     // Replace all template types. If we couldn't find a replacement, we
+     // replace it with UNKNOWN.
+     TemplateTypeReplacer replacer = new TemplateTypeReplacer(
+         registry, inferred);
+     Node callTarget = n.getFirstChild();
+ 
+     FunctionType replacementFnType = fnType.visit(replacer)
+         .toMaybeFunctionType();
+     Preconditions.checkNotNull(replacementFnType);
+ 
+     callTarget.setJSType(replacementFnType);
+     n.setJSType(replacementFnType.getReturnType());
+ 
++    // We infer types in local functions at call sites with parameters that have
++    // a function type. So, if we are in a local function, no need to type check.
++    // The type information is already in the types of the parameters.
++    // See: http://code.google.com/p/closure-compiler/issues/detail?id=1058
++    boolean checkTypes = !inProcessOfInferringTypeOfLocalFunctionParameter(
++        fnType.getTypeOfThis());
++    if (checkTypes) {
++      Node root = n.getFirstChild().getFirstChild();
++      // The new type might actually be a union:
++      boolean maybeUnion = false;
++      JSType t = replacementFnType.getReturnType()
++          .makeImmutable();
++      if (t.isUnionType()) {
++        maybeUnion = true;
++        t = t.toMaybeUnionType();
++      }
++      maybeUnion = maybeUnion || t.isConstructor();
++      for (JSType c : t.getReferencedObjTypes()) {
++        // We don't look at unknown types.  There aren't any.
++        if (!c.isUnknownType()) {
++          checkType(n, replacementFnType.getTypedefType(),
++              c.toMaybeFunctionType(), t.isEmptyType() ? null : t);
++        }
++      }
++      if (maybeUnion) {
++        List<JSType> l = new ArrayList<JSType>(t.getReferencedObjTypes());
++        JSType.injectedPrototype = null;
++        boolean inferredDefinite = false;
++        for (int i = 0; i < l.size(); i++) {
++          if (l.get(i).toMaybeFunctionType() != null
++              && l.get(i).toMaybeFunctionType().isInjected()
++              && !inferredDefinite) {
++            maybeInjectType(null, l.get(i).toMaybeFunctionType());
++            inferredDefinite = true;
++          }
++        }
++        JSType.injectedPrototype = Object.class;
++      }
++    }
++
+     return replacer.madeChanges;
+   }

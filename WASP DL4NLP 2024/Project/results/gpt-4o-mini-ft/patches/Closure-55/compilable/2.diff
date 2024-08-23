@@ -1,9 +1,0 @@
-diff --git a/tmp/d220a12e-4715-4194-888b-e176826613b2_buggy.java b/tmp/03d8777a-842c-4733-844e-a61378265985_fixed.java
-index 43937f5..82a33fe 100644
---- a/tmp/d220a12e-4715-4194-888b-e176826613b2_buggy.java
-+++ b/tmp/03d8777a-842c-4733-844e-a61378265985_fixed.java
-@@ -1,3 +1,3 @@
-   private static boolean isReduceableFunctionExpression(Node n) {
--    return NodeUtil.isFunctionExpression(n);
-+    return NodeUtil.isCall(n.getParent()) && !NodeUtil.isFunctionExpression(n);
-   }

@@ -1,0 +1,45 @@
+diff --git a/tmp/379f54d4-ed5c-4e94-970d-2753ace9a830_buggy.java b/tmp/1c67e23f-1b09-4221-a9a8-45aab38b1007_fixed.java
+index 822447c..8f8ef62 100644
+--- a/tmp/379f54d4-ed5c-4e94-970d-2753ace9a830_buggy.java
++++ b/tmp/1c67e23f-1b09-4221-a9a8-45aab38b1007_fixed.java
+@@ -1,37 +1,39 @@
+     /**
+      * <p>
+      * Escapes the characters in the <code>String</code> passed and writes the result to the <code>Writer</code>
+      * passed.
+      * </p>
+      * 
+      * @param writer
+      *            The <code>Writer</code> to write the results of the escaping to. Assumed to be a non-null value.
+      * @param str
+      *            The <code>String</code> to escape. Assumed to be a non-null value.
+      * @throws IOException
+      *             when <code>Writer</code> passed throws the exception from calls to the {@link Writer#write(int)}
+      *             methods.
+      * 
+      * @see #escape(String)
+      * @see Writer
+      */
+     public void escape(Writer writer, String str) throws IOException {
+         int len = str.length();
+         for (int i = 0; i < len; i++) {
+             char c = str.charAt(i);
++            // TODO: There are better mechanisms for finding out if c is Unicode since there are so many
++            // different values for char size.
+             String entityName = this.entityName(c);
+             if (entityName == null) {
+-                if (c > 0x7F) {
++                if (c > 127) {
+                     writer.write("&#");
+                     writer.write(Integer.toString(c, 10));
+                     writer.write(';');
+                 } else {
+                     writer.write(c);
+                 }
+             } else {
+                 writer.write('&');
+                 writer.write(entityName);
+                 writer.write(';');
+             }
+         }
+     }

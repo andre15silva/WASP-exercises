@@ -1,0 +1,51 @@
+diff --git a/tmp/faeee567-1c20-40eb-9dda-4c9dee8685d1_buggy.java b/tmp/a4c68934-1fb5-483e-b35d-274011a396ac_fixed.java
+index 0dbce00..da0405e 100644
+--- a/tmp/faeee567-1c20-40eb-9dda-4c9dee8685d1_buggy.java
++++ b/tmp/a4c68934-1fb5-483e-b35d-274011a396ac_fixed.java
+@@ -1,33 +1,41 @@
+     @Override
+     public JsonSerializer<?> createContextual(SerializerProvider serializers,
+             BeanProperty property) throws JsonMappingException
+     {
+         if (property != null) {
+             JsonFormat.Value format = serializers.getAnnotationIntrospector().findFormat((Annotated)property.getMember());
+             if (format != null) {
+-
+-            	// Simple case first: serialize as numeric timestamp?
+                 JsonFormat.Shape shape = format.getShape();
++                if (shape == JsonFormat.Shape.ANY) {
++                    if (format.hasPattern()) {
++                        shape = JsonFormat.Shape.STRING;
++                    }
++                    if (format.hasLocale()) {
++                        shape = JsonFormat.Shape.STRING;
++                    }
++                    if (format.hasTimeZone()) {
++                        shape = JsonFormat.Shape.STRING;
++                    }
++                }
+                 if (shape.isNumeric()) {
+                     return withFormat(Boolean.TRUE, null);
+                 }
+-
+-                if (format.getShape() == JsonFormat.Shape.STRING) {
++                if (shape == JsonFormat.Shape.STRING) {
+                     TimeZone tz = format.getTimeZone();
+                     final String pattern = format.hasPattern()
+                                     ? format.getPattern()
+                                     : StdDateFormat.DATE_FORMAT_STR_ISO8601;
+                     final Locale loc = format.hasLocale()
+                                     ? format.getLocale()
+                                     : serializers.getLocale();
+                     SimpleDateFormat df = new SimpleDateFormat(pattern, loc);
+                     if (tz == null) {
+                         tz = serializers.getTimeZone();
+                     }
+                     df.setTimeZone(tz);
+                     return withFormat(Boolean.FALSE, df);
+                 }
+             }
+         }
+         return this;
+     }
+\ No newline at end of file

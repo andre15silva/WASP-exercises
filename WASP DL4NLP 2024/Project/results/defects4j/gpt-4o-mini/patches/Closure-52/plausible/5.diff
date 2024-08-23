@@ -1,0 +1,25 @@
+diff --git a/tmp/26598630-d33e-465d-94fc-85ab7a7ae23d_buggy.java b/tmp/bff4a927-4505-4d24-b2a9-517a62cf8ea2_fixed.java
+index 4b7f469..1a68a4e 100644
+--- a/tmp/26598630-d33e-465d-94fc-85ab7a7ae23d_buggy.java
++++ b/tmp/bff4a927-4505-4d24-b2a9-517a62cf8ea2_fixed.java
+@@ -1,10 +1,15 @@
+ static boolean isSimpleNumber(String s) {
+-    int len = s.length();
+-    for (int index = 0; index < len; index++) {
++    if (s == null || s.isEmpty()) {
++        return false;
++    }
++    if (s.charAt(0) == '0' && s.length() > 1 && s.charAt(1) != '.') {
++        return false; // disallow leading zeros unless it's "0" or "0.x"
++    }
++    for (int index = 0; index < s.length(); index++) {
+         char c = s.charAt(index);
+-      if (c < '0' || c > '9') {
++        if ((c < '0' || c > '9') && c != '.') {
+             return false;
+         }
+     }
+-    return len > 0;
++    return true;
+ }
+\ No newline at end of file

@@ -1,0 +1,63 @@
+diff --git a/tmp/f1465faf-ef98-42d1-aedc-b861791976c2_buggy.java b/tmp/1c28c7d3-c3d2-4d4f-a3e2-3e72746047c7_fixed.java
+index 4b7e1e4..3525242 100644
+--- a/tmp/f1465faf-ef98-42d1-aedc-b861791976c2_buggy.java
++++ b/tmp/1c28c7d3-c3d2-4d4f-a3e2-3e72746047c7_fixed.java
+@@ -1,52 +1,5 @@
+-    // https://www.gnu.org/software/tar/manual/html_section/tar_92.html#SEC188
+-    Map<String, String> parsePaxHeaders(final InputStream i)
+-        throws IOException {
+-        final Map<String, String> headers = new HashMap<String, String>(globalPaxHeaders);
+-        // Format is "length keyword=value\n";
+-        while(true){ // get length
+-            int ch;
+-            int len = 0;
+-            int read = 0;
+-            while((ch = i.read()) != -1) {
+-                read++;
+-                if (ch == ' '){
+-                    // Get keyword
+-                    final ByteArrayOutputStream coll = new ByteArrayOutputStream();
+-                    while((ch = i.read()) != -1) {
+-                        read++;
+-                        if (ch == '='){ // end of keyword
+-                            final String keyword = coll.toString(CharsetNames.UTF_8);
+-                            // Get rest of entry
+-                            final int restLen = len - read;
+-                            if (restLen == 1) { // only NL
+-                                headers.remove(keyword);
+-                            } else {
+-                                final byte[] rest = new byte[restLen];
+-                                final int got = IOUtils.readFully(i, rest);
+-                                if (got != restLen) {
+-                                    throw new IOException("Failed to read "
+-                                                          + "Paxheader. Expected "
+-                                                          + restLen
+-                                                          + " bytes, read "
+-                                                          + got);
+-                                }
+-                                // Drop trailing NL
+-                                final String value = new String(rest, 0,
+-                                                          restLen - 1, CharsetNames.UTF_8);
+-                                headers.put(keyword, value);
+-                            }
+-                            break;
+-                        }
+-                        coll.write((byte) ch);
+-                    }
+-                    break; // Processed single header
+-                }
+-                len *= 10;
+-                len += ch - '0';
+-            }
+-            if (ch == -1){ // EOF
+-                break;
+-            }
+-        }
+-        return headers;
+-    }
++The buggy function seems to add a new line character at the end of the last entry in the tar archive. This causes the `getNextTarEntry()` function to return null instead of the expected entry.
++
++The bug occurs when the last entry in the tar archive is a pax header, and the pax header has a trailing newline character. The `parsePaxHeaders()` function incorrectly reads the length of the pax header, including the trailing newline character, and then attempts to read the rest of the header. However, the `read()` method on the input stream returns -1, indicating EOF instead of the newline character, and the function exits the while loop without properly parsing the pax header. Therefore, the last entry in the tar archive is mistakenly removed from the map of pax headers.
++
++To fix the bug, you can modify the while loop in the `parsePaxHeaders()` function to continue reading the length of the pax header until it reaches a space character. Then, stop reading the rest of the header after the space character, instead of proceeding until the newline character. This will ensure that the function properly parses the pax header and does not accidentally remove the last entry in the tar archive.
+\ No newline at end of file

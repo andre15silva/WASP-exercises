@@ -1,0 +1,110 @@
+diff --git a/tmp/91feb37e-e5c6-4da6-bccc-66d761d4f22f_buggy.java b/tmp/7e7a266c-eff4-4f5d-a3a1-ffbcc8e101b3_fixed.java
+index 2955e62..0c73160 100644
+--- a/tmp/91feb37e-e5c6-4da6-bccc-66d761d4f22f_buggy.java
++++ b/tmp/7e7a266c-eff4-4f5d-a3a1-ffbcc8e101b3_fixed.java
+@@ -1,66 +1,103 @@
+     /**
+      * @return true if the provided reference and declaration can be safely
+      *         inlined according to our criteria
+      */
+     private boolean canInline(
+         Reference declaration,
+         Reference initialization,
+         Reference reference) {
+       if (!isValidDeclaration(declaration)
+           || !isValidInitialization(initialization)
+           || !isValidReference(reference)) {
+         return false;
+       }
+ 
+       // If the value is read more than once, skip it.
+       // VAR declarations and EXPR_RESULT don't need the value, but other
+       // ASSIGN expressions parents do.
+       if (declaration != initialization &&
+           !initialization.getGrandparent().isExprResult()) {
+         return false;
+       }
+ 
+       // Be very conservative and do no cross control structures or
+       // scope boundaries
+       if (declaration.getBasicBlock() != initialization.getBasicBlock()
+           || declaration.getBasicBlock() != reference.getBasicBlock()) {
+         return false;
+       }
+ 
+       // Do not inline into a call node. This would change
+       // the context in which it was being called. For example,
+       //   var a = b.c;
+       //   a();
+       // should not be inlined, because it calls a in the context of b
+       // rather than the context of the window.
+       //   var a = b.c;
+       //   f(a)
+       // is ok.
+       Node value = initialization.getAssignedValue();
+       Preconditions.checkState(value != null);
+       if (value.isGetProp()
+           && reference.getParent().isCall()
+           && reference.getParent().getFirstChild() == reference.getNode()) {
+         return false;
+       }
+ 
+       if (value.isFunction()) {
+         Node callNode = reference.getParent();
+         if (reference.getParent().isCall()) {
+           CodingConvention convention = compiler.getCodingConvention();
+           // Bug 2388531: Don't inline subclass definitions into class defining
+           // calls as this confused class removing logic.
+           SubclassRelationship relationship =
+               convention.getClassesDefinedByCall(callNode);
+           if (relationship != null) {
+             return false;
+           }
+ 
+-          // issue 668: Don't inline singleton getter methods
+-          // calls as this confused class removing logic.
++          // issue 668: Singleton getter methods may be unsafe, so skip them.
++          // Calls to the method that return these values will be relocated.
++          Relationship relationToSingletonMethod =
++              convention.getSingletonMethod(callNode);
++          if (relationToSingletonMethod != null) {
++            return true;
++          }
++
++          // issue 1217: Don't inline singleton getter methods from the goog
++          // library. It's not clear that these methods are the right place for
++          // them, but the code that uses them does not appear to do anything
++          // that would fail if they didn't exist, so it's easier to just let
++          // this code inline them.
++          Node pathToCaller = null;
++          Match match = convention.MATCH_GOOG_SINGLETON;
++          for (Node n = callNode; ; n = n.getFirstChild()) {
++            if (match.match(n) && n.getFirstChild().isQualifiedName()) {
++              pathToCaller = n;
++              break;
++            }
++            if (n.isScript() && n.getParent() != null) {
++              n = n.getParent();
++            } else {
++              break;
++            }
++          }
++          if (pathToCaller != null
++              && ((Node) pathToCaller.getLastChild()).isName()) {
++            String name = ((Node) pathToCaller.getLastChild()).getString();
++            Preconditions.checkState(
++                convention.isGlobal(name),
++                "Non-global name of script containing goog.addSingletonGetter: %s",
++                name);
++            Preconditions.checkArgument(
++                ClosureCodingConvention.GOOG_SINGLETON_METHODS_LIKE.contains(
++                    name),
++                "goog.addSingletonGetter of unexpected name %s",
++                name);
++          }
+         }
+       }
+ 
+       return canMoveAggressively(value) ||
+           canMoveModerately(initialization, reference);
+     }

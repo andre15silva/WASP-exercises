@@ -1,0 +1,24 @@
+diff --git a/tmp/ac9d2b5f-6a54-4273-b71a-eda84de16fd8_buggy.java b/tmp/535ffc73-47b3-47fe-9ad7-2fed692aa9eb_fixed.java
+index 351a97a..1c5c46c 100644
+--- a/tmp/ac9d2b5f-6a54-4273-b71a-eda84de16fd8_buggy.java
++++ b/tmp/535ffc73-47b3-47fe-9ad7-2fed692aa9eb_fixed.java
+@@ -1,18 +1,11 @@
+-    /**
+-     * Tests the list for equality with another object (typically also a list).
+-     *
+-     * @param obj  the other object (<code>null</code> permitted).
+-     *
+-     * @return A boolean.
+-     */
+     public boolean equals(Object obj) {
+ 
+         if (obj == this) {
+             return true;
+         }
+         if (!(obj instanceof ShapeList)) {
+             return false;
+         }
+         return super.equals(obj);
+ 
+     }
+\ No newline at end of file

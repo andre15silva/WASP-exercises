@@ -1,0 +1,21 @@
+diff --git a/tmp/fad26386-2025-4171-a1e4-7f7bc7f81327_buggy.java b/tmp/56350c14-c382-42ec-8b39-f571b8942876_fixed.java
+index 5b8a4d2..729eab7 100644
+--- a/tmp/fad26386-2025-4171-a1e4-7f7bc7f81327_buggy.java
++++ b/tmp/56350c14-c382-42ec-8b39-f571b8942876_fixed.java
+@@ -1,12 +1,16 @@
+     /**
+      * Creates a period from the given millisecond duration with the standard period type
+      * and ISO rules, ensuring that the calculation is performed with the time-only period type.
+      * <p>
+      * The calculation uses the hour, minute, second and millisecond fields.
+      *
+      * @param duration  the duration, in milliseconds
+      */
+     protected BasePeriod(long duration) {
+         this(duration, null, null);
+         // bug [3264409]
++        // JCBC, I suspect there is a bug here (with the way the datetimezone stuff is
++        // set up), this whole function is an ugly hack, it's too complicated just to
++        // give back the time without having the date included
++        setZone(DateTimeZone.UTC);
+     }

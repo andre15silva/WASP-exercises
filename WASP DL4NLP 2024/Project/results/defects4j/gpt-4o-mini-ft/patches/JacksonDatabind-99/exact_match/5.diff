@@ -1,0 +1,15 @@
+diff --git a/tmp/503f5c0a-36e9-4b7a-8a49-6d5da5323aea_buggy.java b/tmp/1272e1ce-1f2b-4b36-9604-458f77580dfb_fixed.java
+index ee836e4..658174f 100644
+--- a/tmp/503f5c0a-36e9-4b7a-8a49-6d5da5323aea_buggy.java
++++ b/tmp/1272e1ce-1f2b-4b36-9604-458f77580dfb_fixed.java
+@@ -1,9 +1,10 @@
+     @Override
+     protected String buildCanonicalName()
+     {
+         StringBuilder sb = new StringBuilder();
+         sb.append(_class.getName());
+         sb.append('<');
+         sb.append(_referencedType.toCanonical());
++        sb.append('>');
+         return sb.toString();
+     }

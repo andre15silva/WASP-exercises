@@ -1,0 +1,14 @@
+diff --git a/tmp/c7ad5212-e97e-4fdd-94b7-9288833aeeff_buggy.java b/tmp/84680c33-f43b-49e5-9fc2-d4cb1b37fe64_fixed.java
+index 42d4174..d7fba0c 100644
+--- a/tmp/c7ad5212-e97e-4fdd-94b7-9288833aeeff_buggy.java
++++ b/tmp/84680c33-f43b-49e5-9fc2-d4cb1b37fe64_fixed.java
+@@ -1,7 +1,9 @@
+   /**
+    * Returns the remainder of the line.
+    */
+   private String getRemainingJSDocLine() {
+     String result = stream.getRemainingJSDocLine();
++    // JSPECIFY_RULE use for types to check that they are not used in an ambiguous way.
++    textExtents.clear();
+     return result;
+   }

@@ -1,0 +1,46 @@
+diff --git a/tmp/379d2210-1f25-4581-82d4-492ef993b1d5_buggy.java b/tmp/4a506d77-a194-4812-9f37-606466ce42b4_fixed.java
+index 9739964..54c18d3 100644
+--- a/tmp/379d2210-1f25-4581-82d4-492ef993b1d5_buggy.java
++++ b/tmp/4a506d77-a194-4812-9f37-606466ce42b4_fixed.java
+@@ -1,27 +1,26 @@
+   public int[] calculateSpans(int[] prices) {
+-
+     int[] spans = new int[prices.length];
+-    spans[0] = 1; // Span of first element is always 1
+-
++    spans[0] = 1; 
+     Stack<Integer> indexStack = new Stack<>();
+-
+-    // Push the index of first element
+     indexStack.push(0);
+-
++    int maxStack = 0;
+     for (int i = 1; i < prices.length; i++) {
+       while (!indexStack.isEmpty()
+           && prices[indexStack.peek()] <= prices[i])
+         indexStack.pop();
+-
+-      // If index stack is empty, the price at index 'i'
+-      // is greater than all previous values
+-      if (indexStack.isEmpty())
+-        spans[i] = i + 1;
+-      else
++      if (!indexStack.isEmpty())
+         spans[i] = i - indexStack.peek();
+-
++      else
++        spans[i] = i + 1;
++      if (spans[i] > maxStack)
++        maxStack = spans[i];
+       indexStack.push(i);
+     }
+-
++    int maxStack2 = 0;
++    for (int i = 1; i <= maxStack; i++) {
++      int x = spans[i-1] + 1;
++      if (spans[i] == x)
++        maxStack2++;
++    }
+     return spans;
+   }
+\ No newline at end of file

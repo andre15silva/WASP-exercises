@@ -1,0 +1,22 @@
+diff --git a/tmp/7b4f60f9-8ac8-4f50-a339-4531770aa1bd_buggy.java b/tmp/8c4b717d-1439-4529-9517-0a1b3d625b73_fixed.java
+index a667cbe..9ca3619 100644
+--- a/tmp/7b4f60f9-8ac8-4f50-a339-4531770aa1bd_buggy.java
++++ b/tmp/8c4b717d-1439-4529-9517-0a1b3d625b73_fixed.java
+@@ -1,10 +1,16 @@
+     /**
+      * Recalculate the hash code after deserialization. The hash code of some
+      * keys might have change (hash codes based on the system hash code are
+      * only stable for the same process).
+      * @return the instance with recalculated hash code
+      */
+     private Object readResolve() {
+-        calculateHashCode(keys);
++        int newHashCode = calculateHashCode(keys);
++        if (newHashCode == hashCode) {
+             return this;
+         }
++        // If the keys are equal (not the actual instances, but their contents),
++        // we use this method otherwise equals() and hashCode() will be broken
++        final Object[] newKeys = (Object[]) keys.clone();
++        return new MultiKey(newKeys);
++    }

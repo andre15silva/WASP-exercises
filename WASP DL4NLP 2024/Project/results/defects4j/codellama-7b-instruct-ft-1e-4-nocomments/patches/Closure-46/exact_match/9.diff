@@ -1,0 +1,29 @@
+diff --git a/tmp/080a8717-2927-4577-8e1b-ffcc73ee193c_buggy.java b/tmp/6cb3d13d-495a-42c5-9614-3f7ee8fc3496_fixed.java
+index 46817a7..9ff5d83 100644
+--- a/tmp/080a8717-2927-4577-8e1b-ffcc73ee193c_buggy.java
++++ b/tmp/6cb3d13d-495a-42c5-9614-3f7ee8fc3496_fixed.java
+@@ -1,16 +1,17 @@
+   @Override
+   public JSType getLeastSupertype(JSType that) {
+     if (!that.isRecordType()) {
+       return super.getLeastSupertype(that);
+     }
+     RecordTypeBuilder builder = new RecordTypeBuilder(registry);
+     for (String property : properties.keySet()) {
+-      if (that.toMaybeRecordType().hasProperty(property) &&
+-          that.toMaybeRecordType().getPropertyType(property).isEquivalentTo(
+-              getPropertyType(property))) {
+-        builder.addProperty(property, getPropertyType(property),
+-            getPropertyNode(property));
++      if (that.toMaybeRecordType().hasProperty(property)) {
++        JSType propertyType = getPropertyType(property);
++        JSType thatPropertyType =  that.toMaybeRecordType().getPropertyType(property);
++        if (propertyType.isEquivalentTo(thatPropertyType)) {
++          builder.addProperty(property, thatPropertyType, getPropertyNode(property));
+         }
+       }
+-    return builder.build();
++    }
++    return registry.createUnionType(recordType, that.toMaybeRecordType());
+   }
+\ No newline at end of file

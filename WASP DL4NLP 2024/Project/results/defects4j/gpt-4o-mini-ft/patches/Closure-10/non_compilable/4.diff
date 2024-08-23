@@ -1,0 +1,16 @@
+diff --git a/tmp/c90fe574-402e-4f8d-abd8-61e0d5cb755f_buggy.java b/tmp/a7f8165b-fafe-4a95-afa4-2a9696c67e95_fixed.java
+index 6fecc90..06f50d1 100644
+--- a/tmp/c90fe574-402e-4f8d-abd8-61e0d5cb755f_buggy.java
++++ b/tmp/a7f8165b-fafe-4a95-afa4-2a9696c67e95_fixed.java
+@@ -1,7 +1,9 @@
+   static boolean mayBeString(Node n, boolean recurse) {
+     if (recurse) {
+       return allResultsMatch(n, MAY_BE_STRING_PREDICATE);
+-    } else {
+-      return mayBeStringHelper(n);
+     }
++    // Don't do advanced analysis on `n` a la
++    // `mayBeStringHelper`, but rather take an approach that tries
++    // to infer based on how the value is actually being used.
++    return mayBeStringValue(n);
+   }

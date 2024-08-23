@@ -1,0 +1,82 @@
+diff --git a/tmp/c5c68509-d6af-4e67-853b-8e26320a9262_buggy.java b/tmp/0563bfb1-603b-4929-86cb-6d2739de408f_fixed.java
+index b36c3f0..4795e62 100644
+--- a/tmp/c5c68509-d6af-4e67-853b-8e26320a9262_buggy.java
++++ b/tmp/0563bfb1-603b-4929-86cb-6d2739de408f_fixed.java
+@@ -1,58 +1,77 @@
+   /**
+    * Returns true if calls to this function have side effects.
+    *
+    * @param callNode The call node to inspected.
+    * @param compiler A compiler object to provide program state changing
+    *     context information. Can be null.
+    */
+   static boolean functionCallHasSideEffects(
+       Node callNode, @Nullable AbstractCompiler compiler) {
+     if (callNode.getType() != Token.CALL) {
+       throw new IllegalStateException(
+           "Expected CALL node, got " + Token.name(callNode.getType()));
+     }
+ 
+     if (callNode.isNoSideEffectsCall()) {
+       return false;
+     }
+ 
+     Node nameNode = callNode.getFirstChild();
+ 
+     // Built-in functions with no side effects.
+     if (nameNode.getType() == Token.NAME) {
+       String name = nameNode.getString();
+       if (BUILTIN_FUNCTIONS_WITHOUT_SIDEEFFECTS.contains(name)) {
+         return false;
+       }
+     } else if (nameNode.getType() == Token.GETPROP) {
+       if (callNode.hasOneChild()
+           && OBJECT_METHODS_WITHOUT_SIDEEFFECTS.contains(
+                 nameNode.getLastChild().getString())) {
+         return false;
+       }
+ 
+       if (callNode.isOnlyModifiesThisCall()
+           && evaluatesToLocalValue(nameNode.getFirstChild())) {
+         return false;
+       }
+ 
+       // Functions in the "Math" namespace have no side effects.
++      if (nameNode.getFirstChild().getType() == Token.NAME
++          && nameNode.getFirstChild().getString().equals("Math")) {
++        nameNode = nameNode.getLastChild();
++        String name = nameNode.getString();
++        // Some math functions have no side effects.
++        // (This test could be a bit more sophisticated.)
++        for (int i = 0; i < MATH_FUNCTION_NAMES_WITHOUT_SIDE_EFFECTS.length; ++i) {
++          if (name.equals(MATH_FUNCTION_NAMES_WITHOUT_SIDE_EFFECTS[i])) {
++            return false;
++          }
++        }
++      }
++
++      // Functions in the "this" namespace have no side effects.
++      if (callNode.isOnlyModifiesThisCall()
++          && nameNode.getFirstChild().isThis()
++          && thisAsFunctionsWithSideEffects.contains(nameNode.getString())) {
++        return false;
++      }
+ 
+       if (compiler != null && !compiler.hasRegExpGlobalReferences()) {
+         if (nameNode.getFirstChild().getType() == Token.REGEXP
+             && REGEXP_METHODS.contains(nameNode.getLastChild().getString())) {
+           return false;
+         } else if (nameNode.getFirstChild().getType() == Token.STRING
+             && STRING_REGEXP_METHODS.contains(
+                 nameNode.getLastChild().getString())) {
+           Node param = nameNode.getNext();
+           if (param != null &&
+               (param.getType() == Token.STRING
+                   || param.getType() == Token.REGEXP))
+           return false;
+         }
+       }
+     }
+ 
+     return true;
+   }

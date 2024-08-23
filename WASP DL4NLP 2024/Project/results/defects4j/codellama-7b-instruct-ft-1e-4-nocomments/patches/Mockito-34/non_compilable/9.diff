@@ -1,0 +1,24 @@
+diff --git a/tmp/05f45592-56e8-4e68-a8c7-896404ad0c19_buggy.java b/tmp/26288bb4-4702-4353-9bad-a44e3c45d221_fixed.java
+index d68a69c..3f3ac5b 100644
+--- a/tmp/05f45592-56e8-4e68-a8c7-896404ad0c19_buggy.java
++++ b/tmp/26288bb4-4702-4353-9bad-a44e3c45d221_fixed.java
+@@ -1,9 +1,14 @@
+     public void captureArgumentsFrom(Invocation i) {
+-        int k = 0;
+         for (Matcher m : matchers) {
+-            if (m instanceof CapturesArguments) {
+-                ((CapturesArguments) m).captureFrom(i.getArguments()[k]);
++			if (m instanceof CapturesArguments && (!i.isVarargs(i.getArguments().length - 1) || m instanceof AnyVararg | (m instanceof LocalizedMatcher && ((LocalizedMatcher) m).getMatcher() instanceof AnyVararg))) {
++				((CapturesArguments) m).captureFrom(i.getArguments()[0]);
++				return;
++			} else {
++				if (i.isVarargs(i.getArguments().length - 1) && i.getArguments()[0].length == 1 && m instanceof LocalizedMatcher && ((LocalizedMatcher) m).getMatcher() instanceof ArrayMatcher) {
++					((LocalizedMatcher) m).getMatcher().captureFrom(i.getArguments()[0][0]);
++					return;
+ 				}
+-            k++;
+             }
+         }
++        throw new AssertionError("Argument does not match any vararg");
++    }
+\ No newline at end of file

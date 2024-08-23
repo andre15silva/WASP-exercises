@@ -1,0 +1,33 @@
+diff --git a/tmp/57aaabd9-17c3-4b88-87e0-939f67fb7cbf_buggy.java b/tmp/e0449254-032a-4ca5-aefe-d7c0fbda12a6_fixed.java
+index 5cedd56..8345f2d 100644
+--- a/tmp/57aaabd9-17c3-4b88-87e0-939f67fb7cbf_buggy.java
++++ b/tmp/e0449254-032a-4ca5-aefe-d7c0fbda12a6_fixed.java
+@@ -1,15 +1,25 @@
+   /**
+    * Returns true if this transaction is a Soroban transaction.
+    *
+    * @return true if this transaction is a Soroban transaction.
+    */
+   public boolean isSorobanTransaction() {
+     if (mOperations.length != 1) {
+       return false;
+     }
+ 
+     Operation op = mOperations[0];
+-    return op instanceof InvokeHostFunctionOperation
+-        || op instanceof BumpSequenceOperation
+-        || op instanceof RestoreFootprintOperation;
++    if (op instanceof InvokeHostFunctionOperation) {
++      return true;
++    }
++    if (op instanceof BumpSequenceOperation) {
++      long baseFee = getBaseFee();
++      byte[] hashOfMemoAndSeqNum = getHashOfMemoAndSeqNum();
++      return AccountConverter.verifySorobanTransactionMemo(
++          getSourceAccount(), baseFee, hashOfMemoAndSeqNum);
++    }
++    if (op instanceof RestoreFootprintOperation) {
++      return true;
++    }
++    return false;
+   }

@@ -1,0 +1,40 @@
+diff --git a/tmp/dce78281-3a03-4cef-8a39-923335161144_buggy.java b/tmp/f17416af-0f67-4a9e-ae62-c5b170563fc3_fixed.java
+index abd3198..4c1d174 100644
+--- a/tmp/dce78281-3a03-4cef-8a39-923335161144_buggy.java
++++ b/tmp/f17416af-0f67-4a9e-ae62-c5b170563fc3_fixed.java
+@@ -1,28 +1,32 @@
+     @Override
+     protected Object encodeCommand(Command command) {
+ 
+         ByteBuf content = Unpooled.buffer();
+ 
+         switch (command.getType()) {
+             case Command.TYPE_POSITION_SINGLE:
+                 return encodeContent(command.getDeviceId(), GatorProtocolDecoder.MSG_POSITION_REQUEST, content);
+             case Command.TYPE_ENGINE_STOP:
+                 return encodeContent(command.getDeviceId(), GatorProtocolDecoder.MSG_CLOSE_THE_OIL_DUCT, content);
+             case Command.TYPE_ENGINE_RESUME:
+                 return encodeContent(command.getDeviceId(), GatorProtocolDecoder.MSG_RESTORES_THE_OIL_DUCT, content);
+             case Command.TYPE_SET_SPEED_LIMIT:
+                 content.writeByte(command.getInteger(Command.KEY_DATA));
+                 return encodeContent(command.getDeviceId(), GatorProtocolDecoder.MSG_SET_SPEED_LIMIT, content);
+             case Command.TYPE_SET_ODOMETER:
+                 content.writeShort(command.getInteger(Command.KEY_DATA));
+                 return encodeContent(command.getDeviceId(), GatorProtocolDecoder.MSG_SET_ODOMETER, content);
+             case Command.TYPE_POSITION_PERIODIC:
+                 String[] data = command.getString(Command.KEY_FREQUENCY).split(";");
+-                content.writeShort(Integer.valueOf(data[0]));
+-                content.writeShort(Integer.valueOf(data[1]));
+-                content.writeShort(Integer.valueOf(data[2]));
++                String sn = getChannel().getDeviceById(command.getDeviceId()).getUniqueId();
++                content.writeShort((short) Integer.decode("0x" + String.valueOf(sn.substring(2, 4))) & 0xffff);
++                content.writeShort((short) Integer.decode("0x" + String.valueOf(sn.substring(4, 6))) & 0xffff);
++                content.writeShort((short) Integer.decode("0x" + String.valueOf(sn.substring(6, 8))) & 0xffff);
++                content.writeShort((short) Integer.valueOf(data[0]));
++                content.writeShort((short) Integer.valueOf(data[1]));
++                content.writeShort((short) Integer.valueOf(data[2]));
+                 return encodeContent(command.getDeviceId(), GatorProtocolDecoder.MSG_POSITION_PERIODIC, content);
+             default:
+                 return null;
+         }
+     }

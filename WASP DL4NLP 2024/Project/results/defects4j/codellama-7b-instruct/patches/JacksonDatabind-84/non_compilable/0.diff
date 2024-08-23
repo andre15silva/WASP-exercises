@@ -1,0 +1,9 @@
+diff --git a/tmp/5cbdf40e-5bd7-47a5-9158-3ef17b7a8243_buggy.java b/tmp/44e7db1d-e5db-4be4-af6c-7cd565ee2da1_fixed.java
+index e69de29..0fcfef8 100644
+--- a/tmp/5cbdf40e-5bd7-47a5-9158-3ef17b7a8243_buggy.java
++++ b/tmp/44e7db1d-e5db-4be4-af6c-7cd565ee2da1_fixed.java
+@@ -0,0 +1,4 @@
++
++    public String writeValueAsString(Object value) throws JsonProcessingException {
++        return objectMapper().writeValueAsString(value);
++    }

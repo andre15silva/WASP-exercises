@@ -1,0 +1,10 @@
+diff --git a/tmp/f917c582-fd21-4c9d-90f5-e574d8b2a6c9_buggy.java b/tmp/7944acdd-389c-443b-b51c-6e830a7fff69_fixed.java
+index 22640dd..4177ac6 100644
+--- a/tmp/f917c582-fd21-4c9d-90f5-e574d8b2a6c9_buggy.java
++++ b/tmp/7944acdd-389c-443b-b51c-6e830a7fff69_fixed.java
+@@ -1,3 +1,3 @@
+   private boolean hasExceptionHandler(Node cfgNode) {
+-    return false;
++    return cfgNode.isTryCatch() || cfgNode.isTryFinally();
+   }
+\ No newline at end of file

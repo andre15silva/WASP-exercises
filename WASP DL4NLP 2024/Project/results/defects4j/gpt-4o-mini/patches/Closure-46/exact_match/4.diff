@@ -1,0 +1,42 @@
+diff --git a/tmp/0ff682ef-bbaa-4849-9e27-0ac1fcaada7d_buggy.java b/tmp/5e83a003-6288-420c-aa6e-d54823dcef87_fixed.java
+index 46817a7..9c5b5b0 100644
+--- a/tmp/0ff682ef-bbaa-4849-9e27-0ac1fcaada7d_buggy.java
++++ b/tmp/5e83a003-6288-420c-aa6e-d54823dcef87_fixed.java
+@@ -1,16 +1,32 @@
+ @Override
+ public JSType getLeastSupertype(JSType that) {
+     if (!that.isRecordType()) {
+         return super.getLeastSupertype(that);
+     }
+     RecordTypeBuilder builder = new RecordTypeBuilder(registry);
++    RecordType thatRecordType = that.toMaybeRecordType();
++    
++    // Iterate through each property in the current record type
+     for (String property : properties.keySet()) {
+-      if (that.toMaybeRecordType().hasProperty(property) &&
+-          that.toMaybeRecordType().getPropertyType(property).isEquivalentTo(
+-              getPropertyType(property))) {
+-        builder.addProperty(property, getPropertyType(property),
++        // Check if the other record type has the property
++        if (thatRecordType.hasProperty(property)) {
++            // Get the property types from both record types
++            JSType thisPropertyType = getPropertyType(property);
++            JSType thatPropertyType = thatRecordType.getPropertyType(property);
++            
++            // Add the least supertype of the property types to the builder
++            builder.addProperty(property, thisPropertyType.getLeastSupertype(thatPropertyType),
+                 getPropertyNode(property));
+         }
+     }
++
++    // Add properties from the other record type that are not in this record type
++    for (String property : thatRecordType.getPropertyNames()) {
++        if (!properties.containsKey(property)) {
++            builder.addProperty(property, thatRecordType.getPropertyType(property),
++                thatRecordType.getPropertyNode(property));
++        }
++    }
++
+     return builder.build();
+ }
+\ No newline at end of file

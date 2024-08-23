@@ -1,0 +1,19 @@
+diff --git a/tmp/e984ad7e-871a-47ec-8ca6-201e0426ee16_buggy.java b/tmp/abc19235-e482-4d2d-a9e3-17677ce9e702_fixed.java
+index 308b324..34810a7 100644
+--- a/tmp/e984ad7e-871a-47ec-8ca6-201e0426ee16_buggy.java
++++ b/tmp/abc19235-e482-4d2d-a9e3-17677ce9e702_fixed.java
+@@ -1,11 +1,9 @@
+-  /**
+-   * Check to see if the given block comment looks like it should be JSDoc.
+-   */
+   private void handleBlockComment(Comment comment) {
+-    if (comment.getValue().indexOf("/* @") != -1 || comment.getValue().indexOf("\n * @") != -1) {
++    if (comment.getValue().indexOf("/* @") != -1 || comment.getValue().indexOf("\n * @") != -1
++        || comment.getValue().indexOf("/*\n @") != -1) {
+       errorReporter.warning(
+           SUSPICIOUS_COMMENT_WARNING,
+           sourceName,
+           comment.getLineno(), "", 0);
+     }
+   }
+\ No newline at end of file

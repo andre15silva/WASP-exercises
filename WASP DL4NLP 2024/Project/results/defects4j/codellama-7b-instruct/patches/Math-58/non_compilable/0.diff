@@ -1,0 +1,35 @@
+diff --git a/tmp/a957ce32-a901-4bcd-9dde-c60ba3095082_buggy.java b/tmp/25c2af73-a6de-4770-99a3-4a454d6975a4_fixed.java
+index 3002587..870a0cf 100644
+--- a/tmp/a957ce32-a901-4bcd-9dde-c60ba3095082_buggy.java
++++ b/tmp/25c2af73-a6de-4770-99a3-4a454d6975a4_fixed.java
+@@ -1,10 +1,24 @@
++    // This code is from the GaussianFitter class, from the Apache Commons Math library
+     /**
+-     * Fits a Gaussian function to the observed points.
++     * Fits the model using default parameters.
+      *
+-     * @return the parameters of the Gaussian function that best fits the
+-     * observed points (in the same order as above).
++     * @return a non-negative array containing the parameters of the model
++     * (in the order of observed x's and parameters).
++     * @throws org.apache.commons.math.exception.DimensionMismatchException
++     * if the number of observed points is not matching the number of
++     * predicted points.
++     * @throws org.apache.commons.math.exception.NotStrictlyPositiveException
++     * if any of the estimated precision parameters is strictly negative.
++     * @see #fit(double[])
+      */
+     public double[] fit() {
+-        final double[] guess = (new ParameterGuesser(getObservations())).guess();
+-        return fit(new Gaussian.Parametric(), guess);
++        return fit((final double[] guess, final double[] tolerance) -> {
++            // This is the body of the fit function, which uses a fitness
++            // function and the optimizer to find the optimal parameters
++
++            // The fitness function takes two double arrays as input, one
++            // containing the observed data and the other containing the parameters,
++            // and returns the sum of squared errors.
++            return createFitnessFunction(guess, tolerance).calculate();
++        });
+     }
+\ No newline at end of file

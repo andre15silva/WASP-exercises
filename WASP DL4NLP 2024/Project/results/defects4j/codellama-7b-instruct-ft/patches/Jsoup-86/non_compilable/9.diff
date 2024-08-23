@@ -1,0 +1,30 @@
+diff --git a/tmp/a9f0bd02-ab7e-41ac-a946-aaaf82624902_buggy.java b/tmp/22c7e605-e731-4e5a-bd16-f6e28a4f5ea4_fixed.java
+index b8e7fdb..c909212 100644
+--- a/tmp/a9f0bd02-ab7e-41ac-a946-aaaf82624902_buggy.java
++++ b/tmp/22c7e605-e731-4e5a-bd16-f6e28a4f5ea4_fixed.java
+@@ -1,15 +1,25 @@
+     /**
+      * Attempt to cast this comment to an XML Declaration note.
+      * @return an XML declaration if it could be parsed as one, null otherwise.
+      */
+     public XmlDeclaration asXmlDeclaration() {
+         String data = getData();
+         Document doc = Jsoup.parse("<" + data.substring(1, data.length() -1) + ">", baseUri(), Parser.xmlParser());
+         XmlDeclaration decl = null;
+         if (doc.childNodeSize() > 0) {
++            final String replacement = "&lt;";
++            List<Node> nodes = new ArrayList<Node>(doc.childNodes());// shallow copy
++            for (Node node : nodes) {
++                node.outerHtml(node.outerHtml().replace(replacement, "&lt;"));
++                if (node instanceof Element && ((Element) node).tag().toString().equalsIgnoreCase("script")) {
++                    String scripttext = node.outerHtml().replace("<!--?", "&lt;?").replace("?--&gt;", "?-->").replace("&lt;!--", "&lt;?").replace("--&gt;", "?&gt;").replace("<!--", "&lt;!--").replace("-->", "?&gt;");
++                    String newnode = node.outerHtml().replace(node.outerHtml(), scripttext);
++                    node.outerHtml(newnode);
++                }
++            }
+             Element el = doc.child(0);
+             decl = new XmlDeclaration(NodeUtils.parser(doc).settings().normalizeTag(el.tagName()), data.startsWith("!"));
+             decl.attributes().addAll(el.attributes());
+         }
+         return decl;
+     }

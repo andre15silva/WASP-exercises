@@ -1,0 +1,11 @@
+diff --git a/tmp/1572b299-5e0f-4f34-9663-92f25886f99c_buggy.java b/tmp/502b7f3a-e3e2-48dc-8a56-24bb6a112ef1_fixed.java
+index fc49bcd..83a4b08 100644
+--- a/tmp/1572b299-5e0f-4f34-9663-92f25886f99c_buggy.java
++++ b/tmp/502b7f3a-e3e2-48dc-8a56-24bb6a112ef1_fixed.java
+@@ -1,4 +1,4 @@
+     @Override
+-    public DefaultPrettyPrinter createInstance() {
++    public DefaultPrettyPrinter createInstanceOrSubclass() {
+         return new DefaultPrettyPrinter(this);
+     }
+\ No newline at end of file

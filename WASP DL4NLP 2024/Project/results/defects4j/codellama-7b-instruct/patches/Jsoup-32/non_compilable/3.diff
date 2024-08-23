@@ -1,0 +1,12 @@
+diff --git a/tmp/3297332e-96c3-4098-8ae0-7bb316e22f8c_buggy.java b/tmp/c2360009-a5a7-4c18-b795-276f517ce062_fixed.java
+index 91469b4..f551dfe 100644
+--- a/tmp/3297332e-96c3-4098-8ae0-7bb316e22f8c_buggy.java
++++ b/tmp/c2360009-a5a7-4c18-b795-276f517ce062_fixed.java
+@@ -1,6 +1,6 @@
+ @Override
+ public Element clone() {
+     Element clone = (Element) super.clone();
+-        clone.classNames();
++    clone.classNames = new ArrayList<>(clone.classNames());
+     return clone;
+ }

@@ -1,0 +1,21 @@
+diff --git a/tmp/01cb1ea5-3857-4a79-8278-5b92b602940a_buggy.java b/tmp/5e5ec8ad-6813-433c-aeff-4950dafcc031_fixed.java
+index 6c5e87f..a59fe50 100644
+--- a/tmp/01cb1ea5-3857-4a79-8278-5b92b602940a_buggy.java
++++ b/tmp/5e5ec8ad-6813-433c-aeff-4950dafcc031_fixed.java
+@@ -1,12 +1,8 @@
+-    /**
+-     * Build a sparse matrix with the supplied row and column dimensions.
+-     *
+-     * @param rowDimension Number of rows of the matrix.
+-     * @param columnDimension Number of columns of the matrix.
+-     */
++class OpenMapRealMatrix {
+    public OpenMapRealMatrix(int rowDimension, int columnDimension) {
+       super(rowDimension, columnDimension);
+       this.rows = rowDimension;
+       this.columns = columnDimension;
+-        this.entries = new OpenIntToDoubleHashMap(0.0);
++      this.entries = new OpenIntToDoubleHashMap(rowDimension * columnDimension);
++   }
+ }
+\ No newline at end of file

@@ -1,0 +1,21 @@
+diff --git a/tmp/222de658-7d2f-4841-a86b-02a25a25ecfa_buggy.java b/tmp/759a1f6c-ec88-412e-b216-c2421c9f88de_fixed.java
+index e69de29..81d31dd 100644
+--- a/tmp/222de658-7d2f-4841-a86b-02a25a25ecfa_buggy.java
++++ b/tmp/759a1f6c-ec88-412e-b216-c2421c9f88de_fixed.java
+@@ -0,0 +1,15 @@
++import com.fasterxml.jackson.annotation.JsonProperty;
++
++public class Base {
++    @JsonProperty("base")
++    private int base = 1;
++
++    // Getters and Setters if needed
++}
++
++public class Sub extends Base {
++    @JsonProperty("sub")
++    private int sub = 2;
++
++    // Getters and Setters if needed
++}
+\ No newline at end of file

@@ -1,0 +1,21 @@
+diff --git a/tmp/30ee1a7b-8da1-467b-9b8a-0ca88ddd077d_buggy.java b/tmp/2297ea13-9901-4503-a202-3a36c2e7fc0b_fixed.java
+index 5cedd56..10bb233 100644
+--- a/tmp/30ee1a7b-8da1-467b-9b8a-0ca88ddd077d_buggy.java
++++ b/tmp/2297ea13-9901-4503-a202-3a36c2e7fc0b_fixed.java
+@@ -1,15 +1,16 @@
+   /**
+    * Returns true if this transaction is a Soroban transaction.
+    *
+    * @return true if this transaction is a Soroban transaction.
+    */
+   public boolean isSorobanTransaction() {
+     if (mOperations.length != 1) {
+       return false;
+     }
+ 
+     Operation op = mOperations[0];
+     return op instanceof InvokeHostFunctionOperation
+         || op instanceof BumpSequenceOperation
++        || (op.getSourceAccount() != null && sourceAccountMuxed(sourceAccount))
+         || op instanceof RestoreFootprintOperation;
+   }

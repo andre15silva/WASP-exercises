@@ -1,0 +1,34 @@
+diff --git a/tmp/79cdce07-4703-4d71-93ec-c62131b254f4_buggy.java b/tmp/5a12a1a8-8aee-41f1-8a51-78392470b88a_fixed.java
+index 6c5e87f..8d6c470 100644
+--- a/tmp/79cdce07-4703-4d71-93ec-c62131b254f4_buggy.java
++++ b/tmp/5a12a1a8-8aee-41f1-8a51-78392470b88a_fixed.java
+@@ -1,12 +1,21 @@
+-    /**
+-     * Build a sparse matrix with the supplied row and column dimensions.
+-     *
+-     * @param rowDimension Number of rows of the matrix.
+-     * @param columnDimension Number of columns of the matrix.
+-     */
++public class OpenMapRealMatrix {
++    private final int rows;
++    private final int columns;
++    private final OpenIntToDoubleHashMap entries;
++
+     public OpenMapRealMatrix(int rowDimension, int columnDimension) {
+-        super(rowDimension, columnDimension);
+         this.rows = rowDimension;
+         this.columns = columnDimension;
+         this.entries = new OpenIntToDoubleHashMap(0.0);
++        this.ensureCapacity(rowDimension * columnDimension);
++        for (int i = 0; i < rowDimension; i++) {
++            for (int j = 0; j < columnDimension; j++) {
++                this.entries.put(i * columnDimension + j, 0.0);
++            }
++        }
++    }
++
++    private ensureCapacity(int capacity) {
++        this.entries.ensureCapacity(capacity);
++    }
+ }
+\ No newline at end of file

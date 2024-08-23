@@ -1,0 +1,31 @@
+diff --git a/tmp/54080b48-23c4-46ff-a795-cfc8b9d1dad6_buggy.java b/tmp/d4762e0b-ca9d-4594-90eb-f3f4e7ffbb4c_fixed.java
+index 181b1ac..8187c0a 100644
+--- a/tmp/54080b48-23c4-46ff-a795-cfc8b9d1dad6_buggy.java
++++ b/tmp/d4762e0b-ca9d-4594-90eb-f3f4e7ffbb4c_fixed.java
+@@ -1,23 +1,24 @@
+     /**
+      * Return the sum of this complex number and the given complex number.
+      * <p>
+      * Uses the definitional formula
+      * <pre>
+      * (a + bi) + (c + di) = (a+c) + (b+d)i
+      * </pre></p>
+      * <p>
+      * If either this or <code>rhs</code> has a NaN value in either part,
+      * {@link #NaN} is returned; otherwise Infinite and NaN values are
+      * returned in the parts of the result according to the rules for
+      * {@link java.lang.Double} arithmetic.</p>
+      *
+      * @param rhs the other complex number
+      * @return the complex number sum
+      * @throws NullArgumentException if <code>rhs</code> is null
+      */
+     public Complex add(Complex rhs)
+         throws NullArgumentException {
+         MathUtils.checkNotNull(rhs);
+-        return createComplex(real + rhs.getReal(),
+-            imaginary + rhs.getImaginary());
++        double r = getReal() + rhs.getReal();
++        double i = getImaginary() + rhs.getImaginary();
++        return createComplex(r, i);
+     }

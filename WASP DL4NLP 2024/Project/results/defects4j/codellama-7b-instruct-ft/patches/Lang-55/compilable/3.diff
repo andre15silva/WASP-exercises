@@ -1,0 +1,26 @@
+diff --git a/tmp/bbc5d7bd-d5df-413f-8753-239d31915ef8_buggy.java b/tmp/6f07a807-825c-457b-b3c6-1b7cc3a3e23c_fixed.java
+index cce9d1e..09c1f07 100644
+--- a/tmp/bbc5d7bd-d5df-413f-8753-239d31915ef8_buggy.java
++++ b/tmp/6f07a807-825c-457b-b3c6-1b7cc3a3e23c_fixed.java
+@@ -1,14 +1,20 @@
+     /**
+      * <p>Stop the stopwatch.</p>
+      * 
+-     * <p>This method ends a new timing session, allowing the time to be retrieved.</p>
++     * <p>This method ends a new timing session, allowing the time to be retrieved.
++     * If the stopwatch is in {@link #STATE_SUSPENDED SUSPENDED} state then the last 
++     * suspend time will be used for the final reported time and a new time will be
++     * calculated for the final elapsed time. This is to maintain the same behavior
++     * across {@link #stop stop()} and {@link #suspend suspend()}/{@link #resume()} and 
++     * {@link #stop()}. This is a bug fix for https://issues.apache.org/bugzilla/show_bug.cgi?id=315 .
++     * </p>
+      *
+      * @throws IllegalStateException if the StopWatch is not running.
+      */
+     public void stop() {
+         if(this.runningState != STATE_RUNNING && this.runningState != STATE_SUSPENDED) {
+             throw new IllegalStateException("Stopwatch is not running. ");
+         }
+             stopTime = System.currentTimeMillis();
+         this.runningState = STATE_STOPPED;
+     }

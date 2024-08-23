@@ -1,0 +1,41 @@
+diff --git a/tmp/dd469431-a294-4f85-bb02-e4e1f7dc9478_buggy.java b/tmp/0d7f7b05-3374-49dc-8fce-1274c62f9e35_fixed.java
+index 800e6e1..cbda9cc 100644
+--- a/tmp/dd469431-a294-4f85-bb02-e4e1f7dc9478_buggy.java
++++ b/tmp/0d7f7b05-3374-49dc-8fce-1274c62f9e35_fixed.java
+@@ -1,32 +1,5 @@
+-    /**
+-     * Visit a node in a local scope, and add any local variables or catch
+-     * parameters into the local symbol table.
+-     *
+-     * @param t The node traversal.
+-     * @param n The node being visited.
+-     * @param parent The parent of n
+-     */
+-    @Override public void visit(NodeTraversal t, Node n, Node parent) {
+-      if (n == scope.getRootNode()) return;
+-
+-      if (n.getType() == Token.LP && parent == scope.getRootNode()) {
+-        handleFunctionInputs(parent);
+-        return;
+-      }
+-
+-      attachLiteralTypes(n);
+-      switch (n.getType()) {
+-        case Token.FUNCTION:
+-          if (parent.getType() == Token.NAME) {
+-            return;
+-          }
+-          defineDeclaredFunction(n, parent);
+-          break;
+-        case Token.CATCH:
+-          defineCatch(n, parent);
+-          break;
+-        case Token.VAR:
+-          defineVar(n, parent);
+-          break;
++public class Program {
++  public static void main(String[] args) {
++    visit(new NodeTraversal(), new Node(Token.LP, null, null), null);
+   }
+ }
+\ No newline at end of file

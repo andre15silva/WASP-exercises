@@ -1,0 +1,58 @@
+diff --git a/tmp/23d5271e-ed11-471e-aec2-c34aa3f16178_buggy.java b/tmp/0b28d7b0-ef47-42e2-a040-c5f65014bd5e_fixed.java
+index a9a5e27..8633338 100644
+--- a/tmp/23d5271e-ed11-471e-aec2-c34aa3f16178_buggy.java
++++ b/tmp/0b28d7b0-ef47-42e2-a040-c5f65014bd5e_fixed.java
+@@ -1,24 +1,36 @@
+-    /**
+-     * Multiply two values throwing an exception if overflow occurs.
+-     * 
+-     * @param val1  the first value
+-     * @param val2  the second value
+-     * @return the new total
+-     * @throws ArithmeticException if the value is too big or too small
+-     * @since 1.2
+-     */
+ public static long safeMultiply(long val1, int val2) {
+-        switch (val2) {
+-            case -1:
+-                return -val1;
+-            case 0:
++    if (val1 == 0 || val2 == 0) {
+         return 0L;
+-            case 1:
+-                return val1;
+     }
++    
++    if (val1 == 1) {
++        return val2;
++    }
++    if (val1 == -1) {
++        if (val2 == Integer.MIN_VALUE) {
++            throw new ArithmeticException("Multiplication overflows a long: " + val1 + " * " + val2);
++        }
++        return -val2;
++    }
++    
+     long total = val1 * val2;
+-        if (total / val2 != val1) {
++    
++    // Check for overflow
++    if (val1 > 0) {
++        if (val2 > 0 && total < val1) {
+             throw new ArithmeticException("Multiplication overflows a long: " + val1 + " * " + val2);
+         }
++        if (val2 < 0 && total > val1) {
++            throw new ArithmeticException("Multiplication overflows a long: " + val1 + " * " + val2);
++        }
++    } else {
++        if (val2 > 0 && total > val1) {
++            throw new ArithmeticException("Multiplication overflows a long: " + val1 + " * " + val2);
++        }
++        if (val2 < 0 && total < val1) {
++            throw new ArithmeticException("Multiplication overflows a long: " + val1 + " * " + val2);
++        }
++    }
++    
+     return total;
+ }
+\ No newline at end of file

@@ -1,0 +1,97 @@
+diff --git a/tmp/e2b70cb4-0129-47d0-b928-ac8fdba6ef88_buggy.java b/tmp/ce92c4d1-f346-44d3-8db5-7cab79336626_fixed.java
+index 6c0aa19..9132bc9 100644
+--- a/tmp/e2b70cb4-0129-47d0-b928-ac8fdba6ef88_buggy.java
++++ b/tmp/ce92c4d1-f346-44d3-8db5-7cab79336626_fixed.java
+@@ -1,20 +1,91 @@
+     /**
+      * @param encoding the encoding to use for file names, use null
+      * for the platform's default encoding
+      * @param useUnicodeExtraFields whether to use InfoZIP Unicode
+      * Extra Fields (if present) to set the file names.
+      * @param allowStoredEntriesWithDataDescriptor whether the stream
+      * will try to read STORED entries that use a data descriptor
+      * @since 1.1
+      */
+     public ZipArchiveInputStream(InputStream inputStream,
+                                  String encoding,
+                                  boolean useUnicodeExtraFields,
+                                  boolean allowStoredEntriesWithDataDescriptor) {
+         zipEncoding = ZipEncodingHelper.getZipEncoding(encoding);
+         this.useUnicodeExtraFields = useUnicodeExtraFields;
+         in = new PushbackInputStream(inputStream, buf.capacity());
+         this.allowStoredEntriesWithDataDescriptor =
+             allowStoredEntriesWithDataDescriptor;
+         // haven't read anything so far
+     }
++
++    /**
++     * Returns the next ZipEntry in this stream, or null if there are no
++     * more entries.
++     */
++    @Override
++    public ZipArchiveEntry getNextZipEntry() throws IOException {
++        if (firstEntryAlreadyRead != null) {
++            return getNextEntry();
++        }
++        firstEntryAlreadyRead = true;
++        // read data of the first entry
++        readDataOfFirstEntry();
++        return getNextEntry();
++    }
++
++    /**
++     * Reads the data of the first entry and returns its data.
++     */
++    private void readDataOfFirstEntry() throws IOException {
++        // read the header of the first entry
++        while (!shouldReadDataOfFirstEntry()) {
++            readNextEntryHeader();
++        }
++        // actual data of the first entry
++        readNextEntryData();
++    }
++
++    /**
++     * Returns true if the data of the first entry should be read,
++     * false otherwise.
++     */
++    private boolean shouldReadDataOfFirstEntry() {
++        return firstEntryAlreadyRead != null &&
++               !firstEntryAlreadyRead.isDirectory() &&
++               firstEntryAlreadyRead.getSize() > 0;
++    }
++
++    /**
++     * Reads the next entry header and returns the first ZipEntry found.
++     */
++    private ZipArchiveEntry readNextEntryHeader() throws IOException {
++        ZipArchiveEntry entry = ZipArchiveEntry.readZipEntry(in, useUnicodeExtraFields);
++        if (entry.getMethod() == ZipEntry.STORED && !allowStoredEntriesWithDataDescriptor) {
++            in.setDataDescriptionFollows(true);
++        }
++        return entry;
++    }
++
++    /**
++     * Reads the next entry data.
++     */
++    private void readNextEntryData() throws IOException {
++        skip(in, entryRemainsInBuffer);
++        in.read(buf, 0, entryRemainsInBuffer);
++        entryRemainsInBuffer = 0;
++    }
++
++    /**
++     * Skips the data in the provided input stream.
++     */
++    private void skip(InputStream in, int count) throws IOException {
++        while (count > 0) {
++            int skipped = in.skip(count);
++            if (skipped == 0) {
++                // if we were unable to skip any bytes, then we must be at end of stream
++                break;
++            }
++            count -= skipped;
++        }
++    }
+\ No newline at end of file

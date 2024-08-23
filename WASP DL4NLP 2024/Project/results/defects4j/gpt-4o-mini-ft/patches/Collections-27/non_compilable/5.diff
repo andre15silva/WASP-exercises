@@ -1,0 +1,17 @@
+diff --git a/tmp/f5ca7508-cf99-4ef0-bc41-0e3831c4451d_buggy.java b/tmp/749f55a6-9a0a-49a8-bc76-290ad8e2b3c2_fixed.java
+index e69de29..1e4b6ec 100644
+--- a/tmp/f5ca7508-cf99-4ef0-bc41-0e3831c4451d_buggy.java
++++ b/tmp/749f55a6-9a0a-49a8-bc76-290ad8e2b3c2_fixed.java
+@@ -0,0 +1,11 @@
++// https://issues.apache.org/jira/browse/HTTPCLIENT-1308
++// We need to keep the old serialization format around for the time being
++// it is used by some JUnit tests in a different package
++// TODO remove this method once we do not need it for junit tests any longer
++public static MultiValueMap<?> deserializeOldPre133Format(final byte[] data, ClassLoader classLoader) 
++        throws UnsupportedEncodingException, IOException {
++    ObjectInputStream ois = new ObjectInputStream(new ByteArrayInputStream(data));
++    MultiValueMap map = (MultiValueMap) ois.readObject();
++    ois.close();
++    return map;
++}
+\ No newline at end of file

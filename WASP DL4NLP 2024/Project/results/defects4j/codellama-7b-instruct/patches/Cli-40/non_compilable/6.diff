@@ -1,0 +1,78 @@
+diff --git a/tmp/c72b7b2b-dcc8-4ff8-a599-0b82a104a613_buggy.java b/tmp/878637e6-7c47-4aea-8cee-e80ab951578a_fixed.java
+index a7d0787..f641d77 100644
+--- a/tmp/c72b7b2b-dcc8-4ff8-a599-0b82a104a613_buggy.java
++++ b/tmp/878637e6-7c47-4aea-8cee-e80ab951578a_fixed.java
+@@ -1,54 +1,53 @@
+     /**
+      * Returns the <code>Object</code> of type <code>clazz</code>
+      * with the value of <code>str</code>.
+      *
+      * @param str the command line value
+      * @param clazz the type of argument
+      * @return The instance of <code>clazz</code> initialised with
+      * the value of <code>str</code>.
+      * @throws ParseException if the value creation for the given class failed
+      */
+-    @SuppressWarnings("unchecked") // returned value will have type T because it is fixed by clazz
+     public static <T> T createValue(final String str, final Class<T> clazz) throws ParseException
+     {
+-        if (PatternOptionBuilder.STRING_VALUE == clazz)
++        if (clazz == String.class)
+         {
+             return (T) str;
+         }
+-        else if (PatternOptionBuilder.OBJECT_VALUE == clazz)
++        else if (clazz == Object.class)
+         {
+-            return (T) createObject(str);
++            return (T) new Object();
+         }
+-        else if (PatternOptionBuilder.NUMBER_VALUE == clazz)
++        else if (clazz == Number.class)
+         {
+-            return (T) createNumber(str);
++            return (T) new Double(str);
+         }
+-        else if (PatternOptionBuilder.DATE_VALUE == clazz)
++        else if (clazz == Date.class)
+         {
+-            return (T) createDate(str);
++            return (T) new Date(str);
+         }
+-        else if (PatternOptionBuilder.CLASS_VALUE == clazz)
++        else if (clazz == Class.class)
+         {
+-            return (T) createClass(str);
++            return (T) Type.forName(str);
+         }
+-        else if (PatternOptionBuilder.FILE_VALUE == clazz)
++        else if (clazz == File.class)
+         {
+-            return (T) createFile(str);
++            return (T) new File(str);
+         }
+-        else if (PatternOptionBuilder.EXISTING_FILE_VALUE == clazz)
++        else if (clazz == ExistingFile.class)
+         {
+-            return (T) openFile(str);
++            return (T) new ExistingFile(str);
+         }
+-        else if (PatternOptionBuilder.FILES_VALUE == clazz)
++        else if (clazz == Files.class)
+         {
+-            return (T) createFiles(str);
++            return (T) Files.newFile(str);
+         }
+-        else if (PatternOptionBuilder.URL_VALUE == clazz)
++        else if (clazz == URL.class)
+         {
+-            return (T) createURL(str);
++            return (T) new URL(str);
+         }
+         else
+         {
+-            return null;
++            throw new ParseException("Invalid value type " + clazz);
+         }
+     }
+\ No newline at end of file

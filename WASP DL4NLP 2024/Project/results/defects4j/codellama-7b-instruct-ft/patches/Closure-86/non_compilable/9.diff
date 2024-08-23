@@ -1,0 +1,203 @@
+diff --git a/tmp/16cd253c-b4b7-4563-865d-331f47d29310_buggy.java b/tmp/5e4b07fc-9e32-4da5-8f2e-dd90146db6b0_fixed.java
+index a3709ee..7884348 100644
+--- a/tmp/16cd253c-b4b7-4563-865d-331f47d29310_buggy.java
++++ b/tmp/5e4b07fc-9e32-4da5-8f2e-dd90146db6b0_fixed.java
+@@ -1,71 +1,183 @@
+   /**
+    * @param locals A predicate to apply to unknown local values.
+    * @return Whether the node is known to be a value that is not a reference
+    *     outside the expression scope.
+    */
+   static boolean evaluatesToLocalValue(Node value, Predicate<Node> locals) {
+     switch (value.getType()) {
+       case Token.ASSIGN:
+-        // A result that is aliased by a non-local name, is the effectively the
+-        // same as returning a non-local name, but this doesn't matter if the
+-        // value is immutable.
++        // A result that is aliased by a name, is the effectively the
++        // same as returning a number or string, but there are cases where
++        // we can statically determine that the value is being aliased by a local
++        // name. When aliasing is detected this is also safe because the aliased
++        // name is only used in the same scope.
+         return NodeUtil.isImmutableValue(value.getLastChild())
+             || (locals.apply(value)
+                 && evaluatesToLocalValue(value.getLastChild(), locals));
+       case Token.COMMA:
+         return evaluatesToLocalValue(value.getLastChild(), locals);
+       case Token.AND:
+       case Token.OR:
+         return evaluatesToLocalValue(value.getFirstChild(), locals)
+            && evaluatesToLocalValue(value.getLastChild(), locals);
+       case Token.HOOK:
+         return evaluatesToLocalValue(value.getFirstChild().getNext(), locals)
+            && evaluatesToLocalValue(value.getLastChild(), locals);
+       case Token.INC:
+       case Token.DEC:
++        // Pre-increment can only be locally mutable, so the result is
++        // always a local primitive.
++        Node child = value.getFirstChild();
+         if (value.getBooleanProp(Node.INCRDECR_PROP)) {
+-          return evaluatesToLocalValue(value.getFirstChild(), locals);
++          return NodeUtil.isImmutableValue(child)
++              || (locals.apply(child)
++                  && evaluatesToLocalValue(child, locals));
+         } else {
+-          return true;
++          // Post-increment, the previous value can be aliased. Even if we know
++          // that the value wasn't modified, they can still chain
++          // expressions:  x += 1 += 1;
++          return locals.apply(value);
+         }
+       case Token.THIS:
+         return locals.apply(value);
+       case Token.NAME:
+         return isImmutableValue(value) || locals.apply(value);
+       case Token.GETELEM:
+       case Token.GETPROP:
+         // There is no information about the locality of object properties.
+         return locals.apply(value);
+       case Token.CALL:
+         return callHasLocalResult(value)
+             || isToStringMethodCall(value)
+             || locals.apply(value);
+       case Token.NEW:
+-        // TODO(nicksantos): This needs to be changed so that it
+-        // returns true iff we're sure the value was never aliased from inside
+-        // the constructor (similar to callHasLocalResult)
+-        return true;
+-      case Token.FUNCTION:
+-      case Token.REGEXP:
++        return callHasLocalResult(value);
+       case Token.ARRAYLIT:
+       case Token.OBJECTLIT:
+         // Literals objects with non-literal children are allowed.
+         return true;
+       case Token.IN:
+         // TODO(johnlenz): should IN operator be included in #isSimpleOperator?
+         return true;
+       default:
+-        // Other op force a local value:
+-        //  x = '' + g (x is now an local string)
+-        //  x -= g (x is now an local number)
++        // Other ops force a local value:
++        //  x = '' + f (x is now an local string)
++        //  x -= f (x is now an local number)
+         if (isAssignmentOp(value)
+             || isSimpleOperator(value)
+             || isImmutableValue(value)) {
+           return true;
+         }
+ 
++      case Token.REG_EXP:
++      case Token.TYPEOF:
++      case Token.VOID:
++        return true;
++      case Token.INSTANCEOF:
++        // x instanceof y means both x and y may be aliased.
++        // In general though we can say if the object expression
++        // is a local the resulting value will be safe.
++        return locals.apply(value);
++      case Token.FUNCTION:
++        return true;
++
++      case Token.DEFINED:
++      case Token.DELPROP:
++      case Token.DELPROP_MOVED:
++        // TODO(johnlenz): determine if these side effects to the DOM
++        // and thus result in local values.
++        return true;
++      case Token.SETPROP:
++      case Token.SETPROP_MOVED:
++        // TODO(nicksantos): determine if these side effects to the DOM
++        // and thus result in local values.
++        return true;
++      case Token.STRING:
++        return true;
++      case Token.NUMBER:
++        return true;
++      case Token.TRUE:
++        return true;
++      case Token.FALSE:
++        return true;
++      case Token.NULL:
++        return true;
++      case Token.NATIVE_JSON_OBJECT:
++        return true;
++      case Token.VAR:
++        // VAR is always local, though the variables it declares may not be.
++        return true;
++      case Token.NAME:
++        return isImmutableValue(value);
++      case Token.EXPR_RESULT:
++        return true;
++      case Token.ASSIGN_BIT_OR:
++      case Token.ASSIGN_BIT_XOR:
++      case Token.ASSIGN_BIT_AND:
++      case Token.ASSIGN_LSH:
++      case Token.ASSIGN_RSH:
++      case Token.ASSIGN_URSH:
++      case Token.ASSIGN_ADD:
++      case Token.ASSIGN_SUB:
++      case Token.ASSIGN_MUL:
++      case Token.ASSIGN_DIV:
++      case Token.ASSIGN_MOD:
++        // In all of these cases, there is no other value than local to the
++        // assign that can be affected.
++        return true;
++      case Token.INC:
++      case Token.DEC:
++        if (value.getBooleanProp(Node.INCRDECR_PROP)) {
++          return NodeUtil.isImmutableValue(value.getFirstChild());
++        } else {
++          return true;
++        }
++      case Token.CALL_C:
++        // This operator results in a local value.
++        Node parent = value.getParent();
++        // The CALL C result is already a number.
++        if (parent.isString()) {
++          return true;
++        } else if (parent.isBinaryOp()) {
++          return isSimpleBinaryOperator(parent);
++        }
++        return false;
++      case Token.OR:
++      case Token.OR2:
++      case Token.AND:
++      case Token.AND2:
++      case Token.INCLUSIVE_OR:
++      case Token.MOD:
++      case Token.LSH:
++      case Token.RSH:
++      case Token.INSTANCEOF:
++      case Token.POS:
++      case Token.NEG:
++        return true;
++      case Token.IF:
++        return true;
++      case Token.WHILE:
++      case Token.DO:
++      case Token.FOR:
++      case Token.FOR_IN:
++      case Token.FOR_OF:
++        return true;
++      case Token.EMPTY:
++      case Token.BLOCK:
++      case Token.LABEL:
++      case Token.SCRIPT:
++      case Token.EXPR_VOID:
++        return true;
++      case Token.IF_CATCH_ERROR:
++        // TODO(nicksantos): determine what this does.
++        return true;
++      case Token.FUNCTION_NAME:
++      case Token.RETURN:
+         throw new IllegalStateException(
+             "Unexpected expression node" + value +
+-            "\n parent:" + value.getParent());
++            "\n parent:" + value.getParent().getType());
++      default:
++        throw new IllegalStateException(
++            "Unexpected expression node " + value.getType());
+     }
+   }

@@ -1,0 +1,133 @@
+diff --git a/tmp/ea99e9a9-c7a7-43b0-9577-fff5d864e106_buggy.java b/tmp/d2fd9e34-4586-4a60-a890-c85bb16dca1d_fixed.java
+index 55b319a..6143ac7 100644
+--- a/tmp/ea99e9a9-c7a7-43b0-9577-fff5d864e106_buggy.java
++++ b/tmp/d2fd9e34-4586-4a60-a890-c85bb16dca1d_fixed.java
+@@ -1,77 +1,102 @@
+     /**
+      * <p>Converts a String to a boolean (optimised for performance).</p>
+      * 
+      * <p><code>'true'</code>, <code>'on'</code> or <code>'yes'</code>
+      * (case insensitive) will return <code>true</code>. Otherwise,
+      * <code>false</code> is returned.</p>
+      * 
+      * <p>This method performs 4 times faster (JDK1.4) than
+      * <code>Boolean.valueOf(String)</code>. However, this method accepts
+      * 'on' and 'yes' as true values.
+      *
+      * <pre>
+      *   BooleanUtils.toBoolean(null)    = false
+      *   BooleanUtils.toBoolean("true")  = true
+      *   BooleanUtils.toBoolean("TRUE")  = true
+      *   BooleanUtils.toBoolean("tRUe")  = true
+      *   BooleanUtils.toBoolean("on")    = true
+      *   BooleanUtils.toBoolean("yes")   = true
+      *   BooleanUtils.toBoolean("false") = false
+-     *   BooleanUtils.toBoolean("x gti") = false
++     *   BooleanUtils.toBoolean("z")     = false
++     *   BooleanUtils.toBoolean("off")   = false
++     *   BooleanUtils.toBoolean("no")    = false
++     *   BooleanUtils.toBoolean("a")     = false
++     *   BooleanUtils.toBoolean("y")     = false
+      * </pre>
+      *
+      * @param str  the String to check
+      * @return the boolean value of the string, <code>false</code> if no match
+      */
+     public static boolean toBoolean(String str) {
+         // Previously used equalsIgnoreCase, which was fast for interned 'true'.
+         // Non interned 'true' matched 15 times slower.
+         // 
++        // Optimisation follows as in JDK1.4 Boolean.valueOf(...)
++        // (see java.lang.Boolean to see a description of how the caching
++        // works).
++        // 
+         // Optimisation provides same performance as before for interned 'true'.
+         // Similar performance for null, 'false', and other strings not length 2/3/4.
+         // 'true'/'TRUE' match 4 times slower, 'tRUE'/'True' 7 times slower.
++        // 'y' is matched 9 times slower, 'yes' 12 times slower.
+         if (str == "true") {
+             return true;
+         }
+         if (str == null) {
+             return false;
+         }
+-        switch (str.length()) {
+-            case 2: {
++        int length = str.length();
++        if (length == 1) {
++            switch (str.charAt(0)) {
++                case 'n':
++                case 'N':
++                    return false;
++            }
++        }
++        if (length == 2) {
+             char ch0 = str.charAt(0);
+             char ch1 = str.charAt(1);
+-                return 
+-                    (ch0 == 'o' || ch0 == 'O') &&
+-                    (ch1 == 'n' || ch1 == 'N');
++            if (ch0 == 'y') {
++                if (ch1 == 'e') {
++                    return true;
+                 }
+-            case 3: {
+-                char ch = str.charAt(0);
+-                if (ch == 'y') {
+-                    return 
+-                        (str.charAt(1) == 'e' || str.charAt(1) == 'E') &&
+-                        (str.charAt(2) == 's' || str.charAt(2) == 'S');
++                if (ch1 == 'n') {
++                    return false;
+                 }
+-                if (ch == 'Y') {
+-                    return 
+-                        (str.charAt(1) == 'E' || str.charAt(1) == 'e') &&
+-                        (str.charAt(2) == 'S' || str.charAt(2) == 's');
++            } else if (ch0 == 't') {
++                switch (ch1) {
++                    case 'r':
++                    case 'R':
++                        return true;
+                 }
+             }
+-            case 4: {
++        } else if (length == 3) {
+             char ch = str.charAt(0);
+             if (ch == 't') {
+-                    return 
+-                        (str.charAt(1) == 'r' || str.charAt(1) == 'R') &&
+-                        (str.charAt(2) == 'u' || str.charAt(2) == 'U') &&
+-                        (str.charAt(3) == 'e' || str.charAt(3) == 'E');
++                if (str.charAt(1) == 'r' && str.charAt(2) == 'u') {
++                    return true;
++                }
++            } else if (ch == 'f') {
++                if (str.charAt(1) == 'a' && str.charAt(2) == 'l') {
++                    return false;
+                 }
+-                if (ch == 'T') {
+-                    return 
+-                        (str.charAt(1) == 'R' || str.charAt(1) == 'r') &&
+-                        (str.charAt(2) == 'U' || str.charAt(2) == 'u') &&
+-                        (str.charAt(3) == 'E' || str.charAt(3) == 'e');
+             }
++        } else if (length == 4) {
++            if (str.charAt(0) == 't') {
++                if (str.charAt(1) == 'r' && str.charAt(2) == 'u' && str.charAt(3) == 'e') {
++                    return true;
++                }
++            } else if (str.charAt(0) == 'f') {
++                if (str.charAt(1) == 'a' && str.charAt(2) == 'l' && str.charAt(3) == 's') {
++                    return false;
++                }
++            }
++        } else if (length > 5) {
++            if (str.charAt(0) == 't' && str.charAt(1) == 'r' && str.charAt(2) == 'u' && str.charAt(3) == 'e') {
++                return true;
++            } else if (str.charAt(0) == 'f' && str.charAt(1) == 'a' && str.charAt(2) == 'l' && str.charAt(3) == 's' && str.charAt(4) == 'e') {
++                return false;
+             }
+         }
+         return false;
+     }

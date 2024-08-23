@@ -1,0 +1,96 @@
+diff --git a/tmp/958e1a09-77a0-4804-b5bf-0c66f8b2a16c_buggy.java b/tmp/d90b9a51-0109-44e8-a985-fdc641696c40_fixed.java
+index 39981f0..63506b7 100644
+--- a/tmp/958e1a09-77a0-4804-b5bf-0c66f8b2a16c_buggy.java
++++ b/tmp/d90b9a51-0109-44e8-a985-fdc641696c40_fixed.java
+@@ -1,65 +1,88 @@
+   /**
+    * Given a node, get a human-readable name for the type of that node so
+    * that will be easy for the programmer to find the original declaration.
+    *
+    * For example, if SubFoo's property "bar" might have the human-readable
+    * name "Foo.prototype.bar".
+    *
+    * @param n The node.
+    * @param dereference If true, the type of the node will be dereferenced
+    *     to an Object type, if possible.
+    */
+   String getReadableJSTypeName(Node n, boolean dereference) {
+ 
+     // The best type name is the actual type name.
+ 
+     // If we're analyzing a GETPROP, the property may be inherited by the
+     // prototype chain. So climb the prototype chain and find out where
+     // the property was originally defined.
+     if (n.isGetProp()) {
+       ObjectType objectType = getJSType(n.getFirstChild()).dereference();
+       if (objectType != null) {
+         String propName = n.getLastChild().getString();
+         if (objectType.getConstructor() != null &&
+             objectType.getConstructor().isInterface()) {
+           objectType = FunctionType.getTopDefiningInterface(
+               objectType, propName);
+-        } else {
+-          // classes
++        }
++
++        // In the case of C3 and @type {C2} @private x; x.prop,
++        // x won't have a type.
+         while (objectType != null && !objectType.hasOwnProperty(propName)) {
+           objectType = objectType.getImplicitPrototype();
+         }
+-        }
+ 
+         // Don't show complex function names or anonymous types.
+         // Instead, try to get a human-readable type name.
+         if (objectType != null &&
+             (objectType.getConstructor() != null ||
+              objectType.isFunctionPrototypeType())) {
+           return objectType.toString() + "." + propName;
+         }
++      } else if (n.getLastChild().isThis()) {
++        // We know for sure that n.length, n.name, etc are non-null.
++        // But check whether the type checks out. The above code fails to
++        // find the name and complains about "n.proto in n.length" etc.
++        if (dereference && n.getFirstChild().isName()) {
++          // An error was made by the programmer. But try to give some
++          // error messages here.
++          Node lhs = n.getFirstChild();
++          String lhsName = lhs.getQualifiedName();
++          JSType t = getJSType(lhs);
++          if (!(t instanceof NamedType)) {
++            warn(
++                "Type-checking variable " + lhsName + " didn't catch an "
++                + "error. Add an @type annotation?",
++                lhs);
++          } else if (t.isObject() && t.toMaybeObjectType().getImplicitPrototype() != null) {
++            warn(
++                "Property " + propName + " never defined on "
++                + objectType.toString(),
++                n);
++          }
++        }
+       }
+     }
+ 
+     JSType type = getJSType(n);
+     if (dereference) {
+       ObjectType dereferenced = type.dereference();
+       if (dereferenced != null) {
+         type = dereferenced;
+       }
+     }
+     if (type.isFunctionPrototypeType() ||
+         (type.toObjectType() != null &&
+          type.toObjectType().getConstructor() != null)) {
+       return type.toString();
+     }
+     String qualifiedName = n.getQualifiedName();
+     if (qualifiedName != null) {
+       return qualifiedName;
+     } else if (type.isFunctionType()) {
+       // Don't show complex function names.
+       return "function";
+     } else {
+       return type.toString();
+     }
+   }

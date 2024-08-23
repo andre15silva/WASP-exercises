@@ -1,0 +1,19 @@
+diff --git a/tmp/fb579c9d-9f5f-4b02-a82c-3283c4a3d75f_buggy.java b/tmp/dc5435b5-0e0d-4e7b-ac4d-61b50b679c17_fixed.java
+index 593602f..93cf3a8 100644
+--- a/tmp/fb579c9d-9f5f-4b02-a82c-3283c4a3d75f_buggy.java
++++ b/tmp/dc5435b5-0e0d-4e7b-ac4d-61b50b679c17_fixed.java
+@@ -1,6 +1,8 @@
+-    @Override
+-    public String toString() {
+-        return rangesList.stream()
+-            .map(RangesList::formatRanges)
+-            .collect(joining(OR_JOINER));
++@Test
++void shouldOmitOuterParentheses() {
++    //given
++    RangesList rangesList = RangesListFactory.create(">=3.0.0 <=3.0.1");
++
++    //when/then
++    assertThat(rangesList.toString()).isEqualTo(">=3.0.0 and <=3.0.1");
+ }
+\ No newline at end of file

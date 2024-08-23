@@ -1,0 +1,55 @@
+diff --git a/tmp/ef25f1bd-a27e-4665-b806-c3685e34264f_buggy.java b/tmp/2238d629-657f-4743-8b0c-d7fb12e2ff5c_fixed.java
+index 0f439b3..32b33ea 100644
+--- a/tmp/ef25f1bd-a27e-4665-b806-c3685e34264f_buggy.java
++++ b/tmp/2238d629-657f-4743-8b0c-d7fb12e2ff5c_fixed.java
+@@ -1,38 +1,27 @@
+-    /**
+-     * Reads bytes from the current tar archive entry.
+-     *
+-     * This method is aware of the boundaries of the current
+-     * entry in the archive and will deal with them as if they
+-     * were this stream's start and EOF.
+-     *
+-     * @param buf The buffer into which to place bytes read.
+-     * @param offset The offset at which to place bytes read.
+-     * @param numToRead The number of bytes to read.
+-     * @return The number of bytes read, or -1 at EOF.
+-     * @throws IOException on error
+-     */
+ @Override
+ public int read(byte[] buf, int offset, int numToRead) throws IOException {
+-    	int totalRead = 0;
+-
+-        if (hasHitEOF || entryOffset >= entrySize) {
+-            return -1;
+-        }
+-
+     if (currEntry == null) {
+         throw new IllegalStateException("No current tar entry");
+     }
+ 
++    if (hasHitEOF || entryOffset >= entrySize) {
++        return -1;
++    }
++
+     numToRead = Math.min(numToRead, available());
+ 
+-        totalRead = is.read(buf, offset, numToRead);
+-        count(totalRead);
+-        
++    int totalRead = is.read(buf, offset, numToRead);
+     if (totalRead == -1) {
+         hasHitEOF = true;
++        // Here we check if we've reached the end of the entry's size.
++        if (entryOffset < entrySize) {
++            throw new IOException("Truncated tar entry");
++        }
++        return -1;
+     } else {
+         entryOffset += totalRead;
++        count(totalRead);
+     }
+ 
+     return totalRead;
+ }
+\ No newline at end of file

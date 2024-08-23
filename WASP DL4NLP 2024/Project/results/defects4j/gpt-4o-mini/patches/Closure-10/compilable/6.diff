@@ -1,0 +1,16 @@
+diff --git a/tmp/26a69cf3-4fac-41c1-9011-21b1a5f931e4_buggy.java b/tmp/2a481ea7-34fb-48e4-997b-3ba8972bf940_fixed.java
+index 6fecc90..cba5889 100644
+--- a/tmp/26a69cf3-4fac-41c1-9011-21b1a5f931e4_buggy.java
++++ b/tmp/2a481ea7-34fb-48e4-997b-3ba8972bf940_fixed.java
+@@ -1,7 +1,9 @@
+ static boolean mayBeString(Node n, boolean recurse) {
+     if (recurse) {
+         return allResultsMatch(n, MAY_BE_STRING_PREDICATE);
+     } else {
+-      return mayBeStringHelper(n);
++        // Updated this line to correctly handle cases where
++        // expressions evaluate as potentially being a string.
++        return mayBeStringHelper(n) || (n != null && n.isString());
+     }
+ }
+\ No newline at end of file

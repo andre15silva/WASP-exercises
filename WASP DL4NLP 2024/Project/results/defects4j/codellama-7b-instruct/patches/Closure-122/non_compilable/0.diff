@@ -1,0 +1,25 @@
+diff --git a/tmp/e0488e84-2d70-4b83-b48e-6430045b7f33_buggy.java b/tmp/76193b98-0b33-43c1-b198-d2b783814a60_fixed.java
+index 308b324..0c59eaa 100644
+--- a/tmp/e0488e84-2d70-4b83-b48e-6430045b7f33_buggy.java
++++ b/tmp/76193b98-0b33-43c1-b198-d2b783814a60_fixed.java
+@@ -1,11 +1,10 @@
+-  /**
+-   * Check to see if the given block comment looks like it should be JSDoc.
+-   */
+-  private void handleBlockComment(Comment comment) {
+-    if (comment.getValue().indexOf("/* @") != -1 || comment.getValue().indexOf("\n * @") != -1) {
+-      errorReporter.warning(
+-          SUSPICIOUS_COMMENT_WARNING,
+-          sourceName,
+-          comment.getLineno(), "", 0);
++function handleBlockComment(comment) {
++    if (comment.isMultiline()) {
++        var lines = comment.getLines();
++        for (var i = 0; i < lines.length; i++) {
++            if (lines[i].startsWith('*')) {
++                // Check for suspicious line
++            }
++        }
+     }
+ }
+\ No newline at end of file

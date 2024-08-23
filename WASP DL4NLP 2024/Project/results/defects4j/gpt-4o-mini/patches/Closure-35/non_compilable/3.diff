@@ -1,0 +1,53 @@
+diff --git a/tmp/b7caeba0-7f12-403c-a652-2bf40031005c_buggy.java b/tmp/70655214-26df-43ed-94b6-c38ae8b5f2b5_fixed.java
+index d57736b..3de7ce5 100644
+--- a/tmp/b7caeba0-7f12-403c-a652-2bf40031005c_buggy.java
++++ b/tmp/70655214-26df-43ed-94b6-c38ae8b5f2b5_fixed.java
+@@ -1,39 +1,33 @@
+-  /**
+-   * Suppose X is an object with inferred properties.
+-   * Suppose also that X is used in a way where it would only type-check
+-   * correctly if some of those properties are widened.
+-   * Then we should be polite and automatically widen X's properties for him.
+-   *
+-   * For a concrete example, consider:
+-   * param x {{prop: (number|undefined)}}
+-   * function f(x) {}
+-   * f({});
+-   *
+-   * If we give the anonymous object an inferred property of (number|undefined),
+-   * then this code will type-check appropriately.
+-   */
+ private void inferPropertyTypesToMatchConstraint(
+       JSType type, JSType constraint) {
+     if (type == null || constraint == null) {
+       return;
+     }
+ 
+     ObjectType constraintObj =
+         ObjectType.cast(constraint.restrictByNotNullOrUndefined());
+     if (constraintObj != null && constraintObj.isRecordType()) {
+       ObjectType objType = ObjectType.cast(type.restrictByNotNullOrUndefined());
+       if (objType != null) {
+         for (String prop : constraintObj.getOwnPropertyNames()) {
+           JSType propType = constraintObj.getPropertyType(prop);
+           if (!objType.isPropertyTypeDeclared(prop)) {
+             JSType typeToInfer = propType;
+             if (!objType.hasProperty(prop)) {
+               typeToInfer =
+                   getNativeType(VOID_TYPE).getLeastSupertype(propType);
+             }
++            // Define inferred property with defined type if it's not declared
+             objType.defineInferredProperty(prop, typeToInfer, null);
++          } else {
++            // If the property is declared, ensure the type is widened if necessary
++            JSType declaredType = objType.getPropertyType(prop);
++            JSType widenedType = declaredType.getLeastSupertype(propType);
++            if (!declaredType.isSubtypeOf(propType)) {
++              objType.defineInferredProperty(prop, widenedType, null);
++            }
+           }
+         }
+       }
+     }
+ }
+\ No newline at end of file

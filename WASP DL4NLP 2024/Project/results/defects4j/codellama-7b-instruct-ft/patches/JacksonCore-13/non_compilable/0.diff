@@ -1,0 +1,41 @@
+diff --git a/tmp/30fa1ec1-b99c-4dd3-8257-822f8f6cf47d_buggy.java b/tmp/28cb67e3-1e63-417a-982d-effdc0068df7_fixed.java
+index e69de29..a8c6bf9 100644
+--- a/tmp/30fa1ec1-b99c-4dd3-8257-822f8f6cf47d_buggy.java
++++ b/tmp/28cb67e3-1e63-417a-982d-effdc0068df7_fixed.java
+@@ -0,0 +1,36 @@
++    // [core#246]
++    public void testFieldNameQuotingEnabled() throws IOException
++    {
++        assumeStrictFeatureEnabled();
++        // // First, test with default factory, with quoting enabled by default
++        
++        // Then with alternatively configured factory
++
++        JsonFactory JF2 = new JsonFactory();
++        JF2.disable(JsonGenerator.Feature.QUOTE_FIELD_NAMES);
++
++        JSON_F_2 = JSON_F; // just in case it already was disabled for some reason...
++        JSON_N_A = new JsonFactory();
++        JSON_N_A.enable(JsonGenerator.Feature.QUOTE_FIELD_NAMES);
++        
++        // With quoting; all tests:
++        JSON_F_2 = JSON_F;
++        
++        _testFieldNameQuotingEnabled(JSON_F, true, true, "{\"foo\":1}");
++        _testFieldNameQuotingEnabled(JSON_F, false, true, "{\"foo\":1}");
++
++        // then without quotes; all tests:
++        JSON_F_2 = JSON_F;
++        
++        _testFieldNameQuotingEnabled(JSON_F, true, false, "{foo:1}");
++        _testFieldNameQuotingEnabled(JSON_F, false, false, "{foo:1}");
++
++        // Then with alternative factory
++
++        _testFieldNameQuotingEnabled(JF2, true, true, "{\"foo\":1}");
++        _testFieldNameQuotingEnabled(JF2, false, true, "{\"foo\":1}");
++
++        // then without quotes
++        _testFieldNameQuotingEnabled(JF2, true, false, "{foo:1}");
++        _testFieldNameQuotingEnabled(JF2, false, false, "{foo:1}");
++    }

@@ -1,0 +1,32 @@
+diff --git a/tmp/7629f48c-2345-4208-8f0d-935a9bf5a698_buggy.java b/tmp/215758cb-97e0-45a3-9c0e-abb45129745a_fixed.java
+index 46817a7..a022a7e 100644
+--- a/tmp/7629f48c-2345-4208-8f0d-935a9bf5a698_buggy.java
++++ b/tmp/215758cb-97e0-45a3-9c0e-abb45129745a_fixed.java
+@@ -1,16 +1,20 @@
+   @Override
+   public JSType getLeastSupertype(JSType that) {
+     if (!that.isRecordType()) {
+       return super.getLeastSupertype(that);
+     }
+     RecordTypeBuilder builder = new RecordTypeBuilder(registry);
+-    for (String property : properties.keySet()) {
+-      if (that.toMaybeRecordType().hasProperty(property) &&
+-          that.toMaybeRecordType().getPropertyType(property).isEquivalentTo(
+-              getPropertyType(property))) {
+-        builder.addProperty(property, getPropertyType(property),
+-            getPropertyNode(property));
+-      }
++    final Iterator<String> propertiesIterator = properties.keySet().iterator();
++    RecordTypeBuilder supBuilder =
++        that.toMaybeRecordType().getLeastSupertypeInternal(recordType, null);
++    for (String supProperty : supBuilder.properties.keySet()) {
++      JSType supType = supBuilder.getPropertyType(supProperty);
++      JSType meType = propertiesIterator.hasNext()
++          ? properties.get(propertiesIterator.next())
++          : registry.createUnionType(this, recordType);
++      builder.addProperty(supProperty,
++          registry.createUnionType(supType, meType),
++          null);
+     }
+     return builder.build();
+   }

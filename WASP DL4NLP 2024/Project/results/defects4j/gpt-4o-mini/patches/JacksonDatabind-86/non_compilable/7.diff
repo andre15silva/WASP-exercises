@@ -1,0 +1,17 @@
+diff --git a/tmp/a1981cf6-2535-4ebe-95d6-6c6dc0699aa4_buggy.java b/tmp/7232d599-11f9-4563-9bb3-988eae4f6779_fixed.java
+index e69de29..2d90bd7 100644
+--- a/tmp/a1981cf6-2535-4ebe-95d6-6c6dc0699aa4_buggy.java
++++ b/tmp/7232d599-11f9-4563-9bb3-988eae4f6779_fixed.java
+@@ -0,0 +1,11 @@
++@Override
++public JavaType getSuperClass() {
++    if (_superClass == null) {
++        if (_class.getSuperclass() != null) {
++            _superClass = _typeFactory.constructType(_class.getSuperclass());
++        } else {
++            _superClass = TypeFactory.unknownType();
++        }
++    }
++    return _superClass;
++}
+\ No newline at end of file

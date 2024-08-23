@@ -1,0 +1,49 @@
+diff --git a/tmp/af2f2adc-ee61-4fcf-9605-9532bddc7c2d_buggy.java b/tmp/7d70cba8-53b9-478e-acd1-fe974e18813a_fixed.java
+index 2608424..ac7a424 100644
+--- a/tmp/af2f2adc-ee61-4fcf-9605-9532bddc7c2d_buggy.java
++++ b/tmp/7d70cba8-53b9-478e-acd1-fe974e18813a_fixed.java
+@@ -1,39 +1,28 @@
+     /**
+      * Convert to multidimensional counter.
+      *
+      * @param index Index in unidimensional counter.
+      * @return the multidimensional counts.
+      * @throws OutOfRangeException if {@code index} is not between
+      * {@code 0} and the value returned by {@link #getSize()} (excluded).
+      */
+     public int[] getCounts(int index) {
+         if (index < 0 ||
+             index >= totalSize) {
+             throw new OutOfRangeException(index, 0, totalSize);
+         }
+ 
+         final int[] indices = new int[dimension];
+ 
+         int count = 0;
+-        for (int i = 0; i < last; i++) {
+-            int idx = 0;
++        for (int i = 0; i < last; ++i) {
+             final int offset = uniCounterOffset[i];
+-            while (count <= index) {
+-                count += offset;
+-                ++idx;
+-            }
+-            --idx;
+-            count -= offset;
+-            indices[i] = idx;
++            count += index / offset * offset;
++            indices[i] = (index - count) / offset;
+         }
+ 
+-        int idx = 1;
+-        while (count < index) {
+-            count += idx;
+-            ++idx;
+-        }
+-        --idx;
+-        indices[last] = idx;
++        count += indices[last];
++        indices[last] = index - count;
+ 
+         return indices;
+     }

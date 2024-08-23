@@ -1,0 +1,16 @@
+diff --git a/tmp/54c9d1e0-42e4-4ae9-a1a4-4a7358c4027e_buggy.java b/tmp/eb0f20f1-d6f3-491e-8b8a-7d606127a701_fixed.java
+index 4e21866..58df26a 100644
+--- a/tmp/54c9d1e0-42e4-4ae9-a1a4-4a7358c4027e_buggy.java
++++ b/tmp/eb0f20f1-d6f3-491e-8b8a-7d606127a701_fixed.java
+@@ -1,10 +1,10 @@
+     /**
+      * Computes the square-root of the weight matrix.
+      *
+      * @param m Symmetric, positive-definite (weight) matrix.
+      * @return the square-root of the weight matrix.
+      */
+     private RealMatrix squareRoot(RealMatrix m) {
+             final EigenDecomposition dec = new EigenDecomposition(m);
+-            return dec.getSquareRoot();
++            return dec.getSquareRoot(100000);
+     }

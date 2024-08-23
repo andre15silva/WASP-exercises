@@ -1,0 +1,24 @@
+diff --git a/tmp/d4033ca7-7c38-4d89-8b53-1e4d13dc4d9f_buggy.java b/tmp/80940043-b414-456b-b2fa-31263bbb48ba_fixed.java
+index 780fa1a..2c37144 100644
+--- a/tmp/d4033ca7-7c38-4d89-8b53-1e4d13dc4d9f_buggy.java
++++ b/tmp/80940043-b414-456b-b2fa-31263bbb48ba_fixed.java
+@@ -1,15 +1,18 @@
+     /**
+      * Constructs a new <code>String</code> by decoding the specified array of bytes using the ISO-8859-1 charset.
+      *
+      * @param bytes
+      *            The bytes to be decoded into characters, may be <code>null</code>
+      * @return A new <code>String</code> decoded from the specified array of bytes using the ISO-8859-1 charset, or
+      *         <code>null</code> if the input byte array was <code>null</code>.
+      * @throws NullPointerException
+      *             Thrown if {@link Charsets#ISO_8859_1} is not initialized, which should never happen since it is
+      *             required by the Java platform specification.
+-     * @since As of 1.7, throws {@link NullPointerException} instead of UnsupportedEncodingException
++     * @since 1.2
+      */
+     public static String newStringIso8859_1(final byte[] bytes) {
++        if (bytes == null) {
++            return null;
++        }
+         return new String(bytes, Charsets.ISO_8859_1);
+     }

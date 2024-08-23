@@ -1,0 +1,20 @@
+diff --git a/tmp/93b618b6-dab7-460e-8d3b-d33b0265674b_buggy.java b/tmp/bdfc0d2a-89e1-45d2-80ea-5297c8e6fc5f_fixed.java
+index d2a3c80..3c48d6b 100644
+--- a/tmp/93b618b6-dab7-460e-8d3b-d33b0265674b_buggy.java
++++ b/tmp/bdfc0d2a-89e1-45d2-80ea-5297c8e6fc5f_fixed.java
+@@ -1,11 +1,14 @@
+     /**
+      * Outputs the record separator.
+      *
+      * @throws IOException
+      *             If an I/O error occurs
+      */
++    @Override
+     public void println() throws IOException {
++        if (!newRecord && !delegatedFormat.isSetSkipHeaderRecord()) {
+             final String recordSeparator = format.getRecordSeparator();
+-            out.append(recordSeparator);
++            getOutputStream().write(recordSeparator.getBytes(Charset.forName(getCharset())));
++        }
+         newRecord = true;
+     }

@@ -1,0 +1,27 @@
+diff --git a/tmp/ced3353a-b64b-4edc-ab74-3d30a220eac0_buggy.java b/tmp/a1759ba1-82a2-4621-a814-b13a1c71f6c4_fixed.java
+index 4f21a3a..45bfb60 100644
+--- a/tmp/ced3353a-b64b-4edc-ab74-3d30a220eac0_buggy.java
++++ b/tmp/a1759ba1-82a2-4621-a814-b13a1c71f6c4_fixed.java
+@@ -1,14 +1,18 @@
+ /**
+-     * Helper method used by standard deserializer.
++ * Helper method used by standard serializer.
+  *
+  * @since 2.3
+  */
+ public TokenBuffer deserialize(JsonParser jp, DeserializationContext ctxt) throws IOException
+ {
+     copyCurrentStructure(jp);
+     /* 28-Oct-2014, tatu: As per #592, need to support a special case of starting from
+-         *    FIELD_NAME, which is taken to mean that we are missing START_OBJECT, but need
+-         *    to assume one did exist.
++     *    FIELD_NAME, which is taken to mean that we are missing START_OBJECT.
+      */
++    if (jp.getCurrentToken() == JsonToken.FIELD_NAME) {
++        jp.clearCurrentToken();
++        jp.setCurrentName(null);
++        jp.setNextToken(JsonToken.START_OBJECT);
++    }
+     return this;
+ }
+\ No newline at end of file

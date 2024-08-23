@@ -1,0 +1,107 @@
+diff --git a/tmp/56415290-40dd-4fbc-b0fb-d8848925f66c_buggy.java b/tmp/599759eb-d64d-4d21-b9f5-8f92c7adddfc_fixed.java
+index 39981f0..0679526 100644
+--- a/tmp/56415290-40dd-4fbc-b0fb-d8848925f66c_buggy.java
++++ b/tmp/599759eb-d64d-4d21-b9f5-8f92c7adddfc_fixed.java
+@@ -1,65 +1,100 @@
+   /**
+    * Given a node, get a human-readable name for the type of that node so
+    * that will be easy for the programmer to find the original declaration.
+    *
+    * For example, if SubFoo's property "bar" might have the human-readable
+    * name "Foo.prototype.bar".
+    *
+    * @param n The node.
+    * @param dereference If true, the type of the node will be dereferenced
+    *     to an Object type, if possible.
+    */
+   String getReadableJSTypeName(Node n, boolean dereference) {
+ 
+     // The best type name is the actual type name.
+ 
+     // If we're analyzing a GETPROP, the property may be inherited by the
+     // prototype chain. So climb the prototype chain and find out where
+     // the property was originally defined.
+     if (n.isGetProp()) {
+       ObjectType objectType = getJSType(n.getFirstChild()).dereference();
+       if (objectType != null) {
+         String propName = n.getLastChild().getString();
++        Node context = n.getSecondChild();
++        String subPropName = propName;
++        while (context != null && context.isName()) {
++          ObjectType propObjectType =
++              getJSType(context).dereference().toObjectType();
++          if (propObjectType == null ||
++              !propObjectType.hasOwnProperty(subPropName)) {
++            break;
++          }
++          propObjectType = propObjectType.getImplicitPrototype();
++          context = propObjectType == null ? null :
++              propObjectType.getReferenceNode();
++          subPropName = null;
++        }
++        if (context != null && propObjectType != null) {
++          Node objectContext = context;
++          context = context.getParent();
++          JSDocInfo info = getJSDocInfo(context);
++          if (info == null) {
++            info = getLastReal(propObjectType.getSource());
++          }
++          if (info != null) {
++            String constructorName = info.getConstructor();
++            if (constructorName != null) {
++              objectContext = getNameNode(objectContext,
++                  constructorName, true);
++            }
++          }
++          if (subPropName == null) {
++            subPropName = propName;
++          }
++          propName = subPropName;
++          objectContext = objectContext.getFirstChild();
++        }
+         if (objectType.getConstructor() != null &&
+             objectType.getConstructor().isInterface()) {
+           objectType = FunctionType.getTopDefiningInterface(
+               objectType, propName);
+         } else {
+           // classes
+           while (objectType != null && !objectType.hasOwnProperty(propName)) {
+             objectType = objectType.getImplicitPrototype();
+           }
+         }
+ 
+         // Don't show complex function names or anonymous types.
+         // Instead, try to get a human-readable type name.
+         if (objectType != null &&
+             (objectType.getConstructor() != null ||
+-             objectType.isFunctionPrototypeType())) {
+-          return objectType.toString() + "." + propName;
++             objectType.isFunctionPrototypeType()) &&
++            objectContext != null) {
++          return getQualifiedName(objectContext) + "." + propName;
+         }
+       }
+     }
+ 
+     JSType type = getJSType(n);
+     if (dereference) {
+       ObjectType dereferenced = type.dereference();
+       if (dereferenced != null) {
+         type = dereferenced;
+       }
+     }
+     if (type.isFunctionPrototypeType() ||
+         (type.toObjectType() != null &&
+          type.toObjectType().getConstructor() != null)) {
+       return type.toString();
+     }
+     String qualifiedName = n.getQualifiedName();
+     if (qualifiedName != null) {
+       return qualifiedName;
+     } else if (type.isFunctionType()) {
+       // Don't show complex function names.
+       return "function";
+     } else {
+       return type.toString();
+     }
+   }

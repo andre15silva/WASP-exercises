@@ -1,0 +1,101 @@
+diff --git a/tmp/a498b2b2-8ffb-44b1-b1f2-3a56a526916c_buggy.java b/tmp/db0f4a15-1ef9-45b7-bd29-80fc14abfb04_fixed.java
+index b81eeca..9cc3307 100644
+--- a/tmp/a498b2b2-8ffb-44b1-b1f2-3a56a526916c_buggy.java
++++ b/tmp/db0f4a15-1ef9-45b7-bd29-80fc14abfb04_fixed.java
+@@ -1,78 +1,38 @@
+-    /**
+-     * Parse an octal string from a buffer.
+-     *
+-     * <p>Leading spaces are ignored.
+-     * The buffer must contain a trailing space or NUL,
+-     * and may contain an additional trailing space or NUL.</p>
+-     *
+-     * <p>The input buffer is allowed to contain all NULs,
+-     * in which case the method returns 0L
+-     * (this allows for missing fields).</p>
+-     *
+-     * <p>To work-around some tar implementations that insert a
+-     * leading NUL this method returns 0 if it detects a leading NUL
+-     * since Commons Compress 1.4.</p>
+-     *
+-     * @param buffer The buffer from which to parse.
+-     * @param offset The offset into the buffer from which to parse.
+-     * @param length The maximum number of bytes to parse - must be at least 2 bytes.
+-     * @return The long value of the octal string.
+-     * @throws IllegalArgumentException if the trailing space/NUL is missing or if a invalid byte is detected.
+-     */
+ public static long parseOctal(final byte[] buffer, final int offset, final int length) {
+-        long    result = 0;
+-        int     end = offset + length;
+-        int     start = offset;
+-
+-        if (length < 2){
+-            throw new IllegalArgumentException("Length "+length+" must be at least 2");
++    // Check if the input array ends with a trailing space or NUL
++    if (buffer[buffer.length - 1] != ' ' && buffer[buffer.length - 1] != 0x0) {
++        throw new IllegalArgumentException("The input array does not end with a trailing space or NUL");
+     }
+ 
++    // Check if the input array is all NULs, and if so, throw an exception
+     boolean allNUL = true;
+-        for (int i = start; i < end; i++){
++    for (int i = offset; i < offset + length; i++) {
+         if (buffer[i] != 0) {
+             allNUL = false;
+             break;
+         }
+     }
+     if (allNUL) {
+-            return 0L;
++        throw new IllegalArgumentException("The input array is all NULs");
+     }
+ 
+-        // Skip leading spaces
+-        while (start < end){
+-            if (buffer[start] == ' '){
+-                start++;
+-            } else {
+-                break;
++    // Check if the input array contains any non-digit characters
++    for (int i = offset; i < offset + length; i++) {
++        if (buffer[i] < '0' || buffer[i] > '7') {
++            throw new IllegalArgumentException("The input array contains non-digit character");
+         }
+     }
+ 
+-        // Must have trailing NUL or space
+-        byte trailer;
+-        trailer = buffer[end-1];
+-        if (trailer == 0 || trailer == ' '){
+-            end--;
+-        } else {
+-            throw new IllegalArgumentException(
+-                    exceptionMessage(buffer, offset, length, end-1, trailer));
+-        }
+-        // May have additional NUL or space
+-        trailer = buffer[end-1];
+-        if (trailer == 0 || trailer == ' '){
+-            end--;
++    // Ensure that the input array is at least 2 bytes long
++    if (length < 2) {
++        throw new IllegalArgumentException("The input array is too short");
+     }
+ 
+-        for ( ;start < end; start++) {
+-            final byte currentByte = buffer[start];
+-            // CheckStyle:MagicNumber OFF
+-            if (currentByte < '0' || currentByte > '7'){
+-                throw new IllegalArgumentException(
+-                        exceptionMessage(buffer, offset, length, start, currentByte));
+-            }
+-            result = (result << 3) + (currentByte - '0'); // convert from ASCII
+-            // CheckStyle:MagicNumber ON
++    // Parse the octal string
++    long result = 0;
++    for (int i = offset; i < offset + length; i++) {
++        result = (result << 3) + (buffer[i] - '0');
+     }
+ 
+     return result;
+ }
+\ No newline at end of file

@@ -1,0 +1,165 @@
+diff --git a/tmp/79afdfb4-3b2e-4f62-b46a-a12965caca5a_buggy.java b/tmp/b6c284c2-da45-4cc2-9899-0f82522e2d75_fixed.java
+index bd45b8e..d8cff90 100644
+--- a/tmp/79afdfb4-3b2e-4f62-b46a-a12965caca5a_buggy.java
++++ b/tmp/b6c284c2-da45-4cc2-9899-0f82522e2d75_fixed.java
+@@ -1,15 +1,158 @@
+ public UTF8StreamJsonParser(IOContext ctxt, int features, InputStream in,
+         ObjectCodec codec, BytesToNameCanonicalizer sym,
+         byte[] inputBuffer, int start, int end,
+         boolean bufferRecyclable)
+ {
+     super(ctxt, features);
+     _inputStream = in;
+     _objectCodec = codec;
+     _symbols = sym;
+     _inputBuffer = inputBuffer;
+     _inputPtr = start;
+     _inputEnd = end;
+-        // If we have offset, need to omit that from byte offset, so:
+     _bufferRecyclable = bufferRecyclable;
++    _inputStream.skip(start);
++    this.fillBuffer(false);
++}
++
++private void fillBuffer(boolean parseLazily) throws IOException
++{
++    _inputStream.read(_inputBuffer, 0, BUF_SIZE);
++    _inputLength = BUF_SIZE;
++    _currentInputPos = 0;
++    _parsingContext = RootSettableTokenBuffer.INSTANCE;
++    _nextToken = null;
++    this.finishToken();
++}
++
++@Override
++public JsonLocation getTokenLocation() {
++    if (_parsingContext != null) {
++        return new JsonLocation(_inputStream, _inputPtr - _inputBuffer, _inputPtr);
++    }
++    return null;
++}
++
++private void finishToken() throws IOException
++{
++    if (_nextToken != null) {
++        return;
++    }
++
++    // First, can we get a token from the non-blocking stack?
++    if (_parsingContext.hasNonBlockingToken()) {
++        _nextToken = _parsingContext.getNonBlockingToken();
++    } else {
++        // Not available; must read or generate...
++        this.skipChildren(true);
++        if (_parsingContext.hasNonBlockingToken()) {
++            _nextToken = _parsingContext.getNonBlockingToken();
++        } else {
++            this.skipChildren(false);
++            _nextToken = this.readNextToken();
++        }
++    }
++
++    if (_nextToken != null && _parsingContext == RootSettableTokenBuffer.INSTANCE) {
++        this.skipSpace();
++    }
++}
++
++private JsonToken readNextToken() throws IOException
++{
++    JsonToken t = JsonToken.UNKNOWN;
++
++    // Note: this is a performance optimization, to check against common values just once
++    int i = _inputPtr;
++    int inputLen = _inputBuffer.length;
++
++    if (i >= inputLen) {
++        if (_parsingContext.inRoot()) {
++            return null;
++        }
++        this.processEndOfInput();
++    }
++
++    while (true) {
++        while (i < inputLen) {
++            byte[] inputBuffer = this._inputBuffer;
++            int[] codes = _icLatin1;
++            int ptr = i;
++            int firstChar = inputBuffer[ptr] & 0xFF;
++            int offset;
++            if (firstChar < codes.length) {
++                offset = _icUTF8Type[firstChar];
++                int extraBytesToRead = offset;
++                if (extraBytesToRead > 0) {
++                    if (++ptr >= inputLen) {
++                        _minorState = JsonToken.NOT_AVAILABLE;
++                        return JsonToken.NOT_AVAILABLE;
++                    }
++                    ++extraBytesToRead;
++                    offset = _icUTF8First[offset];
++                    if (extraBytesToRead <= Byte.MAX_VALUE) {
++                        // 2-byte unicode sequence?
++                        if ((extraBytesToRead == 2) && (firstChar >= 0xE0)) {
++                            offset += ((inputBuffer[ptr-1] & 0xFF) << 8)
++                                + (inputBuffer[ptr] & 0xFF);
++                            extraBytesToRead = 0;
++                        } else {
++                            offset += ((inputBuffer[ptr] & 0xFF) << 8);
++                        }
++                    } else {
++                        offset += ((inputBuffer[ptr-1] & 0xFF) << 16)
++                            + ((inputBuffer[ptr] & 0xFF) << 8);
++                    }
++                }
++                // 3-byte or 4-byte unicode sequence?
++                if (extraBytesToRead >= 3) {
++                    int ch = 0;
++    
++                    do {
++                        if (ptr >= inputLen) {
++                            _minorState = JsonToken.NOT_AVAILABLE;
++                            return JsonToken.NOT_AVAILABLE;
++                        }
++    
++                        ++extraBytesToRead;
++                        ch = (ch << 8) | (inputBuffer[ptr++] & 0xFF);
++                    } while (extraBytesToRead < 4);
++    
++                    if (_ioContext.getStreamReadCapacity() < (ptr-i)) {
++                        if (!this.loadMore(ptr)) {
++                            throw new RuntimeException("Can not read full UTF-16 encoding!!");
++                        }
++                    }
++    
++                    offset = _ioContext.mergeUtf8(0, ptr-extraBytesToRead,
++                        inputBuffer, offset, extraBytesToRead);
++                }
++                if (offset >= 0) {
++                    // Unicode multi-byte
++                    t = _symbols.findName(offset);
++                    if (t != null) {
++                        i += extraBytesToRead;
++    
++                        if (t == JsonToken.FIELD_NAME) {
++                            _parsingContext.setCurrentName(_stringBuilder.toString());
++                        }
++                        return t;
++                    }
++                }
++            }
++            ++i;
++            if (i == inputLen) {
++                break;
++            }
++        }
++
++        if (_parsingContext.inRoot()) {
++            return null;
++        }
++        // Ok, a child token?
++        _parsingContext.setCurrentLength(i - _inputPtr);
++        _inputPtr = i;
++        return JsonToken.NOT_AVAILABLE;
++    }
++    return null;
+ }
+\ No newline at end of file

@@ -1,0 +1,26 @@
+diff --git a/tmp/fc1f3e4a-b715-4276-84fa-0c0bc8f8dd76_buggy.java b/tmp/345c2e40-6092-4d7c-bc6c-794bfc96546d_fixed.java
+index 163b2e1..4798be7 100644
+--- a/tmp/fc1f3e4a-b715-4276-84fa-0c0bc8f8dd76_buggy.java
++++ b/tmp/345c2e40-6092-4d7c-bc6c-794bfc96546d_fixed.java
+@@ -1,13 +1,21 @@
+     /**
+      * Puts all values of this record into the given Map.
+      *
+      * @param map The Map to populate.
+      * @return the given map.
+      */
+     <M extends Map<String, String>> M putIn(final M map) {
+         for (final Entry<String, Integer> entry : mapping.entrySet()) {
+             final int col = entry.getValue().intValue();
++            // AGG: CSV-90 fix
++            // getting the values from values row for CSVRecord with short size
++            // depending on whether size is greater or equal to the column size
++            // so - from size + 1 throw exception
++            if (col >= values.length) {
++                throw new ArrayIndexOutOfBoundsException(
++                        "Field column size outside of array (record=" + record + ", col=" + entry.getValue() + ")");
++            }
+             map.put(entry.getKey(), values[col]);
+         }
+         return map;
+     }

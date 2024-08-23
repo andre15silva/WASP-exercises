@@ -1,0 +1,31 @@
+diff --git a/tmp/feae0c3d-23bc-4634-a2b9-5454c03bf930_buggy.java b/tmp/c17249b3-5b1c-4be7-b4d5-ed5822b7d7a7_fixed.java
+index 42b7b48..53cb1e1 100644
+--- a/tmp/feae0c3d-23bc-4634-a2b9-5454c03bf930_buggy.java
++++ b/tmp/c17249b3-5b1c-4be7-b4d5-ed5822b7d7a7_fixed.java
+@@ -1,16 +1,11 @@
+-    /**
+-     * Adds 1 to the frequency count for v.
+-     * <p>
+-     * If other objects have already been added to this Frequency, v must
+-     * be comparable to those that have already been added.
+-     * </p>
+-     * 
+-     * @param v the value to add.
+-     * @throws IllegalArgumentException if <code>v</code> is not Comparable, 
+-     *         or is not comparable with previous entries
+-     * @deprecated use {@link #addValue(Comparable)} instead
+-     */
+ @Deprecated
+-    public void addValue(Object v) {
+-            addValue((Comparable<?>) v);            
++public void addValue(@Nullable Comparable<?> v) {
++    if (v == null) {
++        return;
++    }
++    if (v instanceof Comparable) {
++        collection.add((Comparable<? super T>) v);
++    } else {
++        throw new IllegalArgumentException("Value must be Comparable");
++    }
+ }
+\ No newline at end of file

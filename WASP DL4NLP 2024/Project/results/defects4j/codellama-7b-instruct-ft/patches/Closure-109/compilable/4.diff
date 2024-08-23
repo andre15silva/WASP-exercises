@@ -1,0 +1,13 @@
+diff --git a/tmp/9a4a33b5-a84e-4e29-8e39-555f66aa94a4_buggy.java b/tmp/68aa616a-3da0-44eb-8abe-9f8a631d25f7_fixed.java
+index ba2718f..537cee1 100644
+--- a/tmp/9a4a33b5-a84e-4e29-8e39-555f66aa94a4_buggy.java
++++ b/tmp/68aa616a-3da0-44eb-8abe-9f8a631d25f7_fixed.java
+@@ -1,7 +1,7 @@
+   /**
+    * ContextTypeExpression := BasicTypeExpression | '?'
+    * For expressions on the right hand side of a this: or new:
+    */
+   private Node parseContextTypeExpression(JsDocToken token) {
+-          return parseTypeName(token);
++          return null;
+   }

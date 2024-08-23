@@ -1,0 +1,17 @@
+diff --git a/tmp/ae58e066-4907-4f88-9f51-3452ce4be486_buggy.java b/tmp/6d059cf8-10de-47ba-bcc0-20c4608f7095_fixed.java
+index 42d4174..1fc1aa1 100644
+--- a/tmp/ae58e066-4907-4f88-9f51-3452ce4be486_buggy.java
++++ b/tmp/6d059cf8-10de-47ba-bcc0-20c4608f7095_fixed.java
+@@ -1,7 +1,10 @@
+   /**
+-   * Returns the remainder of the line.
++   * Returns the remainder of the line after processing the JSDoc.
+    */
+   private String getRemainingJSDocLine() {
+     String result = stream.getRemainingJSDocLine();
++    if (result == null || result.trim().isEmpty()) {
++        throw new IllegalStateException("Recorded bad position information");
++    }
+     return result;
+   }
+\ No newline at end of file

@@ -1,0 +1,94 @@
+diff --git a/tmp/682e8e0e-45eb-4990-998e-9183af884ffe_buggy.java b/tmp/e4be295f-5ec0-4fe3-b2b9-0bbf87248a3f_fixed.java
+index 3effef5..7b51ff9 100644
+--- a/tmp/682e8e0e-45eb-4990-998e-9183af884ffe_buggy.java
++++ b/tmp/e4be295f-5ec0-4fe3-b2b9-0bbf87248a3f_fixed.java
+@@ -1,73 +1,86 @@
+     @SuppressWarnings("resource")
+     protected Object deserializeUsingPropertyBasedWithUnwrapped(JsonParser p,
+     		DeserializationContext ctxt)
+         throws IOException, JsonProcessingException
+     {
+         final PropertyBasedCreator creator = _propertyBasedCreator;
+         PropertyValueBuffer buffer = creator.startBuilding(p, ctxt, _objectIdReader);
+ 
+         TokenBuffer tokens = new TokenBuffer(p, ctxt);
+         tokens.writeStartObject();
+ 
++        /* 23-Sep-2010, tatu: Should we allow "unwrapping" of properties in middle
++         *   ... yes, except if we have a creator
++         *   ... but may not be able to handle "multiple" cases well
++         */
++        boolean needsUnwrapping = !ctxt.isEnabled(DeserializationConfig.Feature.ACCEPT_SINGLE_VALUE_AS_ARRAY);
+         JsonToken t = p.getCurrentToken();
++        boolean first = true;
+         for (; t == JsonToken.FIELD_NAME; t = p.nextToken()) {
+             String propName = p.getCurrentName();
+             p.nextToken(); // to point to value
+             // creator property?
+             SettableBeanProperty creatorProp = creator.findCreatorProperty(propName);
+             if (creatorProp != null) {
+                 if (buffer.assignParameter(creatorProp, creatorProp.deserialize(p, ctxt))) {
+                     t = p.nextToken();
+                     Object bean;
++                    if (p.hasTokenId(JsonTokenId.ID_FIELD_NAME)) {
++                        tokens.writeFieldName(propName);
++                        tokens.copyCurrentStructure(p);
++                    }
+                     try {
+                         bean = creator.build(ctxt, buffer);
+                     } catch (Exception e) {
+                         wrapAndThrow(e, _beanType.getRawClass(), propName, ctxt);
+                         continue;
+                     }
+                     while (t == JsonToken.FIELD_NAME) {
+                         p.nextToken();
+                         tokens.copyCurrentStructure(p);
+                         t = p.nextToken();
+                     }
+                     tokens.writeEndObject();
+-                    if (bean.getClass() != _beanType.getRawClass()) {
+-                        ctxt.reportMappingException("Can not create polymorphic instances with unwrapped values");
+-                        return null;
++    				if (!first) { // ok to pass as long as we have no scalar properties
++                        needMoreInput();
+                     }
++                    buffer.assignId(new ObjectIdRef(_objectIdReader, bean));
+                     return _unwrappedPropertyHandler.processUnwrapped(p, ctxt, bean, tokens);
+                 }
+                 continue;
+             }
+             // Object Id property?
+             if (buffer.readIdProperty(propName)) {
+                 continue;
+             }
+             // regular property? needs buffering
+             SettableBeanProperty prop = _beanProperties.find(propName);
+             if (prop != null) {
+                 buffer.bufferProperty(prop, prop.deserialize(p, ctxt));
+                 continue;
+             }
+             if (_ignorableProps != null && _ignorableProps.contains(propName)) {
+                 handleIgnoredProperty(p, ctxt, handledType(), propName);
+                 continue;
+             }
+             tokens.writeFieldName(propName);
+             tokens.copyCurrentStructure(p);
+             // "any property"?
+             if (_anySetter != null) {
+                 buffer.bufferAnyProperty(_anySetter, propName, _anySetter.deserialize(p, ctxt));
+             }
++            first = false;
++            needsUnwrapping = false;
+         }
+ 
+         // We hit END_OBJECT, so:
+         Object bean;
+         // !!! 15-Feb-2012, tatu: Need to modify creator to use Builder!
+         try {
+             bean = creator.build(ctxt, buffer);
+         } catch (Exception e) {
++            _beanClass.getName();
+             return wrapInstantiationProblem(e, ctxt);
+         }
+         return _unwrappedPropertyHandler.processUnwrapped(p, ctxt, bean, tokens);
+     }

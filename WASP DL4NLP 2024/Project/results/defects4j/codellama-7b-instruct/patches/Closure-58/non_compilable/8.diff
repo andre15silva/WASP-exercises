@@ -1,0 +1,131 @@
+diff --git a/tmp/3fcaabde-78a8-4a8a-999d-1612fbadbf0f_buggy.java b/tmp/4cd07775-0983-41eb-b469-61e05c4b8031_fixed.java
+index 2ff27ef..f0ab766 100644
+--- a/tmp/3fcaabde-78a8-4a8a-999d-1612fbadbf0f_buggy.java
++++ b/tmp/4cd07775-0983-41eb-b469-61e05c4b8031_fixed.java
+@@ -1,97 +1,76 @@
+-  /**
+-   * Computes the GEN and KILL set.
+-   *
+-   * @param n Root node.
+-   * @param gen Local variables that are live because of the instruction at
+-   *        {@code n} will be added to this set.
+-   * @param kill Local variables that are killed because of the instruction at
+-   *        {@code n} will be added to this set.
+-   * @param conditional {@code true} if any assignments encountered are
+-   *        conditionally executed. These assignments might not kill a variable.
+-   */
+-  private void computeGenKill(Node n, BitSet gen, BitSet kill,
+-      boolean conditional) {
++private void computeGenKill(Node n, BitSet gen, BitSet kill, BitSet local, BitSet label) {
+ 
+     switch (n.getType()) {
+         case Token.SCRIPT:
+         case Token.BLOCK:
+         case Token.FUNCTION:
+             return;
+ 
+         case Token.WHILE:
+         case Token.DO:
+         case Token.IF:
+-        computeGenKill(NodeUtil.getConditionExpression(n), gen, kill,
+-            conditional);
++            computeGenKill(n.getFirstChild(), gen, kill, local, label);
+             return;
+ 
+         case Token.FOR:
+-        if (!NodeUtil.isForIn(n)) {
+-          computeGenKill(NodeUtil.getConditionExpression(n), gen, kill,
+-              conditional);
++            if (!isForIn(n)) {
++                computeGenKill(n.getFirstChild(), gen, kill, local, label);
+             } else {
++                Node head = n.getFirstChild();
+                 // for(x in y) {...}
+-          Node lhs = n.getFirstChild();
+-          Node rhs = lhs.getNext();
+-          if (NodeUtil.isVar(lhs)) {
++                while (head.getType() == Token.FOR_IN) {
++                    head = head.getFirstChild();
++                }
++                if (head.getType() == Token.VAR) {
+                     // for(var x in y) {...}
+-            lhs = lhs.getLastChild();
++                    head = head.getLastChild();
+                 }
+-            addToSetIfLocal(lhs, kill);
+-            addToSetIfLocal(lhs, gen);
+-          computeGenKill(rhs, gen, kill, conditional);
++                addToSetIfLocal(head, kill);
++                addToSetIfLocal(head, gen);
++                computeGenKill(head.getNext(), gen, kill, local, label);
+             }
+             return;
+ 
+         case Token.VAR:
+             for (Node c = n.getFirstChild(); c != null; c = c.getNext()) {
+                 if (c.hasChildren()) {
+-            computeGenKill(c.getFirstChild(), gen, kill, conditional);
+-            if (!conditional) {
++                    computeGenKill(c.getFirstChild(), gen, kill, local, label);
++                    if (!isAssign(c)) {
++                        // assignments such as a += 1 reads a.
+                         addToSetIfLocal(c, kill);
+                     }
+                 }
+             }
+             return;
+ 
+         case Token.AND:
+         case Token.OR:
+-        computeGenKill(n.getFirstChild(), gen, kill, conditional);
++            computeGenKill(n.getFirstChild(), gen, kill, local, label);
++            computeGenKill(n.getLastChild(), gen, kill, local, label);
++            return;
++
++        case Token.FOR_IN:
++            for (Node c = n.getFirstChild(); c != null; c = c.getNext()) {
++                if (c.hasChildren()) {
++                    computeGenKill(c.getFirstChild(), gen, kill, local, label);
+                     // May short circuit.
+-        computeGenKill(n.getLastChild(), gen, kill, true);
+-        return;
+-
+-      case Token.HOOK:
+-        computeGenKill(n.getFirstChild(), gen, kill, conditional);
+-        // Assume both sides are conditional.
+-        computeGenKill(n.getFirstChild().getNext(), gen, kill, true);
+-        computeGenKill(n.getLastChild(), gen, kill, true);
++                    computeGenKill(c.getLastChild(), gen, kill, local, label);
++                }
++            }
+             return;
+ 
+         case Token.NAME:
+             if (isArgumentsName(n)) {
+                 markAllParametersEscaped();
+             } else {
+                 addToSetIfLocal(n, gen);
+             }
+             return;
+ 
+         default:
+-        if (NodeUtil.isAssignmentOp(n) && NodeUtil.isName(n.getFirstChild())) {
+-          Node lhs = n.getFirstChild();
+-          if (!conditional) {
+-            addToSetIfLocal(lhs, kill);
+-          }
+-          if (!NodeUtil.isAssign(n)) {
+-            // assignments such as a += 1 reads a.
+-            addToSetIfLocal(lhs, gen);
+-          }
+-          computeGenKill(lhs.getNext(), gen, kill, conditional);
+-        } else {
+             for (Node c = n.getFirstChild(); c != null; c = c.getNext()) {
+-            computeGenKill(c, gen, kill, conditional);
+-          }
++                computeGenKill(c, gen, kill, local, label);
+             }
+             return;
+     }
+ }
+\ No newline at end of file

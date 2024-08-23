@@ -1,0 +1,39 @@
+diff --git a/tmp/72fc690b-18b1-4f59-bc80-a60d9d5eeec3_buggy.java b/tmp/8e9b685f-b62b-4486-8fed-7aff0701d95b_fixed.java
+index a7f0d46..0766049 100644
+--- a/tmp/72fc690b-18b1-4f59-bc80-a60d9d5eeec3_buggy.java
++++ b/tmp/8e9b685f-b62b-4486-8fed-7aff0701d95b_fixed.java
+@@ -1,22 +1,32 @@
+   void add(String newcode) {
+     maybeEndStatement();
+ 
+     if (newcode.length() == 0) {
+       return;
+     }
+ 
+     char c = newcode.charAt(0);
+     if ((isWordChar(c) || c == '\\') &&
+         isWordChar(getLastChar())) {
+       // need space to separate. This is not pretty printing.
+       // For example: "return foo;"
+       append(" ");
+-      // Do not allow a forward slash to appear after a DIV.
++      // Do not allow a forward slash to appear after a DIV. Because
++      // some prettyprinter versions get confused, do this only if there is
++      // something on the right. For example,
++      //   alert(/ // / / / /);
++      //   alert(/ // / // /);
++      //
++      // In this case, REGEXP should appear in the middle.
++      if (!(lastWasTokenType(DIV) &&
++            getSnip(S, 1) != null &&
++            getSnip(S, 1).getToken().isType(DIV))) {
+         // For example,
+         // REGEXP DIV REGEXP
+         // is valid and should print like
+-      // / // / /
++        // / // / / / / /
++      }
+     }
+ 
+     append(newcode);
+   }

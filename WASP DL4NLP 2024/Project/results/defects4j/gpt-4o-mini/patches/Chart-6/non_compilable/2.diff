@@ -1,0 +1,29 @@
+diff --git a/tmp/5c18f2e9-5988-41c5-9caa-37f609cfcdb2_buggy.java b/tmp/1a8feafe-3ae4-499c-b2e4-a444cbb78cd3_fixed.java
+index 351a97a..71a2018 100644
+--- a/tmp/5c18f2e9-5988-41c5-9caa-37f609cfcdb2_buggy.java
++++ b/tmp/1a8feafe-3ae4-499c-b2e4-a444cbb78cd3_fixed.java
+@@ -1,18 +1,13 @@
+-    /**
+-     * Tests the list for equality with another object (typically also a list).
+-     *
+-     * @param obj  the other object (<code>null</code> permitted).
+-     *
+-     * @return A boolean.
+-     */
+ public boolean equals(Object obj) {
+-
+-        if (obj == this) {
++    if (this == obj) {
+         return true;
+     }
+     if (!(obj instanceof ShapeList)) {
+         return false;
+     }
+-        return super.equals(obj);
++    ShapeList other = (ShapeList) obj;
+ 
++    // Assuming ShapeList has a `shapes` field that contains the shapes of the list.
++    // You would also need to define a method for comparing the contents of the list.
++    return Arrays.equals(this.shapes, other.shapes);
+ }
+\ No newline at end of file

@@ -1,0 +1,112 @@
+diff --git a/tmp/8f82a917-3c72-4589-a2e8-177a3155219a_buggy.java b/tmp/b1761e12-2177-4264-be68-c1f0ae3ffdee_fixed.java
+index a7d0787..cd059d9 100644
+--- a/tmp/8f82a917-3c72-4589-a2e8-177a3155219a_buggy.java
++++ b/tmp/b1761e12-2177-4264-be68-c1f0ae3ffdee_fixed.java
+@@ -1,54 +1,101 @@
+     /**
+      * Returns the <code>Object</code> of type <code>clazz</code>
+      * with the value of <code>str</code>.
+      *
+      * @param str the command line value
+      * @param clazz the type of argument
+      * @return The instance of <code>clazz</code> initialised with
+      * the value of <code>str</code>.
+      * @throws ParseException if the value creation for the given class failed
+      */
+     @SuppressWarnings("unchecked") // returned value will have type T because it is fixed by clazz
+     public static <T> T createValue(final String str, final Class<T> clazz) throws ParseException
+     {
+-        if (PatternOptionBuilder.STRING_VALUE == clazz)
++        if (String.class == clazz)
+         {
+             return (T) str;
+         }
+-        else if (PatternOptionBuilder.OBJECT_VALUE == clazz)
++        else if (Object.class == clazz && !str.equals("null"))
+         {
++            // backward compatibility for Version 1.4
++            if (str.equals("true") || str.equals("false"))
++            {
++                return (T) Boolean.valueOf(str);
++            }
+             return (T) createObject(str);
+         }
+-        else if (PatternOptionBuilder.NUMBER_VALUE == clazz)
++        else if (int.class == clazz || Integer.class == clazz)
+         {
+-            return (T) createNumber(str);
++            try
++            {
++                return (T) Integer.valueOf(str);
++            }
++            catch (NumberFormatException e)
++            {
++            // throw just a ParseException instead when NumberFormatException, since it does not happen to code but user provides wrong input
++                throw new ParseException("Expecting a number, got: " + str);
++            }
++        }
++        else if (long.class == clazz || Long.class == clazz)
++        {
++            try
++            {
++                return (T) Long.valueOf(str);
++            }
++            catch (NumberFormatException e)
++            {
++            // throw just a ParseException instead when NumberFormatException, since it does not happen to code but user provides wrong input
++                throw new ParseException("Expecting a number, got: " + str);
++            }
++        }
++        else if (float.class == clazz || Float.class == clazz)
++        {
++            try
++            {
++                return (T) Float.valueOf(str);
++            }
++            catch (NumberFormatException e)
++            {
++            // throw just a ParseException instead when NumberFormatException, since it does not happen to code but user provides wrong input
++                throw new ParseException("Expecting a number, got: " + str);
++            }
++        }
++        else if (double.class == clazz || Double.class == clazz)
++        {
++            try
++            {
++                return (T) Double.valueOf(str);
++            }
++            catch (NumberFormatException e)
++            {
++            // throw just a ParseException instead when NumberFormatException, since it does not happen to code but user provides wrong input
++                throw new ParseException("Expecting a number, got: " + str);
++            }
+         }
+         else if (PatternOptionBuilder.DATE_VALUE == clazz)
+         {
+             return (T) createDate(str);
+         }
+         else if (PatternOptionBuilder.CLASS_VALUE == clazz)
+         {
+             return (T) createClass(str);
+         }
+         else if (PatternOptionBuilder.FILE_VALUE == clazz)
+         {
+             return (T) createFile(str);
+         }
+         else if (PatternOptionBuilder.EXISTING_FILE_VALUE == clazz)
+         {
+             return (T) openFile(str);
+         }
+         else if (PatternOptionBuilder.FILES_VALUE == clazz)
+         {
+             return (T) createFiles(str);
+         }
+         else if (PatternOptionBuilder.URL_VALUE == clazz)
+         {
+             return (T) createURL(str);
+         }
+         else
+-        {
+             return null;
+     }
+-    }

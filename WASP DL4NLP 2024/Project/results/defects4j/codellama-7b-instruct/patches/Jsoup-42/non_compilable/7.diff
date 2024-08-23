@@ -1,0 +1,46 @@
+diff --git a/tmp/626045e1-2324-4cfb-8cf3-6661fe3329e1_buggy.java b/tmp/0db95a4f-6f23-4802-a09e-8b455674949c_fixed.java
+index 442a001..8ac2ad0 100644
+--- a/tmp/626045e1-2324-4cfb-8cf3-6661fe3329e1_buggy.java
++++ b/tmp/0db95a4f-6f23-4802-a09e-8b455674949c_fixed.java
+@@ -1,39 +1,2 @@
+-    /**
+-     * Get the data that this form submits. The returned list is a copy of the data, and changes to the contents of the
+-     * list will not be reflected in the DOM.
+-     * @return a list of key vals
+-     */
+-    public List<Connection.KeyVal> formData() {
+-        ArrayList<Connection.KeyVal> data = new ArrayList<Connection.KeyVal>();
+ 
+-        // iterate the form control elements and accumulate their values
+-        for (Element el: elements) {
+-            if (!el.tag().isFormSubmittable()) continue; // contents are form listable, superset of submitable
+-            String name = el.attr("name");
+-            if (name.length() == 0) continue;
+-            String type = el.attr("type");
+-
+-            if ("select".equals(el.tagName())) {
+-                Elements options = el.select("option[selected]");
+-                boolean set = false;
+-                for (Element option: options) {
+-                    data.add(HttpConnection.KeyVal.create(name, option.val()));
+-                    set = true;
+-                }
+-                if (!set) {
+-                    Element option = el.select("option").first();
+-                    if (option != null)
+-                        data.add(HttpConnection.KeyVal.create(name, option.val()));
+-                }
+-            } else if ("checkbox".equalsIgnoreCase(type) || "radio".equalsIgnoreCase(type)) {
+-                // only add checkbox or radio if they have the checked attribute
+-                if (el.hasAttr("checked")) {
+-                    final String val = el.val();
+-                    data.add(HttpConnection.KeyVal.create(name, val));
+-                }
+-            } else {
+-                data.add(HttpConnection.KeyVal.create(name, el.val()));
+-            }
+-        }
+-        return data;
+-    }
++The test fails due to the line:
+\ No newline at end of file

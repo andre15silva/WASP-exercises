@@ -1,0 +1,23 @@
+diff --git a/tmp/61bf43a8-9239-4beb-bbc5-47cf859547e8_buggy.java b/tmp/586251ec-8b35-4ca1-9428-5ba6f40fe1a4_fixed.java
+index a7cb64f..731fa88 100644
+--- a/tmp/61bf43a8-9239-4beb-bbc5-47cf859547e8_buggy.java
++++ b/tmp/586251ec-8b35-4ca1-9428-5ba6f40fe1a4_fixed.java
+@@ -1,10 +1,16 @@
+     /**
+      * Test if this element has an attribute.
+      * @param attributeKey The attribute key to check.
+      * @return true if the attribute exists, false if not.
+      */
+     public boolean hasAttr(String attributeKey) {
+         Validate.notNull(attributeKey);
+ 
+-        return attributes.hasKey(attributeKey);
++        String attributeValue = attributes.get(attributeKey);
++        try {
++            URL url = new URL(attributeValue);
++            return url.isAbsolute();
++        } catch (MalformedURLException e) {
++            return false;
++        }
+     }
+\ No newline at end of file

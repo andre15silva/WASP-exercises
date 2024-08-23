@@ -1,0 +1,12 @@
+diff --git a/tmp/b5872400-e951-4b66-8e23-30fb6c481755_buggy.java b/tmp/3e637b1d-d6b8-4f74-a5c6-6b91328c01d4_fixed.java
+index 593602f..3e7d6ea 100644
+--- a/tmp/b5872400-e951-4b66-8e23-30fb6c481755_buggy.java
++++ b/tmp/3e637b1d-d6b8-4f74-a5c6-6b91328c01d4_fixed.java
+@@ -1,6 +1,6 @@
+     @Override
+     public String toString() {
+         return rangesList.stream()
+-            .map(RangesList::formatRanges)
++            .map(range -> String.format("(%s)", range.toString()))
+             .collect(joining(OR_JOINER));
+     }

@@ -1,0 +1,13 @@
+diff --git a/tmp/9f422e1d-47f5-4515-a34a-452128ad2717_buggy.java b/tmp/d47405b6-fc87-4e46-af60-55f68ff5ad78_fixed.java
+index 91469b4..2141bbe 100644
+--- a/tmp/9f422e1d-47f5-4515-a34a-452128ad2717_buggy.java
++++ b/tmp/d47405b6-fc87-4e46-af60-55f68ff5ad78_fixed.java
+@@ -1,6 +1,6 @@
+ @Override
+ public Element clone() {
+     Element clone = (Element) super.clone();
+-        clone.classNames();
++    clone.classNames = new HashSet<>(this.classNames); // Properly clone the classNames set
+     return clone;
+ }
+\ No newline at end of file

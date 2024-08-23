@@ -1,0 +1,17 @@
+diff --git a/tmp/97c048ad-93d0-44bb-9a04-1e6588b930c7_buggy.java b/tmp/382a377e-6042-4a23-8440-ca729e72055d_fixed.java
+index b775870..3b80d7f 100644
+--- a/tmp/97c048ad-93d0-44bb-9a04-1e6588b930c7_buggy.java
++++ b/tmp/382a377e-6042-4a23-8440-ca729e72055d_fixed.java
+@@ -1,10 +1,11 @@
+     /**
+-     * Sets the given lines for the provided path, overriding any previously existing comments for the path.
++     * Sets the given lines for the provided path, possibly overriding existing comments associated with the path.
+      * An entry that is a sole new-line (i.e. "\n") will result in an empty line without any comment marker.
+      *
+      * @param path the path to register the comment lines for
+      * @param commentLines the comment lines to set for the path
++     * @throws IllegalStateException if the same path already exists in the configuration
+      */
+     public void setComment(@NotNull String path, @NotNull String... commentLines) {
+         comments.put(path, Collections.unmodifiableList(Arrays.asList(commentLines)));
+     }

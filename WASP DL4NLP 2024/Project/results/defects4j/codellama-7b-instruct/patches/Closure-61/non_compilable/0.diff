@@ -1,0 +1,82 @@
+diff --git a/tmp/9af94c40-86a8-470e-9581-07115450702f_buggy.java b/tmp/c7add9a0-2026-4058-aa8f-fc32f86c63d2_fixed.java
+index b36c3f0..26f1f7e 100644
+--- a/tmp/9af94c40-86a8-470e-9581-07115450702f_buggy.java
++++ b/tmp/c7add9a0-2026-4058-aa8f-fc32f86c63d2_fixed.java
+@@ -1,58 +1,20 @@
+-  /**
+-   * Returns true if calls to this function have side effects.
+-   *
+-   * @param callNode The call node to inspected.
+-   * @param compiler A compiler object to provide program state changing
+-   *     context information. Can be null.
+-   */
+-  static boolean functionCallHasSideEffects(
+-      Node callNode, @Nullable AbstractCompiler compiler) {
+-    if (callNode.getType() != Token.CALL) {
+-      throw new IllegalStateException(
+-          "Expected CALL node, got " + Token.name(callNode.getType()));
++  @Nullable
++  static Token getSideEffectToken(Node child) {
++    Token type = child.getToken();
++    if (Token.CALL.equals(type)) {
++      if (isSideEffectfulCall(child)) {
++        return child.getFirstChild();
++      } else {
++        return null;
++      }
++    } else if (child.isName()) {
++      return getSideEffectToken(child.getChildAtIndex(0));
++    } else if (Token.GETPROP.equals(type)) {
++      return child.getFirstChild();
++    } else {
++      // If the parent node is not a CALL nor a GETPROP child node, then
++      // there must be some side effect
++      // For example, `Math.sin(0)`
++      return tokenThatSignifiesSideEffect();
+     }
+-
+-    if (callNode.isNoSideEffectsCall()) {
+-      return false;
+-    }
+-
+-    Node nameNode = callNode.getFirstChild();
+-
+-    // Built-in functions with no side effects.
+-    if (nameNode.getType() == Token.NAME) {
+-      String name = nameNode.getString();
+-      if (BUILTIN_FUNCTIONS_WITHOUT_SIDEEFFECTS.contains(name)) {
+-        return false;
+-      }
+-    } else if (nameNode.getType() == Token.GETPROP) {
+-      if (callNode.hasOneChild()
+-          && OBJECT_METHODS_WITHOUT_SIDEEFFECTS.contains(
+-                nameNode.getLastChild().getString())) {
+-        return false;
+-      }
+-
+-      if (callNode.isOnlyModifiesThisCall()
+-          && evaluatesToLocalValue(nameNode.getFirstChild())) {
+-        return false;
+-      }
+-
+-      // Functions in the "Math" namespace have no side effects.
+-
+-      if (compiler != null && !compiler.hasRegExpGlobalReferences()) {
+-        if (nameNode.getFirstChild().getType() == Token.REGEXP
+-            && REGEXP_METHODS.contains(nameNode.getLastChild().getString())) {
+-          return false;
+-        } else if (nameNode.getFirstChild().getType() == Token.STRING
+-            && STRING_REGEXP_METHODS.contains(
+-                nameNode.getLastChild().getString())) {
+-          Node param = nameNode.getNext();
+-          if (param != null &&
+-              (param.getType() == Token.STRING
+-                  || param.getType() == Token.REGEXP))
+-          return false;
+-        }
+-      }
+-    }
+-
+-    return true;
+   }
+\ No newline at end of file

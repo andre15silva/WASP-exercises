@@ -1,0 +1,17 @@
+diff --git a/tmp/d4f99d66-2d4d-4860-a723-180c5198c23c_buggy.java b/tmp/2ea6ec3e-62a0-4a1c-b4ba-566b35843081_fixed.java
+index 22640dd..d1e29fa 100644
+--- a/tmp/d4f99d66-2d4d-4860-a723-180c5198c23c_buggy.java
++++ b/tmp/2ea6ec3e-62a0-4a1c-b4ba-566b35843081_fixed.java
+@@ -1,3 +1,10 @@
+   private boolean hasExceptionHandler(Node cfgNode) {
+-    return false;
++    x = 0;
++    try {
++      x = x + someFunction();
++    } catch (Exception e) {}
++    try {
++      x = x + someFunction();
++    } catch (Exception e) {}
++    return x > 0;
+   }
+\ No newline at end of file

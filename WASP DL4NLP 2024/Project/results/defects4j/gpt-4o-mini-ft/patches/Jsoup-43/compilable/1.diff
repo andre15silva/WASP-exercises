@@ -1,0 +1,17 @@
+diff --git a/tmp/0854286a-d950-45e8-9aca-c17446c2ef8e_buggy.java b/tmp/ee5697cf-bead-44ce-a977-5de516821254_fixed.java
+index a5093b1..ad1e179 100644
+--- a/tmp/0854286a-d950-45e8-9aca-c17446c2ef8e_buggy.java
++++ b/tmp/ee5697cf-bead-44ce-a977-5de516821254_fixed.java
+@@ -1,11 +1,11 @@
+-    private static <E extends Element> Integer indexInList(Element search, List<E> elements) {
++    private static <E extends Element> Integer indexInList(E search, List<E> elements) {
+         Validate.notNull(search);
+         Validate.notNull(elements);
+ 
+         for (int i = 0; i < elements.size(); i++) {
+             E element = elements.get(i);
+             if (element.equals(search))
+                 return i;
+         }
+         return null;
+     }

@@ -1,0 +1,25 @@
+diff --git a/tmp/fc88f606-129f-41ee-805c-ceda8f406c94_buggy.java b/tmp/2bab629d-c30f-4045-87c4-ae16fc4ea815_fixed.java
+index 111ba5e..60f49b4 100644
+--- a/tmp/fc88f606-129f-41ee-805c-ceda8f406c94_buggy.java
++++ b/tmp/2bab629d-c30f-4045-87c4-ae16fc4ea815_fixed.java
+@@ -1,9 +1,17 @@
+     public static boolean areEqual(Object o1, Object o2) {
+         if (o1 == null || o2 == null) {
+             return o1 == null && o2 == null;
+-        } else if (isArray(o1)) {
+-            return isArray(o2) && areArraysEqual(o1, o2);
++        } else if (o1.getClass() == o2.getClass()) {
++            if (o1 instanceof int[]) {
++                return Arrays.equals((int[]) o1, (int[]) o2);
++            } else if (o1 instanceof double[]) {
++                return Arrays.equals((double[]) o1, (double[]) o2);
++            } else if (o1 instanceof String[]) {
++                return Arrays.equals((String[]) o1, (String[]) o2);
+             } else {
+                 return o1.equals(o2);
+             }
++        } else {
++            return false;
++        }
+     }
+\ No newline at end of file

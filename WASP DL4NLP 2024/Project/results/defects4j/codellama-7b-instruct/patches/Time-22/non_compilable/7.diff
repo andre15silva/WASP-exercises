@@ -1,0 +1,39 @@
+diff --git a/tmp/9a302b9e-8912-4d2b-8291-8ec3a5049b6e_buggy.java b/tmp/8eccd5e1-5ccc-421b-add6-fb16e15a4ca0_fixed.java
+index 5b8a4d2..1ac30ad 100644
+--- a/tmp/9a302b9e-8912-4d2b-8291-8ec3a5049b6e_buggy.java
++++ b/tmp/8eccd5e1-5ccc-421b-add6-fb16e15a4ca0_fixed.java
+@@ -1,12 +1,26 @@
+-    /**
+-     * Creates a period from the given millisecond duration with the standard period type
+-     * and ISO rules, ensuring that the calculation is performed with the time-only period type.
+-     * <p>
+-     * The calculation uses the hour, minute, second and millisecond fields.
+-     *
+-     * @param duration  the duration, in milliseconds
+-     */
+     protected BasePeriod(long duration) {
+         this(duration, null, null);
+         // bug [3264409]
++        // Use the time-only period type when calculating the duration
++        this(new Period() {
++            @Override
++            public <T extends ReadablePeriod> T copy() {
++                return null;
++            }
++
++            @Override
++            public PeriodType getPeriodType() {
++                return PeriodType.time();
++            }
++
++            @Override
++            public long getValue(int field) {
++                return 0;
++            }
++
++            @Override
++            public int size() {
++                return 0;
++            }
++        });
+     }

@@ -1,0 +1,14 @@
+diff --git a/tmp/d1997924-030f-4317-8fa8-c75f884a73e3_buggy.java b/tmp/3c5d238c-f13e-4b2c-99ad-a9b055a00a91_fixed.java
+index 7f06a9c..d93d4ec 100644
+--- a/tmp/d1997924-030f-4317-8fa8-c75f884a73e3_buggy.java
++++ b/tmp/3c5d238c-f13e-4b2c-99ad-a9b055a00a91_fixed.java
+@@ -1,7 +1,8 @@
+     public void acceptedBy(MemberId memberId) {
+         requireNotCompleted();
+         requireNotCanceled();
+         requireHasSpace();
+         membersWhoAccepted.add(memberId);
++        spectators().remove(memberId);
+         membersWhoDeclined.remove(memberId);
+     }
+\ No newline at end of file

@@ -1,0 +1,14 @@
+diff --git a/tmp/f766e60b-5649-4b43-87d3-5234dbd36979_buggy.java b/tmp/70c70ab5-5b34-42f0-be2c-68eec53205e1_fixed.java
+index e69de29..7384a78 100644
+--- a/tmp/f766e60b-5649-4b43-87d3-5234dbd36979_buggy.java
++++ b/tmp/70c70ab5-5b34-42f0-be2c-68eec53205e1_fixed.java
+@@ -0,0 +1,8 @@
++public class Base {
++    @JsonTypeInfo(
++        use = JsonTypeInfo.Id.CLASS,
++        include = JsonTypeInfo.As.PROPERTY,
++        property = "type"
++    )
++    public int base;
++}
+\ No newline at end of file

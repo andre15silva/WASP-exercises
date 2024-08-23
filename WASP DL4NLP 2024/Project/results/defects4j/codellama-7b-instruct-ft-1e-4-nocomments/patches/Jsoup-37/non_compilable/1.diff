@@ -1,0 +1,24 @@
+diff --git a/tmp/cb23ff39-6020-42ed-86e6-fc379e24d3a6_buggy.java b/tmp/76dc9ee1-a852-4b29-a9ec-b20071b2364c_fixed.java
+index 7498011..6890639 100644
+--- a/tmp/cb23ff39-6020-42ed-86e6-fc379e24d3a6_buggy.java
++++ b/tmp/76dc9ee1-a852-4b29-a9ec-b20071b2364c_fixed.java
+@@ -1,12 +1,14 @@
+     /**
+      * Retrieves the element's inner HTML. E.g. on a {@code <div>} with one empty {@code <p>}, would return
+      * {@code <p></p>}. (Whereas {@link #outerHtml()} would return {@code <div><p></p></div>}.)
+      * 
++     * @param accum accumulator
+      * @return String of HTML.
+      * @see #outerHtml()
+      */
+-    public String html() {
+-        StringBuilder accum = new StringBuilder();
+-        html(accum);
+-        return accum.toString().trim();
++    public void html(Appendable accum) {
++        try {
++            accum.append(outerHtml());
++        } catch (IOException e) {
++        }
+     }
+\ No newline at end of file

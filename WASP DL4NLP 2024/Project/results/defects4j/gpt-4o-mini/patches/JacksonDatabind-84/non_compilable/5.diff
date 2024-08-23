@@ -1,0 +1,12 @@
+diff --git a/tmp/831b5aa2-9d80-494d-b875-c1b4f33ef571_buggy.java b/tmp/c4be2b65-a910-45a1-8f60-076b2a06791e_fixed.java
+index e69de29..22afca1 100644
+--- a/tmp/831b5aa2-9d80-494d-b875-c1b4f33ef571_buggy.java
++++ b/tmp/c4be2b65-a910-45a1-8f60-076b2a06791e_fixed.java
+@@ -0,0 +1,6 @@
++public void serializeBaseProperties(Sub sub) throws JsonProcessingException {
++    ObjectMapper mapper = new ObjectMapper();
++    mapper.addMixIn(Sub.class, BaseMixIn.class); // Add a mixin to include base properties
++    String jsonString = mapper.writeValueAsString(sub);
++    System.out.println(jsonString);
++}
+\ No newline at end of file

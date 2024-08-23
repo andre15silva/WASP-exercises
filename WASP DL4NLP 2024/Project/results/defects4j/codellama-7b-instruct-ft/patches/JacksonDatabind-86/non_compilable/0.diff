@@ -1,0 +1,15 @@
+diff --git a/tmp/a9b9f69a-737e-47a5-9d99-cef750f527ab_buggy.java b/tmp/4ebf2d14-66c5-4800-9e52-0253077997f2_fixed.java
+index e69de29..dd69da3 100644
+--- a/tmp/a9b9f69a-737e-47a5-9d99-cef750f527ab_buggy.java
++++ b/tmp/4ebf2d14-66c5-4800-9e52-0253077997f2_fixed.java
+@@ -0,0 +1,10 @@
++    private static class Sub extends Base {
++        public Sub() {
++            // dummy
++        }
++        {
++            // add base:1 which will get cached but not sub:2
++            //  (not needed on deserialization)
++            registerSubtype(Base.class, Integer.valueOf(1));
++        }
++    }

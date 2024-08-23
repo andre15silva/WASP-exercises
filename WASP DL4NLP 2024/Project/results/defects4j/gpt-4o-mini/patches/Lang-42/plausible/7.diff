@@ -1,0 +1,60 @@
+diff --git a/tmp/677cc5ad-4594-4011-a34f-e6666d9b121a_buggy.java b/tmp/c0cd91e7-2fc0-4d58-9bb9-16947de2aeb4_fixed.java
+index 822447c..0a527c0 100644
+--- a/tmp/677cc5ad-4594-4011-a34f-e6666d9b121a_buggy.java
++++ b/tmp/c0cd91e7-2fc0-4d58-9bb9-16947de2aeb4_fixed.java
+@@ -1,37 +1,37 @@
+-    /**
+-     * <p>
+-     * Escapes the characters in the <code>String</code> passed and writes the result to the <code>Writer</code>
+-     * passed.
+-     * </p>
+-     * 
+-     * @param writer
+-     *            The <code>Writer</code> to write the results of the escaping to. Assumed to be a non-null value.
+-     * @param str
+-     *            The <code>String</code> to escape. Assumed to be a non-null value.
+-     * @throws IOException
+-     *             when <code>Writer</code> passed throws the exception from calls to the {@link Writer#write(int)}
+-     *             methods.
+-     * 
+-     * @see #escape(String)
+-     * @see Writer
+-     */
+ public void escape(Writer writer, String str) throws IOException {
+     int len = str.length();
+     for (int i = 0; i < len; i++) {
+         char c = str.charAt(i);
++        // Handle surrogate pairs for characters outside the Basic Multilingual Plane (BMP)
++        if (c >= 0xD800 && c <= 0xDBFF) {
++            // It's the start of a surrogate pair
++            if (i + 1 < len) {
++                char next = str.charAt(i + 1);
++                if (next >= 0xDC00 && next <= 0xDFFF) {
++                    // Complete surrogate pair
++                    int codePoint = ((c - 0xD800) << 10 | (next - 0xDC00)) + 0x10000;
++                    writer.write("&#");
++                    writer.write(Integer.toString(codePoint));
++                    writer.write(';');
++                    i++; // Skip next character as it's part of the surrogate pair
++                    continue;
++                }
++            }
++        }
++        
+         String entityName = this.entityName(c);
+         if (entityName == null) {
+             if (c > 0x7F) {
+                 writer.write("&#");
+                 writer.write(Integer.toString(c, 10));
+                 writer.write(';');
+             } else {
+                 writer.write(c);
+             }
+         } else {
+             writer.write('&');
+             writer.write(entityName);
+             writer.write(';');
+         }
+     }
+ }
+\ No newline at end of file

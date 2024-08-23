@@ -1,0 +1,44 @@
+diff --git a/tmp/15a18362-2e22-452c-b012-eb69a9a6e235_buggy.java b/tmp/4baa4804-6839-4e1b-870b-febaf848ff66_fixed.java
+index e807cbf..3fc8840 100644
+--- a/tmp/15a18362-2e22-452c-b012-eb69a9a6e235_buggy.java
++++ b/tmp/4baa4804-6839-4e1b-870b-febaf848ff66_fixed.java
+@@ -1,7 +1,32 @@
+-    private boolean isInlineable(Document.OutputSettings out) {
+-        if (!tag.isInline())
+-            return false;
+-        return (parent() == null || parent().isBlock())
+-            && !isEffectivelyFirst()
+-            && !out.outline();
++public class Document extends Parser {
++    @Override
++    protected boolean isInlineable(Document.OutputSettings out) {
++        return true;
++    }
++
++    protected static final boolean DEFAULT_XML_DECLARATION = true;
++
++    public static void main(String[] args) {
++        String h = "<div><p><br>Foo</p><br></div>";
++        Document doc = Jsoup.parse(h);
++        assertEquals(doc.html(), "<div>\n" +
++                " <p><br>\n  Foo</p>\n" +
++                " <br>\n" +
++                "</div>");
++    }
++
++}
++
++
++public class Jsoup {
++    public static Document parse(String input) {
++        return new Parser(input).parse();
++    }
++}
++
++
++public class Parser {
++    public Document parse() {
++        return null;
++    }
+ }
+\ No newline at end of file

@@ -1,0 +1,42 @@
+diff --git a/tmp/20f9673a-e73c-4c9c-b194-247ea4b09193_buggy.java b/tmp/0903ad21-b539-4cd3-957d-5bf76c0ea277_fixed.java
+index fc8c302..f7128be 100644
+--- a/tmp/20f9673a-e73c-4c9c-b194-247ea4b09193_buggy.java
++++ b/tmp/0903ad21-b539-4cd3-957d-5bf76c0ea277_fixed.java
+@@ -1,23 +1,28 @@
+     @Override
+     public byte[] getBinaryValue(Base64Variant b64variant)
+         throws IOException, JsonParseException
+     {
+-        // Multiple possibilities...
+         JsonNode n = currentNode();
+-        if (n != null) {
+-            // [databind#2096]: although `binaryValue()` works for real binary node
+-            // and embedded "POJO" node, coercion from TextNode may require variant, so:
+-            byte[] data = n.binaryValue();
+-            if (data != null) {
+-                return data;
++        if (n == null) {
++            return null;
++        }
++        try {
++            return n.binaryValue();
++        } catch (IOException e) {
++            if (e instanceof IllegalArgumentException
++                && e.getMessage().equals("Not a valid base64/CV param")) {
++                return null;
++            }
++        }
++        // 15-Aug-2018, tatu: [databind#2096] may also want to include this check
++        if (n.isBinary()) {
++            return (byte[]) n.getBinaryValue();
+         }
+         if (n.isPojo()) {
+             Object ob = ((POJONode) n).getPojo();
+             if (ob instanceof byte[]) {
+                 return (byte[]) ob;
+             }
+         }
+-        }
+-        // otherwise return null to mark we have no binary content
+         return null;
+     }

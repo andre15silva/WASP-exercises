@@ -1,0 +1,35 @@
+diff --git a/tmp/f8c85ea5-53c5-4ec0-b22e-1c53d3d65356_buggy.java b/tmp/34aaad57-d68b-458f-811d-685deb20cda2_fixed.java
+index 5abdeb5..198ba53 100644
+--- a/tmp/f8c85ea5-53c5-4ec0-b22e-1c53d3d65356_buggy.java
++++ b/tmp/34aaad57-d68b-458f-811d-685deb20cda2_fixed.java
+@@ -1,29 +1,22 @@
+     /**
+      * Computes the number of uses of the variable varName and store it in
+      * numUseWithinUseCfgNode.
+      */
+     private void getNumUseInUseCfgNode(final Node cfgNode) {
+ 
+       numUsesWithinCfgNode = 0;
+       AbstractCfgNodeTraversalCallback gatherCb =
+           new AbstractCfgNodeTraversalCallback() {
+ 
+         @Override
+         public void visit(NodeTraversal t, Node n, Node parent) {
+-          if (n.isName() && n.getString().equals(varName) &&
+-            // We make a special exception when the entire cfgNode is a chain
+-            // of assignments, since in that case the assignment statements
+-            // will happen after the inlining of the right hand side.
+-            // TODO(blickly): Make the SIDE_EFFECT_PREDICATE check more exact
+-            //   and remove this special case.
+-              !(parent.isAssign() &&
+-               (parent.getFirstChild() == n))) {
++          if (n.isName() && n.getString().equals(varName)) {
+               // Don't count lhs of top-level assignment chain
+               numUsesWithinCfgNode++;
+           }
+         }
+ 
+       };
+ 
+       NodeTraversal.traverse(compiler, cfgNode, gatherCb);
+     }

@@ -1,0 +1,11 @@
+diff --git a/tmp/8fc06713-4968-4780-9f04-92d01e880f8e_buggy.java b/tmp/ad781eff-1d2c-4e2c-b58b-c3b7cd9b3d50_fixed.java
+index fc49bcd..453f611 100644
+--- a/tmp/8fc06713-4968-4780-9f04-92d01e880f8e_buggy.java
++++ b/tmp/ad781eff-1d2c-4e2c-b58b-c3b7cd9b3d50_fixed.java
+@@ -1,4 +1,4 @@
+ @Override
+ public DefaultPrettyPrinter createInstance() {
+-        return new DefaultPrettyPrinter(this);
++    throw new IllegalStateException("Sub-class does not override createInstance");
+ }
+\ No newline at end of file

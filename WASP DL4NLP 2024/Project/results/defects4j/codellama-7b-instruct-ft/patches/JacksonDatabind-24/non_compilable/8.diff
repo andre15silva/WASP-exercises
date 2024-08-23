@@ -1,0 +1,33 @@
+diff --git a/tmp/c8a6cf51-8ad7-4ca5-9e6d-adf21f294f6b_buggy.java b/tmp/b7e9a52b-f430-4ed5-a386-895e3410a6e8_fixed.java
+index 0502fea..08fd0bd 100644
+--- a/tmp/c8a6cf51-8ad7-4ca5-9e6d-adf21f294f6b_buggy.java
++++ b/tmp/b7e9a52b-f430-4ed5-a386-895e3410a6e8_fixed.java
+@@ -1,9 +1,28 @@
+     public BaseSettings withDateFormat(DateFormat df) {
+         if (_dateFormat == df) {
+             return this;
+         }
+         TimeZone tz = (df == null) ? _timeZone : df.getTimeZone();            
++        // [JACKSON-139]: configure both serialization and deserialization, if serialization settings not null
++        // so that config for serialization and deserialization are consistent:
++        if (_dateFormat == null) {
+             return new BaseSettings(_classIntrospector, _annotationIntrospector, _visibilityChecker, _propertyNamingStrategy, _typeFactory,
+                     _typeResolverBuilder, df, _handlerInstantiator, _locale,
+                     tz, _defaultBase64);
+         }
++        BaseSettings s = (BaseSettings)_dateFormat.getClassIntrospector();
++        BaseSettings d = (BaseSettings)_dateFormat.getAnnotationIntrospector();
++        BaseSettings r = (BaseSettings)_dateFormat.getTimeZone();
++        BaseSettings w = (BaseSettings)_dateFormat.getTimeZone();
++        BaseSettings m = (BaseSettings)_dateFormat.getTimeZone();
++        BaseSettings p = (BaseSettings)_dateFormat.getTimeZone();
++        return new BaseSettings(
++                (s == null) ? _classIntrospector : s,
++                (d == null) ? _annotationIntrospector : d,
++                (r == null) ? _visibilityChecker : r,
++                (w == null) ? _timeZone : w,
++                (m == null) ? _typeFactory : m,
++                (p == null) ? _typeResolverBuilder : p,
++                df, _handlerInstantiator, _locale,
++                tz, _defaultBase64);
++    }

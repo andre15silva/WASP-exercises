@@ -1,0 +1,55 @@
+diff --git a/tmp/d054ce32-5bfc-46e1-aab2-00077eeda5df_buggy.java b/tmp/85b65ddf-3b02-4cc6-ae07-49b2a71ec67e_fixed.java
+index 710fcc0..8af71ba 100644
+--- a/tmp/d054ce32-5bfc-46e1-aab2-00077eeda5df_buggy.java
++++ b/tmp/85b65ddf-3b02-4cc6-ae07-49b2a71ec67e_fixed.java
+@@ -1,37 +1,16 @@
+     Object returnValueFor(Class<?> type) {
+-        if (Primitives.isPrimitiveOrWrapper(type)) {
+-            return Primitives.defaultValueForPrimitiveOrWrapper(type);
+-            //new instances are used instead of Collections.emptyList(), etc.
+-            //to avoid UnsupportedOperationException if code under test modifies returned collection
+-        } else if (type == Collection.class) {
+-            return new LinkedList<Object>();
+-        } else if (type == Set.class) {
+-            return new HashSet<Object>();
+-        } else if (type == HashSet.class) {
+-            return new HashSet<Object>();
+-        } else if (type == SortedSet.class) {
+-            return new TreeSet<Object>();
+-        } else if (type == TreeSet.class) {
+-            return new TreeSet<Object>();
+-        } else if (type == LinkedHashSet.class) {
+-            return new LinkedHashSet<Object>();
+-        } else if (type == List.class) {
+-            return new LinkedList<Object>();
+-        } else if (type == LinkedList.class) {
+-            return new LinkedList<Object>();
+-        } else if (type == ArrayList.class) {
+-            return new ArrayList<Object>();
+-        } else if (type == Map.class) {
+-            return new HashMap<Object, Object>();
+-        } else if (type == HashMap.class) {
+-            return new HashMap<Object, Object>();
+-        } else if (type == SortedMap.class) {
+-            return new TreeMap<Object, Object>();
+-        } else if (type == TreeMap.class) {
+-            return new TreeMap<Object, Object>();
+-        } else if (type == LinkedHashMap.class) {
+-            return new LinkedHashMap<Object, Object>();
+-        }
+-        //Let's not care about the rest of collections.
++        if (type.isPrimitive()) {
++            return Primitives.defaultValueForPrimitive(type);
++        } else if (Primitives.isWrapperType(type)) {
++            return Primitives.defaultValueForWrapper(type);
++        } else if (type.equals(Collection.class)) {
++            return Collections.emptyList();
++        } else if (type.equals(Set.class)) {
++            return Collections.emptySet();
++        } else if (type.equals(Map.class)) {
++            return Collections.emptyMap();
++        } else {
++            // Let's not worry about other types of collections for now.
+             return null;
+         }
++    }

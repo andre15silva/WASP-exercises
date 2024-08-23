@@ -1,0 +1,15 @@
+diff --git a/tmp/0b57520f-3e04-4645-a27c-4a5e064ecf19_buggy.java b/tmp/fde9afc7-0948-456f-8cdc-2cd06e7c4c9a_fixed.java
+index e69de29..b402769 100644
+--- a/tmp/0b57520f-3e04-4645-a27c-4a5e064ecf19_buggy.java
++++ b/tmp/fde9afc7-0948-456f-8cdc-2cd06e7c4c9a_fixed.java
+@@ -0,0 +1,9 @@
++public JavaType constructType(Class<?> cls) {
++    if (cls == null) {
++        return TypeFactory.unknownType();
++    }
++    // Fetching the type for superclass
++    JavaType superType = constructType(cls.getSuperclass());
++    // Creating JavaType for the given class with the superclass reference
++    return new ResolvedRecursiveType(cls, superType, null);
++}
+\ No newline at end of file

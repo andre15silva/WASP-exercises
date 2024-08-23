@@ -1,0 +1,48 @@
+diff --git a/tmp/76007021-c7a3-4863-939a-bce455dde222_buggy.java b/tmp/29757ba5-6b8c-42b0-9731-daaf146e9e40_fixed.java
+index c9da1b7..dc0a7f0 100644
+--- a/tmp/76007021-c7a3-4863-939a-bce455dde222_buggy.java
++++ b/tmp/29757ba5-6b8c-42b0-9731-daaf146e9e40_fixed.java
+@@ -1,33 +1,43 @@
+     protected void verifyNonDup(AnnotatedWithParams newOne, int typeIndex, boolean explicit)
+     {
+         final int mask = (1 << typeIndex);
+         _hasNonDefaultCreator = true;
+         AnnotatedWithParams oldOne = _creators[typeIndex];
+         // already had an explicitly marked one?
+         if (oldOne != null) {
+ 
+             if ((_explicitCreators & mask) != 0) { // already had explicitly annotated, leave as-is
+                 // but skip, if new one not annotated
+                 if (!explicit) {
+                     return;
+                 }
+                 // both explicit: verify
+                 // otherwise only verify if neither explicitly annotated.
++            } else if (newOne.getRawType().equals(StringBuilder.class)) {
++                // special case: for construct String, check the first argument, so that if this
++                // string is used to create one string, we get what we expect (no exception
++                // with StringBuilder)  
++                AnnotatedParameter baseAnn = newOne.getParameter(0);
++                Object o = baseAnn.get(MAPPER, "qwerty");
++                AnnotatedWithParams.resolve(MAPPER.getTypeFactory(), baseAnn);
++                if (o.toString().equals(newOne.getRawType().getSimpleName())) {
++                    return;
++                }
+             }
+ 
+             // one more thing: ok to override in sub-class
+             if (oldOne.getClass() == newOne.getClass()) {
+                 // [databind#667]: avoid one particular class of bogus problems
+ 
+                     throw new IllegalArgumentException("Conflicting "+TYPE_DESCS[typeIndex]
+                             +" creators: already had explicitly marked "+oldOne+", encountered "+newOne);
+                 // otherwise, which one to choose?
+                     // new type more generic, use old
+                 // new type more specific, use it
+             }
+         }
+         if (explicit) {
+             _explicitCreators |= mask;
+         }
+         _creators[typeIndex] = _fixAccess(newOne);
+     }

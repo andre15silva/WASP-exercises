@@ -1,0 +1,36 @@
+diff --git a/tmp/28988573-2f4a-45f1-a870-1cfdfeb7a493_buggy.java b/tmp/7eecad1f-c261-41bc-9734-f71bd09be8f3_fixed.java
+index 9a3a9db..256f917 100644
+--- a/tmp/28988573-2f4a-45f1-a870-1cfdfeb7a493_buggy.java
++++ b/tmp/7eecad1f-c261-41bc-9734-f71bd09be8f3_fixed.java
+@@ -1,27 +1,13 @@
+-    /**
+-     * If the stack contains an element with this tag's name, pop up the stack to remove the first occurrence. If not
+-     * found, skips.
+-     *
+-     * @param endTag tag to close
+-     */
+ private void popStackToClose(Token.EndTag endTag) {
+-        String elName = endTag.name();
+     Element firstFound = null;
+-
+     for (int pos = stack.size() -1; pos >= 0; pos--) {
+         Element next = stack.get(pos);
+-            if (next.nodeName().equals(elName)) {
++        if (next.nodeName().equals(endTag.name())) {
+             firstFound = next;
+             break;
+         }
+     }
+-        if (firstFound == null)
+-            return; // not found, skip
+-
+-        for (int pos = stack.size() -1; pos >= 0; pos--) {
+-            Element next = stack.get(pos);
+-            stack.remove(pos);
+-            if (next == firstFound)
+-                break;
++    if (firstFound != null) {
++        stack.remove(firstFound);
+     }
+ }
+\ No newline at end of file

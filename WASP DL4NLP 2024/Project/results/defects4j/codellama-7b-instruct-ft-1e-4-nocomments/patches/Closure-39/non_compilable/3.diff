@@ -1,0 +1,61 @@
+diff --git a/tmp/0d404d21-2ee9-4322-adac-594f02f377c4_buggy.java b/tmp/ca26cc2c-8ae7-4ae6-8ff2-7e4bc71fa1b4_fixed.java
+index e4d90e7..f259c22 100644
+--- a/tmp/0d404d21-2ee9-4322-adac-594f02f377c4_buggy.java
++++ b/tmp/ca26cc2c-8ae7-4ae6-8ff2-7e4bc71fa1b4_fixed.java
+@@ -1,45 +1,45 @@
+   @Override
+   String toStringHelper(boolean forAnnotations) {
+     if (hasReferenceName()) {
+       return getReferenceName();
+     } else if (prettyPrint) {
+-      // Don't pretty print recursively.
+       prettyPrint = false;
+-
+-      // Use a tree set so that the properties are sorted.
+       Set<String> propertyNames = Sets.newTreeSet();
+       for (ObjectType current = this;
+            current != null && !current.isNativeObjectType() &&
+                propertyNames.size() <= MAX_PRETTY_PRINTED_PROPERTIES;
+            current = current.getImplicitPrototype()) {
++        if (current instanceof ProxyObjectType &&
++            ((ProxyObjectType) current).getReferencedType().isRecordType()) {
++          propertyNames.add(current.getReferenceName() + INDENTION);
++        } else {
+           propertyNames.addAll(current.getOwnPropertyNames());
+         }
+-
++      }
+       StringBuilder sb = new StringBuilder();
+       sb.append("{");
+-
+       int i = 0;
+       for (String property : propertyNames) {
+         if (i > 0) {
+           sb.append(", ");
+         }
+-
+-        sb.append(property);
++        if (property.endsWith(INDENTION)) {
++          sb.append(property, 0, property.length() - INDENTION.length());
+           sb.append(": ");
+           sb.append(getPropertyType(property).toString());
+-
++        } else {
++          sb.append(property);
++        }
+         ++i;
+         if (i == MAX_PRETTY_PRINTED_PROPERTIES) {
+           sb.append(", ...");
+           break;
+         }
+       }
+-
+       sb.append("}");
+-
+       prettyPrint = true;
+       return sb.toString();
+     } else {
+       return "{...}";
+     }
+   }
+\ No newline at end of file

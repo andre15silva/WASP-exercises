@@ -1,0 +1,43 @@
+diff --git a/tmp/57618999-deef-4da2-b6b9-9631aa73e018_buggy.java b/tmp/ecc43d46-ab8c-4313-831b-1a39285e0365_fixed.java
+index 58a1651..225c9e3 100644
+--- a/tmp/57618999-deef-4da2-b6b9-9631aa73e018_buggy.java
++++ b/tmp/ecc43d46-ab8c-4313-831b-1a39285e0365_fixed.java
+@@ -1,32 +1,37 @@
+   @Override
+   JSType resolveInternal(ErrorReporter t, StaticScope<JSType> scope) {
+     setResolvedTypeInternal(this);
+ 
+     call = (ArrowType) safeResolve(call, t, scope);
+     prototype = (FunctionPrototypeType) safeResolve(prototype, t, scope);
+ 
+     // Warning about typeOfThis if it doesn't resolve to an ObjectType
+     // is handled further upstream.
+     // TODO(nicksantos): Handle this correctly if we have a UnionType.
+     typeOfThis = (ObjectType) safeResolve(typeOfThis, t, scope);
+ 
+     boolean changed = false;
+     ImmutableList.Builder<ObjectType> resolvedInterfaces =
+         ImmutableList.builder();
+     for (ObjectType iface : implementedInterfaces) {
+       ObjectType resolvedIface = (ObjectType) iface.resolve(t, scope);
+       resolvedInterfaces.add(resolvedIface);
+       changed |= (resolvedIface != iface);
+     }
+     if (changed) {
+       implementedInterfaces = resolvedInterfaces.build();
+     }
+ 
+     if (subTypes != null) {
+       for (int i = 0; i < subTypes.size(); i++) {
+-        subTypes.set(i, (FunctionType) subTypes.get(i).resolve(t, scope));
++        FunctionType ft = FunctionType.cast(subTypes.get(i));
++        // In the case that this is a backwards typedef for another
++        // function, resolve its typeOfThis properly
++        ft.accept(new NodeTraversal(t.getCodingConvention()), null);
++        ft.makeBackwardsTypedefsFromAllParent();
++        subTypes.set(i, ft);
+       }
+     }
+ 
+     return super.resolveInternal(t, scope);
+   }

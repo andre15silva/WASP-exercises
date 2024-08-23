@@ -1,0 +1,53 @@
+diff --git a/tmp/72abc8b6-2b02-439f-a148-07e316961d5b_buggy.java b/tmp/72407d27-9cd3-4229-9982-4f21fdae08c1_fixed.java
+index 0b7c52e..0af6c9c 100644
+--- a/tmp/72abc8b6-2b02-439f-a148-07e316961d5b_buggy.java
++++ b/tmp/72407d27-9cd3-4229-9982-4f21fdae08c1_fixed.java
+@@ -1,27 +1,38 @@
+     /**
+      * Processes a OBJECTLIT node.
+      */
+     private void handleObjectLit(NodeTraversal t, Node n) {
+-      for (Node child = n.getFirstChild();
+-          child != null;
+-          child = child.getNext()) {
+-        // Maybe STRING, GET, SET
++      boolean hasNumber = false;
++      boolean hasString = false;
+ 
+-        // We should never see a mix of numbers and strings.
++      for (Node child = n.getFirstChild(); child != null; child = child.getNext()) {
++        // We should only track the type of property names
+         String name = child.getString();
+         T type = typeSystem.getType(getScope(), n, name);
+ 
++        if (type instanceof NumberType) {
++          hasNumber = true;
++        } else if (type instanceof StringType) {
++          hasString = true;
++        }
++
++        if (hasNumber && hasString) {
++          // Report an error if both number and string types are found
++          compiler.report(JSError.make(
++              t.getSourceName(), child, "Properties cannot be a mix of numbers and strings.",
++              Warnings.INVALIDATION, name,
++              (type == null ? "null" : type.toString()), n.toString(), ""));
++          return; // Exit early after reporting the error
++        }
++
+         Property prop = getProperty(name);
+-        if (!prop.scheduleRenaming(child,
+-                                   processProperty(t, prop, type, null))) {
+-          // TODO(user): It doesn't look like the user can do much in this
+-          // case right now.
++        if (!prop.scheduleRenaming(child, processProperty(t, prop, type, null))) {
+           if (propertiesToErrorFor.containsKey(name)) {
+             compiler.report(JSError.make(
+                 t.getSourceName(), child, propertiesToErrorFor.get(name),
+                 Warnings.INVALIDATION, name,
+                 (type == null ? "null" : type.toString()), n.toString(), ""));
+           }
+         }
+       }
+     }
+\ No newline at end of file

@@ -1,0 +1,79 @@
+diff --git a/tmp/b275d221-69b2-4129-a177-e30076fef893_buggy.java b/tmp/e4bd4f05-7d48-4f73-914a-9061843adf6a_fixed.java
+index fa9dfcc..8ecbdc4 100644
+--- a/tmp/b275d221-69b2-4129-a177-e30076fef893_buggy.java
++++ b/tmp/e4bd4f05-7d48-4f73-914a-9061843adf6a_fixed.java
+@@ -1,61 +1,69 @@
+   @Override
+   protected CompilerOptions createOptions() {
+     CompilerOptions options = new CompilerOptions();
+     if (flags.processJqueryPrimitives) {
+       options.setCodingConvention(new JqueryCodingConvention());
+     } else {
+       options.setCodingConvention(new ClosureCodingConvention());
+     }
+ 
+     options.setExtraAnnotationNames(flags.extraAnnotationName);
+ 
+     CompilationLevel level = flags.compilationLevel;
+     level.setOptionsForCompilationLevel(options);
+ 
+     if (flags.debug) {
+       level.setDebugOptionsForCompilationLevel(options);
+     }
+ 
+     if (flags.useTypesForOptimization) {
+       level.setTypeBasedOptimizationOptions(options);
+     }
+ 
+     if (flags.generateExports) {
+       options.setGenerateExports(flags.generateExports);
+     }
+ 
+     WarningLevel wLevel = flags.warningLevel;
+     wLevel.setOptionsForWarningLevel(options);
+     for (FormattingOption formattingOption : flags.formatting) {
+       formattingOption.applyToOptions(options);
+     }
+ 
+     options.closurePass = flags.processClosurePrimitives;
+ 
+     options.jqueryPass = CompilationLevel.ADVANCED_OPTIMIZATIONS == level &&
+         flags.processJqueryPrimitives;
+ 
+     options.angularPass = flags.angularPass;
+ 
+     if (!flags.translationsFile.isEmpty()) {
+       try {
+         options.messageBundle = new XtbMessageBundle(
+             new FileInputStream(flags.translationsFile),
+             flags.translationsProject);
+       } catch (IOException e) {
+         throw new RuntimeException("Reading XTB file", e);
+       }
+     } else if (CompilationLevel.ADVANCED_OPTIMIZATIONS == level) {
+       // In SIMPLE or WHITESPACE mode, if the user hasn't specified a
+       // translations file, they might reasonably try to write their own
+       // implementation of goog.getMsg that makes the substitution at
+-      // run-time.
+-      //
+-      // In ADVANCED mode, goog.getMsg is going to be renamed anyway,
+-      // so we might as well inline it. But shut off the i18n warnings,
+-      // because the user didn't really ask for i18n.
++      // run-time after removing the call to goog.getMsg in the
++      // user-specified externs. If the externs contain a `@desc` property
++      // for `goog.getMsg`, this causes warnings because we internally do
++      // renaming logic on this method, so now we accept the warnings
++      // except when doing strictly single pass style closures.
++      // TODO(mknoll): These warnings shouldn't be there. Come up with a better fix.
++      options.setWarningLevel(
++          CheckLevel.OFF,
++          JsdDocParser.WARNING_CODES.DUPLICATE_VAR,
++          JSDOC_PARSE_ERRORS.ILLEGAL_JSDOC_ANNOTATION,
++          JSDOC_PARSE_ERRORS.MISSING_JSDOC_END_TAG,
++          JSDOC_PARSE_ERRORS.TOOLTIP_MISSING_MESSAGE_NAME_ANNOTATION,
++          JSDOC_PARSE_ERRORS.TOO_MANY_JSDOC_NESTED_COMMENTS);
+       options.messageBundle = new EmptyMessageBundle();
+     }
+ 
+     return options;
+   }

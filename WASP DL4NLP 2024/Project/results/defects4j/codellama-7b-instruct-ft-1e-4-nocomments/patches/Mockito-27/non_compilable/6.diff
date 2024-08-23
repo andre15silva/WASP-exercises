@@ -1,0 +1,23 @@
+diff --git a/tmp/dcc94463-c25d-4b08-b4d5-ecf69d76514b_buggy.java b/tmp/536c54f6-ea6a-4959-9102-0aea801b9445_fixed.java
+index 5c5286c..e55b61b 100644
+--- a/tmp/dcc94463-c25d-4b08-b4d5-ecf69d76514b_buggy.java
++++ b/tmp/536c54f6-ea6a-4959-9102-0aea801b9445_fixed.java
+@@ -1,6 +1,17 @@
+     public <T> void resetMock(T mock) {
+         MockHandlerInterface<T> oldMockHandler = getMockHandler(mock);
+         MockHandler<T> newMockHandler = new MockHandler<T>(oldMockHandler);
+         MethodInterceptorFilter newFilter = new MethodInterceptorFilter(newMockHandler, (MockSettingsImpl) org.mockito.Mockito.withSettings().defaultAnswer(org.mockito.Mockito.RETURNS_DEFAULTS));
++        InvocationListener[] invocationListeners = null;
++        if (mock instanceof List) {
++            @SuppressWarnings("unchecked")
++            List<InvocationListener> temp = (org.mockitoutil.List<InvocationListener>)mock;
++            invocationListeners = temp.getInvocationListeners();
++        }
++        if (invocationListeners != null) {
++            for (InvocationListener listener : invocationListeners) {
++                newFilter.addListener(listener);
++            }
++        }
+         ((Factory) mock).setCallback(0, newFilter);
+     }
+\ No newline at end of file

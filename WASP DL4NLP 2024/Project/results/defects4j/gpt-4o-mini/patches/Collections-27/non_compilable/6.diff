@@ -1,0 +1,16 @@
+diff --git a/tmp/c2b2b951-e71e-4189-99c1-57ddb604f369_buggy.java b/tmp/1196f00f-4bbc-4e82-8aba-cca2ddbdf049_fixed.java
+index e69de29..9f7ea2f 100644
+--- a/tmp/c2b2b951-e71e-4189-99c1-57ddb604f369_buggy.java
++++ b/tmp/1196f00f-4bbc-4e82-8aba-cca2ddbdf049_fixed.java
+@@ -0,0 +1,10 @@
++public static Object deserialize(byte[] bytes) {
++    Object obj = /* deserialization logic here */;
++    if (obj instanceof MultiValueMap) {
++        MultiValueMap map = (MultiValueMap) obj;
++        if (map.getValueType() != ArrayList.class) {
++            throw new UnsupportedOperationException("unsafe clazz accepted when de-serializing MultiValueMap");
++        }
++    }
++    return obj;
++}
+\ No newline at end of file

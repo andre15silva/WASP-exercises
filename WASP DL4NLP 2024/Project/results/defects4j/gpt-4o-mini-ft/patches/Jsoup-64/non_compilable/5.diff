@@ -1,0 +1,13 @@
+diff --git a/tmp/33c9ceac-4739-4710-8901-35d2fc3cf530_buggy.java b/tmp/da32cf75-79ea-4a2f-a768-3306cb58282c_fixed.java
+index 5eedc11..c103ab2 100644
+--- a/tmp/33c9ceac-4739-4710-8901-35d2fc3cf530_buggy.java
++++ b/tmp/da32cf75-79ea-4a2f-a768-3306cb58282c_fixed.java
+@@ -1,6 +1,8 @@
+     private static void handleRawtext(Token.StartTag startTag, HtmlTreeBuilder tb) {
+         tb.insert(startTag);
+         tb.tokeniser.transition(TokeniserState.Rawtext);
+         tb.markInsertionMode();
++        tb.hyphen = true; // issue #1503
+         tb.transition(Text);
++        tb.commentPending = false;
+     }

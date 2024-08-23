@@ -1,0 +1,34 @@
+diff --git a/tmp/bebadbf4-0540-4671-a8d9-688522545068_buggy.java b/tmp/4dead930-a6c4-4b81-a61f-7abf0be3b312_fixed.java
+index 5cedd56..ec5b0bf 100644
+--- a/tmp/bebadbf4-0540-4671-a8d9-688522545068_buggy.java
++++ b/tmp/4dead930-a6c4-4b81-a61f-7abf0be3b312_fixed.java
+@@ -1,15 +1,26 @@
+   /**
+    * Returns true if this transaction is a Soroban transaction.
+    *
+    * @return true if this transaction is a Soroban transaction.
+    */
+   public boolean isSorobanTransaction() {
+     if (mOperations.length != 1) {
+       return false;
+     }
+ 
+     Operation op = mOperations[0];
+-    return op instanceof InvokeHostFunctionOperation
+-        || op instanceof BumpSequenceOperation
+-        || op instanceof RestoreFootprintOperation;
++    if (!(op instanceof InvokeHostFunctionOperation)) {
++      return false;
++    }
++
++    InvokeHostFunctionOperation invoke = (InvokeHostFunctionOperation) op;
++    if (op instanceof BumpSequenceOperation) {
++      BumpSequenceOperation bumpOperation = (BumpSequenceOperation) op;
++      return bumpOperation.getSourceAccount().getAccountId().equals(
++          AccountConverter.enableMuxed().accountIdFromKey(sourceAccount.getKeyPair()));
++    } else {
++      return op instanceof RestoreFootprintOperation && ((RestoreFootprintOperation) op)
++          .getSourceAccount().getAccountId().equals(
++          AccountConverter.enableMuxed().accountIdFromKey(sourceAccount.getKeyPair()));
++    }
+   }

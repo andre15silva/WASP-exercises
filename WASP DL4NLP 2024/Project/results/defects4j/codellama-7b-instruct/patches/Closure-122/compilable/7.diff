@@ -1,0 +1,30 @@
+diff --git a/tmp/0523eff0-0948-4d22-b519-9da554eee911_buggy.java b/tmp/69183891-2039-40de-9d43-823204da0eae_fixed.java
+index 308b324..26f4494 100644
+--- a/tmp/0523eff0-0948-4d22-b519-9da554eee911_buggy.java
++++ b/tmp/69183891-2039-40de-9d43-823204da0eae_fixed.java
+@@ -1,11 +1,23 @@
+   /**
+    * Check to see if the given block comment looks like it should be JSDoc.
+    */
+   private void handleBlockComment(Comment comment) {
+-    if (comment.getValue().indexOf("/* @") != -1 || comment.getValue().indexOf("\n * @") != -1) {
++    int index1 = comment.getValue().indexOf("/* @");
++    int index2 = comment.getValue().indexOf("\n * @");
++    if (index1 == -1 && index2 == -1) {
+       errorReporter.warning(
+           SUSPICIOUS_COMMENT_WARNING,
+           sourceName,
+           comment.getLineno(), "", 0);
++    } else if (index1 != -1) {
++      errorReporter.warning(
++          SUSPICIOUS_COMMENT_WARNING,
++          sourceName,
++          comment.getLineno(), "", index1);
++    } else {
++      errorReporter.warning(
++          SUSPICIOUS_COMMENT_WARNING,
++          sourceName,
++          comment.getLineno(), "", index2);
+     }
+   }
+\ No newline at end of file

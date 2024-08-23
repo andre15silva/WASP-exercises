@@ -1,0 +1,53 @@
+diff --git a/tmp/48346b95-a9b5-4374-8e20-16b0868ba871_buggy.java b/tmp/6f11feae-4e98-43fd-918e-1af60a3a25e5_fixed.java
+index 01967cc..0985586 100644
+--- a/tmp/48346b95-a9b5-4374-8e20-16b0868ba871_buggy.java
++++ b/tmp/6f11feae-4e98-43fd-918e-1af60a3a25e5_fixed.java
+@@ -1,35 +1,47 @@
+         /**
+          * Method called to check if the default type handler should be
+          * used for given type.
+          * Note: "natural types" (String, Boolean, Integer, Double) will never
+          * use typing; that is both due to them being concrete and final,
+          * and since actual serializers and deserializers will also ignore any
+          * attempts to enforce typing.
+          */
+         public boolean useForType(JavaType t)
+         {
+             switch (_appliesFor) {
+             case NON_CONCRETE_AND_ARRAYS:
+                 while (t.isArrayType()) {
+                     t = t.getContentType();
+                 }
+                 // fall through
+             case OBJECT_AND_NON_CONCRETE:
+ //                return t.isJavaLangObject() || 
+                 return (t.getRawClass() == Object.class)
+                         || (!t.isConcrete()
+                                 // [databind#88] Should not apply to JSON tree models:
+                         || TreeNode.class.isAssignableFrom(t.getRawClass()));
+ 
+             case NON_FINAL:
+                 while (t.isArrayType()) {
+                     t = t.getContentType();
+                 }
+                 // [Issue#88] Should not apply to JSON tree models:
+                 return !t.isFinal() && !TreeNode.class.isAssignableFrom(t.getRawClass());
++            case ARRAYS_AS_ARRAY:
++            case OBJECTS_AS_OBJECTS:
++                // should not really affect type resolving... but there are some
++                // weird cases where we do need to know what the
++                // "natural Java type" is, or we'll get strange exception during
++                // auto-typing. So: resolve as we used to, but only for
++                // "array" types (since objects use type factory to auto-create
++                // abstract types)
++                // 24-Sep-2010, tatu: also: need to skip "root-typed" arrays, since we
++                //    don't know what real type may come
++                return !(t.isArrayType() && (Object.class.isAssignableFrom(t.getRawClass()) ||
++                        TreeNode.class.isAssignableFrom(t.getRawClass())))
++                        && t.getRawClass().isArray();
+             default:
+-            //case JAVA_LANG_OBJECT:
+ //                return t.isJavaLangObject();
+                 return (t.getRawClass() == Object.class);
+             }
+         }

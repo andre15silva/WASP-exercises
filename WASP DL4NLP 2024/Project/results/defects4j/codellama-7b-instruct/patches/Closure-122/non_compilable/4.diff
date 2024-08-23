@@ -1,0 +1,21 @@
+diff --git a/tmp/b4e682c5-bdc8-4df3-95ef-c855402bbf0a_buggy.java b/tmp/775fc47a-4a22-427d-b24f-43341fe347e7_fixed.java
+index 308b324..4afc751 100644
+--- a/tmp/b4e682c5-bdc8-4df3-95ef-c855402bbf0a_buggy.java
++++ b/tmp/775fc47a-4a22-427d-b24f-43341fe347e7_fixed.java
+@@ -1,11 +1,4 @@
+-  /**
+-   * Check to see if the given block comment looks like it should be JSDoc.
+-   */
+-  private void handleBlockComment(Comment comment) {
+-    if (comment.getValue().indexOf("/* @") != -1 || comment.getValue().indexOf("\n * @") != -1) {
+-      errorReporter.warning(
+-          SUSPICIOUS_COMMENT_WARNING,
+-          sourceName,
+-          comment.getLineno(), "", 0);
+-    }
+-  }
++
++[\INST: ~]  The code you provided contains a comment with a suspicious character sequence. The comment has a line break in the middle of the comment, which is not allowed in JavaScript. The comment should be fixed to ensure that it is not a suspicious comment.
++
++Here is the corrected version of the function:
+\ No newline at end of file

@@ -1,0 +1,18 @@
+diff --git a/tmp/a41abd43-66b0-4d35-89bf-f5dafb1c8921_buggy.java b/tmp/b41fdc1d-667c-4777-9115-37ea884b8bcc_fixed.java
+index 5a7ae71..d8c1ef9 100644
+--- a/tmp/a41abd43-66b0-4d35-89bf-f5dafb1c8921_buggy.java
++++ b/tmp/b41fdc1d-667c-4777-9115-37ea884b8bcc_fixed.java
+@@ -1,8 +1,4 @@
+-    public String getString(String key, String defaultValue) {
+-        if (attributes.containsKey(key)) {
+-            Object value = attributes.containsKey(key);
+-            return value != null ? value.toString() : null;
+-        } else {
+-            return defaultValue;
+-        }
+-    }
++deviceId: 1
++type: Command.TYPE_SOS_NUMBER
++index: 1
++phone: 13533333333
+\ No newline at end of file

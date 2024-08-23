@@ -1,0 +1,33 @@
+diff --git a/tmp/40138843-e50c-4af4-8770-d5990d3bf5d6_buggy.java b/tmp/527ef8aa-bab4-416f-81d5-c5e6b98a6ec2_fixed.java
+index eb0a5c8..7974145 100644
+--- a/tmp/40138843-e50c-4af4-8770-d5990d3bf5d6_buggy.java
++++ b/tmp/527ef8aa-bab4-416f-81d5-c5e6b98a6ec2_fixed.java
+@@ -1,27 +1,27 @@
+   public static Try<Done> registerCallContext(
+       final ActorRef<CallContextProviderMessage> callContextProvider,
+       final String callContext,
+       final AriCommand ariCommand) {
+ 
+-    if (!ariCommand.extractCommandType().isCreationCommand()) {
++    if (ariCommand.extractCommandType().isDeleteCommand()) {
+       return Try.success(Done.done());
+     }
+ 
+     final Option<AriResource> maybeResource =
+         ariCommand
+             .extractResourceRelations()
+             .find(AriResourceRelation::isCreated)
+             .map(AriResourceRelation::getResource);
+ 
+     if (maybeResource.isEmpty()) {
+       return Try.failure(
+           new RuntimeException(
+               String.format(
+                   "Failed to extract resourceId from command '%s'", ariCommand.toString())));
+     }
+ 
+     final AriResource resource = maybeResource.get();
+ 
+     callContextProvider.tell(new RegisterCallContext(resource.getId(), callContext));
+     return Try.success(Done.done());
+   }

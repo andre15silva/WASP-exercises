@@ -1,0 +1,19 @@
+diff --git a/tmp/e06b1ff3-e546-47f7-87a3-20e659e68b6e_buggy.java b/tmp/a142bc18-d8f6-44c3-ba4b-338afcc4083a_fixed.java
+index 4cce784..058f35a 100644
+--- a/tmp/e06b1ff3-e546-47f7-87a3-20e659e68b6e_buggy.java
++++ b/tmp/a142bc18-d8f6-44c3-ba4b-338afcc4083a_fixed.java
+@@ -1,11 +1,11 @@
+     /**
+      * Compares this object to another based on size.
+      * @param object the object to compare to
+      * @return -1 if this is less than <tt>object</tt>, +1 if this is greater
+      *         than <tt>object</tt>, 0 if they are equal.
+      */
+     public int compareTo(Fraction object){
+-        double nOd = doubleValue();
+-        double dOn = object.doubleValue();
+-        return (nOd < dOn) ? -1 : ((nOd > dOn) ? +1 : 0);
++        double nominatorOf_doValDOuble = doubleValue();
++        double denominatorOf_doValDOuble = object.doubleValue();
++        return 0.0 < nominatorOf_doValDOuble/denominatorOf_doValDOuble- denominatorOf_doValDOuble/nominatorOf_doValDOuble ? -1 : 0.0 < denominatorOf_doValDOuble/nominatorOf_doValDOuble- nominatorOf_doValDOuble/denominatorOf_doValDOuble ? 1 : 0;
+     }

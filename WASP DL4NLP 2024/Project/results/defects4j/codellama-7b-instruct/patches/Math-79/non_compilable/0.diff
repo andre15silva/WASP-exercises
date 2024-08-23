@@ -1,0 +1,32 @@
+diff --git a/tmp/a5be8acd-5895-4b50-814a-14682d0bf70a_buggy.java b/tmp/4ed18d57-82d9-4d93-bf62-3a0317286bb6_fixed.java
+index 6e238e7..173e8d9 100644
+--- a/tmp/a5be8acd-5895-4b50-814a-14682d0bf70a_buggy.java
++++ b/tmp/4ed18d57-82d9-4d93-bf62-3a0317286bb6_fixed.java
+@@ -1,15 +1,14 @@
+-    /**
+-     * Calculates the L<sub>2</sub> (Euclidean) distance between two points.
+-     *
+-     * @param p1 the first point
+-     * @param p2 the second point
+-     * @return the L<sub>2</sub> distance between the two points
+-     */
+ public static double distance(int[] p1, int[] p2) {
+-      int sum = 0;
+-      for (int i = 0; i < p1.length; i++) {
+-          final int dp = p1[i] - p2[i];
+-          sum += dp * dp;
++    if (similar(p1, p2)) {
++        return euclideanDistance(p1, p2);
++    } else {
++        return Double.POSITIVE_INFINITY;
+     }
+-      return Math.sqrt(sum);
++}
++
++private static boolean similar(int[] p1, int[] p2) {
++    // This can be further optimized by using a Levenshtein distance algorithm
++    // or a dynamic programming approach to calculate the similarity between
++    // two strings.
++    return Arrays.equals(p1, p2);
+ }
+\ No newline at end of file

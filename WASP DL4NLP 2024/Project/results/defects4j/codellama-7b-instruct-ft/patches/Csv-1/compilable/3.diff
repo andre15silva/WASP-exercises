@@ -1,0 +1,22 @@
+diff --git a/tmp/55dcdbd1-b1c0-4718-b463-e70804dc1ed1_buggy.java b/tmp/cf2647c0-aac9-41cb-af1d-11438e219175_fixed.java
+index 3ba614a..70064bc 100644
+--- a/tmp/55dcdbd1-b1c0-4718-b463-e70804dc1ed1_buggy.java
++++ b/tmp/cf2647c0-aac9-41cb-af1d-11438e219175_fixed.java
+@@ -1,9 +1,17 @@
+     @Override
+     public int read() throws IOException {
+         int current = super.read();
+         if (current == '\n') {
+             lineCounter++;
++        } else if (current == '\r') {
++            // check if previous char is also '\r'
++            if (lastChar == '\r') {
++                // discard the extra '\r', so that the line counter is not overcounted.
++                lastChar = -1;
++            } else {
++                lineCounter++;
++            }
+         }
+         lastChar = current;
+         return lastChar;
+     }

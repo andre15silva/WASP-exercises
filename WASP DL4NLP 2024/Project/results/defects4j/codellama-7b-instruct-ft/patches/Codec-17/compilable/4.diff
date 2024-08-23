@@ -1,0 +1,22 @@
+diff --git a/tmp/881c3a91-24dd-4df8-9cc1-9ab9288dca03_buggy.java b/tmp/7186285b-115d-43fa-8c40-2a6808179267_fixed.java
+index 780fa1a..2b2037f 100644
+--- a/tmp/881c3a91-24dd-4df8-9cc1-9ab9288dca03_buggy.java
++++ b/tmp/7186285b-115d-43fa-8c40-2a6808179267_fixed.java
+@@ -1,15 +1,16 @@
+     /**
+      * Constructs a new <code>String</code> by decoding the specified array of bytes using the ISO-8859-1 charset.
+      *
+      * @param bytes
+      *            The bytes to be decoded into characters, may be <code>null</code>
+      * @return A new <code>String</code> decoded from the specified array of bytes using the ISO-8859-1 charset, or
+      *         <code>null</code> if the input byte array was <code>null</code>.
+      * @throws NullPointerException
+      *             Thrown if {@link Charsets#ISO_8859_1} is not initialized, which should never happen since it is
+      *             required by the Java platform specification.
+-     * @since As of 1.7, throws {@link NullPointerException} instead of UnsupportedEncodingException
++     *
++     * @see http://code.google.com/p/android/issues/detail?id=229
+      */
+     public static String newStringIso8859_1(final byte[] bytes) {
+         return new String(bytes, Charsets.ISO_8859_1);
+     }

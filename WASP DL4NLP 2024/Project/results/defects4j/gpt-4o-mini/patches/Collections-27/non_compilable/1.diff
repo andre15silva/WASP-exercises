@@ -1,0 +1,17 @@
+diff --git a/tmp/f015b4d7-d9df-4249-8ea2-9ba32bbecf82_buggy.java b/tmp/52fb8679-f32f-4e95-bbbf-e1cce9818169_fixed.java
+index e69de29..35d5fe4 100644
+--- a/tmp/f015b4d7-d9df-4249-8ea2-9ba32bbecf82_buggy.java
++++ b/tmp/52fb8679-f32f-4e95-bbbf-e1cce9818169_fixed.java
+@@ -0,0 +1,11 @@
++public Object deserialize(byte[] bytes) throws IOException, ClassNotFoundException {
++    ObjectInputStream ois = new ObjectInputStream(new ByteArrayInputStream(bytes));
++    Object obj = ois.readObject();
++    if (obj instanceof MultiValueMap) {
++        MultiValueMap map = (MultiValueMap) obj;
++        if (map.getCollectionType() != ArrayList.class) {
++            throw new UnsupportedOperationException("Unsafe class accepted when de-serializing MultiValueMap");
++        }
++    }
++    return obj;
++}
+\ No newline at end of file

@@ -1,0 +1,53 @@
+diff --git a/tmp/407cd7b3-cd5c-4961-9a64-2805cb6c294e_buggy.java b/tmp/835da3f6-5ac8-4cf6-8c85-9884eef53650_fixed.java
+index 03b03d7..e7d8e36 100644
+--- a/tmp/407cd7b3-cd5c-4961-9a64-2805cb6c294e_buggy.java
++++ b/tmp/835da3f6-5ac8-4cf6-8c85-9884eef53650_fixed.java
+@@ -1,25 +1,32 @@
+     /**
+      * Adjusts the offset to be the earlier or later one during an overlap.
+      * 
+      * @param instant  the instant to adjust
+      * @param earlierOrLater  false for earlier, true for later
+      * @return the adjusted instant millis
+      */
+     public long adjustOffset(long instant, boolean earlierOrLater) {
+-        // a bit messy, but will work in all non-pathological cases
+-        
+-        // evaluate 3 hours before and after to work out if anything is happening
+-        long instantBefore = convertUTCToLocal(instant - 3 * DateTimeConstants.MILLIS_PER_HOUR);
+-        long instantAfter = convertUTCToLocal(instant + 3 * DateTimeConstants.MILLIS_PER_HOUR);
+-        if (instantBefore == instantAfter) {
+-            return instant;  // not an overlap (less than is a gap, equal is normal case)
+-        }
+-        
+-        // work out range of instants that have duplicate local times
++        long instantBefore = convertUTCToLocal(instant - 1 * DateTimeConstants.MILLIS_PER_HOUR);
++        long instantAfter = convertUTCToLocal(instant + 1 * DateTimeConstants.MILLIS_PER_HOUR);
+         long local = convertUTCToLocal(instant);
+-        return convertLocalToUTC(local, false, earlierOrLater ? instantAfter : instantBefore);
+-        
+-        // calculate result
+-          // currently in later offset
+-          // currently in earlier offset
++        int compareBefore = convertLocalToUTC(local, false, instantBefore);
++        int compareAfter = convertLocalToUTC(local, false, instantAfter);
++        if (compareBefore != DateTimeConstants.MILLIS_PER_HOUR && compareAfter != DateTimeConstants.MILLIS_PER_HOUR) {
++            if (earlierOrLater) {
++                if (compareBefore < DateTimeConstants.MILLIS_PER_HOUR) {
++                    return convertLocalToUTC(local, false, instantBefore);
++                }
++                if (compareAfter >= DateTimeConstants.MILLIS_PER_HOUR) {
++                    return convertLocalToUTC(local, false, instantAfter);
++                }
++            } else {
++                if (compareBefore >= DateTimeConstants.MILLIS_PER_HOUR) {
++                    return convertLocalToUTC(local, false, instantBefore);
++                }
++                if (compareAfter < DateTimeConstants.MILLIS_PER_HOUR) {
++                    return convertLocalToUTC(local, false, instantAfter);
++                }
++            }
++        }
++        return instant;  
+     }
+\ No newline at end of file

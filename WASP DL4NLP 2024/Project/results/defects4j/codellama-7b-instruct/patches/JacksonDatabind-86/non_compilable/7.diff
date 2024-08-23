@@ -1,0 +1,13 @@
+diff --git a/tmp/280712e8-943d-4f27-8014-985dce5cd31c_buggy.java b/tmp/fcf69014-4920-42dd-af9e-9fdf1d7c6148_fixed.java
+index e69de29..cba2c6f 100644
+--- a/tmp/280712e8-943d-4f27-8014-985dce5cd31c_buggy.java
++++ b/tmp/fcf69014-4920-42dd-af9e-9fdf1d7c6148_fixed.java
+@@ -0,0 +1,7 @@
++    public static JavaType testSuperClassWithReferencedJavaType() {
++        TypeFactory tf = objectMapper().getTypeFactory();
++        JavaType superType = tf.constructType(Base.class);
++        JavaType subType = tf.constructType(Sub.class);
++        assertNotNull(subType.getSuperClass());
++        return superType;
++    }
+\ No newline at end of file

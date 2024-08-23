@@ -1,0 +1,12 @@
+diff --git a/tmp/316c1ab3-0581-4c9a-8eb3-7be1286fe8a6_buggy.java b/tmp/dd2d413b-e565-48f5-bddf-a877519b0f63_fixed.java
+index a2af134..f937192 100644
+--- a/tmp/316c1ab3-0581-4c9a-8eb3-7be1286fe8a6_buggy.java
++++ b/tmp/dd2d413b-e565-48f5-bddf-a877519b0f63_fixed.java
+@@ -1,3 +1,7 @@
+     public HostAbstract(final List<Pe> peList, final boolean activate) {
+         this(defaultBwCapacity, defaultStorageCapacity, new HarddriveStorage(defaultRamCapacity), peList, activate);
++        simulation.start();
++        simulation.stop("simulation finished");
++        assertThatBrokerCloudletsHaveTheExpectedExecutionTimes(simulation.getBroker());
++        assertThatListenersWereCalledTheExpectedAmountOfTimes();
+     }

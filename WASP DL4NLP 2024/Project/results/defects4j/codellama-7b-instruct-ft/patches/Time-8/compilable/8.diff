@@ -1,0 +1,68 @@
+diff --git a/tmp/b233b699-1252-4433-ad7f-8f4d8fc978d8_buggy.java b/tmp/79fd6ff1-afef-43ca-8f06-c869aeb38d1f_fixed.java
+index eed2194..23585f0 100644
+--- a/tmp/b233b699-1252-4433-ad7f-8f4d8fc978d8_buggy.java
++++ b/tmp/79fd6ff1-afef-43ca-8f06-c869aeb38d1f_fixed.java
+@@ -1,55 +1,50 @@
+     /**
+      * Gets a time zone instance for the specified offset to UTC in hours and minutes.
+      * This method assumes 60 minutes in an hour, and standard length minutes.
+      * <p>
+      * This factory is a convenient way of constructing zones with a fixed offset.
+      * The hours value must be in the range -23 to +23.
+-     * The minutes value must be in the range -59 to +59.
+-     * The following combinations of sign for the hour and minute are possible:
++     * The sign of the offset is ignored and the absolute value is used.
+      * <pre>
+      *  Hour    Minute    Example    Result 
+      * 
+      *  +ve     +ve       (2, 15)    +02:15
+      *  +ve     zero      (2, 0)     +02:00
+      *  +ve     -ve       (2, -15)   IllegalArgumentException
+      * 
+      *  zero    +ve       (0, 15)    +00:15
+      *  zero    zero      (0, 0)     +00:00
+      *  zero    -ve       (0, -15)   -00:15
+      * 
+      *  -ve     +ve       (-2, 15)   -02:15
+      *  -ve     zero      (-2, 0)    -02:00
+      *  -ve     -ve       (-2, -15)  -02:15
++     * 
++     *  -23     +ve       (-23, 59)  -23:59
++     *  -23     zero      (-23, 0)   -23:00
++     *  -23     -ve       (-23, -59)  IllegalArgumentException
+      * </pre>
+-     * Note that in versions before 2.3, the minutes had to be zero or positive.
++     * Note that in versions before 2.3, the minutes had to be positive (or zero).
+      * 
+      * @param hoursOffset  the offset in hours from UTC, from -23 to +23
+      * @param minutesOffset  the offset in minutes from UTC, from -59 to +59
+      * @return the DateTimeZone object for the offset
+      * @throws IllegalArgumentException if any value is out of range, the minutes are negative
+      *  when the hours are positive, or the resulting offset exceeds +/- 23:59:59.000
+      */
+     public static DateTimeZone forOffsetHoursMinutes(int hoursOffset, int minutesOffset) throws IllegalArgumentException {
+         if (hoursOffset == 0 && minutesOffset == 0) {
+             return DateTimeZone.UTC;
+         }
+         if (hoursOffset < -23 || hoursOffset > 23) {
+             throw new IllegalArgumentException("Hours out of range: " + hoursOffset);
+         }
+-        if (minutesOffset < 0 || minutesOffset > 59) {
++        if (minutesOffset < -59 || minutesOffset > 59) {
+             throw new IllegalArgumentException("Minutes out of range: " + minutesOffset);
+         }
+-        int offset = 0;
+         try {
+-            int hoursInMinutes = hoursOffset * 60;
+-            if (hoursInMinutes < 0) {
+-                minutesOffset = hoursInMinutes - minutesOffset;
+-            } else {
+-                minutesOffset = hoursInMinutes + minutesOffset;
+-            }
+-            offset = FieldUtils.safeMultiply(minutesOffset, DateTimeConstants.MILLIS_PER_MINUTE);
++            return forOffsetMillis((hoursOffset * 60 + minutesOffset) * DateTimeConstants.MILLIS_PER_MINUTE);
+         } catch (ArithmeticException ex) {
+             throw new IllegalArgumentException("Offset is too large");
+         }
+-        return forOffsetMillis(offset);
+     }

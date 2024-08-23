@@ -1,0 +1,20 @@
+diff --git a/tmp/6349e6fb-117f-4c77-99f5-a0bd5524df79_buggy.java b/tmp/be746796-22ec-4024-a00f-08e0b50bffc4_fixed.java
+index a6f008f..e8208aa 100644
+--- a/tmp/6349e6fb-117f-4c77-99f5-a0bd5524df79_buggy.java
++++ b/tmp/be746796-22ec-4024-a00f-08e0b50bffc4_fixed.java
+@@ -1,11 +1,15 @@
+     /**
+      * Method that can be called on backends that support passing opaque datatypes of
+      * non-JSON formats
+      *
+      * @since 2.8
+      */
+     public void writeEmbeddedObject(Object object) throws IOException {
++        if (object instanceof byte[]) {
+             // 01-Sep-2016, tatu: As per [core#318], handle small number of cases
++            _writeQuotedBinary(object);
++            return;
++        }
+         throw new JsonGenerationException("No native support for writing embedded objects",
+                 this);
+     }

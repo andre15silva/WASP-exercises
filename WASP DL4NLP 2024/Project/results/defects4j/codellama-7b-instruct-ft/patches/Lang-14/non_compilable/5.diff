@@ -1,0 +1,50 @@
+diff --git a/tmp/be0a5044-c564-4556-8392-503313d46fa5_buggy.java b/tmp/e087d1e3-e584-4439-9c8c-693c2887584d_fixed.java
+index c18eb8b..4e61b7a 100644
+--- a/tmp/be0a5044-c564-4556-8392-503313d46fa5_buggy.java
++++ b/tmp/e087d1e3-e584-4439-9c8c-693c2887584d_fixed.java
+@@ -1,30 +1,42 @@
+     /**
+      * <p>Compares two CharSequences, returning {@code true} if they represent
+      * equal sequences of characters.</p>
+      *
+      * <p>{@code null}s are handled without exceptions. Two {@code null}
+-     * references are considered to be equal. The comparison is case sensitive.</p>
++     * references are considered equal. Comparison is case sensitive.</p>
+      *
+      * <pre>
+      * StringUtils.equals(null, null)   = true
+      * StringUtils.equals(null, "abc")  = false
+      * StringUtils.equals("abc", null)  = false
+      * StringUtils.equals("abc", "abc") = true
+      * StringUtils.equals("abc", "ABC") = false
++     *
++     * StringUtils.equals("abc", "abc", false)  = true
++     * StringUtils.equals("abc", "ABC", false)  = false
++     * StringUtils.equals("abc", "ABC", true)   = true
+      * </pre>
+      *
+      * @see java.lang.CharSequence#equals(Object)
+      * @param cs1  the first CharSequence, may be {@code null}
+      * @param cs2  the second CharSequence, may be {@code null}
+-     * @return {@code true} if the CharSequences are equal (case-sensitive), or both {@code null}
++     * @paramComparisonType Ordinal or code point comparison
++     * @return {@code true} if the CharSequences are equal (optionally ignoring
++     *         case), or both {@code null}
+      * @since 3.0 Changed signature from equals(String, String) to equals(CharSequence, CharSequence)
+      */
+-    public static boolean equals(CharSequence cs1, CharSequence cs2) {
++    public static boolean equals(CharSequence cs1, CharSequence cs2,ComparisonType ComparisonType) {
+         if (cs1 == cs2) {
+             return true;
+         }
+         if (cs1 == null || cs2 == null) {
+             return false;
+         }
++        if (ComparisonType == ComparisonType.ORDINAL) {
+             return cs1.equals(cs2);
+         }
++        if (ComparisonType == ComparisonType.CODEPOINT) {
++            return regionMatches(cs1, 0, cs2, 0, cs1.length() - 1);
++        }
++        return contains(cs1, cs2);
++    }

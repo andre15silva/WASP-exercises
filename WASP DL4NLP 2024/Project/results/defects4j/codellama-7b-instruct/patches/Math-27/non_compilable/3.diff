@@ -1,0 +1,29 @@
+diff --git a/tmp/9149c293-658c-491a-aa9f-1c02938f15a9_buggy.java b/tmp/4fd28f15-c9a3-4794-a7e8-c4b2a43bd53c_fixed.java
+index 490e9f7..78439cd 100644
+--- a/tmp/9149c293-658c-491a-aa9f-1c02938f15a9_buggy.java
++++ b/tmp/4fd28f15-c9a3-4794-a7e8-c4b2a43bd53c_fixed.java
+@@ -1,11 +1,21 @@
++public class Fraction {
++    private int numerator;
++    private int denominator;
++
++    public Fraction(int numerator, int denominator) {
++        this.numerator = numerator;
++        this.denominator = denominator;
++    }
++
+     /**
+-     * <p>
+      * Gets the fraction percentage as a <tt>double</tt>. This calculates the
+      * fraction as the numerator divided by denominator multiplied by 100.
+-     * </p>
+      *
+      * @return the fraction percentage as a <tt>double</tt>.
+      */
+     public double percentageValue() {
+         return multiply(100).doubleValue();
+     }
++
++    // Other methods as required by the problem statement
++}
+\ No newline at end of file

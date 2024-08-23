@@ -1,0 +1,37 @@
+diff --git a/tmp/3c684c03-b573-470b-94e6-80ad1ad04254_buggy.java b/tmp/b51dbc6a-a530-4679-8ede-e6220625b463_fixed.java
+index c9c2b44..61438be 100644
+--- a/tmp/3c684c03-b573-470b-94e6-80ad1ad04254_buggy.java
++++ b/tmp/b51dbc6a-a530-4679-8ede-e6220625b463_fixed.java
+@@ -1,13 +1,18 @@
+-        @Override
+-        public boolean matches(Element root, Element element) {
+-            // evaluate from last to first
+-            for (int i = evaluators.size() -1; i >= 0; --i) {
+-                if (element == null)
+-                    return false;
+-                Evaluator eval = evaluators.get(i);
+-                if (!eval.matches(root, element))
+-                    return false;
+-                element = element.parent();
+-            }
+-            return true;
+-        }
++Element ul = doc.expectFirst("#outer");
++assertEquals(2, ul.childrenSize());
++
++Element li1 = ul.expectFirst("> li:nth-child(1)");
++assertEquals("Foo", li1.ownText());
++assertTrue(li1.select("ul").isEmpty());
++
++Element li2 = ul.expectFirst("> li:nth-child(2)");
++assertEquals("Bar", li2.ownText());
++
++// And now for the bug - li2 select was not restricted to the li2 context
++Elements innerLis = li2.select("ul > li");
++assertEquals(2, innerLis.size());
++assertEquals("Baz", innerLis.first().ownText());
++
++// Confirm that parent selector (" ") works same as immediate parent (">");
++Elements innerLisFromParent = li2.select("ul li");
++assertEquals(innerLis, innerLisFromParent);
+\ No newline at end of file

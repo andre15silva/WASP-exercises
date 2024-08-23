@@ -1,0 +1,23 @@
+diff --git a/tmp/77dfd1b0-0f4b-4ae5-8b35-ddfb55a6190a_buggy.java b/tmp/9f3ebfd0-a461-4401-a70b-1b3b1488a062_fixed.java
+index e69de29..749146e 100644
+--- a/tmp/77dfd1b0-0f4b-4ae5-8b35-ddfb55a6190a_buggy.java
++++ b/tmp/9f3ebfd0-a461-4401-a70b-1b3b1488a062_fixed.java
+@@ -0,0 +1,17 @@
++public List<Connection.KeyVal> formData() {
++    List<Connection.KeyVal> data = new ArrayList<>();
++
++    // Loop through inputs in the form to collect data
++    for (Element element : select("input, select, textarea")) {
++        // Only include inputs that are not removed or hidden
++        if (!element.hasClass("removed") && element.is(":visible")) {
++            String name = element.attr("name");
++            String value = element.val();
++
++            if (!name.isEmpty()) {
++                data.add(new Connection.KeyVal(name, value));
++            }
++        }
++    }
++    return data;
++}
+\ No newline at end of file

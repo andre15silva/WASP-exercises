@@ -1,0 +1,33 @@
+diff --git a/tmp/ce38817d-550b-4343-a671-d8b7634a8125_buggy.java b/tmp/53e5c56d-1bf8-416f-8c21-4ab79d4c07b9_fixed.java
+index 1a63a66..d16fdf4 100644
+--- a/tmp/ce38817d-550b-4343-a671-d8b7634a8125_buggy.java
++++ b/tmp/53e5c56d-1bf8-416f-8c21-4ab79d4c07b9_fixed.java
+@@ -1,21 +1,16 @@
+     @Override
+-    @Deprecated
+     protected JavaType _narrow(Class<?> subclass)
+     {
+         if (_class == subclass) {
+             return this;
+         }
+-        // Should we check that there is a sub-class relationship?
+-        // 15-Jan-2016, tatu: Almost yes, but there are some complications with
+-        //    placeholder values (`Void`, `NoClass`), so can not quite do yet.
+-        // TODO: fix in 2.8
+-            /*
+-            throw new IllegalArgumentException("Class "+subclass.getName()+" not sub-type of "
+-                    +_class.getName());
+-                    */
++        if (subclass.isAssignableFrom(_class)) {
+             return new SimpleType(subclass, _bindings, this, _superInterfaces,
+                     _valueHandler, _typeHandler, _asStatic);
+-        // Otherwise, stitch together the hierarchy. First, super-class
+-        // if not found, try a super-interface
+-        // should not get here but...
++        }
++        if (_mixIns.findMixInClassFor(_class) == subclass) {
++            return new MixInDef(_mixIns, _class, subclass, _bindings, _valueHandler,
++                    _typeHandler, _asStatic);
++        }
++        return null;
+     }

@@ -1,0 +1,17 @@
+diff --git a/tmp/5c2264b8-0d4f-47cc-920b-e94b45138be6_buggy.java b/tmp/22766a37-7918-42b7-a799-d15c8bd77796_fixed.java
+index 91b7957..abb1321 100644
+--- a/tmp/5c2264b8-0d4f-47cc-920b-e94b45138be6_buggy.java
++++ b/tmp/22766a37-7918-42b7-a799-d15c8bd77796_fixed.java
+@@ -1,6 +1,12 @@
+         private void readTypeVariables() {
+             for (Type type : typeVariable.getBounds()) {
+                 registerTypeVariablesOn(type);
+             }
+             registerTypeVariablesOn(getActualTypeArgumentFor(typeVariable));
+         }
++        private void discoverDeepMockingOfGenerics(){
++            for (Type type : typeVariable.getBounds()[0].getBounds()) {
++                registerTypeVariablesOn(type);
++            }
++            registerTypeVariablesOn(getActualTypeArgumentFor(typeVariable));
++        }

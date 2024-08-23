@@ -1,0 +1,22 @@
+diff --git a/tmp/5ceff20b-6762-4666-97bd-e9001eb831f7_buggy.java b/tmp/223cf397-d312-4c32-bd73-40e32cbc7a04_fixed.java
+index e1fc51f..36b8f5d 100644
+--- a/tmp/5ceff20b-6762-4666-97bd-e9001eb831f7_buggy.java
++++ b/tmp/223cf397-d312-4c32-bd73-40e32cbc7a04_fixed.java
+@@ -1,9 +1,10 @@
+     public boolean hasSameMethod(Invocation candidate) {    
+-        //not using method.equals() for 1 good reason:
+-        //sometimes java generates forwarding methods when generics are in play see JavaGenericsForwardingMethodsTest
+-        Method m1 = invocation.getMethod();
+-        Method m2 = candidate.getMethod();
++        // Get the method names and signatures
++        String m1Name = invocation.getMethod().getName();
++        String m2Name = candidate.getMethod().getName();
++        String m1Signature = invocation.getMethod().getSignature();
++        String m2Signature = candidate.getMethod().getSignature();
+         
+-        	/* Avoid unnecessary cloning */
+-        return m1.equals(m2);
++        // Compare the method names and signatures
++        return m1Name.equals(m2Name) && m1Signature.equals(m2Signature);
+     }
+\ No newline at end of file

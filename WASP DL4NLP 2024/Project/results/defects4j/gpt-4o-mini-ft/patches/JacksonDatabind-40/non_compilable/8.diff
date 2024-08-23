@@ -1,0 +1,34 @@
+diff --git a/tmp/fc032d96-1e3e-40ca-87e2-3b20e1d0c131_buggy.java b/tmp/febcb1c5-27c4-4a5e-b408-0f8c347cc007_fixed.java
+index e69de29..54c6447 100644
+--- a/tmp/fc032d96-1e3e-40ca-87e2-3b20e1d0c131_buggy.java
++++ b/tmp/febcb1c5-27c4-4a5e-b408-0f8c347cc007_fixed.java
+@@ -0,0 +1,28 @@
++// TEST SETUP NOT NEEDED --> REMOVE
++package org.apache.struts2.interceptor.validation.validators;
++
++import org.apache.struts2.StrutsTestCase;
++
++// TEST SETUP NOT NEEDED --> REMOVE
++public class TestRequiredStringValidator extends StrutsTestCase {
++
++    private RequiredStringValidator rst = new RequiredStringValidator();
++    
++    public void testEmptyToNullCoercionForPrimitives() throws Exception {
++        _testEmptyToNullCoercion(int.class, Integer.valueOf(0));
++        _testEmptyToNullCoercion(long.class, Long.valueOf(0));
++        _testEmptyToNullCoercion(double.class, Double.valueOf(0.0));
++        _testEmptyToNullCoercion(float.class, Float.valueOf(0.0f));
++    }
++
++    private void _testEmptyToNullCoercion(Class<?> clazz, Object expected) {
++        rst.setEmptyToNull(true);
++        Object result = rst.convertValue(clazz, null, null, "");
++
++        // commons-beanutils is not the most reliable at providing the default value of classes,
++        // which is new Integer(0), whereas the framework builders are capable of using Autoboxed
++        // default values (like 0, 0L, 0.0d etc)
++        assertEquals(expected, result);
++    }
++
++}
+\ No newline at end of file

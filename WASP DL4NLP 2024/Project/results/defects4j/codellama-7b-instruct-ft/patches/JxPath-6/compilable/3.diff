@@ -1,0 +1,51 @@
+diff --git a/tmp/6601c646-543e-4ea3-a660-63e1636e1a6b_buggy.java b/tmp/8337b9f0-61a3-4cd1-b2a7-f74720dcf415_fixed.java
+index f650982..398c0e7 100644
+--- a/tmp/6601c646-543e-4ea3-a660-63e1636e1a6b_buggy.java
++++ b/tmp/8337b9f0-61a3-4cd1-b2a7-f74720dcf415_fixed.java
+@@ -1,42 +1,46 @@
+     /**
+      * Compares two values
+      */
+     protected boolean equal(
+         EvalContext context,
+         Expression left,
+         Expression right) 
+     {
+         Object l = left.compute(context);
+         Object r = right.compute(context);
+ 
+ //        System.err.println("COMPARING: " +
+ //            (l == null ? "null" : l.getClass().getName()) + " " +
+ //            (r == null ? "null" : r.getClass().getName()));
+ 
+         if (l instanceof InitialContext || l instanceof SelfContext) {
+             l = ((EvalContext) l).getSingleNodePointer();
+         }
+ 
+         if (r instanceof InitialContext || r instanceof SelfContext) {
+             r = ((EvalContext) r).getSingleNodePointer();
+         }
+ 
+         if (l instanceof Collection) {
+             l = ((Collection) l).iterator();
+         }
+ 
+         if (r instanceof Collection) {
+             r = ((Collection) r).iterator();
+         }
+ 
++        if (r instanceof Iterator && l instanceof Collection) {
++        	// In Xpath 1.0 it is possible to write `$d = $c/text()`
++        	if (r.equals(l)) return true;
++        }
+         if ((l instanceof Iterator) && !(r instanceof Iterator)) {
+             return contains((Iterator) l, r);
+         }
+         if (!(l instanceof Iterator) && (r instanceof Iterator)) {
+             return contains((Iterator) r, l);
+         }
+         if (l instanceof Iterator && r instanceof Iterator) {
+             return findMatch((Iterator) l, (Iterator) r);
+         }
+         return equal(l, r);
+     }

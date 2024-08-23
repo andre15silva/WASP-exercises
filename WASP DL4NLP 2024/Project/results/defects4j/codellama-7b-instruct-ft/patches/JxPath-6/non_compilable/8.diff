@@ -1,0 +1,59 @@
+diff --git a/tmp/e6254801-1808-49b0-bf8d-de0019344f67_buggy.java b/tmp/2ad90fe3-5c77-40cc-a782-da0a7ee7aba0_fixed.java
+index f650982..2efd323 100644
+--- a/tmp/e6254801-1808-49b0-bf8d-de0019344f67_buggy.java
++++ b/tmp/2ad90fe3-5c77-40cc-a782-da0a7ee7aba0_fixed.java
+@@ -1,42 +1,52 @@
+     /**
+      * Compares two values
+      */
+     protected boolean equal(
+         EvalContext context,
+         Expression left,
+         Expression right) 
+     {
+         Object l = left.compute(context);
+         Object r = right.compute(context);
+ 
+ //        System.err.println("COMPARING: " +
+ //            (l == null ? "null" : l.getClass().getName()) + " " +
+ //            (r == null ? "null" : r.getClass().getName()));
+ 
+-        if (l instanceof InitialContext || l instanceof SelfContext) {
++        if (l instanceof SelfContext) {
++            EvalContext eval = (EvalContext) l;
+             l = ((EvalContext) l).getSingleNodePointer();
++        } else if (l instanceof InitialContext) {
++            l = ((EvalContext) l).getSingleNodePointer();
++        } else if (l instanceof Variable) {
++            l = XPathWrapper.evaluateExpression((Variable) l, context);
+         }
+ 
+-        if (r instanceof InitialContext || r instanceof SelfContext) {
++        if (r instanceof SelfContext) {
++            EvalContext eval = (EvalContext) r;
+             r = ((EvalContext) r).getSingleNodePointer();
++        } else if (r instanceof InitialContext) {
++            r = ((EvalContext) r).getSingleNodePointer();
++        } else if (r instanceof Variable) {
++            r = XPathWrapper.evaluateExpression((Variable) r, context);
+         }
+ 
+         if (l instanceof Collection) {
+             l = ((Collection) l).iterator();
+         }
+ 
+         if (r instanceof Collection) {
+             r = ((Collection) r).iterator();
+         }
+ 
+         if ((l instanceof Iterator) && !(r instanceof Iterator)) {
+             return contains((Iterator) l, r);
+         }
+         if (!(l instanceof Iterator) && (r instanceof Iterator)) {
+             return contains((Iterator) r, l);
+         }
+         if (l instanceof Iterator && r instanceof Iterator) {
+             return findMatch((Iterator) l, (Iterator) r);
+         }
+         return equal(l, r);
+     }

@@ -1,0 +1,28 @@
+diff --git a/tmp/4cb5ee18-0347-415c-805f-10469d17fe4b_buggy.java b/tmp/263d017a-5228-440c-b9f4-7b99e2387999_fixed.java
+index 4685979..9a65038 100644
+--- a/tmp/4cb5ee18-0347-415c-805f-10469d17fe4b_buggy.java
++++ b/tmp/263d017a-5228-440c-b9f4-7b99e2387999_fixed.java
+@@ -1,16 +1,13 @@
+-  /**
+-   * Encodes {@code value}.
+-   *
+-   * @param value a finite value. May not be {@link Double#isNaN() NaNs} or
+-   *     {@link Double#isInfinite() infinities}.
+-   * @return this writer.
+-   */
+   public JsonWriter value(double value) throws IOException {
++    if (Double.isFinite(value)) {
+       writeDeferredName();
+-    if (Double.isNaN(value) || Double.isInfinite(value)) {
+-      throw new IllegalArgumentException("Numeric values must be finite, but was " + value);
+-    }
+       beforeValue();
+       out.append(Double.toString(value));
+       return this;
++    } else if (lenient) {
++      out.append("null");
++      return this;
++    } else {
++      throw new IllegalArgumentException("Numeric values must be finite, but was " + value);
++    }
+   }

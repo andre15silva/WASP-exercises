@@ -1,0 +1,38 @@
+diff --git a/tmp/dc18df52-2ccd-4d4a-9f54-dadef5a961b7_buggy.java b/tmp/e773dc5c-f646-4f48-bc7e-c2373f041ccf_fixed.java
+index 1bd0d7e..07c2ac0 100644
+--- a/tmp/dc18df52-2ccd-4d4a-9f54-dadef5a961b7_buggy.java
++++ b/tmp/e773dc5c-f646-4f48-bc7e-c2373f041ccf_fixed.java
+@@ -1,31 +1,26 @@
+     /**
+      * Get the ns uri of the specified node.
+      * @param node Node to check
+      * @return String ns uri
+      */
+     public static String getNamespaceURI(Node node) {
+         if (node instanceof Document) {
+-            node = ((Document) node).getDocumentElement();
++            return ((Document) node).getDocumentElement().getNamespaceURI();
+         }
+ 
+         Element element = (Element) node;
+-
+-        String uri = element.getNamespaceURI();
+-        if (uri == null) {
+         String prefix = getPrefix(node);
+         String qname = prefix == null ? "xmlns" : "xmlns:" + prefix;
+ 
+         Node aNode = node;
+         while (aNode != null) {
+             if (aNode.getNodeType() == Node.ELEMENT_NODE) {
+                 Attr attr = ((Element) aNode).getAttributeNode(qname);
+                 if (attr != null) {
+                     return attr.getValue();
+                 }
+             }
+             aNode = aNode.getParentNode();
+         }
+         return null;
+     }
+\ No newline at end of file
+-        return uri;
+-    }

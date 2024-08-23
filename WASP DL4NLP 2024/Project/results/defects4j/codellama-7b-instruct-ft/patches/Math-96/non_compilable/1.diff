@@ -1,0 +1,50 @@
+diff --git a/tmp/e5567a37-5e63-46f2-8017-8bc3f0fd8f40_buggy.java b/tmp/068eaf61-9cc1-4d98-a583-188db603c6c8_fixed.java
+index f674e52..1972e99 100644
+--- a/tmp/e5567a37-5e63-46f2-8017-8bc3f0fd8f40_buggy.java
++++ b/tmp/068eaf61-9cc1-4d98-a583-188db603c6c8_fixed.java
+@@ -1,41 +1,44 @@
+     /**
+      * Test for the equality of two Complex objects.
+      * <p>
+      * If both the real and imaginary parts of two Complex numbers
+      * are exactly the same, and neither is <code>Double.NaN</code>, the two
+      * Complex objects are considered to be equal.</p>
+      * <p>
+      * All <code>NaN</code> values are considered to be equal - i.e, if either
+      * (or both) real and imaginary parts of the complex number are equal
+      * to <code>Double.NaN</code>, the complex number is equal to 
+      * <code>Complex.NaN</code>.</p>
+      *
+      * @param other Object to test for equality to this
+      * @return true if two Complex objects are equal, false if
+      *         object is null, not an instance of Complex, or
+      *         not equal to this Complex instance
+      * 
+      */
+     public boolean equals(Object other) {
+         boolean ret;
+         
+         if (this == other) { 
+             ret = true;
+         } else if (other == null) {
+             ret = false;
+         } else  {
+             try {
+                 Complex rhs = (Complex)other;
+                 if (rhs.isNaN()) {
+                     ret = this.isNaN();
+                 } else {
+-                    ret = (Double.doubleToRawLongBits(real) == Double.doubleToRawLongBits(rhs.getReal())) && (Double.doubleToRawLongBits(imaginary) == Double.doubleToRawLongBits(rhs.getImaginary()));
++                    // This bit fiddling is required as 1.3.1's Double.doubleToRawLongBits does not return the correct bits for -0.0
++                    // This ensures that the following condition has the same truth value in Java 1.3 and 1.4.2
++                    ret = (Double.doubleToRawLongBits(real < 0 ? -0.0 :real) == Double.doubleToRawLongBits(rhs.getReal < 0 ? -0.0 : rhs.getReal())) && 
++                        (Double.doubleToRawLongBits(imaginary < 0 ? -0.0 : imaginary) == Double.doubleToRawLongBits(rhs.getImaginary < 0 ? -0.0 : rhs.getImaginary()));
+                 }
+             } catch (ClassCastException ex) {
+                 // ignore exception
+                 ret = false;
+             }
+         }
+       
+         return ret;
+     }

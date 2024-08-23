@@ -1,0 +1,72 @@
+diff --git a/tmp/fdcdf1ed-dce2-4cdb-b78c-b28c2972dcdd_buggy.java b/tmp/ed1c0266-63e7-464b-a309-f1300e459292_fixed.java
+index 135fc63..55a83bc 100644
+--- a/tmp/fdcdf1ed-dce2-4cdb-b78c-b28c2972dcdd_buggy.java
++++ b/tmp/ed1c0266-63e7-464b-a309-f1300e459292_fixed.java
+@@ -1,48 +1,33 @@
+-    void resetInsertionMode() {
+-        boolean last = false;
+-        for (int pos = stack.size() -1; pos >= 0; pos--) {
+-            Element node = stack.get(pos);
+-            if (pos == 0) {
+-                last = true;
+-                node = contextElement;
+-            }
+-            String name = node.nodeName();
+-            if ("select".equals(name)) {
++void resetInsertionMode(Document doc) {
++    List<Node> stack = new ArrayList<>();
++    stack.add(doc.getBody());
++    while (stack.size() > 0) {
++        Node node = stack.get(stack.size() - 1);
++        stack.remove(stack.size() - 1);
++        if ("select".equals(node.nodeName()) {
+             transition(HtmlTreeBuilderState.InSelect);
+-                break; // frag
+-            } else if (("td".equals(name) || "td".equals(name) && !last)) {
++        } else if ("td".equals(node.nodeName()) || "th".equals(node.nodeName())) {
+             transition(HtmlTreeBuilderState.InCell);
+-                break;
+-            } else if ("tr".equals(name)) {
++        } else if ("tr".equals(node.nodeName())) {
+             transition(HtmlTreeBuilderState.InRow);
+-                break;
+-            } else if ("tbody".equals(name) || "thead".equals(name) || "tfoot".equals(name)) {
++        } else if ("tbody".equals(node.nodeName()) || "thead".equals(node.nodeName()) || "tfoot".equals(node.nodeName())) {
+             transition(HtmlTreeBuilderState.InTableBody);
+-                break;
+-            } else if ("caption".equals(name)) {
++        } else if ("caption".equals(node.nodeName())) {
+             transition(HtmlTreeBuilderState.InCaption);
+-                break;
+-            } else if ("colgroup".equals(name)) {
++        } else if ("colgroup".equals(node.nodeName())) {
+             transition(HtmlTreeBuilderState.InColumnGroup);
+-                break; // frag
+-            } else if ("table".equals(name)) {
++        } else if ("table".equals(node.nodeName())) {
+             transition(HtmlTreeBuilderState.InTable);
+-                break;
+-            } else if ("head".equals(name)) {
++        } else if ("head".equals(node.nodeName())) {
+             transition(HtmlTreeBuilderState.InBody);
+-                break; // frag
+-            } else if ("body".equals(name)) {
++        } else if ("body".equals(node.nodeName())) {
+             transition(HtmlTreeBuilderState.InBody);
+-                break;
+-            } else if ("frameset".equals(name)) {
++        } else if ("frameset".equals(node.nodeName())) {
+             transition(HtmlTreeBuilderState.InFrameset);
+-                break; // frag
+-            } else if ("html".equals(name)) {
++        } else if ("html".equals(node.nodeName())) {
+             transition(HtmlTreeBuilderState.BeforeHead);
+-                break; // frag
+-            } else if (last) {
++        } else {
+             transition(HtmlTreeBuilderState.InBody);
+-                break; // frag
+         }
+     }
+ }
+\ No newline at end of file

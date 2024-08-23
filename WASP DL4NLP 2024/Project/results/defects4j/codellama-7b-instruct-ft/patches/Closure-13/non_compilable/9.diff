@@ -1,0 +1,61 @@
+diff --git a/tmp/b68c1dfc-3a1c-4392-8d34-319ab69bfb0e_buggy.java b/tmp/35dc816d-15a2-4e01-ad6e-8d3041d5b0bf_fixed.java
+index b5d94e0..667b4f4 100644
+--- a/tmp/b68c1dfc-3a1c-4392-8d34-319ab69bfb0e_buggy.java
++++ b/tmp/35dc816d-15a2-4e01-ad6e-8d3041d5b0bf_fixed.java
+@@ -1,26 +1,50 @@
+   private void traverse(Node node) {
+-    // The goal here is to avoid retraversing
++    // The goal here is to avoidetraversing
+     // the entire AST to catch newly created opportunities.
+     // So we track whether a "unit of code" has changed,
+     // and revisit immediately.
+     if (!shouldVisit(node)) {
+       return;
+     }
+ 
+     int visits = 0;
+-    do {
+     Node c = node.getFirstChild();
++    boolean changed;
++    if (c.getType() == Token.FUNCTION) {
++      Node valueName = c.getChildAtIndex(1);
++      Node functionValueName = c.getChildAtIndex(0);
++      int valueIndexStart = functionValueName.getSourceToCodeConverter().
++          offsetOf(valueName);
++      int valueIndexEnd = functionValueName.getSourceToCodeConverter().
++          offsetOf(valueName) + valueName.getSourceToCodeConverter().
++              lastIndexOf(valueName);
++      changed = !functionValueName.isIdempotent() || valueIndexStart >= 0
++          && valueIndexEnd > 0;
++    } else {
++      changed = false;
++    }
++    if (changed && c.getType() == Token.VAR) {
++      this.transformers.clear();
++      this.transformers.trimToSize();
++    }
++
++    do {
++      int visits_loop = visits;
++      Node next = node.getNext();
++      do {
++        c = node.getFirstChild();
+         while(c != null) {
+           traverse(c);
+-        Node next = c.getNext();
+-        c = next;
++          c = c.getNext();
+         }
+ 
+         visit(node);
+-      visits++;
++        visits_loop++;
+ 
+-      Preconditions.checkState(visits < 10000, "too many interations");
++        Preconditions.checkState(visits_loop < 10000, "too many interations");
+       } while (shouldRetraverse(node));
++      node = next;
++    } while (next != null);
+ 
+     exitNode(node);
+   }

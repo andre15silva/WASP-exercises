@@ -1,0 +1,26 @@
+diff --git a/tmp/10615386-fa7b-4e27-9ee7-ea0e7b1fca98_buggy.java b/tmp/dd988c97-8ee6-470b-87ff-b63299d5598e_fixed.java
+index a38ec6d..65b3c77 100644
+--- a/tmp/10615386-fa7b-4e27-9ee7-ea0e7b1fca98_buggy.java
++++ b/tmp/dd988c97-8ee6-470b-87ff-b63299d5598e_fixed.java
+@@ -1,10 +1,14 @@
+-    @Override
+-    public JSType caseObjectType(ObjectType type) {
++  /* override */
++  public function caseObjectType(type) {
+     if (value.equals("function")) {
+-        JSType ctorType = getNativeType(U2U_CONSTRUCTOR_TYPE);
+-        return resultEqualsValue && ctorType.isSubtype(type) ? ctorType : null;
+-          // Objects are restricted to "Function", subtypes are left
+-          // Only filter out subtypes of "function"
++        return {
++            match: function(type) {
++                return type.is(U2U_CONSTRUCTOR_TYPE);
++            },
++            bind: function(type) {
++                return U2U_CONSTRUCTOR_TYPE.getFnType();
++            }
++        };
+     }
+     return matchesExpectation("object") ? type : null;
+   }
+\ No newline at end of file

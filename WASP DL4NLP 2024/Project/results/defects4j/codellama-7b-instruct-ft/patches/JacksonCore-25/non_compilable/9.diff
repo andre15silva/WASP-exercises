@@ -1,0 +1,58 @@
+diff --git a/tmp/4515de46-6697-45b3-9994-b1cc192bd609_buggy.java b/tmp/40923475-a37a-4d9c-b259-21fc7df9ad8c_fixed.java
+index 8dfbd84..e34efd7 100644
+--- a/tmp/4515de46-6697-45b3-9994-b1cc192bd609_buggy.java
++++ b/tmp/40923475-a37a-4d9c-b259-21fc7df9ad8c_fixed.java
+@@ -1,43 +1,51 @@
+     private String _handleOddName2(int startPtr, int hash, int[] codes) throws IOException
+     {
+         _textBuffer.resetWithShared(_inputBuffer, startPtr, (_inputPtr - startPtr));
+         char[] outBuf = _textBuffer.getCurrentSegment();
+         int outPtr = _textBuffer.getCurrentSegmentSize();
+         final int maxCode = codes.length;
+ 
+         while (true) {
+             if (_inputPtr >= _inputEnd) {
+                 if (!_loadMore()) { // acceptable for now (will error out later)
+                     break;
+                 }
+             }
+             char c = _inputBuffer[_inputPtr];
++            _inputPtr++;
++            if (c == '}') {
++                break;
++            }
+             int i = (int) c;
++            if (i == 256) {
++                // Ooops
++                _textBuffer.finishCurrentSegment();
++                _handleOddUnquotedName(_textBuffer.getText());
++                return _symbols.findSymbol(_textBuffer.getCurrentSegment(), 0, _textBuffer.getCurrentSegmentSize());
++            }
+             if (i <= maxCode) {
+                 if (codes[i] != 0) {
+                     break;
+                 }
+             } else if (!Character.isJavaIdentifierPart(c)) {
+                 break;
+             }
+-            ++_inputPtr;
+-            hash = (hash * CharsToNameCanonicalizer.HASH_MULT) + i;
+             // Ok, let's add char to output:
+             outBuf[outPtr++] = c;
+ 
+             // Need more room?
+             if (outPtr >= outBuf.length) {
+                 outBuf = _textBuffer.finishCurrentSegment();
+                 outPtr = 0;
+             }
+         }
+         _textBuffer.setCurrentLength(outPtr);
+         {
+             TextBuffer tb = _textBuffer;
+             char[] buf = tb.getTextBuffer();
+             int start = tb.getTextOffset();
+             int len = tb.size();
+ 
+             return _symbols.findSymbol(buf, start, len, hash);
+         }
+     }

@@ -1,0 +1,55 @@
+diff --git a/tmp/9119490b-0b8c-4c51-b411-9c5265e8a801_buggy.java b/tmp/727716a6-a21c-427d-9c01-87a1138df97a_fixed.java
+index 8e93a5e..e0292ee 100644
+--- a/tmp/9119490b-0b8c-4c51-b411-9c5265e8a801_buggy.java
++++ b/tmp/727716a6-a21c-427d-9c01-87a1138df97a_fixed.java
+@@ -1,43 +1,32 @@
+-    /**
+-     * <p>Render the specified text and return the rendered Options
+-     * in a StringBuffer.</p>
+-     *
+-     * @param sb The StringBuffer to place the rendered text into.
+-     * @param width The number of characters to display per line
+-     * @param nextLineTabStop The position on the next line for the first tab.
+-     * @param text The text to be rendered.
+-     *
+-     * @return the StringBuffer with the rendered Options contents.
+-     */
+ protected StringBuffer renderWrappedText(StringBuffer sb, int width, 
+                                          int nextLineTabStop, String text)
+ {
+     int pos = findWrapPos(text, width, 0);
+ 
+     if (pos == -1)
+     {
+         sb.append(rtrim(text));
+-
+         return sb;
+     }
++    
+     sb.append(rtrim(text.substring(0, pos))).append(defaultNewLine);
+ 
+-        // all following lines must be padded with nextLineTabStop space 
+-        // characters
++    // all following lines must be padded with nextLineTabStop space characters
+     final String padding = createPadding(nextLineTabStop);
+ 
+     while (true)
+     {
++        // Take the remaining text, apply the padding, and trim it.
+         text = padding + text.substring(pos).trim();
+-            pos = findWrapPos(text, width, nextLineTabStop);
++        pos = findWrapPos(text, width, 0); // Update to start at 0 again
+ 
+         if (pos == -1)
+         {
+-                sb.append(text);
+-
++            sb.append(text); // Append remaining text if no wrap found
+             return sb;
+         }
+ 
++        // Append the wrapped line, and add a new line
+         sb.append(rtrim(text.substring(0, pos))).append(defaultNewLine);
+     }
+ }
+\ No newline at end of file

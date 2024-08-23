@@ -1,0 +1,21 @@
+diff --git a/tmp/f4c539b3-9434-40af-b816-301fcadc8a68_buggy.java b/tmp/ba3fb22a-ec70-4b1c-bf4d-6ba4e43194e1_fixed.java
+index e31352b..836a244 100644
+--- a/tmp/f4c539b3-9434-40af-b816-301fcadc8a68_buggy.java
++++ b/tmp/ba3fb22a-ec70-4b1c-bf4d-6ba4e43194e1_fixed.java
+@@ -1,15 +1,7 @@
+-    /**
+-     * Returns a paint for the specified value.
+-     * 
+-     * @param value  the value (must be within the range specified by the
+-     *         lower and upper bounds for the scale).
+-     * 
+-     * @return A paint for the specified value.
+-     */
+     public Paint getPaint(double value) {
+         double v = Math.max(value, this.lowerBound);
+         v = Math.min(v, this.upperBound);
+         int g = (int) ((value - this.lowerBound) / (this.upperBound
+                 - this.lowerBound) * 255.0);
+         return new Color(g, g, g);
+     }
+\ No newline at end of file

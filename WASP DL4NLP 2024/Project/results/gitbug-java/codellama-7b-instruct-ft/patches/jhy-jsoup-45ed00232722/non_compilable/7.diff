@@ -1,0 +1,27 @@
+diff --git a/tmp/989d2599-cecb-4873-a052-b35319aa4ebc_buggy.java b/tmp/bf0c7318-d62c-4837-b5c3-85e924205176_fixed.java
+index 855afa5..282da8f 100644
+--- a/tmp/989d2599-cecb-4873-a052-b35319aa4ebc_buggy.java
++++ b/tmp/bf0c7318-d62c-4837-b5c3-85e924205176_fixed.java
+@@ -1,13 +1,21 @@
+-    static URL encodeUrl(URL u) {
++	public static URL encodeUrl(final URL u) {
+ 	    u = punyUrl(u);
+         try {
++            if ( u.getQuery() != null ) {
++                //  weirdo new URL() class seems to do the query encoding for us
++                return u; 
++            }
+             //  odd way to encode urls, but it works!
+             String urlS = u.toExternalForm(); // URL external form may have spaces which is illegal in new URL() (odd asymmetry)
+             urlS = urlS.replace(" ", "%20");
++            if ( urlS.indexOf('[') >= 0 ) {
++                //  do not let URL class escape []'s of which the browser may throw away by default 
++                urlS = urlS.replace("[", "%5B").replace("]", "%5D");
++            }
+             final URI uri = new URI(urlS);
+             return new URL(uri.toASCIIString());
+         } catch (URISyntaxException | MalformedURLException e) {
+             // give up and return the original input
+             return u;
+         }
+     }

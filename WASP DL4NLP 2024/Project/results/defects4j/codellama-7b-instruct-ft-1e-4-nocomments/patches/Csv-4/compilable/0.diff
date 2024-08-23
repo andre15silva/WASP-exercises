@@ -1,0 +1,25 @@
+diff --git a/tmp/28004b7c-4711-4df6-8515-797ed5c84b8f_buggy.java b/tmp/38e8bc95-88b2-45bc-9437-9e1733f0fb40_fixed.java
+index fd29bad..29ee8c1 100644
+--- a/tmp/28004b7c-4711-4df6-8515-797ed5c84b8f_buggy.java
++++ b/tmp/38e8bc95-88b2-45bc-9437-9e1733f0fb40_fixed.java
+@@ -1,10 +1,19 @@
+     /**
+      * Returns a copy of the header map that iterates in column order.
+      * <p>
+      * The map keys are column names. The map values are 0-based indices.
+      * </p>
++     * <p>
++     * There can be no header map if no header line is present or if {@link CSVFormat#withSkipHeaderRecord()}
++     * is specified.
++     * </p>
+      * @return a copy of the header map that iterates in column order.
++     * @throws IllegalStateException if the CSV file has no header line and {@link CSVFormat#withSkipHeaderRecord()}
++     * is not specified.
+      */
+     public Map<String, Integer> getHeaderMap() {
++        if (this.headerMap == null) {
++            throw new IllegalStateException("No header line in CSV file");
++        }
+         return new LinkedHashMap<String, Integer>(this.headerMap);
+     }
+\ No newline at end of file

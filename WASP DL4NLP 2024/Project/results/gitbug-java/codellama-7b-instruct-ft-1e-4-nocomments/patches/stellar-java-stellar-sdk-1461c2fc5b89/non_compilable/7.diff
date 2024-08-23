@@ -1,0 +1,22 @@
+diff --git a/tmp/a58fdadb-8288-4657-b614-46fe2f25eaf5_buggy.java b/tmp/8479f42f-4554-4ee6-9f88-6ea5cd2ef145_fixed.java
+index 5cedd56..68d30ad 100644
+--- a/tmp/a58fdadb-8288-4657-b614-46fe2f25eaf5_buggy.java
++++ b/tmp/8479f42f-4554-4ee6-9f88-6ea5cd2ef145_fixed.java
+@@ -1,15 +1,13 @@
+   /**
+    * Returns true if this transaction is a Soroban transaction.
+    *
+    * @return true if this transaction is a Soroban transaction.
+    */
+   public boolean isSorobanTransaction() {
+     if (mOperations.length != 1) {
+       return false;
+     }
+-
+     Operation op = mOperations[0];
+     return op instanceof InvokeHostFunctionOperation
+-        || op instanceof BumpSequenceOperation
+-        || op instanceof RestoreFootprintOperation;
++        || op instanceof BumpSequenceOperation && !((BumpSequenceOperation) op).getSource().equals(getSourceAccount());
+   }
+\ No newline at end of file

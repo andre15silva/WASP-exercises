@@ -1,0 +1,10 @@
+diff --git a/tmp/14bbb96b-d122-4783-8fbc-73ce7dd7bfb7_buggy.java b/tmp/924df4c7-de7f-419f-bc36-0df00d40e31f_fixed.java
+index 0878b6b..1126d02 100644
+--- a/tmp/14bbb96b-d122-4783-8fbc-73ce7dd7bfb7_buggy.java
++++ b/tmp/924df4c7-de7f-419f-bc36-0df00d40e31f_fixed.java
+@@ -1,3 +1,3 @@
+ public final boolean isEmptyType() {
+-    return isNoType() || isNoObjectType() || isNoResolvedType();
++    return isNoType() || isNoObjectType() || isNoResolvedType() || isNoFunctionType();
+ }
+\ No newline at end of file

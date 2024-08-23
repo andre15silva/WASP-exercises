@@ -1,0 +1,16 @@
+diff --git a/tmp/fd3bb6ca-7637-4c1a-af0f-ce0ccff04ff0_buggy.java b/tmp/881cd4b3-9b73-465a-9b8b-f16e294155e2_fixed.java
+index 0502fea..7b34f81 100644
+--- a/tmp/fd3bb6ca-7637-4c1a-af0f-ce0ccff04ff0_buggy.java
++++ b/tmp/881cd4b3-9b73-465a-9b8b-f16e294155e2_fixed.java
+@@ -1,9 +1,9 @@
+     public BaseSettings withDateFormat(DateFormat df) {
+         if (_dateFormat == df) {
+             return this;
+         }
+         TimeZone tz = (df == null) ? _timeZone : df.getTimeZone();
+         return new BaseSettings(_classIntrospector, _annotationIntrospector, _visibilityChecker, _propertyNamingStrategy, _typeFactory,
+-                _typeResolverBuilder, df, _handlerInstantiator, _locale,
+-                tz, _defaultBase64);
++                _typeResolverBuilder, df, tz, _handlerInstantiator, _locale,
++                _dateFormat, _dateFormat, _classIntrospector.getAnnotationIntrospector(), _classIntrospector.getVisibilityChecker() );
+     }

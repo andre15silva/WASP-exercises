@@ -1,0 +1,96 @@
+diff --git a/tmp/63649c35-3f6c-444f-a6dc-d8d6bb8deb91_buggy.java b/tmp/cfcc6413-9bb3-4c93-b8bd-80484e28a117_fixed.java
+index 39981f0..2f6319f 100644
+--- a/tmp/63649c35-3f6c-444f-a6dc-d8d6bb8deb91_buggy.java
++++ b/tmp/cfcc6413-9bb3-4c93-b8bd-80484e28a117_fixed.java
+@@ -1,65 +1,88 @@
+   /**
+    * Given a node, get a human-readable name for the type of that node so
+    * that will be easy for the programmer to find the original declaration.
+    *
+    * For example, if SubFoo's property "bar" might have the human-readable
+    * name "Foo.prototype.bar".
+    *
+    * @param n The node.
+    * @param dereference If true, the type of the node will be dereferenced
+    *     to an Object type, if possible.
+    */
+   String getReadableJSTypeName(Node n, boolean dereference) {
+ 
+     // The best type name is the actual type name.
+ 
+     // If we're analyzing a GETPROP, the property may be inherited by the
+     // prototype chain. So climb the prototype chain and find out where
+     // the property was originally defined.
+     if (n.isGetProp()) {
+       ObjectType objectType = getJSType(n.getFirstChild()).dereference();
+       if (objectType != null) {
+         String propName = n.getLastChild().getString();
+         if (objectType.getConstructor() != null &&
+             objectType.getConstructor().isInterface()) {
+           objectType = FunctionType.getTopDefiningInterface(
+               objectType, propName);
+         } else {
+           // classes
+           while (objectType != null && !objectType.hasOwnProperty(propName)) {
+             objectType = objectType.getImplicitPrototype();
+           }
+         }
+ 
+-        // Don't show complex function names or anonymous types.
+-        // Instead, try to get a human-readable type name.
++        // Don't show complex object names or anonymous types, instead try
++        // to get a human-readable type name.
+         if (objectType != null &&
+             (objectType.getConstructor() != null ||
+-             objectType.isFunctionPrototypeType())) {
++             objectType.isFunctionPrototypeType() ||
++             !objectType.isNativeObjectType())) {
+           return objectType.toString() + "." + propName;
+         }
+       }
+     }
+ 
+     JSType type = getJSType(n);
+     if (dereference) {
+       ObjectType dereferenced = type.dereference();
+       if (dereferenced != null) {
+         type = dereferenced;
+       }
+     }
+     if (type.isFunctionPrototypeType() ||
+         (type.toObjectType() != null &&
+          type.toObjectType().getConstructor() != null)) {
+       return type.toString();
++    } else if (type.isObjectType()) {
++      checkState(n.isAssign() && n.getFirstChild().getNext() == null);
++      ObjectType objectType =
++          ObjectType.cast(type);
++      String propName = n.getFirstChild().getString();
++      while (objectType != null && !objectType.hasOwnProperty(propName)) {
++        objectType = objectType.getImplicitPrototype();
++      }
++      if (objectType == null) {
++        // e.g.
++        //   goog.events.EventHandler = {onevent:function(){...}}
++        //   var handler = new goog.events.EventHandler;
++        //   handler.onevent(...);
++        addPropertyDefinedError(type.getRawInputId());
++      } else if (objectType.getConstructor() == null) {
++        checkState(
++            objectType.isNativeObjectType(),
++            "Object of type %s, had no constructor defined",
++            objectType);
++        // Objects with no defined own properties are anonymous.
++        addPropertyDefinedError(type.getRawInputId());
++      }
+     }
+     String qualifiedName = n.getQualifiedName();
+     if (qualifiedName != null) {
+       return qualifiedName;
+     } else if (type.isFunctionType()) {
+       // Don't show complex function names.
+       return "function";
+     } else {
+       return type.toString();
+     }
+   }

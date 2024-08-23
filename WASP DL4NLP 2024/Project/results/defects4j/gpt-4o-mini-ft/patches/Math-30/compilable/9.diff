@@ -1,0 +1,36 @@
+diff --git a/tmp/7b3d2ca1-cf36-46e7-9d5e-b6ed588f6a06_buggy.java b/tmp/ff8320fc-374c-4361-9828-4f3346f4300d_fixed.java
+index 3c69e10..4fb0f5e 100644
+--- a/tmp/7b3d2ca1-cf36-46e7-9d5e-b6ed588f6a06_buggy.java
++++ b/tmp/ff8320fc-374c-4361-9828-4f3346f4300d_fixed.java
+@@ -1,27 +1,29 @@
+     /**
+      * @param Umin smallest Mann-Whitney U value
+      * @param n1 number of subjects in first sample
+      * @param n2 number of subjects in second sample
+      * @return two-sided asymptotic p-value
+      * @throws ConvergenceException if the p-value can not be computed
+      * due to a convergence error
+      * @throws MaxCountExceededException if the maximum number of
+      * iterations is exceeded
+      */
+     private double calculateAsymptoticPValue(final double Umin,
+                                              final int n1,
+                                              final int n2)
+         throws ConvergenceException, MaxCountExceededException {
+ 
+         final int n1n2prod = n1 * n2;
+ 
+         // http://en.wikipedia.org/wiki/Mann%E2%80%93Whitney_U#Normal_approximation
+         final double EU = n1n2prod / 2.0;
++        // The variance should be n1*n2*(n1+n2+1)/12.0, but that can result
++        // in overflow.  Ideally,
++        // http://stats.stackexchange.com/a/68625
++        // says we should use 1/4 U, which is what we have now for the moment.
+         final double VarU = n1n2prod * (n1 + n2 + 1) / 12.0;
+-
+         final double z = (Umin - EU) / FastMath.sqrt(VarU);
+ 
+         final NormalDistribution standardNormal = new NormalDistribution(0, 1);
+-
+         return 2 * standardNormal.cumulativeProbability(z);
+     }

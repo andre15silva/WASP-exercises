@@ -1,0 +1,51 @@
+diff --git a/tmp/f6bd9778-80a3-4d85-891a-ea00ed858634_buggy.java b/tmp/4c24c6f6-7485-4344-9033-f8505f9a1a74_fixed.java
+index 388771b..2d87858 100644
+--- a/tmp/f6bd9778-80a3-4d85-891a-ea00ed858634_buggy.java
++++ b/tmp/4c24c6f6-7485-4344-9033-f8505f9a1a74_fixed.java
+@@ -1,37 +1,45 @@
+     /**
+      * Creates a new timeseries by copying a subset of the data in this time
+      * series.
+      *
+      * @param start  the index of the first time period to copy.
+      * @param end  the index of the last time period to copy.
+      *
+      * @return A series containing a copy of this times series from start until
+      *         end.
+      *
+      * @throws CloneNotSupportedException if there is a cloning problem.
+      */
+     public TimeSeries createCopy(int start, int end)
+             throws CloneNotSupportedException {
+         if (start < 0) {
+             throw new IllegalArgumentException("Requires start >= 0.");
+         }
+         if (end < start) {
+             throw new IllegalArgumentException("Requires start <= end.");
+         }
+         TimeSeries copy = (TimeSeries) super.clone();
+         copy.data = new java.util.ArrayList();
++        copy.minY = Double.POSITIVE_INFINITY;
++        copy.maxY = Double.NEGATIVE_INFINITY;
+         if (this.data.size() > 0) {
+             for (int index = start; index <= end; index++) {
+                 TimeSeriesDataItem item
+                         = (TimeSeriesDataItem) this.data.get(index);
+                 TimeSeriesDataItem clone = (TimeSeriesDataItem) item.clone();
+                 try {
+                     copy.add(clone);
+                 }
+                 catch (SeriesException e) {
+                     e.printStackTrace();
+                 }
++                if (clone.getY() < copy.minY) {
++                    copy.minY = clone.getY();
++                }
++                if (clone.getY() > copy.maxY) {
++                    copy.maxY = clone.getY();
++                }
+             }
+         }
+         return copy;
+     }
+\ No newline at end of file

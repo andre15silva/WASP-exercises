@@ -1,0 +1,29 @@
+diff --git a/tmp/953ace2d-8a6e-46bf-8b8b-3190d9be9188_buggy.java b/tmp/bd57d56e-8851-4796-aaf0-c7c1bd70746f_fixed.java
+index 23f078d..172ff4f 100644
+--- a/tmp/953ace2d-8a6e-46bf-8b8b-3190d9be9188_buggy.java
++++ b/tmp/bd57d56e-8851-4796-aaf0-c7c1bd70746f_fixed.java
+@@ -1,14 +1,23 @@
+     private static void appendToAscii(String s, boolean spaceAsPlus, StringBuilder sb) throws UnsupportedEncodingException {
+         // minimal normalization of Unicode -> Ascii, and space normal. Existing escapes are left as-is.
+         for (int i = 0; i < s.length(); i++) {
+             int c = s.codePointAt(i);
+             if (c == ' ') {
+                 sb.append(spaceAsPlus ? '+' : "%20");
+             } else if (c > 127) { // out of ascii range
++                int pos = i;
++                // https://tools.ietf.org/html/rfc3986#appendix-A
++                // All URI code points can be represented in ASCII, but the
++                // pct-encoded octets in a URI must be in lowercase. Therefore
++                // we will normalize anything beyond the BMP.
++                while (c > 0x7f || Character.isSupplementaryCodePoint(c)) {
+                     sb.append(URLEncoder.encode(new String(Character.toChars(c)), UTF_8.name()));
+-                // ^^ is a bit heavy-handed - if perf critical, we could optimize
++                    c = s.codePointAt(pos);
++                }
++                sb.append((char) c);
+             } else {
+                 sb.append((char) c);
+             }
++            sb.append(s.substring(i, i + 1));
+         }
+     }

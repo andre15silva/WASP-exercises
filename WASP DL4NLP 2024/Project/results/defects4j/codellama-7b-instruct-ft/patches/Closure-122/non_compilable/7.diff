@@ -1,0 +1,20 @@
+diff --git a/tmp/324d3eae-4dd2-4b41-bede-f556c4c87e14_buggy.java b/tmp/c12ea053-9e31-4ab3-8b87-ebf08c867a6f_fixed.java
+index 308b324..8f889e5 100644
+--- a/tmp/324d3eae-4dd2-4b41-bede-f556c4c87e14_buggy.java
++++ b/tmp/c12ea053-9e31-4ab3-8b87-ebf08c867a6f_fixed.java
+@@ -1,11 +1,14 @@
+   /**
+    * Check to see if the given block comment looks like it should be JSDoc.
+    */
+   private void handleBlockComment(Comment comment) {
+     if (comment.getValue().indexOf("/* @") != -1 || comment.getValue().indexOf("\n * @") != -1) {
+       errorReporter.warning(
+           SUSPICIOUS_COMMENT_WARNING,
+           sourceName,
+-          comment.getLineno(), "", 0);
++          comment.getLineno(),
++          "",
++          // position is not valid for token stream-based files.
++          (comment.isTokenOnly() ? null : comment.getCharno()));
+     }
+   }

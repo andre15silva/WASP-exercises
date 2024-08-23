@@ -1,0 +1,23 @@
+diff --git a/tmp/029393d3-b785-481b-8555-c4bbfba0ac7f_buggy.java b/tmp/18dcee3f-1c03-404b-9e4b-875a92beddec_fixed.java
+index 5cedd56..23f764e 100644
+--- a/tmp/029393d3-b785-481b-8555-c4bbfba0ac7f_buggy.java
++++ b/tmp/18dcee3f-1c03-404b-9e4b-875a92beddec_fixed.java
+@@ -1,15 +1,15 @@
+   /**
+    * Returns true if this transaction is a Soroban transaction.
+    *
+    * @return true if this transaction is a Soroban transaction.
+    */
+   public boolean isSorobanTransaction() {
+     if (mOperations.length != 1) {
+       return false;
+     }
+-
+     Operation op = mOperations[0];
+     return op instanceof InvokeHostFunctionOperation
+         || op instanceof BumpSequenceOperation
+-        || op instanceof RestoreFootprintOperation;
++        || op instanceof AccountMergeOperation
++        || op instanceof CreateAccountOperation;
+   }
+\ No newline at end of file

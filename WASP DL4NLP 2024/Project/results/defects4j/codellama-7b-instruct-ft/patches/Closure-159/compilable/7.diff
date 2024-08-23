@@ -1,0 +1,35 @@
+diff --git a/tmp/8d807b7d-0005-4b9e-a6c6-8e962c4c4be4_buggy.java b/tmp/b0ddb6cd-ac35-4e36-809c-ade5ce451840_fixed.java
+index de9af32..23a627d 100644
+--- a/tmp/8d807b7d-0005-4b9e-a6c6-8e962c4c4be4_buggy.java
++++ b/tmp/b0ddb6cd-ac35-4e36-809c-ade5ce451840_fixed.java
+@@ -1,18 +1,29 @@
+   /**
+    * @see #findCalledFunctions(Node)
+    */
+   private void findCalledFunctions(
+       Node node, Set<String> changed) {
+     Preconditions.checkArgument(changed != null);
+     // For each referenced function, add a new reference
+     if (node.getType() == Token.CALL) {
+       Node child = node.getFirstChild();
+       if (child.getType() == Token.NAME) {
+-        changed.add(child.getString());
++        String name = child.getString(); // eg window.jQuery
++        int parenPos = name.indexOf('(');
++        if (parenPos != -1) {
++          // strip off the parameter list.
++          String calledName = name.substring(0, parenPos);
++          if (parenPos < name.length() - 1) {
++            // there's a space (or some other character) before the paren
++            calledName = calledName.substring(0, calledName.length()
++                - name.substring(parenPos).length());
++          }
++          changed.add(calledName);
++        }
+       }
+     }
+ 
+     for (Node c = node.getFirstChild(); c != null; c = c.getNext()) {
+       findCalledFunctions(c, changed);
+     }
+   }

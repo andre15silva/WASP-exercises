@@ -1,0 +1,63 @@
+diff --git a/tmp/ba3840cc-b2e4-4f48-bad7-4cebe2ee2d04_buggy.java b/tmp/887821ac-5a89-4800-8a41-3a2059a88a86_fixed.java
+index e4d90e7..749e423 100644
+--- a/tmp/ba3840cc-b2e4-4f48-bad7-4cebe2ee2d04_buggy.java
++++ b/tmp/887821ac-5a89-4800-8a41-3a2059a88a86_fixed.java
+@@ -1,45 +1,41 @@
+   @Override
+   String toStringHelper(boolean forAnnotations) {
+-    if (hasReferenceName()) {
+-      return getReferenceName();
+-    } else if (prettyPrint) {
+-      // Don't pretty print recursively.
++    if (prettyPrint) {
+       prettyPrint = false;
+-
+-      // Use a tree set so that the properties are sorted.
++      boolean recordRecursive = !super.isNativeObjectType() &&
++          getReferencedType() != null;
+       Set<String> propertyNames = Sets.newTreeSet();
+       for (ObjectType current = this;
+-           current != null && !current.isNativeObjectType() &&
++           current != null && (forAnnotations || !current.isNativeObjectType()) &&
+                propertyNames.size() <= MAX_PRETTY_PRINTED_PROPERTIES;
+            current = current.getImplicitPrototype()) {
+         propertyNames.addAll(current.getOwnPropertyNames());
++        if (recordRecursive && current.hasReferenceName() && current.getReferenceName().equals(
++            super.getReferenceName())) {
++          recordRecursive = false;
++        }
+       }
+-
+       StringBuilder sb = new StringBuilder();
+-      sb.append("{");
+-
+       int i = 0;
+       for (String property : propertyNames) {
++        JSType type = getPropertyType(property);
++        if (!forAnnotations || (!type.isUnknownType() && !type.isToplevel())) {
+           if (i > 0) {
+             sb.append(", ");
+           }
+-
+           sb.append(property);
+           sb.append(": ");
+-        sb.append(getPropertyType(property).toString());
+-
++          sb.append(type.toString());
+           ++i;
+           if (i == MAX_PRETTY_PRINTED_PROPERTIES) {
+             sb.append(", ...");
+             break;
+           }
+         }
+-
+-      sb.append("}");
+-
++      }
+       prettyPrint = true;
+       return sb.toString();
+     } else {
+       return "{...}";
+     }
+   }
+\ No newline at end of file

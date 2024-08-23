@@ -1,0 +1,112 @@
+diff --git a/tmp/a0f5739a-771f-4d3f-be20-bad602bb5a65_buggy.java b/tmp/5323637f-a1e8-4bfb-bef7-f219fa2fdf9e_fixed.java
+index a667cbe..ae3bffb 100644
+--- a/tmp/a0f5739a-771f-4d3f-be20-bad602bb5a65_buggy.java
++++ b/tmp/5323637f-a1e8-4bfb-bef7-f219fa2fdf9e_fixed.java
+@@ -1,10 +1,97 @@
+-    /**
+-     * Recalculate the hash code after deserialization. The hash code of some
+-     * keys might have change (hash codes based on the system hash code are
+-     * only stable for the same process).
+-     * @return the instance with recalculated hash code
+-     */
+-    private Object readResolve() {
+-        calculateHashCode(keys);
+-        return this;
++import java.io.ByteArrayInputStream;
++import java.io.ByteArrayOutputStream;
++import java.io.ObjectInputStream;
++import java.io.ObjectOutputStream;
++import java.io.Serializable;
++import java.util.Arrays;
++import java.util.Objects;
++
++public class TestSerializable {
++
++    static interface MultiKey<T> extends Serializable {
++        T[] getKeys();
++        int hashCode();
++        boolean equals(Object other);
++    }
++
++    static class BaseMultiKey<T> implements MultiKey<T> {
++        protected T[] keys;
++
++        BaseMultiKey(T... keys) {
++            this.keys = keys;
++        }
++
++        public T[] getKeys() {
++            return keys;
++        }
++
++        public int hashCode() {
++            return Arrays.deepHashCode(keys);
++        }
++
++        public boolean equals(Object other) {
++            if (!(other instanceof MultiKey)) {
++                return false;
++            }
++
++            MultiKey<?> otherKey = (MultiKey<?>) other;
++            return Arrays.equals(keys, otherKey.getKeys());
++        }
++    }
++
++    static class DerivedMultiKey<T> extends BaseMultiKey<T> {
++        DerivedMultiKey(T... keys) {
++            super(keys);
++        }
++
++        @Override
++        public T[] getKeys() {
++            return super.getKeys();
++        }
++
++        @Override
++        public int hashCode() {
++            return super.hashCode();
++        }
++
++        @Override
++        public boolean equals(Object other) {
++            if (!(other instanceof DerivedMultiKey)) {
++                return false;
++            }
++
++            DerivedMultiKey<?> otherKey = (DerivedMultiKey<?>) other;
++            return super.equals(other) && 
++                        Arrays.equals(keys, otherKey.getKeys());
++        }
++    }
++
++    @Test
++    public void testEqualsAfterSerializationOfDerivedClass() throws IOException, ClassNotFoundException {
++        // create an instance of the derived class
++        MultiKey<String> mk = new DerivedMultiKey<>("A", "B");
++
++        // serialize
++        ByteArrayOutputStream baos = new ByteArrayOutputStream();
++        ObjectOutputStream out = new ObjectOutputStream(baos);
++        out.writeObject(mk);
++        out.close();
++
++        // deserialize
++        ByteArrayInputStream bais = new ByteArrayInputStream(baos.toByteArray());
++        ObjectInputStream in = new ObjectInputStream(bais);
++        DerivedMultiKey<?> mk2 = (DerivedMultiKey<?>) in.readObject();
++        in.close();
++
++        // check if the instances are equal after deserialization
++        assertEquals(mk, mk2);
++    }
++
++    private static <T> void assertEquals(MultiKey<T> mk1, MultiKey<T> mk2) {
++        // compare hash code
++        assertEquals(mk1.hashCode(), mk2.hashCode(), "Hash code of deserialized instance should be the same as the original instance");
++
++        // compare equality
++        assertTrue(mk1.equals(mk2), "Equals should return true for the same instance and for the deserialized instance");
++    }
+ }
+\ No newline at end of file

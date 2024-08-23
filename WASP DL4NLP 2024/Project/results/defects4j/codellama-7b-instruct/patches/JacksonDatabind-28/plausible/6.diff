@@ -1,0 +1,21 @@
+diff --git a/tmp/96cf6ee8-b0c5-4bb6-ba55-ee769481a6a8_buggy.java b/tmp/a9618d21-c90c-4a55-9e2b-abd844d3a656_fixed.java
+index 66bb99f..22e8ef1 100644
+--- a/tmp/96cf6ee8-b0c5-4bb6-ba55-ee769481a6a8_buggy.java
++++ b/tmp/a9618d21-c90c-4a55-9e2b-abd844d3a656_fixed.java
+@@ -1,14 +1,12 @@
+     @Override
+     public ObjectNode deserialize(JsonParser p, DeserializationContext ctxt) throws IOException
+     {
+         if (p.getCurrentToken() == JsonToken.START_OBJECT) {
+             p.nextToken();
+             return deserializeObject(p, ctxt, ctxt.getNodeFactory());
+         }
+-            // 23-Sep-2015, tatu: Ugh. We may also be given END_OBJECT (similar to FIELD_NAME),
+-            //    if caller has advanced to the first token of Object, but for empty Object
+-            if (p.getCurrentToken() == JsonToken.FIELD_NAME) {
++        if (p.getCurrentToken() == JsonToken.FIELD_NAME || p.getCurrentToken() == JsonToken.END_OBJECT) {
+             return deserializeObject(p, ctxt, ctxt.getNodeFactory());
+         }
+         throw ctxt.mappingException(ObjectNode.class);
+     }
+\ No newline at end of file

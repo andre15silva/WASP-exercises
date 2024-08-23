@@ -1,0 +1,41 @@
+diff --git a/tmp/7265bc49-16b6-45ac-a8ac-a164b5fe41a8_buggy.java b/tmp/ef0ce597-4539-4c0b-be22-26dfa7b2acdb_fixed.java
+index 939f49b..5ad491d 100644
+--- a/tmp/7265bc49-16b6-45ac-a8ac-a164b5fe41a8_buggy.java
++++ b/tmp/ef0ce597-4539-4c0b-be22-26dfa7b2acdb_fixed.java
+@@ -1,21 +1,36 @@
+     private boolean isPrototypePropertyAssign(Node assign) {
+       Node n = assign.getFirstChild();
+       if (n != null && NodeUtil.isVarOrSimpleAssignLhs(n, assign)
+           && n.getType() == Token.GETPROP
+           ) {
+         // We want to exclude the assignment itself from the usage list
+         boolean isChainedProperty =
+             n.getFirstChild().getType() == Token.GETPROP;
+ 
+         if (isChainedProperty) {
+           Node child = n.getFirstChild().getFirstChild().getNext();
+ 
+           if (child.getType() == Token.STRING &&
+               child.getString().equals("prototype")) {
++            Node prototypeAssign = n;
++            do {
++              prototypeAssign = prototypeAssign.getNext();
++            } while (prototypeAssign != null &&
++                !NodeUtil.isNamedType(prototypeAssign.getLastChild().getNext()));
++
++            Node typeNode = prototypeAssign.getLastChild().getNext();
++            if (typeNode.getType() == Token.NAME && isAliasedType(typeNode)) {
++              for (Node curr = typeNode.getFirstChild(); curr != null;
++                   curr = curr.getNext()) {
++                curr.putBooleanProp("ES6_PROXY_AWARE", true);
++              }
+               return true;
++            } else {
++              return false;
++            }
+           }
+         }
+       }
+ 
+       return false;
+     }

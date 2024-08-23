@@ -1,0 +1,35 @@
+diff --git a/tmp/268dff8a-ffe1-4040-8899-627a46222c0c_buggy.java b/tmp/d86daedb-fccc-49de-933a-5bc1295a2950_fixed.java
+index d931bce..a21be1e 100644
+--- a/tmp/268dff8a-ffe1-4040-8899-627a46222c0c_buggy.java
++++ b/tmp/d86daedb-fccc-49de-933a-5bc1295a2950_fixed.java
+@@ -1,5 +1,28 @@
+ /** {@inheritDoc} */
+ public double solve(final UnivariateRealFunction f, double min, double max, double initial)
+     throws MaxIterationsExceededException, FunctionEvaluationException {
+-        return solve(min, max);
++    // Check if function is null
++    if (f == null) {
++        throw new IllegalArgumentException("Function cannot be null");
++    }
++    
++    // Initialize the solver parameters
++    double midPoint = initial;
++    double functionValue = f.value(midPoint);
++    
++    // Implement the bisection method
++    while (max - min > getAbsoluteAccuracy()) {
++        midPoint = (min + max) / 2;
++        functionValue = f.value(midPoint);
++        
++        if (functionValue == 0) {
++            return midPoint; // found exact root
++        } else if (functionValue > 0) {
++            max = midPoint; // root is in the left half
++        } else {
++            min = midPoint; // root is in the right half
++        }
++    }
++    
++    return midPoint; // return the midpoint as the approximation of the root
+ }
+\ No newline at end of file

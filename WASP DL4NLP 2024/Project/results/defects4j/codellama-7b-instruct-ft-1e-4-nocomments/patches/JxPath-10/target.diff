@@ -1,0 +1,10 @@
+diff --git a/tmp/417df11e-75a7-451a-a2f3-65c356b431e9_buggy.java b/tmp/091df6a4-8b74-4e0f-aadd-6c9cb1b4e983_fixed.java
+index b86b44d..0ad345d 100644
+--- a/tmp/417df11e-75a7-451a-a2f3-65c356b431e9_buggy.java
++++ b/tmp/091df6a4-8b74-4e0f-aadd-6c9cb1b4e983_fixed.java
+@@ -1,4 +1,4 @@
+     public final Object computeValue(EvalContext context) {
+-        return compute(args[0].computeValue(context), args[1].computeValue(context))
++        return compute(args[0].compute(context), args[1].compute(context))
+                 ? Boolean.TRUE : Boolean.FALSE;
+     }

@@ -1,0 +1,18 @@
+diff --git a/tmp/3e45af7c-5321-43ba-8102-2324d3da5c41_buggy.java b/tmp/0c7a31e0-87aa-4d45-a395-86f3511f8e84_fixed.java
+index e69de29..9c6c276 100644
+--- a/tmp/3e45af7c-5321-43ba-8102-2324d3da5c41_buggy.java
++++ b/tmp/0c7a31e0-87aa-4d45-a395-86f3511f8e84_fixed.java
+@@ -0,0 +1,13 @@
++
++public void _testEmptyToNullCoercion(Class<?> type, Object value) throws Exception {
++    String className = type.getName();
++    try {
++        Object coercedValue = coerceEmptyToNull(value, type);
++        String toString = (coercedValue != null)
++                ? coercedValue.getClass().getName() + ":" + coercedValue.toString()
++                : "null";
++        System.out.println("Coerced " + className + " from " + value + " to " + toString);
++    } catch (IllegalArgumentException e) {
++        e.printStackTrace();
++    }
++}

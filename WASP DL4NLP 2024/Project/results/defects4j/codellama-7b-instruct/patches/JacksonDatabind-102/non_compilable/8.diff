@@ -1,0 +1,101 @@
+diff --git a/tmp/621a3cbe-1682-4b22-addc-cca75f3824db_buggy.java b/tmp/e96b83bf-733e-40d6-918d-a3de5abd2ca7_fixed.java
+index 1b07d98..cea18a1 100644
+--- a/tmp/621a3cbe-1682-4b22-addc-cca75f3824db_buggy.java
++++ b/tmp/e96b83bf-733e-40d6-918d-a3de5abd2ca7_fixed.java
+@@ -1,76 +1,30 @@
+-    @Override
+-    public JsonSerializer<?> createContextual(SerializerProvider serializers,
+-            BeanProperty property) throws JsonMappingException
+-    {
+-        // Note! Should not skip if `property` null since that'd skip check
+-        // for config overrides, in case of root value
+-        if (property == null) {
+-            return this;
+-        }
++public DateFormat createContextual(SerializerProvider serializers,
++        BeanProperty property) throws JsonMappingException {
++    DateFormat df = null;
++    if (property != null) {
++        // Find the format overrides
+         JsonFormat.Value format = findFormatOverrides(serializers, property, handledType());
+-        if (format == null) {
+-            return this;
+-        }
+-        // Simple case first: serialize as numeric timestamp?
+-        JsonFormat.Shape shape = format.getShape();
+-        if (shape.isNumeric()) {
+-            return withFormat(Boolean.TRUE, null);
+-        }
+-
+-        // 08-Jun-2017, tatu: With [databind#1648], this gets bit tricky..
+-        // First: custom pattern will override things
++        // Check if the format is numeric
++        if (format.isNumeric()) {
++            df = Boolean.TRUE;
++        } else {
++            // Check if the format has a pattern
+             if (format.hasPattern()) {
+-            final Locale loc = format.hasLocale()
+-                            ? format.getLocale()
+-                            : serializers.getLocale();
+-            SimpleDateFormat df = new SimpleDateFormat(format.getPattern(), loc);
+-            TimeZone tz = format.hasTimeZone() ? format.getTimeZone()
+-                    : serializers.getTimeZone();
++                final Locale loc = format.hasLocale()? format.getLocale(): serializers.getLocale();
++                final TimeZone tz = format.hasTimeZone()? format.getTimeZone(): serializers.getTimeZone();
++                df = new SimpleDateFormat(format.getPattern(), loc);
+                 df.setTimeZone(tz);
+-            return withFormat(Boolean.FALSE, df);
+-        }
+-
+-        // Otherwise, need one of these changes:
+-        final boolean hasLocale = format.hasLocale();
+-        final boolean hasTZ = format.hasTimeZone();
+-        final boolean asString = (shape == JsonFormat.Shape.STRING);
+-
+-        if (!hasLocale && !hasTZ && !asString) {
+-            return this;
+-        }
+-
+-        DateFormat df0 = serializers.getConfig().getDateFormat();
+-        // Jackson's own `StdDateFormat` is quite easy to deal with...
+-        if (df0 instanceof StdDateFormat) {
+-            StdDateFormat std = (StdDateFormat) df0;
++            } else {
++                // Otherwise, create a SimpleDateFormat instance
++                df = new SimpleDateFormat(serializers.getConfig().getDateFormat());
+                 if (format.hasLocale()) {
+-                std = std.withLocale(format.getLocale());
++                    df.setLocale(format.getLocale());
+                 }
+                 if (format.hasTimeZone()) {
+-                std = std.withTimeZone(format.getTimeZone());
++                    df.setTimeZone(format.getTimeZone());
+                 }
+-            return withFormat(Boolean.FALSE, std);
+             }
+-
+-        // 08-Jun-2017, tatu: Unfortunately there's no generally usable
+-        //    mechanism for changing `DateFormat` instances (or even clone()ing)
+-        //    So: require it be `SimpleDateFormat`; can't config other types
+-        if (!(df0 instanceof SimpleDateFormat)) {
+-            serializers.reportBadDefinition(handledType(), String.format(
+-"Configured `DateFormat` (%s) not a `SimpleDateFormat`; cannot configure `Locale` or `TimeZone`",
+-df0.getClass().getName()));
+         }
+-        SimpleDateFormat df = (SimpleDateFormat) df0;
+-        if (hasLocale) {
+-            // Ugh. No way to change `Locale`, create copy; must re-crete completely:
+-            df = new SimpleDateFormat(df.toPattern(), format.getLocale());
+-        } else {
+-            df = (SimpleDateFormat) df.clone();
+     }
+-        TimeZone newTz = format.getTimeZone();
+-        boolean changeTZ = (newTz != null) && !newTz.equals(df.getTimeZone());
+-        if (changeTZ) {
+-            df.setTimeZone(newTz);
+-        }
+-        return withFormat(Boolean.FALSE, df);
++    return df;
+ }
+\ No newline at end of file

@@ -1,0 +1,14 @@
+diff --git a/tmp/5586129b-5366-4865-91e0-b6aab4d959d9_buggy.java b/tmp/545db178-bd1f-4649-a2f7-da646a164be0_fixed.java
+index 84989ca..08e96cf 100644
+--- a/tmp/5586129b-5366-4865-91e0-b6aab4d959d9_buggy.java
++++ b/tmp/545db178-bd1f-4649-a2f7-da646a164be0_fixed.java
+@@ -1,6 +1,8 @@
+     boolean matchesLetter() {
+         if (isEmpty())
+             return false;
+         char c = input[pos];
+-        return (c >= 'A' && c <= 'Z') || (c >= 'a' && c <= 'z');
++        // support Chinese chars and others, http://www.w3.org/International/questions/qa-escapes
++        return (c >= 'A' && c <= 'Z') || (c >= 'a' && c <= 'z') || c == (char) 162 || c == (char) 171 ||
++                c == (char) 134 || c == (char) 151 || c == (char) 149;
+     }

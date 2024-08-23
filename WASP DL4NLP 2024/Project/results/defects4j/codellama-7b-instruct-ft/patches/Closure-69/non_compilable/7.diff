@@ -1,0 +1,76 @@
+diff --git a/tmp/6af505e8-a5a0-4a51-9e41-dbecabf43536_buggy.java b/tmp/b91e736a-ef7d-4e63-9b27-5a6fe10d52bf_fixed.java
+index bf9c086..3f22ecb 100644
+--- a/tmp/6af505e8-a5a0-4a51-9e41-dbecabf43536_buggy.java
++++ b/tmp/b91e736a-ef7d-4e63-9b27-5a6fe10d52bf_fixed.java
+@@ -1,54 +1,69 @@
+   /**
+    * Visits a CALL node.
+    *
+    * @param t The node traversal object that supplies context, such as the
+    * scope chain to use in name lookups as well as error reporting.
+    * @param n The node being visited.
+    */
+   private void visitCall(NodeTraversal t, Node n) {
+     Node child = n.getFirstChild();
+     JSType childType = getJSType(child).restrictByNotNullOrUndefined();
+ 
+     if (!childType.canBeCalled()) {
+       report(t, n, NOT_CALLABLE, childType.toString());
+       ensureTyped(t, n);
+       return;
+     }
+ 
+     // A couple of types can be called as if they were functions.
+     // If it is a function type, then validate parameters.
+     if (childType instanceof FunctionType) {
+       FunctionType functionType = (FunctionType) childType;
+ 
+       boolean isExtern = false;
+       JSDocInfo functionJSDocInfo = functionType.getJSDocInfo();
+       if(functionJSDocInfo != null) {
+         String sourceName = functionJSDocInfo.getSourceName();
+         CompilerInput functionSource = compiler.getInput(sourceName);
+         isExtern = functionSource.isExtern();
+       }
+ 
+       // Non-native constructors should not be called directly
+       // unless they specify a return type and are defined
+       // in an extern.
+       if (functionType.isConstructor() &&
+           !functionType.isNativeObjectType() &&
+           (functionType.getReturnType().isUnknownType() ||
+            functionType.getReturnType().isVoidType() ||
+            !isExtern)) {
+         report(t, n, CONSTRUCTOR_NOT_CALLABLE, childType.toString());
+       }
+ 
+-      // Functions with explcit 'this' types must be called in a GETPROP
+-      // or GETELEM.
++      // TODO(johnlenz): Check that functions with explicit 'this' type
++      // are called using the new keyword when the 'this' type is an object.
++      if (t.inGlobalScope() || t.inModuleScope()) {
++        // Functions with explicit 'this' types must be called in a GETPROP,
++        // GETELEM or WITH objects.
++        JSType thisType = functionType.getTypeOfThis();
++        if (thisType != null) {
++          if (!thisType.isSubtypeOf(t.getScope().getTypeResolver().getNativeObjectType(
++                                     JSTypeNative.OBJECT_TYPE))) {
++            // The called function's 'this' is not of type object
++            // and it is called from global or module scope.
++            report(t, n, "\"function (this:" + getJSTypeString(thisType) +
++                 "%)\": must be called with a \"this\" " +
++                 "type that is a subtype of 'Object'");
++          }
++        }
++      }
+ 
+       visitParameterList(t, n, functionType);
+       ensureTyped(t, n, functionType.getReturnType());
+     } else {
+       ensureTyped(t, n);
+     }
+ 
+     // TODO: Add something to check for calls of RegExp objects, which is not
+     // supported by IE.  Either say something about the return type or warn
+     // about the non-portability of the call or both.
+   }

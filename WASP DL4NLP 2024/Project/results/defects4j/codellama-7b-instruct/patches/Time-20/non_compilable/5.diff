@@ -1,0 +1,32 @@
+diff --git a/tmp/f8d31d7e-1e78-4dea-a0cf-616c48cac79f_buggy.java b/tmp/7dab6c31-b62e-4d4f-984a-6a1c564e8f9a_fixed.java
+index ae6c2b1..12317c5 100644
+--- a/tmp/f8d31d7e-1e78-4dea-a0cf-616c48cac79f_buggy.java
++++ b/tmp/7dab6c31-b62e-4d4f-984a-6a1c564e8f9a_fixed.java
+@@ -1,10 +1,21 @@
+     public int parseInto(DateTimeParserBucket bucket, String text, int position) {
+-            String str = text.substring(position);
+-            for (String id : ALL_IDS) {
+-                if (str.startsWith(id)) {
+-                    bucket.setZone(DateTimeZone.forID(id));
+-                    return position + id.length();
++        int start = position;
++        int foundIndex = text.indexOf(":", position, true);
++        if (foundIndex != ~position) {
++            // We found an ':' so this looks like a zone ID
++            // Use backward search to find start of string
++            start = text.substring(0, foundIndex).lastIndexOf(" ", true);
++            if (start < 0) {
++                // No space found before the ':', so use start of string
++                start = 0;
++            } else {
++                start += 1;
+             }
++            // Set the zone ID and return the position of the colon
++            String zid = text.substring(start, foundIndex);
++            bucket.setZone(DateTimeZone.forID(zid));
++            return foundIndex;
+         }
++        // No ':' found, so parse as normal
+         return ~position;
+     }
+\ No newline at end of file

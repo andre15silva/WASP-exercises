@@ -1,0 +1,16 @@
+diff --git a/tmp/b31ac32f-7cf8-4eef-9c32-c87a08d27544_buggy.java b/tmp/92472984-ea20-412e-a415-e2d8eeddfe1a_fixed.java
+index 516fad7..5bbadf1 100644
+--- a/tmp/b31ac32f-7cf8-4eef-9c32-c87a08d27544_buggy.java
++++ b/tmp/92472984-ea20-412e-a415-e2d8eeddfe1a_fixed.java
+@@ -1,8 +1,11 @@
+     /**
+      * If the property contains a collection, then the length of that
+      * collection, otherwise - 1.
+      * @return int length
+      */
+     public int getLength() {
++        if (ValueUtils.getBaseValue(getBaseValue()).isMapLike()) {
+             return ValueUtils.getLength(getBaseValue());
+         }
++        return 1;
++    }

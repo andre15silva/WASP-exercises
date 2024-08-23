@@ -1,0 +1,45 @@
+diff --git a/tmp/6f8f43eb-47f8-4350-b3a4-bfbae3bdf752_buggy.java b/tmp/c9f88cb9-8d9c-4270-ad6a-32c1961f517d_fixed.java
+index ff397b6..5f60f72 100644
+--- a/tmp/6f8f43eb-47f8-4350-b3a4-bfbae3bdf752_buggy.java
++++ b/tmp/c9f88cb9-8d9c-4270-ad6a-32c1961f517d_fixed.java
+@@ -1,35 +1,30 @@
+     @Override
+     protected Object decode(DeviceSession deviceSession, MqttPublishMessage message) throws Exception {
+-
+         JsonObject json;
+         try (ByteBufferInputStream inputStream = new ByteBufferInputStream(message.payload().nioBuffer())) {
+             json = Json.createReader(inputStream).readObject();
+         }
+-
++        String id = json.getString("id");
++        if (id.startsWith("0152")) {
++            return null;
++        }
+         String type = json.getString("rpt");
+         switch (type) {
+             case "hf":
+             case "loc":
+                 Position position = new Position(getProtocolName());
+                 position.setDeviceId(deviceSession.getDeviceId());
+-
+                 position.setValid(true);
+-
+                 DateFormat dateFormat = new SimpleDateFormat("yyyyMMdd'T'HHmmss.SSS'Z'");
+                 position.setTime(dateFormat.parse(json.getString("ts")));
+-
+                 JsonObject location = json.getJsonObject("location");
+                 position.setLatitude(location.getJsonNumber("lat").doubleValue());
+                 position.setLongitude(location.getJsonNumber("lon").doubleValue());
+-
+                 position.setCourse(json.getInt("bear"));
+                 position.setSpeed(UnitsConverter.knotsFromCps(json.getInt("spd")));
+-
+                 position.set(Position.KEY_IGNITION, json.getString("ign").equals("on"));
+-
+                 return position;
+-
+             default:
+                 return null;
+         }
+     }
+\ No newline at end of file

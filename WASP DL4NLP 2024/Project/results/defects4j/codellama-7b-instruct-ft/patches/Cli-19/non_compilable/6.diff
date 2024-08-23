@@ -1,0 +1,43 @@
+diff --git a/tmp/4b144715-8a8a-43b0-ae33-dcee0a30f12b_buggy.java b/tmp/2d0c2b5a-c0f2-466a-9d9b-1686bfeaff53_fixed.java
+index 62e8ec8..18d066f 100644
+--- a/tmp/4b144715-8a8a-43b0-ae33-dcee0a30f12b_buggy.java
++++ b/tmp/2d0c2b5a-c0f2-466a-9d9b-1686bfeaff53_fixed.java
+@@ -1,26 +1,37 @@
+     /**
+      * <p>If an {@link Option} exists for <code>token</code> then
+      * set the current option and add the token to the processed 
+      * list.</p>
+      *
+      * <p>If an {@link Option} does not exist and <code>stopAtNonOption</code>
+      * is set then ignore the current token and add the remaining tokens
+      * to the processed tokens list directly.</p>
+      *
+      * @param token The current option token
+      * @param stopAtNonOption Specifies whether flattening should halt
+      * at the first non option.
+      */
+     private void processOptionToken(String token, boolean stopAtNonOption)
+     {
+         if (options.hasOption(token))
+         {
+             currentOption = options.getOption(token);
+             tokens.add(token);
+         }
+         else if (stopAtNonOption)
+         {
+             eatTheRest = true;
+-            tokens.add(token);
++            unrecognized.add(token);
++        }
++        else
++        {
++            if (this.collectUnrecognizedOptions)
++            {
++                unrecognized.add(token);
++            }
++            else
++            {
++                eatTheRest = true;
++            }
+         }
+     }

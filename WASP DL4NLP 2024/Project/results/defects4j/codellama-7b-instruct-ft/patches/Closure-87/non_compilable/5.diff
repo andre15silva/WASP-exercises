@@ -1,0 +1,37 @@
+diff --git a/tmp/d17b5b61-311d-4fc7-93e9-9b2f5b9c0478_buggy.java b/tmp/d9e1711a-9f99-4126-b28e-1106c41eca4b_fixed.java
+index 19fd63e..389d33f 100644
+--- a/tmp/d17b5b61-311d-4fc7-93e9-9b2f5b9c0478_buggy.java
++++ b/tmp/d9e1711a-9f99-4126-b28e-1106c41eca4b_fixed.java
+@@ -1,24 +1,29 @@
+   /**
+    * @return Whether the node is a block with a single statement that is
+    *     an expression.
+    */
+   private boolean isFoldableExpressBlock(Node n) {
+     if (n.getType() == Token.BLOCK) {
+       if (n.hasOneChild()) {
+         Node maybeExpr = n.getFirstChild();
+           // IE has a bug where event handlers behave differently when
+           // their return value is used vs. when their return value is in
+           // an EXPR_RESULT. It's pretty freaking weird. See:
+-          // http://code.google.com/p/closure-compiler/issues/detail?id=291
+-          // We try to detect this case, and not fold EXPR_RESULTs
++          // http://code.google.com/p/v8/issues/detail?id=147
++          // So we try to detect this and not fold EXPR_RESULTs
+           // into other expressions.
+ 
+             // We only have to worry about methods with an implicit 'this'
+-            // param, or this doesn't happen.
++            // param, or this doesn't happen. Unfortunately, this is not
++            // easy to determine, so to get the bug, must use a pattern
++            // (but there is still the issue that you can't use it in
++            if (NodeUtil.hasOnchangeHandlerCall(maybeExpr)) {
++              return false;
++            }
+ 
+           return NodeUtil.isExpressionNode(maybeExpr);
+       }
+     }
+ 
+     return false;
+   }

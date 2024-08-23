@@ -1,0 +1,75 @@
+diff --git a/tmp/d2975c11-ebc8-4ca3-ad09-04dd1ec6bead_buggy.java b/tmp/96f4af3b-f780-4c88-9bbf-7a1fc3606256_fixed.java
+index a7d0787..c927e03 100644
+--- a/tmp/d2975c11-ebc8-4ca3-ad09-04dd1ec6bead_buggy.java
++++ b/tmp/96f4af3b-f780-4c88-9bbf-7a1fc3606256_fixed.java
+@@ -1,54 +1,70 @@
+     /**
+      * Returns the <code>Object</code> of type <code>clazz</code>
+      * with the value of <code>str</code>.
+      *
+      * @param str the command line value
+      * @param clazz the type of argument
+      * @return The instance of <code>clazz</code> initialised with
+      * the value of <code>str</code>.
+      * @throws ParseException if the value creation for the given class failed
+      */
+     @SuppressWarnings("unchecked") // returned value will have type T because it is fixed by clazz
+     public static <T> T createValue(final String str, final Class<T> clazz) throws ParseException
+     {
+         if (PatternOptionBuilder.STRING_VALUE == clazz)
+         {
+             return (T) str;
+         }
+         else if (PatternOptionBuilder.OBJECT_VALUE == clazz)
+         {
+             return (T) createObject(str);
+         }
+         else if (PatternOptionBuilder.NUMBER_VALUE == clazz)
+         {
+             return (T) createNumber(str);
+         }
+         else if (PatternOptionBuilder.DATE_VALUE == clazz)
+         {
+             return (T) createDate(str);
+         }
+         else if (PatternOptionBuilder.CLASS_VALUE == clazz)
+         {
+             return (T) createClass(str);
+         }
+         else if (PatternOptionBuilder.FILE_VALUE == clazz)
+         {
+             return (T) createFile(str);
+         }
+         else if (PatternOptionBuilder.EXISTING_FILE_VALUE == clazz)
+         {
+             return (T) openFile(str);
+         }
+         else if (PatternOptionBuilder.FILES_VALUE == clazz)
+         {
+             return (T) createFiles(str);
+         }
+         else if (PatternOptionBuilder.URL_VALUE == clazz)
+         {
+             return (T) createURL(str);
+         }
++        else if (PatternOptionBuilder.INTEGER_VALUE == clazz)
++        {
++            return (T) Integer.valueOf(str);
++        }
++        else if (PatternOptionBuilder.LONG_VALUE == clazz)
++        {
++            return (T) Long.valueOf(str);
++        }
++        else if (PatternOptionBuilder.DOUBLE_VALUE == clazz)
++        {
++            return (T) Double.valueOf(str);
++        }
++        else if (PatternOptionBuilder.BOOLEAN_VALUE == clazz)
++        {
++            return (T) Boolean.valueOf(str);
++        }
+         else
+         {
+             return null;
+         }
+     }

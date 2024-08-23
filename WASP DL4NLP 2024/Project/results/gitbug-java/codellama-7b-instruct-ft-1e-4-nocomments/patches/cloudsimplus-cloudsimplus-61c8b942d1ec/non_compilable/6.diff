@@ -1,0 +1,27 @@
+diff --git a/tmp/8740e7c5-0ff3-4b70-8426-70d078a591a1_buggy.java b/tmp/a64420c4-a51c-4600-b987-af93d4d75212_fixed.java
+index a2af134..0776bc8 100644
+--- a/tmp/8740e7c5-0ff3-4b70-8426-70d078a591a1_buggy.java
++++ b/tmp/a64420c4-a51c-4600-b987-af93d4d75212_fixed.java
+@@ -1,3 +1,21 @@
+     public HostAbstract(final List<Pe> peList, final boolean activate) {
+         this(defaultBwCapacity, defaultStorageCapacity, new HarddriveStorage(defaultRamCapacity), peList, activate);
+     }
++    public void start() {
++        super.start();
++        addOnHostStartListener(new HostEventAdapter<HostAbstract>() {
++            @Override
++            public void hostStarted(final HostEventInfo<HostAbstract> hostEvent) {
++                System.out.println("Host start "+hostEvent.getTime());
++                for(int i=0; i<getComputingUnits().size(); i++){
++                    getComputingUnits().get(i).getOnHostMigrate().addHostListener(new HostEventAdapter<HostAbstract>() {
++                        @Override
++                        public void hostMigrated(HostEventInfo<HostAbstract> hostEvent) {
++				System.out.println("Migrated");
++                        }
++                    });
++                }
++            }
++        });
++        super.start();
++    }
+\ No newline at end of file

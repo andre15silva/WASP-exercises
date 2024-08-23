@@ -1,0 +1,23 @@
+diff --git a/tmp/88866f98-873c-4bcd-9c5b-24481a3cbd3b_buggy.java b/tmp/1e9b2fc5-b7f9-4651-a7cb-a7aef90c63e2_fixed.java
+index bd45b8e..e547006 100644
+--- a/tmp/88866f98-873c-4bcd-9c5b-24481a3cbd3b_buggy.java
++++ b/tmp/1e9b2fc5-b7f9-4651-a7cb-a7aef90c63e2_fixed.java
+@@ -1,15 +1,14 @@
++
+     public UTF8StreamJsonParser(IOContext ctxt, int features, InputStream in,
+             ObjectCodec codec, BytesToNameCanonicalizer sym,
+             byte[] inputBuffer, int start, int end,
+-            boolean bufferRecyclable)
+-    {
++            boolean bufferRecyclable) {
+         super(ctxt, features);
+         _inputStream = in;
+         _objectCodec = codec;
+         _symbols = sym;
+         _inputBuffer = inputBuffer;
+         _inputPtr = start;
+         _inputEnd = end;
+-        // If we have offset, need to omit that from byte offset, so:
+         _bufferRecyclable = bufferRecyclable;
+     }
+\ No newline at end of file

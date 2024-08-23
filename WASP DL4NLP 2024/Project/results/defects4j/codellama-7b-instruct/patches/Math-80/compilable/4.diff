@@ -1,0 +1,31 @@
+diff --git a/tmp/d7156ad9-db78-425a-8625-6a1c0c75d12c_buggy.java b/tmp/ed01604a-b456-45c7-8b24-14b87e56f5d0_fixed.java
+index fbd0884..a93e9a3 100644
+--- a/tmp/d7156ad9-db78-425a-8625-6a1c0c75d12c_buggy.java
++++ b/tmp/ed01604a-b456-45c7-8b24-14b87e56f5d0_fixed.java
+@@ -1,23 +1,16 @@
+-    /**
+-     * Flip qd array if warranted.
+-     * @param n number of rows in the block
+-     * @param step within the array (1 for flipping all elements, 2 for flipping
+-     * only every other element)
+-     * @return true if qd array was flipped
+-     */
+     private boolean flipIfWarranted(final int n, final int step) {
+-        if (1.5 * work[pingPong] < work[4 * (n - 1) + pingPong]) {
+-            // flip array
++        final double work1 = work[4 * n - 1];
++        if (1.5 * work1 < work[pingPong]) {
+             int j = 4 * n - 1;
+             for (int i = 0; i < j; i += 4) {
+                 for (int k = 0; k < 4; k += step) {
+                     final double tmp = work[i + k];
+                     work[i + k] = work[j - k];
+                     work[j - k] = tmp;
+                 }
+                 j -= 4;
+             }
+             return true;
+         }
+         return false;
+     }
+\ No newline at end of file

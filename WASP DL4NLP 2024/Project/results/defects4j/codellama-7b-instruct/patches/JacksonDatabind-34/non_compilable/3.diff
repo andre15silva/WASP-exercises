@@ -1,0 +1,35 @@
+diff --git a/tmp/92b88c24-c5a6-4c34-834f-2520e4fd4dcd_buggy.java b/tmp/cef37bba-ba01-4333-a5cf-519b6ec8929f_fixed.java
+index 618906f..11310bc 100644
+--- a/tmp/92b88c24-c5a6-4c34-834f-2520e4fd4dcd_buggy.java
++++ b/tmp/cef37bba-ba01-4333-a5cf-519b6ec8929f_fixed.java
+@@ -1,15 +1,19 @@
+     @Override
+-    public void acceptJsonFormatVisitor(JsonFormatVisitorWrapper visitor, JavaType typeHint) throws JsonMappingException
+-    {
+-        if (_isInt) {
+-            visitIntFormat(visitor, typeHint, JsonParser.NumberType.BIG_INTEGER);
+-        } else {
+-            Class<?> h = handledType();
++    public JsonNumberFormatVisitor expectNumberFormat(JavaType typeHint) throws JsonMappingException {
+         if (h == BigDecimal.class) {
+-                visitFloatFormat(visitor, typeHint, JsonParser.NumberType.BIG_INTEGER);
++            return new JsonNumberFormatVisitor() {
++                @Override
++                public void format(JsonValueFormat format) {
++                    sb.append("[numberFormat=").append(format).append("]");
++                }
++                @Override
++                public void enumTypes(Set<String> enums) { }
++                @Override
++                public void numberType(NumberType numberType) {
++                    sb.append("[numberType=BIG_DECIMAL]");
++                }
++            };
+         } else {
+-                // otherwise bit unclear what to call... but let's try:
+-                /*JsonNumberFormatVisitor v2 =*/ visitor.expectNumberFormat(typeHint);
+-            }
++            return visitor.expectNumberFormat(typeHint);
+         }
+     }
+\ No newline at end of file

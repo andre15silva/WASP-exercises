@@ -1,0 +1,30 @@
+diff --git a/tmp/31c7104b-a210-418d-b533-7fb58ac37059_buggy.java b/tmp/3b8e4dc1-a4a2-4b62-8451-917781a95e75_fixed.java
+index e69de29..5c5ce05 100644
+--- a/tmp/31c7104b-a210-418d-b533-7fb58ac37059_buggy.java
++++ b/tmp/3b8e4dc1-a4a2-4b62-8451-917781a95e75_fixed.java
+@@ -0,0 +1,24 @@
++private void _testFieldNameQuotingEnabled(JsonFactory JF, boolean useAltFactory, boolean enableQuoting, String expected) throws IOException {
++    // create the generator factory
++    JsonFactory factory = useAltFactory ? JF2 : JSON_F;
++    JsonGenerator jgen = factory.createGenerator(new StringWriter());
++
++    // set the quoting feature
++    jgen.enableQuoting(true);
++
++    // start the object
++    jgen.startObject();
++
++    // add a field with the field name "foo"
++    jgen.writeFieldName("foo");
++    jgen.writeNumber(1);
++
++    // end the object
++    jgen.endObject();
++
++    // get the generated string
++    String result = jgen.toString();
++
++    // compare the generated string with the expected
++    assertEquals(expected, result);
++}
+\ No newline at end of file

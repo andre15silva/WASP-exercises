@@ -1,0 +1,18 @@
+diff --git a/tmp/fa4d6789-5b96-48fa-a9ef-45eaaa0c69f7_buggy.java b/tmp/f822d241-bf69-4759-b38e-8291cf6a7c03_fixed.java
+index 13db7da..6405860 100644
+--- a/tmp/fa4d6789-5b96-48fa-a9ef-45eaaa0c69f7_buggy.java
++++ b/tmp/f822d241-bf69-4759-b38e-8291cf6a7c03_fixed.java
+@@ -1,11 +1,11 @@
+     /**
+      * Generates a tooltip string to go in an HTML image map.
+      *
+      * @param toolTipText  the tooltip.
+      * 
+      * @return The formatted HTML area tag attribute(s).
+      */
+     public String generateToolTipFragment(String toolTipText) {
+-        return " title=\"" + toolTipText
++        return " title=\"" + Encode.forHtmlAttribute(toolTipText)
+                 + "\" alt=\"\"";
+     }
+\ No newline at end of file

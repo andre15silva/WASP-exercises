@@ -1,0 +1,24 @@
+diff --git a/tmp/f01c7b11-2d1b-4a7e-8eb3-29d984043d8d_buggy.java b/tmp/984103c6-6de5-450d-b44f-8d4e161c782c_fixed.java
+index 3002587..56985ca 100644
+--- a/tmp/f01c7b11-2d1b-4a7e-8eb3-29d984043d8d_buggy.java
++++ b/tmp/984103c6-6de5-450d-b44f-8d4e161c782c_fixed.java
+@@ -1,10 +1,19 @@
+     /**
+      * Fits a Gaussian function to the observed points.
+      *
+      * @return the parameters of the Gaussian function that best fits the
+      * observed points (in the same order as above).
+      */
+     public double[] fit() {
+         final double[] guess = (new ParameterGuesser(getObservations())).guess();
++        try {
+             return fit(new Gaussian.Parametric(), guess);
++        } catch (ConvergenceException ce) {
++            // FIXME: catch-block must be removed from JavaDoc for patched version, use
++            // fit(getObservations(), guess) for compatibility with the legacy optimizer.
++            final double[] p = getCovarianceMatrix().getColumnVector(0).toArray();
++            return fit(new Gaussian.Parametric(),
++                       new double[] { p[0], p[1], p[2], p[2] * Math.sqrt(TWO_PI),
++                             p[4], p[3] });
++        }
+     }

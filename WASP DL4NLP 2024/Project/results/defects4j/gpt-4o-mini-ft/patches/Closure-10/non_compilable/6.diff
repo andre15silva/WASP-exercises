@@ -1,0 +1,19 @@
+diff --git a/tmp/13363677-0a63-4223-8c09-730d076b0687_buggy.java b/tmp/d2c38d32-0f1f-457e-bd57-d1facfed90d5_fixed.java
+index 6fecc90..0e6f759 100644
+--- a/tmp/13363677-0a63-4223-8c09-730d076b0687_buggy.java
++++ b/tmp/d2c38d32-0f1f-457e-bd57-d1facfed90d5_fixed.java
+@@ -1,7 +1,13 @@
+   static boolean mayBeString(Node n, boolean recurse) {
+     if (recurse) {
+       return allResultsMatch(n, MAY_BE_STRING_PREDICATE);
+     } else {
+-      return mayBeStringHelper(n);
++      // It seems that there's a regression in Rhino 1.7R2 where if we fail
++      // this test, we can erroneously believe that we see a primitive
++      // reference that may be a string. However, it may have been a 4 argument
++      // call to the same function that may fail.
++      return mayBeStringHelper(n) || n.getFirstChild().matches(TS_FUNC_DEF)
++          || n.getParent() != null
++          && mayBeString(n.getParent(), true);
+     }
+   }

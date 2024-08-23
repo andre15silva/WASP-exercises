@@ -1,0 +1,22 @@
+diff --git a/tmp/3a9bd86f-44b5-4313-a160-2f8960a37c7e_buggy.java b/tmp/73ea35ae-27f1-437b-b27f-06a4efad86aa_fixed.java
+index c6cb157..27d881d 100644
+--- a/tmp/3a9bd86f-44b5-4313-a160-2f8960a37c7e_buggy.java
++++ b/tmp/73ea35ae-27f1-437b-b27f-06a4efad86aa_fixed.java
+@@ -1,14 +1,15 @@
+     /**
+      * Method called to expand size of the current segment, to
+      * accommodate for more contiguous content. Usually only
+      * used when parsing tokens like names if even then.
+      */
+     public char[] expandCurrentSegment()
+     {
+         final char[] curr = _currentSegment;
+         // Let's grow by 50% by default
+         final int len = curr.length;
+-        // but above intended maximum, slow to increase by 25%
+-        int newLen = (len == MAX_SEGMENT_LEN) ? (MAX_SEGMENT_LEN+1) : Math.min(MAX_SEGMENT_LEN, len + (len >> 1));
++        int newLen = Math.min(MAX_SEGMENT_LEN, len + (len >> 1));
++        // but above intended maximum, slow to increase by 50%
++        newLen = (newLen == MAX_SEGMENT_LEN ? (MAX_SEGMENT_LEN+1) : Math.min(MAX_SEGMENT_LEN, newLen + (newLen >> 1)));
+         return (_currentSegment = Arrays.copyOf(curr, newLen));
+     }

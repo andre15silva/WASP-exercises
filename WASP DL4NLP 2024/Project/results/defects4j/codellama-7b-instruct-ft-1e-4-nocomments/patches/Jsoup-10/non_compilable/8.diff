@@ -1,0 +1,82 @@
+diff --git a/tmp/18692923-46c4-43ad-bad0-d143dcbd49ba_buggy.java b/tmp/abe75c90-14ec-4fb0-a6fe-bc9904d8b24f_fixed.java
+index b4e6f03..70905b9 100644
+--- a/tmp/18692923-46c4-43ad-bad0-d143dcbd49ba_buggy.java
++++ b/tmp/abe75c90-14ec-4fb0-a6fe-bc9904d8b24f_fixed.java
+@@ -1,44 +1,70 @@
+     /**
+      * Get an absolute URL from a URL attribute that may be relative (i.e. an <code>&lt;a href></code> or
+      * <code>&lt;img src></code>).
+      * <p/>
+      * E.g.: <code>String absUrl = linkEl.absUrl("href");</code>
+      * <p/>
+      * If the attribute value is already absolute (i.e. it starts with a protocol, like
+      * <code>http://</code> or <code>https://</code> etc), and it successfully parses as a URL, the attribute is
+      * returned directly. Otherwise, it is treated as a URL relative to the element's {@link #baseUri}, and made
+      * absolute using that.
+      * <p/>
+      * As an alternate, you can use the {@link #attr} method with the <code>abs:</code> prefix, e.g.:
+      * <code>String absUrl = linkEl.attr("abs:href");</code>
+      *
+      * @param attributeKey The attribute key
+      * @return An absolute URL if one could be made, or an empty string (not null) if the attribute was missing or
+      * could not be made successfully into a URL.
+      * @see #attr
+      * @see java.net.URL#URL(java.net.URL, String)
+      */
+     public String absUrl(String attributeKey) {
+         Validate.notEmpty(attributeKey);
+-
+         String relUrl = attr(attributeKey);
+         if (!hasAttr(attributeKey)) {
+-            return ""; // nothing to make absolute with
++            return ""; 
+         } else {
+             URL base;
+             try {
+                 try {
+                     base = new URL(baseUri);
+                 } catch (MalformedURLException e) {
+-                    // the base is unsuitable, but the attribute may be abs on its own, so try that
+                     URL abs = new URL(relUrl);
+                     return abs.toExternalForm();
+                 }
+-                // workaround: java resolves '//path/file + ?foo' to '//path/?foo', not '//path/file?foo' as desired
+-                URL abs = new URL(base, relUrl);
+-                return abs.toExternalForm();
++                if (baseUri.endsWith("?")) {
++                    base = new URL(baseUri + "&");
++                }
++                String filePart = new File(base.getFile()).getName();
++                String uri = base.toExternalForm();
++                boolean endsWithSlash = uri.endsWith("/");
++                if (filePart.equals("")) {
++                    if (endsWithSlash) {
++                        uri += "/";
++                    }
++                } else if (uri.endsWith(filePart)) {
++                    int slashesAtEnd = 0;
++                    for (int t = uri.length() - 1; t > uri.lastIndexOf(filePart); t--) {
++                        if (uri.charAt(t) == '/') {
++                            slashesAtEnd++;
++                        }
++                    }
++                    while (slashesAtEnd-- != 0) {
++                        uri = uri.substring(0, uri.length() - 1);
++                    }
++                }
++                if (!endsWithSlash) {
++                    uri += "/";
++                }
++                int q = relUrl.indexOf('?');
++                if (q > 0) {
++                    uri += relUrl.substring(0, q);
++                    uri += "?";
++                }
++                uri += relUrl.substring(q + 1);
++                return uri;
+             } catch (MalformedURLException e) {
+                 return "";
+             }
+         }
+     }
+\ No newline at end of file

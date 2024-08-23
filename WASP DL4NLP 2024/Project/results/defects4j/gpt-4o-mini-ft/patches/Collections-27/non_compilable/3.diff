@@ -1,0 +1,14 @@
+diff --git a/tmp/f7862917-bb04-4d8e-a52e-8ff1adce349b_buggy.java b/tmp/3d9b8342-46bd-4e73-9a98-e3e1978a3ba2_fixed.java
+index e69de29..4443c76 100644
+--- a/tmp/f7862917-bb04-4d8e-a52e-8ff1adce349b_buggy.java
++++ b/tmp/3d9b8342-46bd-4e73-9a98-e3e1978a3ba2_fixed.java
+@@ -0,0 +1,8 @@
++public MultiValueMap classToMap(Class mapClass) {
++    Descriptor descriptor = Descriptors.getDescriptor(mapClass);
++    MultiValueMap mvmap = new MultiValueMap();
++    for (Entry field : descriptor.getFields()) {
++        mvmap.add(field.getName(), field.getType());
++    }
++    return mvmap;
++}
+\ No newline at end of file

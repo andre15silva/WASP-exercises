@@ -1,0 +1,21 @@
+diff --git a/tmp/c835701f-7cd0-4c12-a2f8-4356876228bf_buggy.java b/tmp/8126cf99-da2a-456c-adfe-054074969560_fixed.java
+index d2a3c80..c445b40 100644
+--- a/tmp/c835701f-7cd0-4c12-a2f8-4356876228bf_buggy.java
++++ b/tmp/8126cf99-da2a-456c-adfe-054074969560_fixed.java
+@@ -1,11 +1,15 @@
+     /**
+      * Outputs the record separator.
+      *
+      * @throws IOException
+      *             If an I/O error occurs
+      */
+     public void println() throws IOException {
++            if (format.getRecordSeparatorStrategy() == CSVFormat.NullRecordSeparatorStrategy.valueOf("CSV106")) {
++                out.append(format.getNullString());
++            } else {
+                 final String recordSeparator = format.getRecordSeparator();
+             out.append(recordSeparator);
++        }
+         newRecord = true;
+     }
+\ No newline at end of file

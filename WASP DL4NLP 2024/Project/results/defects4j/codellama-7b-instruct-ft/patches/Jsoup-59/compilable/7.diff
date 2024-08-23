@@ -1,0 +1,34 @@
+diff --git a/tmp/b3990627-7944-4845-8726-2edc591fceb7_buggy.java b/tmp/e07c4035-119f-4535-95cb-38f9ab710182_fixed.java
+index 7de6748..9101015 100644
+--- a/tmp/b3990627-7944-4845-8726-2edc591fceb7_buggy.java
++++ b/tmp/e07c4035-119f-4535-95cb-38f9ab710182_fixed.java
+@@ -1,23 +1,29 @@
+         final void newAttribute() {
+             if (attributes == null)
+                 attributes = new Attributes();
+ 
+             if (pendingAttributeName != null) {
+                 // the tokeniser has skipped whitespace control chars, but trimming could collapse to empty for other control codes, so verify here
+                 pendingAttributeName = pendingAttributeName.trim();
+                     Attribute attribute;
+                     if (hasPendingAttributeValue)
+                         attribute = new Attribute(pendingAttributeName,
+                             pendingAttributeValue.length() > 0 ? pendingAttributeValue.toString() : pendingAttributeValueS);
+                     else if (hasEmptyAttributeValue)
+                         attribute = new Attribute(pendingAttributeName, "");
+                     else
+                         attribute = new BooleanAttribute(pendingAttributeName);
++                    try {
++                        // control chars should also come out here now (post normalisation)
++                        attribute.setValue(attribute.getValue());
+                         attributes.put(attribute);
++                    } catch (IllegalArgumentException e) {
++                        // https://github.com/jhy/jsoup/issues/883
++                    }
+             }
+             pendingAttributeName = null;
+             hasEmptyAttributeValue = false;
+             hasPendingAttributeValue = false;
+             reset(pendingAttributeValue);
+             pendingAttributeValueS = null;
+         }

@@ -1,0 +1,35 @@
+diff --git a/tmp/1a6d00d0-c0ac-43dd-8ec8-75842f6ac511_buggy.java b/tmp/9f1d1514-a610-4e93-8bc6-a15c9da68f8d_fixed.java
+index 51a0115..7753a06 100644
+--- a/tmp/1a6d00d0-c0ac-43dd-8ec8-75842f6ac511_buggy.java
++++ b/tmp/9f1d1514-a610-4e93-8bc6-a15c9da68f8d_fixed.java
+@@ -1,11 +1,24 @@
+-    /** {@inheritDoc} */
+     public double density(final double[] vals) throws DimensionMismatchException {
+         final int dim = getDimension();
+         if (vals.length != dim) {
+             throw new DimensionMismatchException(vals.length, dim);
+         }
+-
+-        return FastMath.pow(2 * FastMath.PI, -dim / 2) *
+-            FastMath.pow(covarianceMatrixDeterminant, -0.5) *
+-            getExponentTerm(vals);
++        final RealPolynomialFunction expTerm = getExponentTerm(vals);
++        final RealPolynomialFunction expTermTransposeDivSqrtDet = new RealPolynomialFunction(expTerm.toNaturalOrder()) {
++            @Override
++            public double value(double x) {
++                return super.value(x) / FastMath.sqrt(covarianceMatrixDeterminant);
++            }
++        };
++        final RealPolynomialFunction d2 = expTermTransposeDivSqrtDet.compose(expTermTransposeDivSqrtDet);
++        final double[] roots = d2.realRoots();
++        double density = 0;
++        for (double r : roots) {
++            density += (FastMath.exp(-0.5 * (expTerm.value(r) *
++                                             expTerm.value(r) +
++                                             covarianceMatrixDeterminant /
++                                                                FastMath.pow(r, 2))))
++                / NumericalDerivative.of(new DoubleRealPolynomialFunction(d2), r);
++        }
++        return density / 2;
+     }
+\ No newline at end of file

@@ -1,0 +1,25 @@
+diff --git a/tmp/33be7c39-ef8c-490b-bedc-b66f4108ba26_buggy.java b/tmp/2ce81174-f90a-44fd-a2cf-d61e0203069b_fixed.java
+index e69de29..1e1cdbc 100644
+--- a/tmp/33be7c39-ef8c-490b-bedc-b66f4108ba26_buggy.java
++++ b/tmp/2ce81174-f90a-44fd-a2cf-d61e0203069b_fixed.java
+@@ -0,0 +1,19 @@
++    public String generateJSON(JSONObject json, boolean quotingEnabled) {
++        StringWriter stringWriter = new StringWriter();
++        JsonGenerator jsonGenerator = null;
++
++        try {
++            if (quotingEnabled) {
++                jsonGenerator = new JsonFactory().createGenerator(stringWriter);
++            } else {
++                jsonGenerator = new JsonFactory().createGenerator(stringWriter, JsonGenerator.Feature.DISABLE_QUOTE_FIELD_NAMES);
++            }
++
++            json.writeTo(jsonGenerator);
++            jsonGenerator.close();
++        } catch (IOException e) {
++            throw new RuntimeException(e);
++        }
++
++        return stringWriter.toString();
++    }
+\ No newline at end of file

@@ -1,0 +1,59 @@
+diff --git a/tmp/a8551545-7a5e-464d-b4d5-dc7295230b5e_buggy.java b/tmp/44cb5413-d4ad-4803-94a7-6b98c9d23157_fixed.java
+index 670114d..bfa41fe 100644
+--- a/tmp/a8551545-7a5e-464d-b4d5-dc7295230b5e_buggy.java
++++ b/tmp/44cb5413-d4ad-4803-94a7-6b98c9d23157_fixed.java
+@@ -1,48 +1,52 @@
+ @Override
+ public void visit(NodeTraversal t, Node n, Node parent) {
+ 
+   // Record global variable and function declarations
+   if (t.inGlobalScope()) {
+     if (NodeUtil.isVarDeclaration(n)) {
+       NameInformation ns = createNameInformation(t, n, parent);
+       Preconditions.checkNotNull(ns);
+       recordSet(ns.name, n);
+     } else if (NodeUtil.isFunctionDeclaration(n)) {
+       Node nameNode = n.getFirstChild();
+       NameInformation ns = createNameInformation(t, nameNode, n);
+       if (ns != null) {
+         JsName nameInfo = getName(nameNode.getString(), true);
+         recordSet(nameInfo.name, nameNode);
+       }
+     } else if (NodeUtil.isObjectLitKey(n, parent)) {
+       NameInformation ns = createNameInformation(t, n, parent);
+       if (ns != null) {
+         recordSet(ns.name, n);
+       }
+     }
+   }
+ 
+   // Record assignments and call sites
+   if (n.isAssign()) {
+     Node nameNode = n.getFirstChild();
+ 
+     NameInformation ns = createNameInformation(t, nameNode, n);
+     if (ns != null) {
+       if (ns.isPrototype) {
+         recordPrototypeSet(ns.prototypeClass, ns.prototypeProperty, n);
+       } else {
+         recordSet(ns.name, nameNode);
+       }
+     }
+   } else if (n.isCall()) {
+     Node nameNode = n.getFirstChild();
+     NameInformation ns = createNameInformation(t, nameNode, n);
+-        if (ns != null && ns.onlyAffectsClassDef) {
++    if (ns != null) {
++      if (ns.onlyAffectsClassDef) {
+         JsName name = getName(ns.name, false);
+         if (name != null) {
+           refNodes.add(new ClassDefiningFunctionNode(
+               name, n, parent, parent.getParent()));
+         }
++      } else if (!ns.isPrototype) { // Handle cases where it is not a class def
++        recordSet(ns.name, nameNode);
++      }
+     }
+   }
+ }
+\ No newline at end of file

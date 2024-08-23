@@ -1,0 +1,27 @@
+diff --git a/tmp/88776ff6-4738-4b60-af9f-5ec9776c9f62_buggy.java b/tmp/3c5bb799-5d23-4739-8743-5edfef329e9f_fixed.java
+index ee836e4..e0a23db 100644
+--- a/tmp/88776ff6-4738-4b60-af9f-5ec9776c9f62_buggy.java
++++ b/tmp/3c5bb799-5d23-4739-8743-5edfef329e9f_fixed.java
+@@ -1,9 +1,20 @@
+     @Override
+     protected String buildCanonicalName()
+     {
+-        StringBuilder sb = new StringBuilder();
+-        sb.append(_class.getName());
++        final StringBuilder sb = new StringBuilder();
++        sb.append(ReferenceType.class.getName()); // to reduce number of cases to consider
++        sb.append('<');
++        List<JavaType> typeParameters = _referencedType.getTypeParameters();
++        if (!typeParameters.isEmpty()) {
++            sb.append(_referencedType.getRawClass().getName());
+             sb.append('<');
+             sb.append(_referencedType.toCanonical());
++            sb.append('>');
++        } else {
++            sb.append(JavaType.class.getName());
++            sb.append('<');
++            sb.append(StringUtil.replaceChars(_referencedType.toCanonical(), '.', '/'));
++            sb.append('>');
++        }
+         return sb.toString();
+     }

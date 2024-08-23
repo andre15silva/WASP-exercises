@@ -1,0 +1,85 @@
+diff --git a/tmp/93579bcd-72cb-4bb0-84b5-aee4f2ee49e4_buggy.java b/tmp/1dc2fef2-5c02-428b-88a8-3d284f947bf0_fixed.java
+index 2955e62..8fe3fde 100644
+--- a/tmp/93579bcd-72cb-4bb0-84b5-aee4f2ee49e4_buggy.java
++++ b/tmp/1dc2fef2-5c02-428b-88a8-3d284f947bf0_fixed.java
+@@ -1,66 +1,78 @@
+     /**
+      * @return true if the provided reference and declaration can be safely
+      *         inlined according to our criteria
+      */
+     private boolean canInline(
+         Reference declaration,
+         Reference initialization,
+         Reference reference) {
+       if (!isValidDeclaration(declaration)
+           || !isValidInitialization(initialization)
+           || !isValidReference(reference)) {
+         return false;
+       }
+ 
+       // If the value is read more than once, skip it.
+       // VAR declarations and EXPR_RESULT don't need the value, but other
+       // ASSIGN expressions parents do.
+       if (declaration != initialization &&
+           !initialization.getGrandparent().isExprResult()) {
+         return false;
+       }
+ 
+       // Be very conservative and do no cross control structures or
+       // scope boundaries
+       if (declaration.getBasicBlock() != initialization.getBasicBlock()
+           || declaration.getBasicBlock() != reference.getBasicBlock()) {
+         return false;
+       }
+ 
+       // Do not inline into a call node. This would change
+       // the context in which it was being called. For example,
+       //   var a = b.c;
+       //   a();
+       // should not be inlined, because it calls a in the context of b
+       // rather than the context of the window.
+       //   var a = b.c;
+       //   f(a)
+       // is ok.
+       Node value = initialization.getAssignedValue();
+       Preconditions.checkState(value != null);
+       if (value.isGetProp()
+           && reference.getParent().isCall()
+           && reference.getParent().getFirstChild() == reference.getNode()) {
+         return false;
+       }
+ 
+       if (value.isFunction()) {
+         Node callNode = reference.getParent();
+         if (reference.getParent().isCall()) {
++          CompilerOptions options = compiler.getOptions();
+           CodingConvention convention = compiler.getCodingConvention();
+           // Bug 2388531: Don't inline subclass definitions into class defining
+           // calls as this confused class removing logic.
+           SubclassRelationship relationship =
+               convention.getClassesDefinedByCall(callNode);
+           if (relationship != null) {
+             return false;
+           }
+ 
+-          // issue 668: Don't inline singleton getter methods
+-          // calls as this confused class removing logic.
++          // issue 668: Don't inline singleton getter methods.
++          // Singleton getter methods defined using goog.addSingletonGetter may
++          // create their own prototype as a side-effect. Note: Closure does not
++          // use prototype in production for singleton getters, but our
++          // optimization breaks this behavior.
++          if (CompilerOptions.ADVANCED_OPTIMIZATIONS.equals(options.getLanguage(
++              Reference.OTHER))
++              && convention != null) {
++            if (reference.getParent().isName() && value.isFunction() &&
++                convention.hasSingletonGetterMethod()) {
++              return false;
++            }
++          }
+         }
+       }
+ 
+       return canMoveAggressively(value) ||
+           canMoveModerately(initialization, reference);
+     }

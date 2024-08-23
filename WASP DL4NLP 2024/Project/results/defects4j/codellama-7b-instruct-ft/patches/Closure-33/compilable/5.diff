@@ -1,0 +1,45 @@
+diff --git a/tmp/91710868-66c0-4f7a-8e7c-085c192a2979_buggy.java b/tmp/230a9c76-dcda-40d1-826b-3f92d411fadc_fixed.java
+index fb2b020..8bdcfca 100644
+--- a/tmp/91710868-66c0-4f7a-8e7c-085c192a2979_buggy.java
++++ b/tmp/230a9c76-dcda-40d1-826b-3f92d411fadc_fixed.java
+@@ -1,27 +1,40 @@
+   @Override
+   public void matchConstraint(ObjectType constraintObj) {
+     // We only want to match contraints on anonymous types.
+ 
+     // Handle the case where the constraint object is a record type.
+     //
+     // param constraintObj {{prop: (number|undefined)}}
+     // function f(constraintObj) {}
+     // f({});
+     //
+     // We want to modify the object literal to match the constraint, by
+     // taking any each property on the record and trying to match
+     // properties on this object.
+     if (constraintObj.isRecordType()) {
+       for (String prop : constraintObj.getOwnPropertyNames()) {
+         JSType propType = constraintObj.getPropertyType(prop);
+         if (!isPropertyTypeDeclared(prop)) {
+           JSType typeToInfer = propType;
+           if (!hasProperty(prop)) {
++            // We've seen issues 411, 700, 714, 725, and 726, where
++            // properties appear to be unavailable in anonymous records.
++            //
++            // http://code.google.com/p/closure-compiler/issues/detail?id=411
++            // http://code.google.com/p/closure-compiler/issues/detail?id=700
++            // http://code.google.com/p/closure-compiler/issues/detail?id=714
++            // http://code.google.com/p/closure-compiler/issues/detail?id=725
++            // http://code.google.com/p/closure-compiler/issues/detail?id=726
++            //
++            // In order to avoid these problems, we don't warn when
++            // assigning to inferred properties (see issue 726 and
++            // {@code matchInterface}).  Of course, this has drawbacks of
++            // its own.  The best solution is to fix the issue.
+             typeToInfer = getNativeType(JSTypeNative.VOID_TYPE)
+                 .getLeastSupertype(propType);
+           }
+           defineInferredProperty(prop, typeToInfer, null);
+         }
+       }
+     }
+   }

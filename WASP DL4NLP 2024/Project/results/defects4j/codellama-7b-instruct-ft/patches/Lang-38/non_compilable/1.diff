@@ -1,0 +1,26 @@
+diff --git a/tmp/a4985a05-3332-455c-b23c-16d017e54bac_buggy.java b/tmp/f6b77443-9ef5-470a-9622-db0d640c513a_fixed.java
+index c1f30a5..5f6ee51 100644
+--- a/tmp/a4985a05-3332-455c-b23c-16d017e54bac_buggy.java
++++ b/tmp/f6b77443-9ef5-470a-9622-db0d640c513a_fixed.java
+@@ -1,15 +1,21 @@
+     /**
+      * <p>Formats a <code>Calendar</code> object into the
+      * supplied <code>StringBuffer</code>.</p>
+      * 
+      * @param calendar  the calendar to format
+      * @param buf  the buffer to format into
+      * @return the specified string buffer
+      */
+     public StringBuffer format(Calendar calendar, StringBuffer buf) {
+         if (mTimeZoneForced) {
+             calendar = (Calendar) calendar.clone();
+             calendar.setTimeZone(mTimeZone);
+         }
++        // For the GregorianCalendar, yyyy-MM-dd'T'HH:mm:ss.SSS'Z' is the same as yyyy-MM-dd'T'HH:mm:ss.SSSZ 
++        // so it is easier to use the default time zone for formatting the standard format.
++        else {
++            // JDK6 only
++            locale(TimeZone.getDefault());
++        }
+         return applyRules(calendar, buf);
+     }

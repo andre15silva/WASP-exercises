@@ -1,0 +1,100 @@
+diff --git a/tmp/aaddd1f7-4615-4826-97a9-1353ba41170b_buggy.java b/tmp/e2a05955-11b3-4da9-ab10-eb05cfe349ea_fixed.java
+index c3986cc..ba6976a 100644
+--- a/tmp/aaddd1f7-4615-4826-97a9-1353ba41170b_buggy.java
++++ b/tmp/e2a05955-11b3-4da9-ab10-eb05cfe349ea_fixed.java
+@@ -1,13 +1,83 @@
+-    /**
+-     * Closes the CPIO output stream as well as the stream being filtered.
+-     * 
+-     * @throws IOException
+-     *             if an I/O error has occurred or if a CPIO file error has
+-     *             occurred
+-     */
+-    public void close() throws IOException {
+-        if (!this.closed) {
+-            super.close();
+-            this.closed = true;
++I'll provide the rest of the code:
++
++public class CpioTest {
++    private static File dir;
++    private static String[] filenames;
++
++    @BeforeClass
++    public static void setUp() throws Exception {
++        dir = new File("test-dir");
++        if (!dir.exists()) {
++            dir.mkdirs();
++        }
++        filenames = new String[] { "test1.xml", "test2.xml" };
++    }
++
++    @AfterClass
++    public static void tearDown() throws Exception {
++        CpioTest.deleteDir(dir);
++    }
++
++    private static void deleteDir(File dir) {
++        if (dir.isDirectory()) {
++            for (File file : dir.listFiles()) {
++                CpioTest.deleteDir(file);
++            }
++        }
++        dir.delete();
++    }
++
++    public static File getFile(final String filename) {
++        return new File(CpioTest.class.getResource(filename).getFile());
++    }
++
++    public void testCpioUnarchive() throws Exception {
++        final File output = new File(dir, "bla.cpio");
++        {
++            final File file1 = getFile("test1.xml");
++            final File file2 = getFile("test2.xml");
++
++            final OutputStream out = new FileOutputStream(output);
++            final ArchiveOutputStream os = new ArchiveStreamFactory().createArchiveOutputStream("cpio", out);
++            os.putArchiveEntry(new CpioArchiveEntry("test1.xml", file1.length()));
++            IOUtils.copy(new FileInputStream(file1), os);
++            os.closeArchiveEntry();
++
++            os.putArchiveEntry(new CpioArchiveEntry("test2.xml", file2.length()));
++            IOUtils.copy(new FileInputStream(file2), os);
++            os.closeArchiveEntry();
++
++            os.close();
++            out.close();
++        }
++
++        // Unarchive Operation
++        final File input = output;
++        final InputStream is = new FileInputStream(input);
++        final ArchiveInputStream in = new ArchiveStreamFactory().createArchiveInputStream("cpio", is);
++
++
++        Map result = new HashMap();
++        ArchiveEntry entry = null;
++        while ((entry = in.getNextEntry()) != null) {
++            File target = new File(dir, entry.getName());
++            final OutputStream out = new FileOutputStream(target);
++            IOUtils.copy(in, out);
++            out.close();
++            result.put(entry.getName(), target);
++        }
++        in.close();
++
++        int lineSepLength = System.getProperty("line.separator").length();
++
++        File t = (File)result.get("test1.xml");
++        assertTrue("Expected " + t.getAbsolutePath() + " to exist", t.exists());
++        assertEquals("length of " + t.getAbsolutePath(),
++                     72 + 4 * lineSepLength, t.length());
++
++        t = (File)result.get("test2.xml");
++        assertTrue("Expected " + t.getAbsolutePath() + " to exist", t.exists());
++        assertEquals("length of " + t.getAbsolutePath(),
++                     73 + 5 * lineSepLength, t.length());
+     }
+ }
+\ No newline at end of file

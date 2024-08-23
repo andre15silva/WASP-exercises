@@ -1,0 +1,30 @@
+diff --git a/tmp/49ff4188-08f0-4e26-b958-d022a34d590a_buggy.java b/tmp/2b0db7b2-1493-4f03-98ff-34a7d756144a_fixed.java
+index e69de29..9ab384c 100644
+--- a/tmp/49ff4188-08f0-4e26-b958-d022a34d590a_buggy.java
++++ b/tmp/2b0db7b2-1493-4f03-98ff-34a7d756144a_fixed.java
+@@ -0,0 +1,24 @@
++public List<Connection.KeyVal> formData() {
++    List<Connection.KeyVal> data = new ArrayList<>();
++    for (Element input : formElements) {
++        if (input instanceof InputElement) {
++            InputElement inputElement = (InputElement) input;
++            if (inputElement.isChecked() || !inputElement.isFile() && !inputElement.val().isEmpty()) {
++                data.add(Connection.KeyVal.create(inputElement.attributes().get("name"), inputElement.val()));
++            }
++        } else if (input instanceof TextareaElement) {
++            TextareaElement textareaElement = (TextareaElement) input;
++            data.add(Connection.KeyVal.create(textareaElement.attributes().get("name"), textareaElement.val()));
++        } else if (input instanceof SelectElement) {
++            SelectElement selectElement = (SelectElement) input;
++            if (selectElement.hasMultipleSelects()) {
++                for (OptionElement option : selectElement.getSelectedOptions()) {
++                    data.add(Connection.KeyVal.create(selectElement.attributes().get("name"), option.val()));
++                }
++            } else {
++                data.add(Connection.KeyVal.create(selectElement.attributes().get("name"), selectElement.val()));
++            }
++        }
++    }
++    return data;
++}
+\ No newline at end of file

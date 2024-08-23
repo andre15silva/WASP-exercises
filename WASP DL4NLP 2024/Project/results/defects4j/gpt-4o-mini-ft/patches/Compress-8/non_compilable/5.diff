@@ -1,0 +1,67 @@
+diff --git a/tmp/9d78d71d-71bb-47a8-9d13-d829bb8e8fb5_buggy.java b/tmp/fa6683ab-a8cb-4b97-8bb6-03e3d65f086a_fixed.java
+index e087f95..160996d 100644
+--- a/tmp/9d78d71d-71bb-47a8-9d13-d829bb8e8fb5_buggy.java
++++ b/tmp/fa6683ab-a8cb-4b97-8bb6-03e3d65f086a_fixed.java
+@@ -1,53 +1,61 @@
+     /**
+      * Parse an octal string from a buffer.
+      * Leading spaces are ignored.
+      * The buffer must contain a trailing space or NUL,
+      * and may contain an additional trailing space or NUL.
+      *
+      * The input buffer is allowed to contain all NULs,
+      * in which case the method returns 0L
+      * (this allows for missing fields).
+      *
+      * @param buffer The buffer from which to parse.
+      * @param offset The offset into the buffer from which to parse.
+-     * @param length The maximum number of bytes to parse - must be at least 2 bytes.
++     * @param length The maximum number of bytes to parse - and must contain at least 2 bytes
+      * @return The long value of the octal string.
+      * @throws IllegalArgumentException if the trailing space/NUL is missing or if a invalid byte is detected.
+      */
+     public static long parseOctal(final byte[] buffer, final int offset, final int length) {
+         long    result = 0;
+         boolean stillPadding = true;
+         int     end = offset + length;
+         int     start = offset;
+ 
+         for (int i = start; i < end; i++){
+             final byte currentByte = buffer[i];
+             if (currentByte == 0) {
+                 break;
+             }
+ 
+         // Skip leading spaces
+             if (currentByte == (byte) ' ' || currentByte == '0') {
+                 if (stillPadding) {
+                    continue;
+             }
+                 if (currentByte == (byte) ' ') {
+                 break;
+                 }
+             }
+ 
+         // Must have trailing NUL or space
+         // May have additional NUL or space
+ 
+             stillPadding = false;
+             // CheckStyle:MagicNumber OFF
+             if (currentByte < '0' || currentByte > '7'){
+                 throw new IllegalArgumentException(
+                         exceptionMessage(buffer, offset, length, start, currentByte));
+             }
+             result = (result << 3) + (currentByte - '0'); // convert from ASCII
+             // CheckStyle:MagicNumber ON
+         }
+ 
++        if (stillPadding) {
++            // if the last chunk was empty or has been made empty by skipping spaces, we're done
++            return result;
++        }
++        if (start == end) {
++            throw new IllegalArgumentException(
++                    exceptionMessage(buffer, offset, length, start, 0));
++        }
+         return result;
+     }

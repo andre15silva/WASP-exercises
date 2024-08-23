@@ -1,0 +1,32 @@
+diff --git a/tmp/3140da1f-4a42-47b2-8437-352f2f2ae9ea_buggy.java b/tmp/329b42af-a03d-424b-8932-565caae7c1d9_fixed.java
+index b278cd0..6627afd 100644
+--- a/tmp/3140da1f-4a42-47b2-8437-352f2f2ae9ea_buggy.java
++++ b/tmp/329b42af-a03d-424b-8932-565caae7c1d9_fixed.java
+@@ -1,9 +1,26 @@
+     /**
+      * <p>Checks if the locale specified is in the list of available locales.</p>
+      *
+      * @param locale the Locale object to check if it is available
+      * @return true if the locale is a known locale
+      */
+     public static boolean isAvailableLocale(Locale locale) {
++        synchronized (cAvailableLocaleSet) {
++            if (cAvailableLocaleSet == null || cAvailableLocaleSet.size() == 0) {
++                initializeSystemLocaleMap();
++            }
+             return cAvailableLocaleSet.contains(locale);
+         }
++    }
++
++    /**
++     * <p>Initializes the map of available locales.</p>
++     */
++    private static void initializeSystemLocaleMap() {
++        cAvailableLocaleSet = new HashSet<Locale>();
++        Locale[] jdkLocaleArray = Locale.getAvailableLocales();
++        for (Locale jdkLocale : jdkLocaleArray) {
++            Locale locale = new Locale(jdkLocale.getLanguage(), jdkLocale.getCountry());
++            cAvailableLocaleSet.add(locale);
++        }
++    }
+\ No newline at end of file

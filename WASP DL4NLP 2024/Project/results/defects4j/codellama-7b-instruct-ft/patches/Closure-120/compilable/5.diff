@@ -1,0 +1,32 @@
+diff --git a/tmp/ac074a6b-31f8-430c-8150-08b06fb6d1a8_buggy.java b/tmp/3a73f2c8-420a-4de8-b45a-69eaee27aaac_fixed.java
+index 07b0792..830dbe1 100644
+--- a/tmp/ac074a6b-31f8-430c-8150-08b06fb6d1a8_buggy.java
++++ b/tmp/3a73f2c8-420a-4de8-b45a-69eaee27aaac_fixed.java
+@@ -1,22 +1,25 @@
+     /**
+      * @return Whether the variable is only assigned a value once for its
+      *     lifetime.
+      */
+     boolean isAssignedOnceInLifetime() {
+       Reference ref = getOneAndOnlyAssignment();
+       if (ref == null) {
+         return false;
+       }
+ 
+-      // Make sure this assignment is not in a loop.
++      boolean assignedOnce = false;
+       for (BasicBlock block = ref.getBasicBlock();
+            block != null; block = block.getParent()) {
+         if (block.isFunction) {
+           break;
+         } else if (block.isLoop) {
+           return false;
++        } else if (assignedOnce) {
++          // Issue 1053 points out that it's not safe to use a value that was
++          // previously assigned in a loop to determine its type.
++          return true;
+         }
+       }
+-
+       return true;
+     }

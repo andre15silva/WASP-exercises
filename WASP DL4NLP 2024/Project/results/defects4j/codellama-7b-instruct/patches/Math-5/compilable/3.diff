@@ -1,0 +1,38 @@
+diff --git a/tmp/1a58440a-d996-4fed-8c02-d0c63c6fb0a1_buggy.java b/tmp/68da109c-9e42-4461-935a-eb93808c3de3_fixed.java
+index e23e29c..b510d39 100644
+--- a/tmp/1a58440a-d996-4fed-8c02-d0c63c6fb0a1_buggy.java
++++ b/tmp/68da109c-9e42-4461-935a-eb93808c3de3_fixed.java
+@@ -1,24 +1,22 @@
+ /** {@inheritDoc} */
+ public Complex reciprocal() {
+     if (isNaN) {
+         return NaN;
+     }
+ 
+-        if (real == 0.0 && imaginary == 0.0) {
++    if (real == 0.0) {
++        if (imaginary != 0.0) {
++            return createComplex(0.0, 1.0 / imaginary);
++        } else {
+             return NaN;
+         }
+-
+-        if (isInfinite) {
+-            return ZERO;
+-        }
+-
+-        if (FastMath.abs(real) < FastMath.abs(imaginary)) {
+-            double q = real / imaginary;
+-            double scale = 1. / (real * q + imaginary);
+-            return createComplex(scale * q, -scale);
++    } else {
++        if (imaginary == 0.0) {
++            return createComplex(1.0 / real, 0.0);
+         } else {
+             double q = imaginary / real;
+             double scale = 1. / (imaginary * q + real);
+             return createComplex(scale, -scale * q);
+         }
+     }
++}
+\ No newline at end of file

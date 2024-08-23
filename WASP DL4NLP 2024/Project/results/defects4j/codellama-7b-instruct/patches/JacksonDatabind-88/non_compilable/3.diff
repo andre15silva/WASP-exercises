@@ -1,0 +1,73 @@
+diff --git a/tmp/3636d8ae-9602-4d6f-a9a3-22ee337f65c5_buggy.java b/tmp/f1720a17-0f80-4e4e-b904-383c1e8c5e03_fixed.java
+index ae1f3a6..46a70fc 100644
+--- a/tmp/3636d8ae-9602-4d6f-a9a3-22ee337f65c5_buggy.java
++++ b/tmp/f1720a17-0f80-4e4e-b904-383c1e8c5e03_fixed.java
+@@ -1,34 +1,47 @@
+ protected JavaType _typeFromId(String id, DatabindContext ctxt) throws IOException
+ {
+-        /* 30-Jan-2010, tatu: Most ids are basic class names; so let's first
+-         *    check if any generics info is added; and only then ask factory
+-         *    to do translation when necessary
+-         */
++    // 17-Aug-2017, tatu: As per [databind#1735] now need to ensure assignment
++    //    compatibility, and to ensure backwards compatibility, we can't
++    //    just call `constructFromCanonical` for all cases (although if we
++    //    have type info in string like `java.util.Map<java.lang.String,java.lang.String>`
++    //    we could actually construct the subtype, if possible)
+     TypeFactory tf = ctxt.getTypeFactory();
+     if (id.indexOf('<') > 0) {
+-            // note: may want to try combining with specialization (esp for EnumMap)?
+-            // 17-Aug-2017, tatu: As per [databind#1735] need to ensure assignment
+-            //    compatibility -- needed later anyway, and not doing so may open
+-            //    security issues.
+         JavaType t = tf.constructFromCanonical(id);
+-                // Probably cleaner to have a method in `TypeFactory` but can't add in patch
+-            return t;
++        JavaType t2 = tf.checkAndReturnGenericsBound(t);
++        // ... if ok, return, otherwise throw IllegalArgumentException
++        if (t2 != null) {
++            return t2;
++        }
++        StringBuilder sb = new StringBuilder();
++        sb.append("Invalid type id '").append(id).append("' (for id type '");
++        sb.append(getClass().getSimpleName()).append("'); ");
++        // see [databind#219] for why this is here
++        if (id.charAt(0) == '[') {
++            sb.append("(note: 'character' '[' is not valid in type Id values)");
++        }
++        sb.append(": ");
++        sb.append("problems with [");
++        sb.append("'").append(t.getId()).append("': ");
++        sb.append(t.getGenericSignature()).append("]");
++        throw new IllegalArgumentException(sb.toString());
+     }
+     Class<?> cls;
+     try {
+         cls =  tf.findClass(id);
+     } catch (ClassNotFoundException e) {
+-            // 24-May-2016, tatu: Ok, this is pretty ugly, but we should always get
+-            //   DeserializationContext, just playing it safe
+-            if (ctxt instanceof DeserializationContext) {
+-                DeserializationContext dctxt = (DeserializationContext) ctxt;
+         // First: we may have problem handlers that can deal with it?
+-                return dctxt.handleUnknownTypeId(_baseType, id, this, "no such class found");
++        return ctxt.handleMissingClass(id, this);
+     }
+-            // ... meaning that we really should never get here.
+-            return null;
+-        } catch (Exception e) {
+-            throw new IllegalArgumentException("Invalid type id '"+id+"' (for id type 'Id.class'): "+e.getMessage(), e);
++    JavaType t = tf.constructSpecializedType(_baseType, cls);
++    JavaType t2 = tf.checkAndReturnGenericsBound(t);
++    // ... if ok, return, otherwise throw IllegalArgumentException
++    if (t2 != null) {
++        return t2;
+     }
+-        return tf.constructSpecializedType(_baseType, cls);
++    StringBuilder sb = new StringBuilder();
++    sb.append("Invalid type id '").append(id).append("' (for id type '");
++    sb.append(getClass().getSimpleName()).append("'); ");
++    sb.append("no such class found");
++    throw new IllegalArgumentException(sb.toString());
+ }
+\ No newline at end of file

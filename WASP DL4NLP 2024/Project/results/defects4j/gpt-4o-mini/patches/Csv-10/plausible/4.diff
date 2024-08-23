@@ -1,0 +1,42 @@
+diff --git a/tmp/e2c6d45d-d812-4550-950d-e48defe63dc7_buggy.java b/tmp/fd66ddad-4a2e-4f29-9100-03982775e645_fixed.java
+index 97f28e5..26b295a 100644
+--- a/tmp/e2c6d45d-d812-4550-950d-e48defe63dc7_buggy.java
++++ b/tmp/fd66ddad-4a2e-4f29-9100-03982775e645_fixed.java
+@@ -1,26 +1,18 @@
+-    /**
+-     * Creates a printer that will print values to the given stream following the CSVFormat.
+-     * <p>
+-     * Currently, only a pure encapsulation format or a pure escaping format is supported. Hybrid formats (encapsulation
+-     * and escaping with a different character) are not supported.
+-     * </p>
+-     * 
+-     * @param out
+-     *        stream to which to print. Must not be null.
+-     * @param format
+-     *        the CSV format. Must not be null.
+-     * @throws IOException
+-     *         thrown if the optional header cannot be printed.
+-     * @throws IllegalArgumentException
+-     *         thrown if the parameters of the format are inconsistent or if either out or format are null.
+-     */
+ public CSVPrinter(final Appendable out, final CSVFormat format) throws IOException {
+     Assertions.notNull(out, "out");
+     Assertions.notNull(format, "format");
+ 
+     this.out = out;
+     this.format = format;
+     this.format.validate();
+-        // TODO: Is it a good idea to do this here instead of on the first call to a print method?
+-        // It seems a pain to have to track whether the header has already been printed or not.
++
++    // Print the header if it is defined in the format
++    if (format.getHeader() != null) {
++        printHeader();
++    }
++}
++
++private void printHeader() throws IOException {
++    String header = String.join(String.valueOf(format.getDelimiter()), format.getHeader());
++    out.append(header).append(format.getRecordSeparator());
+ }
+\ No newline at end of file

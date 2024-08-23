@@ -1,0 +1,41 @@
+diff --git a/tmp/bb96672c-c31f-4b54-b9fa-5b084ff40892_buggy.java b/tmp/4a7bf740-caee-446e-8460-fbbc12bc5fc6_fixed.java
+index b56897c..ded16b4 100644
+--- a/tmp/bb96672c-c31f-4b54-b9fa-5b084ff40892_buggy.java
++++ b/tmp/4a7bf740-caee-446e-8460-fbbc12bc5fc6_fixed.java
+@@ -1,27 +1,36 @@
+       @Override
+       public boolean apply(Node n) {
+         // When the node is null it means, we reached the implicit return
+         // where the function returns (possibly without an return statement)
+         if (n == null) {
+           return false;
+         }
+ 
+         // TODO(user): We only care about calls to functions that
+         // passes one of the dependent variable to a non-side-effect free
+         // function.
+         if (n.isCall() && NodeUtil.functionCallHasSideEffects(n)) {
+           return true;
+         }
+ 
+         if (n.isNew() && NodeUtil.constructorCallHasSideEffects(n)) {
+           return true;
+         }
+ 
+ 
+         for (Node c = n.getFirstChild(); c != null; c = c.getNext()) {
+           if (!ControlFlowGraph.isEnteringNewCfgNode(c) && apply(c)) {
++            // We don't inline simple FOR IN expressions. Examples include
++            // a = x in a ? 2 : 3; or a = x in b ? 2 : 3;
++            //
++            // Note, that we don't even inline simple FOR IN statements. Examples
++            // include var a,b,x = a in b; print(2); x, or var a,b,x =
++            // a in b; delete a[b]; x.
++            if (n.isForIn()) {
++              return false;
++            }
+             return true;
+           }
+         }
+         return false;
+       }

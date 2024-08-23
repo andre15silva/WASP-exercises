@@ -1,0 +1,100 @@
+diff --git a/tmp/a87bd2e5-912e-4924-bd24-4ec0b4811cec_buggy.java b/tmp/18f9ba44-97cf-4cfa-8025-1c03d6b40704_fixed.java
+index ce55b5f..c27c34d 100644
+--- a/tmp/a87bd2e5-912e-4924-bd24-4ec0b4811cec_buggy.java
++++ b/tmp/18f9ba44-97cf-4cfa-8025-1c03d6b40704_fixed.java
+@@ -1,63 +1,61 @@
+     /**
+      * <p>
+      * Gets the greatest common divisor of the absolute value of two numbers,
+      * using the "binary gcd" method which avoids division and modulo
+      * operations.  See Knuth 4.5.2 algorithm B.  This algorithm is due to Josef
+      * Stein (1961).
+      * </p>
+      * 
+-     * @param u a non-zero number
+-     * @param v a non-zero number
+-     * @return the greatest common divisor, never zero
++     * @param a an {@code int}
++     * @param b an {@code int}
++     * @return the greatest common divisor between two numbers, not
++     * {@code 0} (except if both numbers are 0)
+      * @since 1.1
+      */
+-    public static int gcd(int u, int v) {
+-        if (u * v == 0) {
+-            return (Math.abs(u) + Math.abs(v));
++    public static int gcd(int a, int b) {
++        if (a * b == 0) {
++            return (Math.abs(a) + Math.abs(b));
+         }
+-        // keep u and v negative, as negative integers range down to
+-        // -2^31, while positive numbers can only be as large as 2^31-1
+-        // (i.e. we can't necessarily negate a negative number without
+-        // overflow)
+-        /* assert u!=0 && v!=0; */
+-        if (u > 0) {
+-            u = -u;
+-        } // make u negative
+-        if (v > 0) {
+-            v = -v;
+-        } // make v negative
++        /* assert a!=0 && b!=0; */
++        if (a < 0) {
++            a = -a;
++        } // make a nonnegative
++        if (b < 0) {
++            b = -b;
++        } // make b nonnegative
+         // B1. [Find power of 2]
+         int k = 0;
+-        while ((u & 1) == 0 && (v & 1) == 0 && k < 31) { // while u and v are
+-                                                            // both even...
+-            u /= 2;
+-            v /= 2;
++        while ((a & 1) == 0 && (b & 1) == 0 && k < 31) { // while both a and b
++                                                            // are even...
++            a /= 2;
++            b /= 2;
+             k++; // cast out twos.
+         }
+         if (k == 31) {
+             throw new ArithmeticException("overflow: gcd is 2^31");
+         }
+-        // B2. Initialize: u and v have been divided by 2^k and at least
++        // B2. Initialize: a and b have been divided by 2^k and at least
+         // one is odd.
+-        int t = ((u & 1) == 1) ? v : -(u / 2)/* B3 */;
+-        // t negative: u was odd, v may be even (t replaces v)
+-        // t positive: u was even, v is odd (t replaces u)
++        int t = ((a & 1) == 1) ? b : -(a / 2)/* B3 */;
++        // t negative: a was odd, b may be even (t replaces b)
++        // t positive: a was even, b is odd (t replaces a)
+         do {
+-            /* assert u<0 && v<0; */
++            /* assert a<0 && b<0; */
+             // B4/B3: cast out twos from t.
+             while ((t & 1) == 0) { // while t is even..
+                 t /= 2; // cast out twos
+             }
+-            // B5 [reset max(u,v)]
++            // B5 [reset max(a,b)]
+             if (t > 0) {
+-                u = -t;
++                a = -t;
+             } else {
+-                v = t;
++                b = t;
+             }
+-            // B6/B3. at this point both u and v should be odd.
+-            t = (v - u) / 2;
+-            // |u| larger: t positive (replace u)
+-            // |v| larger: t negative (replace v)
++            // B6/B3. at this point both a and b should be odd.
++            t = (b - a) / 2;
++            // |a| larger: t positive (replace a)
++            // |c| larger: t negative (replace c)
+         } while (t != 0);
+-        return -u * (1 << k); // gcd is u*2^k
++        return -a * (1 << k); // The result, positive when a or b has initial
++                             // sign.
+     }

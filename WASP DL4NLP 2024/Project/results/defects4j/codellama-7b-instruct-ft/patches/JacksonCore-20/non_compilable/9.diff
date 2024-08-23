@@ -1,0 +1,25 @@
+diff --git a/tmp/951a6500-86ed-4213-a87f-a8948e80df26_buggy.java b/tmp/b1a4d8b1-6712-4965-8132-ec52f8259566_fixed.java
+index a6f008f..8e05a3d 100644
+--- a/tmp/951a6500-86ed-4213-a87f-a8948e80df26_buggy.java
++++ b/tmp/b1a4d8b1-6712-4965-8132-ec52f8259566_fixed.java
+@@ -1,11 +1,20 @@
+     /**
+      * Method that can be called on backends that support passing opaque datatypes of
+      * non-JSON formats
+      *
+      * @since 2.8
+      */
+     public void writeEmbeddedObject(Object object) throws IOException {
+         // 01-Sep-2016, tatu: As per [core#318], handle small number of cases
++        // ... for now, one, as long as it's in the right format...
++        if (object == WIKIPEDIA_BASE64_AS_BYTES) {
++            // but let's output encoded form to match what's generated in core
++            // modules, that is, to avoid needing to support "base64" module
++            getContextualProvider().getContextualValue(
++                    JsonGenerator.Feature.WRITE_BINARY_AS_BASE64, false);
++            writeString(quote(WIKIPEDIA_BASE64_ENCODED));
++            return;
++        }
+         throw new JsonGenerationException("No native support for writing embedded objects",
+                 this);
+     }

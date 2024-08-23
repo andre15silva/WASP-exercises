@@ -1,0 +1,48 @@
+diff --git a/tmp/1677812b-e204-4ed3-8be4-dffc425173a4_buggy.java b/tmp/24931364-ae5a-4d15-8706-73890a16ca17_fixed.java
+index 072c672..ac44cad 100644
+--- a/tmp/1677812b-e204-4ed3-8be4-dffc425173a4_buggy.java
++++ b/tmp/24931364-ae5a-4d15-8706-73890a16ca17_fixed.java
+@@ -1,20 +1,43 @@
+       @Override
+       public int parseArguments(Parameters params) throws CmdLineException {
+         String param = params.getParameter(0);
+ 
+         if (param == null) {
+           setter.addValue(true);
+           return 0;
+         } else {
++          if (param.equals("--version")) {
++            err.println(
++                "Closure Compiler (http://code.google.com/closure/compiler)" +
++                "\n" +
++                "Version: " +
++                closure.version +
++                "\n" +
++                "Build timestamp: " +
++                closure.timestamp +
++                "\n" +
++                "Build time: " +
++                closure.time +
++                "\n" +
++                "Build by: " +
++                closure.user +
++                "\n" +
++                "Build server: " +
++                closure.server +
++                "\n" +
++                "Hashed version: " +
++                closure.hash);
++            return 1;
++          }
+           String lowerParam = param.toLowerCase();
+           if (TRUES.contains(lowerParam)) {
+             setter.addValue(true);
+           } else if (FALSES.contains(lowerParam)) {
+             setter.addValue(false);
+           } else {
+             setter.addValue(true);
+             return 0;
+           }
+           return 1;
+         }
+       }

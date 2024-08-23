@@ -1,0 +1,48 @@
+diff --git a/tmp/ba1f478e-d421-4f5a-b131-9141e852fdea_buggy.java b/tmp/39779a74-74bc-45f3-a78d-acef8c1d512f_fixed.java
+index 5f96616..09a13a3 100644
+--- a/tmp/ba1f478e-d421-4f5a-b131-9141e852fdea_buggy.java
++++ b/tmp/39779a74-74bc-45f3-a78d-acef8c1d512f_fixed.java
+@@ -1,20 +1,42 @@
+   @Override
+   public void matchConstraint(JSType constraint) {
+     // We only want to match constraints on anonymous types.
+     if (hasReferenceName()) {
+       return;
+     }
+ 
+     // Handle the case where the constraint object is a record type.
+     //
+     // param constraint {{prop: (number|undefined)}}
+     // function f(constraint) {}
+     // f({});
+     //
+     // We want to modify the object literal to match the constraint, by
+     // taking any each property on the record and trying to match
+     // properties on this object.
+     if (constraint.isRecordType()) {
+       matchRecordTypeConstraint(constraint.toObjectType());
+     }
++
++    // We also want to make sure that the object literal has no
++    // required properties that are not satisfied by the constraint.
++    // For example, if we have a constraint of {a: (number|undefined)},
++    // we do not want an object literal of {a: (boolean|undefined)} to
++    // match.
++    //
++    // Note that this is different from the logic for object literals,
++    // which we match if the property has a value of the correct type,
++    // or is not required. Here, we require the property to be defined
++    // and have a value of the correct type.
++    for (Map.Entry<String, JSType> entry : constraint.getPropertyMap().entrySet()) {
++      String propName = entry.getKey();
++      JSType propType = entry.getValue();
++      if (!this.hasProperty(propName)) {
++        return;
++      }
++      JSType actualPropType = this.getPropertyType(propName);
++      if (!actualPropType.canBeAssignedTo(propType)) {
++        return;
++      }
++    }
+   }
+\ No newline at end of file

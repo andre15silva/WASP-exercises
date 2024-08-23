@@ -1,0 +1,127 @@
+diff --git a/tmp/cadb043b-92f3-4d01-b848-1f3d1f12852e_buggy.java b/tmp/aebffadb-66c1-4a36-a3cb-39e25321503c_fixed.java
+index d907b39..c425766 100644
+--- a/tmp/cadb043b-92f3-4d01-b848-1f3d1f12852e_buggy.java
++++ b/tmp/aebffadb-66c1-4a36-a3cb-39e25321503c_fixed.java
+@@ -1,56 +1,121 @@
+     public int read(byte[] buffer, int start, int length) throws IOException {
+         if (closed) {
+             throw new IOException("The stream is closed");
+         }
+         if (inf.finished() || current == null) {
+             return -1;
+         }
+ 
+         // avoid int overflow, check null buffer
+         if (start <= buffer.length && length >= 0 && start >= 0
+             && buffer.length - start >= length) {
+             if (current.getMethod() == ZipArchiveOutputStream.STORED) {
+                 int csize = (int) current.getSize();
+                 if (readBytesOfEntry >= csize) {
+                     return -1;
+                 }
+                 if (offsetInBuffer >= lengthOfLastRead) {
+                     offsetInBuffer = 0;
+                     if ((lengthOfLastRead = in.read(buf)) == -1) {
+                         return -1;
+                     }
+                     count(lengthOfLastRead);
+                     bytesReadFromStream += lengthOfLastRead;
+                 }
+                 int toRead = length > lengthOfLastRead
+                     ? lengthOfLastRead - offsetInBuffer
+                     : length;
+                 if ((csize - readBytesOfEntry) < toRead) {
+                     toRead = csize - readBytesOfEntry;
+                 }
+                 System.arraycopy(buf, offsetInBuffer, buffer, start, toRead);
+                 offsetInBuffer += toRead;
+                 readBytesOfEntry += toRead;
+                 crc.update(buffer, start, toRead);
+                 return toRead;
+             }
+             if (inf.needsInput()) {
+                 fill();
+                 if (lengthOfLastRead > 0) {
+                     bytesReadFromStream += lengthOfLastRead;
+                 }
+             }
+             int read = 0;
+             try {
+                 read = inf.inflate(buffer, start, length);
+             } catch (DataFormatException e) {
+                 throw new ZipException(e.getMessage());
+             }
+-            if (read == 0 && inf.finished()) {
++            if (read == 0 && inf.finished() && in.available() < 100) {
++                /* 100 is a magic value which is a guess. This value might
++                 * need to be adjusted.
++                 */
++                // check for multi volumed MIME-Zip file and read data from 
++                // next volume */
++                if (stream instanceof FileInputStream
++                    && current.hasDataDescriptor() == false && 
++                        (current.getCrc() == 0 || // fix for #44491
++                         current.getSize() == 0)) { /* Truncated last entry */
++                    /* this is the last entry in a multi-volume MIME-Zip file,
++                       probably truncated, so we switch streams and try to
++                       recover. */
++                    FileInputStream fin = (FileInputStream) stream;
++                    long pos = fin.getChannel().position();
++                    boolean truncated = false;
++                    ZipArchiveInputStream zi;
++                    List volumes = new ArrayList();
++                    while ((zi=new ZipArchiveInputStream(
++		                       new FileInputStream(fin.getFD().getFile()),
++                               null,true)) != null) {
++                        ArchiveEntry entry = null;
++                        while ((entry = zi.getNextEntry()) != null) {
++                            volumes.add(zi);
++                        }
++                    }
++                    in = (InputStream) volumes.remove(0);
++                    fin = new FileInputStream(new File(new URI(this.url
++			                           .toString())));
++		    stream = fin.getChannel();
++                    in = fin;
++                    if (volumes.size() > 2) { /* skip the first two volumes */
++                        for (int i = 2; i < volumes.size(); i++) {
++                            fin = new FileInputStream(new File(new URI(this.url
++			                                                           .toString()
++				                                                 ++)));
++			    in = fin.getChannel();
++			    volumes.remove(i);
++                        }
++                    } else if (volumes.size() > 0) {
++                        fin = new FileInputStream(new File(new URI(this.url
++				                                                 .toString()
++					                                                 ++)));
++			    in = fin.getChannel();
++			    volumes.remove(0);
++                    }
++                    ((ZipArchiveInputStream) in).close();
++                    ((FileInputStream) in).close();
++                    for (int i = 0; i < volumes.size(); i++) {
++                        volumes.get(i).close();
++                    }
++                    try {
++			current = zf.getEntry(current.getName());
++                    } catch (Throwable ignore) {
++                        // JvB:
++                        return 0;
++                    }
++                    bytesReadFromStream = 0;
++                    offsetInBuffer = 0;
++                    read = inf.getTotalInBuffer();
++                    count(read);
++                    in.mark(2048);
++                    return read;
++                }
++                if (inf.finished()) {
+                     return -1;
+                 }
++            }
+             crc.update(buffer, start, read);
+             return read;
+         }
+         throw new ArrayIndexOutOfBoundsException();
+     }

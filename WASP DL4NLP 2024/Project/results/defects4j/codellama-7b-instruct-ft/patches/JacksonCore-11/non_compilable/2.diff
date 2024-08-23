@@ -1,0 +1,28 @@
+diff --git a/tmp/4162cca0-179b-4de5-86ba-cf15717f9b41_buggy.java b/tmp/44c07aee-ad1a-4bc6-b2d5-72c75513a6a7_fixed.java
+index 29d025a..201f67b 100644
+--- a/tmp/4162cca0-179b-4de5-86ba-cf15717f9b41_buggy.java
++++ b/tmp/44c07aee-ad1a-4bc6-b2d5-72c75513a6a7_fixed.java
+@@ -1,13 +1,23 @@
+     private void _verifySharing()
+     {
+         if (_hashShared) {
+             _hashArea = Arrays.copyOf(_hashArea, _hashArea.length);
+             _names = Arrays.copyOf(_names, _names.length);
+             _hashShared = false;
++            // 22-Sep-2015, tatu: As per [jackson-core#216] we need to ensure that
++            //    the new symbol table has space for twice the number of symbols
++            //    in the parent, plus 25% of new length
++            // Expansion amount must be an exact power of 2, plus 1
++            int newLen = (_hashArea.length - 1) << 1;
++            _hashArea = Arrays.copyOf(_hashArea, newLen);
++            if (newLen > 512) {
++                _names = Arrays.copyOf(_names, newLen >> 1);
++            }
++            _expansionSizeBytes = newLen;
+             // 09-Sep-2015, tatu: As per [jackson-core#216], also need to ensure
+             //    we rehash as needed, as need-rehash flag is not copied from parent
+         }
+         if (_needRehash) {
+             rehash();
+         }
+     }

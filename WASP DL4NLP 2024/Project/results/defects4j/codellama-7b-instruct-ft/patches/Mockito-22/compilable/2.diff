@@ -1,0 +1,27 @@
+diff --git a/tmp/a7ce75e3-02cd-47a9-b172-629a717754f7_buggy.java b/tmp/29253fd5-975a-4690-9dd9-e5f63b833a46_fixed.java
+index 111ba5e..025bfd7 100644
+--- a/tmp/a7ce75e3-02cd-47a9-b172-629a717754f7_buggy.java
++++ b/tmp/29253fd5-975a-4690-9dd9-e5f63b833a46_fixed.java
+@@ -1,9 +1,20 @@
+     public static boolean areEqual(Object o1, Object o2) {
+         if (o1 == null || o2 == null) {
+             return o1 == null && o2 == null;
+-        } else if (isArray(o1)) {
+-            return isArray(o2) && areArraysEqual(o1, o2);
++        } else if (o1 instanceof Object[] && o2 instanceof Object[]) {
++            int length = ((Object[]) o1).length;
++            if (length != ((Object[]) o2).length) {
++                return false;
++            }
++            for (int i = 0; i < length; ++i) {
++                // Use .equals() to allow arrays to override the equals() method as
++                // needed.
++                if (!((Object[]) o1)[i].equals(((Object[]) o2)[i])) {
++                    return false;
++                }
++            }
++            return true;
+         } else {
+             return o1.equals(o2);
+         }
+     }

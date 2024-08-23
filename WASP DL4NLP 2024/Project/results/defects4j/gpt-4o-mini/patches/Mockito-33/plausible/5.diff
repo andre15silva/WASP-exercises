@@ -1,0 +1,35 @@
+diff --git a/tmp/e30b3c9e-45b0-4654-b711-803bde5ae4eb_buggy.java b/tmp/82a3f9bd-4d9f-4566-acd6-5f60890c2d44_fixed.java
+index e1fc51f..26c52b9 100644
+--- a/tmp/e30b3c9e-45b0-4654-b711-803bde5ae4eb_buggy.java
++++ b/tmp/82a3f9bd-4d9f-4566-acd6-5f60890c2d44_fixed.java
+@@ -1,9 +1,25 @@
+ public boolean hasSameMethod(Invocation candidate) {        
+-        //not using method.equals() for 1 good reason:
+-        //sometimes java generates forwarding methods when generics are in play see JavaGenericsForwardingMethodsTest
+     Method m1 = invocation.getMethod();
+     Method m2 = candidate.getMethod();
+     
+-        	/* Avoid unnecessary cloning */
+-        return m1.equals(m2);
++    // Check if both methods have the same name
++    if (!m1.getName().equals(m2.getName())) {
++        return false;
++    }
++    
++    // Check if both methods have the same parameter types
++    Class<?>[] paramTypes1 = m1.getParameterTypes();
++    Class<?>[] paramTypes2 = m2.getParameterTypes();
++    
++    if (paramTypes1.length != paramTypes2.length) {
++        return false;
++    }
++
++    for (int i = 0; i < paramTypes1.length; i++) {
++        if (!paramTypes1[i].equals(paramTypes2[i])) {
++            return false;
++        }
++    }
++    
++    return true; // Methods have the same name and parameter types
+ }
+\ No newline at end of file

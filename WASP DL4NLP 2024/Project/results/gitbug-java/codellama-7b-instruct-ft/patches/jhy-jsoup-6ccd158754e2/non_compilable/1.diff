@@ -1,0 +1,48 @@
+diff --git a/tmp/df28517d-0e2d-4766-8b23-b48623835970_buggy.java b/tmp/54fa8eef-420b-45be-95c5-31cae6b0fd09_fixed.java
+index 23f078d..5e4a858 100644
+--- a/tmp/df28517d-0e2d-4766-8b23-b48623835970_buggy.java
++++ b/tmp/54fa8eef-420b-45be-95c5-31cae6b0fd09_fixed.java
+@@ -1,14 +1,41 @@
+     private static void appendToAscii(String s, boolean spaceAsPlus, StringBuilder sb) throws UnsupportedEncodingException {
+         // minimal normalization of Unicode -> Ascii, and space normal. Existing escapes are left as-is.
+         for (int i = 0; i < s.length(); i++) {
+             int c = s.codePointAt(i);
+             if (c == ' ') {
+                 sb.append(spaceAsPlus ? '+' : "%20");
+             } else if (c > 127) { // out of ascii range
+-                sb.append(URLEncoder.encode(new String(Character.toChars(c)), UTF_8.name()));
+-                // ^^ is a bit heavy-handed - if perf critical, we could optimize
++                // as per https://developers.google.com/webmasters/ajax-crawling/docs/specification,
++                // we must use UTF-8 for the values of all params regardless of their
++                // actual encoding or the encoding their server uses.
++                // and also see http://tools.ietf.org/html/rfc3986
++
++                // first, write the codepoint as if it were unicode
++                String encurl = URLEncoder.encode(new String(Character.toChars(c)), "UTF-8");
++
++                // now, we may have a surrogate pair... e.g. '\uD83D\uDCA9'
++                // but for each url segment, we need:
++                // * each surrogate in its own segment
++                // * each lead surrogate followed by a ?
++                // see https://stackoverflow.com/questions/15903714/utf-8-vs-utf-16-in-java-and-javascript#comment22710143_15950356
++                if (Character.isSurrogate(c)) {
++                    if (Character.isLeadSurrogate(c)) {
++                        sb.append('?');
++                    }
++                } else {
++                    // split the url segments by ?
++                    String[] ar = encurl.split("\\?");
++                    for (String part : ar) {
++                        // split the url by surrogate
++                        String[] a = part.split("\\uD800");
++                        for (String sub : a) {
++                            // normalize the surrogate
++                            sb.append(URLEncoder.encode(sub, UTF_8.name()));
++                        }
++                    }
++                }
+             } else {
+                 sb.append((char) c);
+             }
+         }
+     }

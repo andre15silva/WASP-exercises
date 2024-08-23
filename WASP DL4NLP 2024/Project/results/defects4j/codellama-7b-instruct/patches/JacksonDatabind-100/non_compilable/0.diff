@@ -1,0 +1,46 @@
+diff --git a/tmp/8020d796-d675-4768-9c21-b6a811e8c4a9_buggy.java b/tmp/4c23a773-146d-483a-a5c9-ef1d263bc6c9_fixed.java
+index fc8c302..5e62ad1 100644
+--- a/tmp/8020d796-d675-4768-9c21-b6a811e8c4a9_buggy.java
++++ b/tmp/4c23a773-146d-483a-a5c9-ef1d263bc6c9_fixed.java
+@@ -1,23 +1,28 @@
+ @Override
+-    public byte[] getBinaryValue(Base64Variant b64variant)
+-        throws IOException, JsonParseException
+-    {
+-        // Multiple possibilities...
+-        JsonNode n = currentNode();
+-        if (n != null) {
+-            // [databind#2096]: although `binaryValue()` works for real binary node
+-            // and embedded "POJO" node, coercion from TextNode may require variant, so:
+-            byte[] data = n.binaryValue();
++public byte[] getBinaryValue(Base64Variant variant) throws IOException {
++    final JsonNode n = currentNode();
++    if (n == null) {
++        return null;
++    }
++
++    // First try to decode as binary node
++    byte[] data = n.binaryValue(variant);
+     if (data != null) {
+         return data;
+     }
++
++    // If not, check if it's a POJO and extract byte array from it
+     if (n.isPojo()) {
+-                Object ob = ((POJONode) n).getPojo();
+-                if (ob instanceof byte[]) {
+-                    return (byte[]) ob;
++        try {
++            Object obj = ((POJONode) n).getPojo();
++            if (obj instanceof byte[]) {
++                return (byte[]) obj;
+             }
++        } catch (Exception e) {
++            // failed to extract byte array from POJO, fall through to null below
+         }
+     }
+-        // otherwise return null to mark we have no binary content
++
++    // Finally, return null if all else fails
+     return null;
+ }

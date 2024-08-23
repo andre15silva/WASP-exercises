@@ -1,0 +1,36 @@
+diff --git a/tmp/b98ac003-ae7e-4b53-89af-ca4c4ab23fb3_buggy.java b/tmp/1968586e-9e3b-4a6b-9d00-d88c5b95d5aa_fixed.java
+index 9033e1c..ad15c16 100644
+--- a/tmp/b98ac003-ae7e-4b53-89af-ca4c4ab23fb3_buggy.java
++++ b/tmp/1968586e-9e3b-4a6b-9d00-d88c5b95d5aa_fixed.java
+@@ -1,11 +1,20 @@
+-    /**
+-     * Returns true iff they are equal as defined by
+-     * {@link #equals(double,double,int) equals(x, y, 1)}.
+-     *
+-     * @param x first value
+-     * @param y second value
+-     * @return {@code true} if the values are equal.
+-     */
+-    public static boolean equals(double x, double y) {
+-        return (Double.isNaN(x) && Double.isNaN(y)) || x == y;
++public static boolean equals(double[] a, double[] b) {
++    if (a == b) {
++        return true; // both are null or both reference the same object
++    }
++    if (a == null || b == null) {
++        return false; // one is null and the other isn't
++    }
++    if (a.length != b.length) {
++        return false; // different lengths
++    }
++    for (int i = 0; i < a.length; i++) {
++        if (Double.isNaN(a[i]) && Double.isNaN(b[i])) {
++            continue; // both are NaN, consider as equal
++        }
++        if (a[i] != b[i]) {
++            return false; // values are not equal
++        }
++    }
++    return true; // all values are equal
+ }
+\ No newline at end of file

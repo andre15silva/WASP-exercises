@@ -1,0 +1,53 @@
+diff --git a/tmp/298ba8d0-8bdc-4792-a319-66ae4b44d322_buggy.java b/tmp/34af7a0b-5b58-4cd6-b867-4129f027834b_fixed.java
+index 784bbab..8b669a8 100644
+--- a/tmp/298ba8d0-8bdc-4792-a319-66ae4b44d322_buggy.java
++++ b/tmp/34af7a0b-5b58-4cd6-b867-4129f027834b_fixed.java
+@@ -1,42 +1,48 @@
+     /**
+      * Initializes the name to index mapping if the format defines a header.
+      *
+      * @return null if the format has no header.
+      * @throws IOException if there is a problem reading the header or skipping the first record
+      */
+     private Map<String, Integer> initializeHeader() throws IOException {
+         Map<String, Integer> hdrMap = null;
+         final String[] formatHeader = this.format.getHeader();
+         if (formatHeader != null) {
+             hdrMap = new LinkedHashMap<String, Integer>();
+ 
+             String[] headerRecord = null;
+             if (formatHeader.length == 0) {
+                 // read the header from the first line of the file
+                 final CSVRecord nextRecord = this.nextRecord();
+                 if (nextRecord != null) {
+                     headerRecord = nextRecord.values();
+                 }
+             } else {
+                 if (this.format.getSkipHeaderRecord()) {
+                     this.nextRecord();
+                 }
+                 headerRecord = formatHeader;
+             }
+ 
+             // build the name to index mappings
+             if (headerRecord != null) {
+                 for (int i = 0; i < headerRecord.length; i++) {
+                     final String header = headerRecord[i];
++                    final boolean isHeaderMissing = this.format.getMissingHeader().contains(header);
+                     final boolean containsHeader = hdrMap.containsKey(header);
+                     final boolean emptyHeader = header.trim().isEmpty();
+                     if (containsHeader && (!emptyHeader || (emptyHeader && !this.format.getIgnoreEmptyHeaders()))) {
+                         throw new IllegalArgumentException("The header contains a duplicate name: \"" + header +
+                                 "\" in " + Arrays.toString(headerRecord));
+                     }
++                    if (!isHeaderMissing || this.format.getNullString().equals(header)) {
++                        // we only add headers that are not marked as 
++                        // missing (and not the null string if it is used)
+                         hdrMap.put(header, Integer.valueOf(i));
+                     }
++                    // null values may exist as headers if configured to be ignored
++                }
+             }
+         }
+         return hdrMap;
+     }

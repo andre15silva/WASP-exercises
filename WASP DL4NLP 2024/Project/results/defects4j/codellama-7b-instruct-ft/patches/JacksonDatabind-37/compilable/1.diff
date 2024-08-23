@@ -1,0 +1,35 @@
+diff --git a/tmp/d2dd379d-3919-4289-8ce4-cd5f26b12be2_buggy.java b/tmp/c31de608-b585-4f2d-bed9-4919b11ace74_fixed.java
+index e5ad041..640313c 100644
+--- a/tmp/d2dd379d-3919-4289-8ce4-cd5f26b12be2_buggy.java
++++ b/tmp/c31de608-b585-4f2d-bed9-4919b11ace74_fixed.java
+@@ -1,19 +1,29 @@
+     @Override
+     protected JavaType _narrow(Class<?> subclass)
+     {
+         if (_class == subclass) {
+             return this;
+         }
+         // Should we check that there is a sub-class relationship?
+         // 15-Jan-2016, tatu: Almost yes, but there are some complications with
+         //    placeholder values, so no.
+         /*
+         if (!_class.isAssignableFrom(subclass)) {
+             throw new IllegalArgumentException("Class "+subclass.getName()+" not sub-type of "
+                     +_class.getName());
+         }
+         */
+         // 15-Jan-2015, tatu: Not correct; should really re-resolve...
+-        return new SimpleType(subclass, _bindings, _superClass, _superInterfaces,
++        final SimpleType t = new SimpleType(subclass, _bindings, _superClass, _superInterfaces,
+             _valueHandler, _typeHandler, _asStatic);
++        // 26-Jan-2019, tatu: Turns out we have issues with `Schemas` array within,
++        //    even if we create proper placeholders and bindings (see #208).
++        //    Seems it has to do with `SimpleType` class trying to resolve missing
++        //    properties without considering array type...
++        /*
++        if (_schemas.getClass() == JsonmapSchema.class) {
++            SimpleType.constructPlaceholder(mappedType, _bindings);
++        }
++        */
++        return t;
+     }

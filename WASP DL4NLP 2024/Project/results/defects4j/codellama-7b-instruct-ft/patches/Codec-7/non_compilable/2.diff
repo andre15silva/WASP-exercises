@@ -1,0 +1,64 @@
+diff --git a/tmp/b22a0a55-b817-40be-936e-db29f39c1cee_buggy.java b/tmp/67e3e253-5874-456b-ade5-84e47c8dc639_fixed.java
+index 31c6a4b..4d18a06 100644
+--- a/tmp/b22a0a55-b817-40be-936e-db29f39c1cee_buggy.java
++++ b/tmp/67e3e253-5874-456b-ade5-84e47c8dc639_fixed.java
+@@ -1,11 +1,59 @@
+     /**
+      * Encodes binary data using the base64 algorithm into 76 character blocks separated by CRLF.
+      *
+      * @param binaryData
+      *            binary data to encode
+      * @return String containing Base64 characters.
+      * @since 1.4
+      */    
+     public static String encodeBase64String(byte[] binaryData) {
+         return StringUtils.newStringUtf8(encodeBase64(binaryData, true));
+     }
++
++    /**
++     * Encodes binary data using the base64 algorithm into 76 character blocks separated by CRLF.
++     *
++     * @param binaryData
++     *            binary data to encode
++     * @return String containing Base64 characters.
++     * @since 1.4
++     */    
++    public static String byteToString(byte[] binaryData) {
++        return StringUtils.newStringUtf8(encodeBase64(binaryData, true));
++    }
++
++    /**
++     * Encodes binary data using the base64 algorithm into 76 character blocks separated by CRLF.
++     *
++     * @param binaryData
++     *            binary data to encode
++     * @return String containing Base64 characters.
++     * @since 1.4
++     */    
++    public static String byteToString(byte[] binaryData, int off, int len) {
++        return StringUtils.newStringUtf8(encodeBase64(binaryData, off, len, true));
++    }
++
++    /**
++     * Encodes binary data using the base64 algorithm, optionally surrounded by PEM headers.
++     *
++     * @param binaryData
++     *            binary data to encode
++     * @return String containing Base64 characters.
++     * @since 1.4
++     */    
++    public static String byteToString(byte[] binaryData, boolean usePemChunking) {
++        return StringUtils.newStringUtf8(encodeBase64(binaryData, usePemChunking));
++    }
++
++    /**
++     * Encodes binary data using the base64 algorithm, optionally surrounded by PEM headers.
++     *
++     * @param binaryData
++     *            binary data to encode
++     * @return String containing Base64 characters.
++     * @since 1.4
++     */    
++    public static String byteToString(byte[] binaryData, int off, int len, boolean usePemChunking) {
++        return StringUtils.newStringUtf8(encodeBase64(binaryData, off, len, usePemChunking));
++    }

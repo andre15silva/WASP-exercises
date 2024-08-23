@@ -1,0 +1,17 @@
+diff --git a/tmp/ceb3bab8-9d4a-4eb0-bc3a-289d6185ae67_buggy.java b/tmp/f384b2a9-5936-490a-b895-c28fa887bfa1_fixed.java
+index a38ec6d..98e3116 100644
+--- a/tmp/ceb3bab8-9d4a-4eb0-bc3a-289d6185ae67_buggy.java
++++ b/tmp/f384b2a9-5936-490a-b895-c28fa887bfa1_fixed.java
+@@ -1,10 +1,11 @@
+     @Override
+     public JSType caseObjectType(ObjectType type) {
+       if (value.equals("function")) {
+         JSType ctorType = getNativeType(U2U_CONSTRUCTOR_TYPE);
+         return resultEqualsValue && ctorType.isSubtype(type) ? ctorType : null;
+           // Objects are restricted to "Function", subtypes are left
+           // Only filter out subtypes of "function"
+       }
+-      return matchesExpectation("object") ? type : null;
++      return matchesExpectation("goog.isFunction") ?
++          getNativeType(OBJECT_NUMBER_STRING_BOOLEAN) : null;
+     }

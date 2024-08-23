@@ -1,0 +1,18 @@
+diff --git a/tmp/a177f169-6755-4b5d-8a7d-04cc3df80e85_buggy.java b/tmp/0f4f1724-4e72-4ae7-ada1-27e0686c50d5_fixed.java
+index a38ec6d..29daaa1 100644
+--- a/tmp/a177f169-6755-4b5d-8a7d-04cc3df80e85_buggy.java
++++ b/tmp/0f4f1724-4e72-4ae7-ada1-27e0686c50d5_fixed.java
+@@ -1,10 +1,10 @@
+     @Override
+     public JSType caseObjectType(ObjectType type) {
+       if (value.equals("function")) {
+         JSType ctorType = getNativeType(U2U_CONSTRUCTOR_TYPE);
+-        return resultEqualsValue && ctorType.isSubtype(type) ? ctorType : null;
+-          // Objects are restricted to "Function", subtypes are left
+-          // Only filter out subtypes of "function"
++        if (ctorType.isSubtype(type)) {
++          return ctorType;
++        }
+       }
+       return matchesExpectation("object") ? type : null;
+     }

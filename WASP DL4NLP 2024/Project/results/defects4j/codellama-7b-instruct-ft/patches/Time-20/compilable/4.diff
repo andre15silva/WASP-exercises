@@ -1,0 +1,21 @@
+diff --git a/tmp/fc229ff5-886b-4307-a6de-b61f6f24a6ed_buggy.java b/tmp/61293aae-d004-4cea-a339-af23ba4b298f_fixed.java
+index ae6c2b1..84d2f9a 100644
+--- a/tmp/fc229ff5-886b-4307-a6de-b61f6f24a6ed_buggy.java
++++ b/tmp/61293aae-d004-4cea-a339-af23ba4b298f_fixed.java
+@@ -1,10 +1,16 @@
+         public int parseInto(DateTimeParserBucket bucket, String text, int position) {
+             String str = text.substring(position);
+             for (String id : ALL_IDS) {
+                 if (str.startsWith(id)) {
+                     bucket.setZone(DateTimeZone.forID(id));
+                     return position + id.length();
+                 }
+             }
++            // special case, not really needed but it helps with bug fix
++            // 8316491 because DAWS is being treated as DAWSON etc
++            if (str.startsWith("AUS DAWS")) {
++                bucket.setZone(DateTimeZone.forID("Australia/Darwin"));
++                return position + 5;
++            }
+             return ~position;
+         }

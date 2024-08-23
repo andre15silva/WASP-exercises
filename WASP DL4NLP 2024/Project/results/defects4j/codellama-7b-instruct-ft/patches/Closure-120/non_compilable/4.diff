@@ -1,0 +1,32 @@
+diff --git a/tmp/934f5c4f-733f-4f38-bc8a-e545631d4b8c_buggy.java b/tmp/d887f245-e558-4a78-89a1-e6cad820affe_fixed.java
+index 07b0792..af28de3 100644
+--- a/tmp/934f5c4f-733f-4f38-bc8a-e545631d4b8c_buggy.java
++++ b/tmp/d887f245-e558-4a78-89a1-e6cad820affe_fixed.java
+@@ -1,22 +1,27 @@
+     /**
+      * @return Whether the variable is only assigned a value once for its
+      *     lifetime.
+      */
+     boolean isAssignedOnceInLifetime() {
+       Reference ref = getOneAndOnlyAssignment();
+       if (ref == null) {
+         return false;
+       }
+ 
+       // Make sure this assignment is not in a loop.
+       for (BasicBlock block = ref.getBasicBlock();
+            block != null; block = block.getParent()) {
+         if (block.isFunction) {
+           break;
+         } else if (block.isLoop) {
+           return false;
+         }
+       }
+ 
++      // Make sure this assignment is not a constant prop.
++      if (ref.getProp() != null && ref.getProp().isConstant()) {
++        return false;
++      }
++
+       return true;
+     }

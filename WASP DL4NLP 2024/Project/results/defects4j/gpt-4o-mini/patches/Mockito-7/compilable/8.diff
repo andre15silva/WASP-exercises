@@ -1,0 +1,18 @@
+diff --git a/tmp/7e9162bf-b464-4d08-9bd6-eb1aad4cf7c3_buggy.java b/tmp/54779700-5b39-421f-a848-78c2c628d4a7_fixed.java
+index 91b7957..0a347f4 100644
+--- a/tmp/7e9162bf-b464-4d08-9bd6-eb1aad4cf7c3_buggy.java
++++ b/tmp/54779700-5b39-421f-a848-78c2c628d4a7_fixed.java
+@@ -1,6 +1,11 @@
+ private void readTypeVariables() {
++    if (typeVariable != null) {
+         for (Type type : typeVariable.getBounds()) {
+             registerTypeVariablesOn(type);
+         }
+-            registerTypeVariablesOn(getActualTypeArgumentFor(typeVariable));
++        Type actualTypeArgument = getActualTypeArgumentFor(typeVariable);
++        if (actualTypeArgument != null) {
++            registerTypeVariablesOn(actualTypeArgument);
++        }
++    }
+ }
+\ No newline at end of file

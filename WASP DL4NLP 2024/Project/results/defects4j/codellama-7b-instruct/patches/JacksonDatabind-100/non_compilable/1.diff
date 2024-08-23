@@ -1,0 +1,40 @@
+diff --git a/tmp/fd1e5354-2da0-4750-b9dc-42642ba3f5fc_buggy.java b/tmp/1e4fc68c-f462-4ea6-85dd-c99ed5802d51_fixed.java
+index fc8c302..2f09bca 100644
+--- a/tmp/fd1e5354-2da0-4750-b9dc-42642ba3f5fc_buggy.java
++++ b/tmp/1e4fc68c-f462-4ea6-85dd-c99ed5802d51_fixed.java
+@@ -1,23 +1,18 @@
+     @Override
+     public byte[] getBinaryValue(Base64Variant b64variant)
+         throws IOException, JsonParseException
+     {
+-        // Multiple possibilities...
+         JsonNode n = currentNode();
+-        if (n != null) {
+-            // [databind#2096]: although `binaryValue()` works for real binary node
+-            // and embedded "POJO" node, coercion from TextNode may require variant, so:
+-            byte[] data = n.binaryValue();
+-            if (data != null) {
+-                return data;
+-            }
+-            if (n.isPojo()) {
+-                Object ob = ((POJONode) n).getPojo();
+-                if (ob instanceof byte[]) {
+-                    return (byte[]) ob;
+-                }
+-            }
+-        }
+-        // otherwise return null to mark we have no binary content
+-        return null;
++        if (n instanceof TextNode
++                && n.isBinary()
++                && b64variant.equals(Base64Variants.MODIFIED_FOR_URL)) {
++            try {
++                // 15-Aug-2018, tatu: changed from .data to .encoded; and from .binaryValue()
++                // to .binaryValue(b64variant)
++                return n.encoded().binaryValue(b64variant);
++            } catch (Exception e) {
++                throw new JsonParseException(e.getMessage());
++            }
++        }
++        return n.binaryValue();
+     }

@@ -1,0 +1,61 @@
+diff --git a/tmp/eab064a6-5f2e-4489-97a0-e2821f20968c_buggy.java b/tmp/7602d18f-d65d-48d6-b4c1-0d093b91d482_fixed.java
+index 139579d..fba3c2d 100644
+--- a/tmp/eab064a6-5f2e-4489-97a0-e2821f20968c_buggy.java
++++ b/tmp/7602d18f-d65d-48d6-b4c1-0d093b91d482_fixed.java
+@@ -1,43 +1,37 @@
+-    // performance sensitive
+-    public boolean hasClass(String className) {
++    public boolean hasClass(final String className) {
+         final String classAttr = attributes.get("class");
+         final int len = classAttr.length();
+         final int wantLen = className.length();
+-
+         if (len == 0 || len < wantLen) {
+             return false;
+         }
+-
+-        // if both lengths are equal, only need compare the className with the attribute
+         if (len == wantLen) {
+-            return className.equalsIgnoreCase(classAttr);
++            return classAttr.equalsIgnoreCase(className);
+         }
+-
+-        // otherwise, scan for whitespace and compare regions (with no string or arraylist allocations)
+         boolean inClass = false;
+-        int start = 0;
++        int prev = 0;
++        int next;
+         for (int i = 0; i < len; i++) {
+             if (Character.isWhitespace(classAttr.charAt(i))) {
+                 if (inClass) {
+-                    // white space ends a class name, compare it with the requested one, ignore case
+-                    if (i - start == wantLen && classAttr.regionMatches(true, start, className, 0, wantLen)) {
++                    if (i - prev + 1 == wantLen && classAttr.regionMatches(true, prev, className, 0, wantLen)) {
+                         return true;
+                     }
+                     inClass = false;
+                 }
++                prev = i + 1;
+             } else {
++                next = i + 1;
++                while (next < len && Character.isWhitespace(classAttr.charAt(next))) {
++                    next++;
++                }
+                 if (!inClass) {
+-                    // we're in a class name : keep the start of the substring
+                     inClass = true;
+-                    start = i;
+                 }
+             }
+         }
+-
+-        // check the last entry
+-        if (inClass && len - start == wantLen) {
+-            return classAttr.regionMatches(true, start, className, 0, wantLen);
++        if (inClass) {
++            return classAttr.regionMatches(true, prev, className, 0, wantLen);
+         }
+-
+         return false;
+     }
+\ No newline at end of file

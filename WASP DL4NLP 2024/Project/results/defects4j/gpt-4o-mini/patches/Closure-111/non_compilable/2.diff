@@ -1,0 +1,11 @@
+diff --git a/tmp/da6cc4a0-cd99-4aa3-aa67-131446ae9e40_buggy.java b/tmp/5182404c-f535-4d67-8cd3-5740be510789_fixed.java
+index f1d02c1..67e848b 100644
+--- a/tmp/da6cc4a0-cd99-4aa3-aa67-131446ae9e40_buggy.java
++++ b/tmp/5182404c-f535-4d67-8cd3-5740be510789_fixed.java
+@@ -1,4 +1,4 @@
+ @Override
+ protected JSType caseTopType(JSType topType) {
+-          return topType;
++    return ARRAY_TYPE; // Return ARRAY_TYPE instead of topType
+ }
+\ No newline at end of file

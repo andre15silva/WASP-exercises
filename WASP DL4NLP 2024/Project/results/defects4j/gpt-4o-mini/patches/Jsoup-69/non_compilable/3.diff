@@ -1,0 +1,18 @@
+diff --git a/tmp/4b56a026-a71e-4bbe-a434-3dea92a438f0_buggy.java b/tmp/b80eb4cd-901c-4fdb-89dd-c5bbcdf1c81b_fixed.java
+index e69de29..9ad06b4 100644
+--- a/tmp/4b56a026-a71e-4bbe-a434-3dea92a438f0_buggy.java
++++ b/tmp/b80eb4cd-901c-4fdb-89dd-c5bbcdf1c81b_fixed.java
+@@ -0,0 +1,12 @@
++public List<Connection.KeyVal> formData() {
++    List<Connection.KeyVal> data = new ArrayList<>();
++    for (Element input : select("input")) {
++        String name = input.attr("name");
++        String value = input.attr("value");
++        // Check if name is not empty and input is not removed
++        if (!name.isEmpty() && !input.is(":hidden") && input.parent() != null) {
++            data.add(Connection.KeyVal.create(name, value));
++        }
++    }
++    return data;
++}
+\ No newline at end of file

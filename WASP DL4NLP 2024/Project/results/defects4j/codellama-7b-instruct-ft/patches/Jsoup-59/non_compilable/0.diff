@@ -1,0 +1,39 @@
+diff --git a/tmp/51eaa8ab-8335-4929-a5fa-b4cf2235ac43_buggy.java b/tmp/6b1c563c-6e22-46e1-8791-aac3e30a07f6_fixed.java
+index 7de6748..58ec0dd 100644
+--- a/tmp/51eaa8ab-8335-4929-a5fa-b4cf2235ac43_buggy.java
++++ b/tmp/6b1c563c-6e22-46e1-8791-aac3e30a07f6_fixed.java
+@@ -1,23 +1,29 @@
+         final void newAttribute() {
+             if (attributes == null)
+                 attributes = new Attributes();
+ 
+             if (pendingAttributeName != null) {
++                boolean needsQuotes = true;
+                 // the tokeniser has skipped whitespace control chars, but trimming could collapse to empty for other control codes, so verify here
+                 pendingAttributeName = pendingAttributeName.trim();
++                if (pendingAttributeValueS != null) {
++                    pendingAttributeValue = new StringBuilder(pendingAttributeValueS);
++                    pendingAttributeValueS = null;
++                }
+                     Attribute attribute;
++                    String val = pendingAttributeValue.toString();
+                     if (hasPendingAttributeValue)
+-                        attribute = new Attribute(pendingAttributeName,
+-                            pendingAttributeValue.length() > 0 ? pendingAttributeValue.toString() : pendingAttributeValueS);
++                        val = val.length() > 0 ? val : pendingAttributeValueS;
+                     else if (hasEmptyAttributeValue)
+-                        attribute = new Attribute(pendingAttributeName, "");
+-                    else
+-                        attribute = new BooleanAttribute(pendingAttributeName);
++                        val = "";
++                    if (val.length() > 0)
++                        needsQuotes = !Attributes.unquoted(pendingAttributeName).equals(val);
++                    attribute = new Attribute(pendingAttributeName, val, needsQuotes);
+                     attributes.put(attribute);
+             }
+             pendingAttributeName = null;
+             hasEmptyAttributeValue = false;
+             hasPendingAttributeValue = false;
+             reset(pendingAttributeValue);
+             pendingAttributeValueS = null;
+         }

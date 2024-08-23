@@ -1,0 +1,138 @@
+diff --git a/tmp/ca129785-d5d2-4bbc-b3c0-834f509fc3db_buggy.java b/tmp/2b0d4cdd-e7a7-40bd-9ff8-b5e90f9b649c_fixed.java
+index 6c0aa19..6152ee9 100644
+--- a/tmp/ca129785-d5d2-4bbc-b3c0-834f509fc3db_buggy.java
++++ b/tmp/2b0d4cdd-e7a7-40bd-9ff8-b5e90f9b649c_fixed.java
+@@ -1,20 +1,133 @@
+     /**
++     * @param inputStream the input stream to read from.
+      * @param encoding the encoding to use for file names, use null
+      * for the platform's default encoding
+      * @param useUnicodeExtraFields whether to use InfoZIP Unicode
+      * Extra Fields (if present) to set the file names.
+      * @param allowStoredEntriesWithDataDescriptor whether the stream
+      * will try to read STORED entries that use a data descriptor
+      * @since 1.1
+      */
+     public ZipArchiveInputStream(InputStream inputStream,
+                                  String encoding,
+                                  boolean useUnicodeExtraFields,
+                                  boolean allowStoredEntriesWithDataDescriptor) {
+         zipEncoding = ZipEncodingHelper.getZipEncoding(encoding);
+         this.useUnicodeExtraFields = useUnicodeExtraFields;
+         in = new PushbackInputStream(inputStream, buf.capacity());
+         this.allowStoredEntriesWithDataDescriptor =
+             allowStoredEntriesWithDataDescriptor;
+         // haven't read anything so far
+     }
++
++    /**
++     * Reads the next entry in the archive.
++     * 
++     * @return the next ZipEntry in the archive, or null if
++     * there are no more entries
++     */
++    public ZipArchiveEntry getNextZipEntry() throws IOException {
++        // have we already read an entry?
++        if (currentEntry != null) {
++            // check if we need to read the next entry
++            if (readNextEntry()) {
++                // we read an entry, so return it
++                ZipArchiveEntry entry = currentEntry;
++                currentEntry = null;
++                return entry;
++            } else {
++                // otherwise, we're at the end of the input
++                return null;
++            }
++        } else {
++            return readNextEntry() ? currentEntry : null;
++        }
++    }
++
++    /**
++     * Reads the next entry from the input stream.
++     * 
++     * @return true if an entry was read, false if at the end of the input
++     */
++    private boolean readNextEntry() throws IOException {
++        // we haven't read anything so far
++        seek = 0;
++        // loop until we read the next entry or hit the end of the input
++        while (true) {
++            // try to read the next entry
++            if (readLocalFileHeader()) {
++                // we read an entry, so store it and return it
++                currentEntry = createZipArchiveEntry();
++                totalSize += currentEntry.getCompressedSize();
++                return true;
++            } else {
++                // otherwise, we need to seek past the data
++                seek(currentEntry.getDataOffset());
++            }
++        }
++    }
++
++    /**
++     * Reads the local file header from the input stream.
++     * 
++     * @return true if a local header was read, false if at
++     * the end of the input
++     */
++    private boolean readLocalFileHeader() throws IOException {
++        // get the signature
++        int signature = ZipUtil.readIntLE(in);
++        // is this the signature for a local file header
++        if (signature != ZipConstants.LOCAL_FILE_HEADER_SIGNATURE) {
++            return false;
++        }
++        // read the remaining fields
++        currentEntry.setMethod(ZipUtil.readShortLE(in));
++        currentEntry.setDosTime(ZipUtil.readIntLE(in));
++        currentEntry.setCrc(ZipUtil.readIntLE(in));
++        currentEntry.setCompressedSize(ZipUtil.readIntLE(in));
++        currentEntry.setSize(ZipUtil.readIntLE(in));
++        currentEntry.setNameLength(ZipUtil.readShortLE(in));
++        currentEntry.setExtraLength(ZipUtil.readShortLE(in));
++
++        // skip over the file name and extra fields
++        seek(currentEntry.getNameLength() + currentEntry.getExtraLength());
++
++        if (currentEntry.getMethod() == ZipConstants.STORED) {
++            // if we require stored entries without a data descriptor,
++            // return now
++            if (!allowStoredEntriesWithDataDescriptor) {
++                return true;
++            }
++
++            // read the data descriptor
++            if (!readDataDescriptor()) {
++                return false;
++            }
++        }
++
++        return true;
++    }
++
++    /**
++     * Reads the data descriptor section of a stored entry.
++     * 
++     * @return true if a data descriptor was read, false if at
++     * the end of the input
++     */
++    private boolean readDataDescriptor() throws IOException {
++        // skip over the signature
++        seek(4);
++        // read the crc and sizes
++        currentEntry.setCrc(ZipUtil.readIntLE(in));
++        currentEntry.setCompressedSize(ZipUtil.readIntLE(in));
++        currentEntry.setSize(ZipUtil.readIntLE(in));
++        return true;
++    }
++
++    /**
++     * Seeks to the specified position in the input stream.
++     */
++    private void seek(long pos) throws IOException {
++        in.unread(buf, (int)pos, (int)(seek - pos));
++        seek = pos;
++    }

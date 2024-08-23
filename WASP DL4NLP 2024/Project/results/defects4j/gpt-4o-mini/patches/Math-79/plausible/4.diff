@@ -1,0 +1,26 @@
+diff --git a/tmp/b3ea3d64-a080-4a37-8c86-2a398babf977_buggy.java b/tmp/b88dde6e-8aeb-4c26-9460-1cb6adb798d6_fixed.java
+index 6e238e7..b3a56d1 100644
+--- a/tmp/b3ea3d64-a080-4a37-8c86-2a398babf977_buggy.java
++++ b/tmp/b88dde6e-8aeb-4c26-9460-1cb6adb798d6_fixed.java
+@@ -1,15 +1,11 @@
+-    /**
+-     * Calculates the L<sub>2</sub> (Euclidean) distance between two points.
+-     *
+-     * @param p1 the first point
+-     * @param p2 the second point
+-     * @return the L<sub>2</sub> distance between the two points
+-     */
+ public static double distance(int[] p1, int[] p2) {
+-      int sum = 0;
++    if (p1 == null || p2 == null || p1.length != p2.length) {
++        throw new IllegalArgumentException("Input points must not be null and must be of the same dimension.");
++    }
++    double sum = 0; // change to double to avoid integer overflow
+     for (int i = 0; i < p1.length; i++) {
+-          final int dp = p1[i] - p2[i];
++        final double dp = p1[i] - p2[i]; // change to double
+         sum += dp * dp;
+     }
+     return Math.sqrt(sum);
+ }
+\ No newline at end of file

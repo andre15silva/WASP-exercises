@@ -1,0 +1,15 @@
+diff --git a/tmp/38ecdb51-de10-44a4-ac5b-74e40463f445_buggy.java b/tmp/1a067f2e-f00d-4c5f-9951-f7294ebf6f17_fixed.java
+index 2b35d23..386de1f 100644
+--- a/tmp/38ecdb51-de10-44a4-ac5b-74e40463f445_buggy.java
++++ b/tmp/1a067f2e-f00d-4c5f-9951-f7294ebf6f17_fixed.java
+@@ -1,8 +1,9 @@
+     /** Compute the maximum of two values
+      * @param a first value
+      * @param b second value
+      * @return b if a is lesser or equal to b, a otherwise
+      */
+     public static float max(final float a, final float b) {
+-        return (a <= b) ? b : (Float.isNaN(a + b) ? Float.NaN : b);
++        return (Float.isNaN(a) || Float.isNaN(b)) ?
++                            Float.NaN : Math.max(a, b);
+     }

@@ -1,0 +1,31 @@
+diff --git a/tmp/25840339-c073-4250-83d3-61d743b6a3da_buggy.java b/tmp/316d39bd-595d-45e8-915e-78aa13670d18_fixed.java
+index bfa2423..85a153f 100644
+--- a/tmp/25840339-c073-4250-83d3-61d743b6a3da_buggy.java
++++ b/tmp/316d39bd-595d-45e8-915e-78aa13670d18_fixed.java
+@@ -1,23 +1,8 @@
+-    /**
+-     * Generate a random sample from the distribution.
+-     *
+-     * @param sampleSize the number of random values to generate.
+-     * @return an array representing the random sample.
+-     * @throws NotStrictlyPositiveException if {@code sampleSize} is not
+-     * positive.
+-     */
+     public T[] sample(int sampleSize) throws NotStrictlyPositiveException {
+         if (sampleSize <= 0) {
+-            throw new NotStrictlyPositiveException(LocalizedFormats.NUMBER_OF_SAMPLES,
+-                    sampleSize);
++            throw new NotStrictlyPositiveException(Locale.getDefault(),
++                    "sampleSize must be strictly positive.");
+         }
+ 
+-        final T[]out = (T[]) java.lang.reflect.Array.newInstance(singletons.get(0).getClass(), sampleSize);
+-
+-        for (int i = 0; i < sampleSize; i++) {
+-            out[i] = sample();
+-        }
+-
+-        return out;
+-
++        return (T[]) Array.newInstance(getSingletons().get(0).getClass(), sampleSize);
+     }

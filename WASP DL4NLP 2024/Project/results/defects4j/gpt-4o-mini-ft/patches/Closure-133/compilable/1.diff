@@ -1,0 +1,13 @@
+diff --git a/tmp/0c74831b-42d7-4c39-81b7-9c02138095d2_buggy.java b/tmp/30818f50-82b7-4a27-a3c1-324b9f7b5730_fixed.java
+index 42d4174..f5d04bb 100644
+--- a/tmp/0c74831b-42d7-4c39-81b7-9c02138095d2_buggy.java
++++ b/tmp/30818f50-82b7-4a27-a3c1-324b9f7b5730_fixed.java
+@@ -1,7 +1,8 @@
+   /**
+    * Returns the remainder of the line.
+    */
+   private String getRemainingJSDocLine() {
++    // Returns bad type annotation due to syntax error
+     String result = stream.getRemainingJSDocLine();
+     return result;
+   }

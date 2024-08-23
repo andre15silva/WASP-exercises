@@ -1,0 +1,112 @@
+diff --git a/tmp/f6eb3775-5460-42cc-b849-9d89a0169be9_buggy.java b/tmp/b3b1d359-954a-4fe2-8039-2a01cb93a523_fixed.java
+index 940af3f..2031af8 100644
+--- a/tmp/f6eb3775-5460-42cc-b849-9d89a0169be9_buggy.java
++++ b/tmp/b3b1d359-954a-4fe2-8039-2a01cb93a523_fixed.java
+@@ -1,82 +1,82 @@
+         /**
+          * Estimate a first guess of the amplitude and angular frequency.
+          * This method assumes that the {@link #sortObservations()} method
+          * has been called previously.
+          *
+          * @throws ZeroException if the abscissa range is zero.
+          * @throws MathIllegalStateException when the guessing procedure cannot
+          * produce sensible results.
+          */
+         private void guessAOmega() {
+             // initialize the sums for the linear model between the two integrals
+             double sx2 = 0;
+             double sy2 = 0;
+             double sxy = 0;
+             double sxz = 0;
+             double syz = 0;
+ 
+             double currentX = observations[0].getX();
+             double currentY = observations[0].getY();
+             double f2Integral = 0;
+             double fPrime2Integral = 0;
+             final double startX = currentX;
+             for (int i = 1; i < observations.length; ++i) {
+                 // one step forward
+                 final double previousX = currentX;
+                 final double previousY = currentY;
+                 currentX = observations[i].getX();
+                 currentY = observations[i].getY();
+ 
+                 // update the integrals of f<sup>2</sup> and f'<sup>2</sup>
+                 // considering a linear model for f (and therefore constant f')
+                 final double dx = currentX - previousX;
+                 final double dy = currentY - previousY;
+                 final double f2StepIntegral =
+                     dx * (previousY * previousY + previousY * currentY + currentY * currentY) / 3;
+                 final double fPrime2StepIntegral = dy * dy / dx;
+ 
+                 final double x = currentX - startX;
+                 f2Integral += f2StepIntegral;
+                 fPrime2Integral += fPrime2StepIntegral;
+ 
+                 sx2 += x * x;
+                 sy2 += f2Integral * f2Integral;
+                 sxy += x * f2Integral;
+                 sxz += x * fPrime2Integral;
+                 syz += f2Integral * fPrime2Integral;
+             }
+ 
+             // compute the amplitude and pulsation coefficients
+             double c1 = sy2 * sxz - sxy * syz;
+             double c2 = sxy * sxz - sx2 * syz;
+             double c3 = sx2 * sy2 - sxy * sxy;
+-            if ((c1 / c2 < 0) || (c2 / c3 < 0)) {
+-                final int last = observations.length - 1;
+-                // Range of the observations, assuming that the
+-                // observations are sorted.
+-                final double xRange = observations[last].getX() - observations[0].getX();
+-                if (xRange == 0) {
+-                    throw new ZeroException();
+-                }
+-                omega = 2 * Math.PI / xRange;
+-
+-                double yMin = Double.POSITIVE_INFINITY;
+-                double yMax = Double.NEGATIVE_INFINITY;
+-                for (int i = 1; i < observations.length; ++i) {
+-                    final double y = observations[i].getY();
+-                    if (y < yMin) {
+-                        yMin = y;
+-                    }
+-                    if (y > yMax) {
+-                        yMax = y;
+-                    }
+-                }
+-                a = 0.5 * (yMax - yMin);
+-            } else {
+-                    // In some ill-conditioned cases (cf. MATH-844), the guesser
++            // TODO JW: why is (c1 / c2 < 0) && (c2 / c3 < 0) always invalid??
++            if (/* (c1 / c2 < 0) && (c2 / c3 < 0) */
++            		FastMath.abs(c1) > 1e-3 && FastMath.abs(c3) > 1e-3 ) {
++            		// In some ill-conditioned cases (cf. Math-885), the guesser
+             		// procedure cannot produce sensible results.
+-
++            		// Let's check if some harmonic model is available instead.
++            		// We consider two different cases: either all observations
++            		// have abscissa integral (in that case, the guesser procedure
++            		// is likely to fail for harmonic parameters), or the abscissa
++            		// are not integers (in that case, the guesser will likely
++            		// succeed in finding amplitude and period).
++            		// TODO: use the function values to evaluate if that is the case.
++            		boolean allObservationsAreInteger = true;
++            		for (int i = 1; i < observations.length; i++) {
++            			if (FastMath.abs(observations[i].getX()
++            					- observations[i - 1].getX()) > 1e-3) {
++            				allObservationsAreInteger = false;
++            				break;
++            			}
++            		}
++				    if (allObservationsAreInteger) {
++				    	guessAOmega0();
++				    } else {
+                     a = FastMath.sqrt(c1 / c2);
+                     omega = FastMath.sqrt(c2 / c3);
+ 				    }
++            } else {
++            		guessAOmega0();
++        }
+     }

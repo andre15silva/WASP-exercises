@@ -1,0 +1,16 @@
+diff --git a/tmp/1021877c-73fa-4106-aec4-2de17658bb04_buggy.java b/tmp/8756df13-3743-437d-a3e2-aaaf576dd5ca_fixed.java
+index 741e96b..a98d5ad 100644
+--- a/tmp/1021877c-73fa-4106-aec4-2de17658bb04_buggy.java
++++ b/tmp/8756df13-3743-437d-a3e2-aaaf576dd5ca_fixed.java
+@@ -1,7 +1,8 @@
+ public ChecksumCalculatingInputStream(final Checksum checksum, final InputStream in) {
+-
+-
++    if (checksum == null || in == null) {
++        throw new NullPointerException("Checksum and InputStream must not be null.");
++    }
+ 
+     this.checksum = checksum;
+     this.in = in;
+ }
+\ No newline at end of file

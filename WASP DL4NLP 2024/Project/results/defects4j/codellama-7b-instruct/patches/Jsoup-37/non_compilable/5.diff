@@ -1,0 +1,27 @@
+diff --git a/tmp/e6b76843-ab46-4978-8f6f-4b3b8ae317e3_buggy.java b/tmp/f9a82a4d-60bf-471f-be7e-db8b9da763ac_fixed.java
+index 7498011..adebbcf 100644
+--- a/tmp/e6b76843-ab46-4978-8f6f-4b3b8ae317e3_buggy.java
++++ b/tmp/f9a82a4d-60bf-471f-be7e-db8b9da763ac_fixed.java
+@@ -1,12 +1,10 @@
+-    /**
+-     * Retrieves the element's inner HTML. E.g. on a {@code <div>} with one empty {@code <p>}, would return
+-     * {@code <p></p>}. (Whereas {@link #outerHtml()} would return {@code <div><p></p></div>}.)
+-     * 
+-     * @return String of HTML.
+-     * @see #outerHtml()
+-     */
+-    public String html() {
+-        StringBuilder accum = new StringBuilder();
+-        html(accum);
+-        return accum.toString().trim();
++import org.jsoup.nodes.Element;
++import org.jsoup.nodes.Document;
++
++public class Solution {
++    public static void prettyPrint(Document doc) {
++        Element div = doc.select("div").first();
++        String html = div.outerHtml();
++        doc.html(html);
++    }
+ }
+\ No newline at end of file

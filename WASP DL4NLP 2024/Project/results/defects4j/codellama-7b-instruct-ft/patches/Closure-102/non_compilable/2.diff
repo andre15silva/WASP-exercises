@@ -1,0 +1,23 @@
+diff --git a/tmp/02cc3846-aa36-4bb1-8585-6a1e218b079b_buggy.java b/tmp/a4cdf449-900b-4695-a1e8-3eb640b4398b_fixed.java
+index f47d784..90e9f38 100644
+--- a/tmp/02cc3846-aa36-4bb1-8585-6a1e218b079b_buggy.java
++++ b/tmp/a4cdf449-900b-4695-a1e8-3eb640b4398b_fixed.java
+@@ -1,12 +1,18 @@
+   @Override
+   public void process(Node externs, Node root) {
+     NodeTraversal.traverse(compiler, root, this);
+     if (MAKE_LOCAL_NAMES_UNIQUE) {
+       MakeDeclaredNamesUnique renamer = new MakeDeclaredNamesUnique();
+       NodeTraversal t = new NodeTraversal(compiler, renamer);
+       t.traverseRoots(externs, root);
+     }
+     removeDuplicateDeclarations(root);
+     new PropogateConstantAnnotations(compiler, assertOnChange)
+         .process(externs, root);
++    if (compiler.getOptions().compilationLevel == CompilationLevel.SIMPLE_OPTIMIZATIONS) {
++      // Remove the arguments property since it does not work during runtime
++      // with VERBOSE mode.
++      // See: https://code.google.com/p/google-closure-compiler/issues/detail?id=115
++      new RemoveUnusedVars(true, false).process(null, root);
++    }
+   }

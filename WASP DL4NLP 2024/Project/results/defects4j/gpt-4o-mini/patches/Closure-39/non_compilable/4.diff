@@ -1,0 +1,58 @@
+diff --git a/tmp/9e3e47e6-5934-4518-8a47-1e1279b123d7_buggy.java b/tmp/1bc84c41-5b80-46fa-bc48-3b2638627d44_fixed.java
+index e4d90e7..edcf06b 100644
+--- a/tmp/9e3e47e6-5934-4518-8a47-1e1279b123d7_buggy.java
++++ b/tmp/1bc84c41-5b80-46fa-bc48-3b2638627d44_fixed.java
+@@ -1,45 +1,50 @@
+ @Override
+ String toStringHelper(boolean forAnnotations) {
+     if (hasReferenceName()) {
+         return getReferenceName();
+     } else if (prettyPrint) {
+         // Don't pretty print recursively.
+         prettyPrint = false;
+ 
+         // Use a tree set so that the properties are sorted.
+         Set<String> propertyNames = Sets.newTreeSet();
+         for (ObjectType current = this;
+              current != null && !current.isNativeObjectType() &&
+-               propertyNames.size() <= MAX_PRETTY_PRINTED_PROPERTIES;
++                 propertyNames.size() < MAX_PRETTY_PRINTED_PROPERTIES;
+              current = current.getImplicitPrototype()) {
+             propertyNames.addAll(current.getOwnPropertyNames());
+         }
+ 
+         StringBuilder sb = new StringBuilder();
+         sb.append("{");
+ 
+         int i = 0;
+         for (String property : propertyNames) {
+             if (i > 0) {
+                 sb.append(", ");
+             }
+ 
+             sb.append(property);
+             sb.append(": ");
+-        sb.append(getPropertyType(property).toString());
++            JSType propertyType = getPropertyType(property);
++            if (propertyType.isRecordType() && propertyType.hasCircularReference()) {
++                sb.append("{...}");
++            } else {
++                sb.append(propertyType.toString());
++            }
+ 
+             ++i;
+             if (i == MAX_PRETTY_PRINTED_PROPERTIES) {
+                 sb.append(", ...");
+                 break;
+             }
+         }
+ 
+         sb.append("}");
+ 
+         prettyPrint = true;
+         return sb.toString();
+     } else {
+         return "{...}";
+     }
+ }
+\ No newline at end of file

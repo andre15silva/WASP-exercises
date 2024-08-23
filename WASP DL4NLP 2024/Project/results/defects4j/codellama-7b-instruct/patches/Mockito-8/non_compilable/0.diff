@@ -1,0 +1,28 @@
+diff --git a/tmp/902cc106-46fe-4d6e-b528-6aa56c6234c1_buggy.java b/tmp/fd11ee10-b006-408b-adde-41064dcd0967_fixed.java
+index 42b58d0..a450501 100644
+--- a/tmp/902cc106-46fe-4d6e-b528-6aa56c6234c1_buggy.java
++++ b/tmp/fd11ee10-b006-408b-adde-41064dcd0967_fixed.java
+@@ -1,19 +1,5 @@
+-    protected void registerTypeVariablesOn(Type classType) {
+-        if (!(classType instanceof ParameterizedType)) {
+-            return;
+-        }
+-        ParameterizedType parameterizedType = (ParameterizedType) classType;
+-        TypeVariable[] typeParameters = ((Class<?>) parameterizedType.getRawType()).getTypeParameters();
+-        Type[] actualTypeArguments = parameterizedType.getActualTypeArguments();
+-        for (int i = 0; i < actualTypeArguments.length; i++) {
+-            TypeVariable typeParameter = typeParameters[i];
+-            Type actualTypeArgument = actualTypeArguments[i];
+-
+-            if (actualTypeArgument instanceof WildcardType) {
+-                contextualActualTypeParameters.put(typeParameter, boundsOf((WildcardType) actualTypeArgument));
+-            } else {
+-                contextualActualTypeParameters.put(typeParameter, actualTypeArgument);
+-            }
+-            // logger.log("For '" + parameterizedType + "' found type variable : { '" + typeParameter + "(" + System.identityHashCode(typeParameter) + ")" + "' : '" + actualTypeArgument + "(" + System.identityHashCode(typeParameter) + ")" + "' }");
++    protected void registerTypeVariablesOn() {
++            // BUG: Infinite recursion
++            registerTypeVariablesOn();
+         }
+     }
+\ No newline at end of file

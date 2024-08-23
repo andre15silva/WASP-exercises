@@ -1,0 +1,34 @@
+diff --git a/tmp/ac807cff-bc82-489e-96d3-9336f3a0036a_buggy.java b/tmp/14f4e453-e294-4643-88fc-30b0aa2a1054_fixed.java
+index 6c0aa19..0618d64 100644
+--- a/tmp/ac807cff-bc82-489e-96d3-9336f3a0036a_buggy.java
++++ b/tmp/14f4e453-e294-4643-88fc-30b0aa2a1054_fixed.java
+@@ -1,20 +1,28 @@
+     /**
+      * @param encoding the encoding to use for file names, use null
+      * for the platform's default encoding
+      * @param useUnicodeExtraFields whether to use InfoZIP Unicode
+      * Extra Fields (if present) to set the file names.
+      * @param allowStoredEntriesWithDataDescriptor whether the stream
+      * will try to read STORED entries that use a data descriptor
+      * @since 1.1
+      */
+     public ZipArchiveInputStream(InputStream inputStream,
+                                  String encoding,
+                                  boolean useUnicodeExtraFields,
+                                  boolean allowStoredEntriesWithDataDescriptor) {
+         zipEncoding = ZipEncodingHelper.getZipEncoding(encoding);
+         this.useUnicodeExtraFields = useUnicodeExtraFields;
+         in = new PushbackInputStream(inputStream, buf.capacity());
+         this.allowStoredEntriesWithDataDescriptor =
+             allowStoredEntriesWithDataDescriptor;
+-        // haven't read anything so far
++        // We are almost certainly going to read the first
++        // entry, so read the next block from the stream.
++        //
++        // Also note that we don't check for errors in reading
++        // here because we need to read some data from the
++        // stream in order to figure out what the first entry is.
++        //
++        // Actually, now I'm not sure if we ever do that.
++        readNextEntry();
+     }

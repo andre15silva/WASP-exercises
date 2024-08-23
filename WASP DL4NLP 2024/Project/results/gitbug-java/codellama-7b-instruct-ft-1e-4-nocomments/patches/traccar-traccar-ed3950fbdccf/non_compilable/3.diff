@@ -1,0 +1,42 @@
+diff --git a/tmp/f5717c9d-1312-4d09-8d41-b5c630c6d2a4_buggy.java b/tmp/f1503825-aa40-45ed-a9d8-86470c87b93c_fixed.java
+index abd3198..7b7167d 100644
+--- a/tmp/f5717c9d-1312-4d09-8d41-b5c630c6d2a4_buggy.java
++++ b/tmp/f1503825-aa40-45ed-a9d8-86470c87b93c_fixed.java
+@@ -1,28 +1,31 @@
+     @Override
+     protected Object encodeCommand(Command command) {
+-
++        String uniqueId = getCacheManager().getObject(Device.class, command.getDeviceId()).getUniqueId();
++        String key = uniqueId.substring(uniqueId.length() - 3);
+         ByteBuf content = Unpooled.buffer();
+-
+         switch (command.getType()) {
+             case Command.TYPE_POSITION_SINGLE:
+                 return encodeContent(command.getDeviceId(), GatorProtocolDecoder.MSG_POSITION_REQUEST, content);
+             case Command.TYPE_ENGINE_STOP:
+                 return encodeContent(command.getDeviceId(), GatorProtocolDecoder.MSG_CLOSE_THE_OIL_DUCT, content);
+             case Command.TYPE_ENGINE_RESUME:
+                 return encodeContent(command.getDeviceId(), GatorProtocolDecoder.MSG_RESTORES_THE_OIL_DUCT, content);
+             case Command.TYPE_SET_SPEED_LIMIT:
+                 content.writeByte(command.getInteger(Command.KEY_DATA));
+                 return encodeContent(command.getDeviceId(), GatorProtocolDecoder.MSG_SET_SPEED_LIMIT, content);
+             case Command.TYPE_SET_ODOMETER:
+                 content.writeShort(command.getInteger(Command.KEY_DATA));
+                 return encodeContent(command.getDeviceId(), GatorProtocolDecoder.MSG_SET_ODOMETER, content);
+             case Command.TYPE_POSITION_PERIODIC:
++                content.writeShort(GatorProtocolDecoder.ENGINE_RECOVER);
+                 String[] data = command.getString(Command.KEY_FREQUENCY).split(";");
+-                content.writeShort(Integer.valueOf(data[0]));
+-                content.writeShort(Integer.valueOf(data[1]));
+-                content.writeShort(Integer.valueOf(data[2]));
++                content.writeByte(Integer.valueOf(data[0]));
++                content.writeByte(Integer.valueOf(data[1]));
++                content.writeByte(Integer.valueOf(data[2]));
++                content.writeByte(Integer.valueOf(key) >>> 8);
++                content.writeByte((byte) Integer.valueOf(key).intValue());
+                 return encodeContent(command.getDeviceId(), GatorProtocolDecoder.MSG_POSITION_PERIODIC, content);
+             default:
+                 return null;
+         }
+     }
+\ No newline at end of file

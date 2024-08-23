@@ -1,0 +1,72 @@
+diff --git a/tmp/82c741c0-0bb0-42f7-9dce-132b25552696_buggy.java b/tmp/62aad6d4-2945-4659-88db-25e6b961b8c7_fixed.java
+index c4b260c..b253892 100644
+--- a/tmp/82c741c0-0bb0-42f7-9dce-132b25552696_buggy.java
++++ b/tmp/62aad6d4-2945-4659-88db-25e6b961b8c7_fixed.java
+@@ -1,51 +1,57 @@
+     // todo - this is getting gnarly. needs a rewrite.
+     static Document parseByteData(ByteBuffer byteData, String charsetName, String baseUri, Parser parser) {
+         String docData;
+         Document doc = null;
++        // check the byte order mark (BOM) to detect the encoding used to encode the content. unicode uses different byte order marks.
++        // BOM for UTF-8 https://en.wikipedia.org/wiki/Byte_order_mark#Representations_of_byte_order_marks_by_encoding
++        // BOM for UCS-2LE https://en.wikipedia.org/wiki/Byte_order_mark#Representations_of_byte_order_marks_by_encoding
++        // BOM for UCS-2BE https://en.wikipedia.org/wiki/Byte_order_mark#Representations_of_byte_order_marks_by_encoding
+         if (charsetName == null) { // determine from meta. safe parse as UTF-8
+             // look for <meta http-equiv="Content-Type" content="text/html;charset=gb2312"> or HTML5 <meta charset="gb2312">
+             docData = Charset.forName(defaultCharset).decode(byteData).toString();
+             doc = parser.parseInput(docData, baseUri);
+             Element meta = doc.select("meta[http-equiv=content-type], meta[charset]").first();
+             if (meta != null) { // if not found, will keep utf-8 as best attempt
+                 String foundCharset;
+                 if (meta.hasAttr("http-equiv")) {
+                     foundCharset = getCharsetFromContentType(meta.attr("content"));
+                     if (foundCharset == null && meta.hasAttr("charset")) {
+                         try {
+                             if (Charset.isSupported(meta.attr("charset"))) {
+                                 foundCharset = meta.attr("charset");
+                             }
+                         } catch (IllegalCharsetNameException e) {
+                             foundCharset = null;
+                         }
+                     }
+                 } else {
+                     foundCharset = meta.attr("charset");
+                 }
+ 
+                 if (foundCharset != null && foundCharset.length() != 0 && !foundCharset.equals(defaultCharset)) { // need to re-decode
+                     foundCharset = foundCharset.trim().replaceAll("[\"']", "");
+                     charsetName = foundCharset;
+                     byteData.rewind();
+-                    docData = Charset.forName(foundCharset).decode(byteData).toString();
+-                    doc = null;
++                    doc = parser.parseInput(Charset.forName(foundCharset).decode(byteData).toString(), baseUri);
++                    doc.outputSettings().charset(foundCharset);
++                } else { // no need to re-decode, just use the found charset, which will always be null except for when detecting
++                    if (foundCharset != null)
++                        charsetName = foundCharset.trim().replaceAll("[\"']", "");
++                    else if (charsetName != null)
++                        charsetName = charsetName.trim().replaceAll("[\"']", "");
+                 }
+             }
+         } else { // specified by content type header (or by user on file load)
+             Validate.notEmpty(charsetName, "Must set charset arg to character set of file to parse. Set to null to attempt to detect from HTML");
+-            docData = Charset.forName(charsetName).decode(byteData).toString();
++            byteData.rewind();
++            doc = parser.parseInput(Charset.forName(charsetName).decode(byteData).toString(), baseUri);
++            doc.outputSettings().charset(charsetName);
+         }
+         // UTF-8 BOM indicator. takes precedence over everything else. rarely used. re-decodes incase above decoded incorrectly
++        docData = doc.outerHtml().replace("\uFEFF", "");
+         if (docData.length() > 0 && docData.charAt(0) == 65279) {
+-            byteData.rewind();
+-            docData = Charset.forName(defaultCharset).decode(byteData).toString();
+-            docData = docData.substring(1);
+-            charsetName = defaultCharset;
+-        }
+-        if (doc == null) {
+             doc = parser.parseInput(docData, baseUri);
+-            doc.outputSettings().charset(charsetName);
++            doc.outputSettings().charset(defaultCharset);
+         }
+         return doc;
+     }

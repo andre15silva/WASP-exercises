@@ -1,0 +1,17 @@
+diff --git a/tmp/922461e4-2dee-4f23-bb00-5f9515e1d21c_buggy.java b/tmp/52c281c0-b520-4b9e-8fc9-4c62420cb781_fixed.java
+index 10da689..820944e 100644
+--- a/tmp/922461e4-2dee-4f23-bb00-5f9515e1d21c_buggy.java
++++ b/tmp/52c281c0-b520-4b9e-8fc9-4c62420cb781_fixed.java
+@@ -1,7 +1,12 @@
+     /** Multiply this by a single digit x.
+      * @param x multiplicand
+      * @return product of this and x
+      */
+     public Dfp multiply(final int x) {
++        // TODO: check if multiplyFast can be really replaced by multiply
++        if (Field.MERGE_CHECK) {
+             return multiplyFast(x);
++        } else {
++            return multiply(x);
++        }
+     }

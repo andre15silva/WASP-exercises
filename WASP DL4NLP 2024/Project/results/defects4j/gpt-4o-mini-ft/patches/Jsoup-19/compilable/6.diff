@@ -1,0 +1,27 @@
+diff --git a/tmp/f5eedc8d-7e0b-4e52-86b4-db2d47a32ff1_buggy.java b/tmp/0812b07b-25e4-4625-bd88-433d94348deb_fixed.java
+index 4aff4e4..009d8c1 100644
+--- a/tmp/f5eedc8d-7e0b-4e52-86b4-db2d47a32ff1_buggy.java
++++ b/tmp/0812b07b-25e4-4625-bd88-433d94348deb_fixed.java
+@@ -1,15 +1,18 @@
+     private boolean testValidProtocol(Element el, Attribute attr, Set<Protocol> protocols) {
+         // try to resolve relative urls to abs, and optionally update the attribute so output html has abs.
+         // rels without a baseuri get removed
+         String value = el.absUrl(attr.getKey());
+         if (!preserveRelativeLinks)
+             attr.setValue(value);
+         
++        boolean valid = false;
+         for (Protocol protocol : protocols) {
+-            String prot = protocol.toString() + ":";
++            String prot = protocol.toString().toLowerCase() + ":";
+             if (value.toLowerCase().startsWith(prot)) {
++                valid = true;
++                break;
++            }
++        }
++        if ( !valid ) return false; // We dropped it
+         return true;
+     }
+-        }
+-        return false;
+-    }

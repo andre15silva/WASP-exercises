@@ -1,0 +1,39 @@
+diff --git a/tmp/d04603fe-99e2-4a17-82ef-e99f3c0cde7b_buggy.java b/tmp/ce996b7e-21f3-41dd-8c67-941525b098a6_fixed.java
+index 19fd63e..4f584dd 100644
+--- a/tmp/d04603fe-99e2-4a17-82ef-e99f3c0cde7b_buggy.java
++++ b/tmp/ce996b7e-21f3-41dd-8c67-941525b098a6_fixed.java
+@@ -1,24 +1,32 @@
+   /**
+    * @return Whether the node is a block with a single statement that is
+    *     an expression.
+    */
+   private boolean isFoldableExpressBlock(Node n) {
+     if (n.getType() == Token.BLOCK) {
+       if (n.hasOneChild()) {
+         Node maybeExpr = n.getFirstChild();
+           // IE has a bug where event handlers behave differently when
+           // their return value is used vs. when their return value is in
+-          // an EXPR_RESULT. It's pretty freaking weird. See:
++          // an EXPR_RESULT. It's pretty weird. See:
+           // http://code.google.com/p/closure-compiler/issues/detail?id=291
+           // We try to detect this case, and not fold EXPR_RESULTs
+-          // into other expressions.
++          // into other expressions. Also, in
++          // http://code.google.com/p/closure-compiler/source/detail?r=585, we
++          // only fold if the result of the expression is of type TOKEN_TRUE,
++          // TOKEN_FALSE or an immediate number, because even if we do
++          // nothing, Chrome still creates another EXPR_RESULT node if the
++          // result is TOKEN_TRUE or TOKEN-FALSE. Since this might be a
++          // performance sink, it seems reasonable to omit it, and let the
++          // rest of the passes catch the cases where it does something
++          // useful.
+ 
+             // We only have to worry about methods with an implicit 'this'
+             // param, or this doesn't happen.
+ 
+           return NodeUtil.isExpressionNode(maybeExpr);
+       }
+     }
+ 
+     return false;
+   }

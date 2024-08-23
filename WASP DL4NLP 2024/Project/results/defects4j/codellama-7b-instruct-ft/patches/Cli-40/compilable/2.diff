@@ -1,0 +1,78 @@
+diff --git a/tmp/a0fdfe15-07a1-49ad-b628-3089c12e9e48_buggy.java b/tmp/538078a7-5aec-436f-b5f7-f6339bd31cce_fixed.java
+index a7d0787..744e92c 100644
+--- a/tmp/a0fdfe15-07a1-49ad-b628-3089c12e9e48_buggy.java
++++ b/tmp/538078a7-5aec-436f-b5f7-f6339bd31cce_fixed.java
+@@ -1,54 +1,57 @@
+     /**
+      * Returns the <code>Object</code> of type <code>clazz</code>
+      * with the value of <code>str</code>.
+      *
+-     * @param str the command line value
+-     * @param clazz the type of argument
+-     * @return The instance of <code>clazz</code> initialised with
++     * @param value the command-line value
++     * @param clazz the type of result
++     * @return The instance of <code>T</code> initialised with
+      * the value of <code>str</code>.
+      * @throws ParseException if the value creation for the given class failed
+      */
+-    @SuppressWarnings("unchecked") // returned value will have type T because it is fixed by clazz
+-    public static <T> T createValue(final String str, final Class<T> clazz) throws ParseException
++    public static <T> T createValue(final String value, final Class<T> clazz) throws ParseException
++    {
++        try
+         {
+             if (PatternOptionBuilder.STRING_VALUE == clazz)
+             {
+-            return (T) str;
++                return (T) value;
+             }
+             else if (PatternOptionBuilder.OBJECT_VALUE == clazz)
+             {
+-            return (T) createObject(str);
++                return (T) createObject(value);
+             }
+             else if (PatternOptionBuilder.NUMBER_VALUE == clazz)
+             {
+-            return (T) createNumber(str);
++                return (T) createNumber(value);
+             }
+             else if (PatternOptionBuilder.DATE_VALUE == clazz)
+             {
+-            return (T) createDate(str);
++                return (T) createDate(value);
+             }
+             else if (PatternOptionBuilder.CLASS_VALUE == clazz)
+             {
+-            return (T) createClass(str);
++                return (T) createClass(value);
+             }
+             else if (PatternOptionBuilder.FILE_VALUE == clazz)
+             {
+-            return (T) createFile(str);
++                return (T) createFile(value);
+             }
+             else if (PatternOptionBuilder.EXISTING_FILE_VALUE == clazz)
+             {
+-            return (T) openFile(str);
++                return (T) openFile(value);
+             }
+             else if (PatternOptionBuilder.FILES_VALUE == clazz)
+             {
+-            return (T) createFiles(str);
++                return (T) createFiles(value);
+             }
+             else if (PatternOptionBuilder.URL_VALUE == clazz)
+             {
+-            return (T) createURL(str);
++                return (T) createURL(value);
+             }
+-        else
++        }
++        catch (final Exception exc)
+         {
++            throw new ParseException(exc.getMessage());
++        }
+         return null;
+     }
+-    }

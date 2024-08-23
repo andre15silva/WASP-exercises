@@ -1,0 +1,54 @@
+diff --git a/tmp/72aea3c4-ff12-47f5-b62f-ed2785b73509_buggy.java b/tmp/c7ce1f35-beec-466c-84eb-7aaa4951d00d_fixed.java
+index eea9e73..d81a2ef 100644
+--- a/tmp/72aea3c4-ff12-47f5-b62f-ed2785b73509_buggy.java
++++ b/tmp/c7ce1f35-beec-466c-84eb-7aaa4951d00d_fixed.java
+@@ -1,41 +1,16 @@
+-    /**
+-     * <p>Checks if the CharSequence contains any character in the given
+-     * set of characters.</p>
+-     *
+-     * <p>A <code>null</code> CharSequence will return <code>false</code>.
+-     * A <code>null</code> or zero length search array will return <code>false</code>.</p>
+-     *
+-     * <pre>
+-     * StringUtils.containsAny(null, *)                = false
+-     * StringUtils.containsAny("", *)                  = false
+-     * StringUtils.containsAny(*, null)                = false
+-     * StringUtils.containsAny(*, [])                  = false
+-     * StringUtils.containsAny("zzabyycdxx",['z','a']) = true
+-     * StringUtils.containsAny("zzabyycdxx",['b','y']) = true
+-     * StringUtils.containsAny("aba", ['z'])           = false
+-     * </pre>
+-     *
+-     * @param cs  the CharSequence to check, may be null
+-     * @param searchChars  the chars to search for, may be null
+-     * @return the <code>true</code> if any of the chars are found,
+-     * <code>false</code> if no match or null input
+-     * @since 2.4
+-     */
+-	public static boolean containsAny(CharSequence cs, char[] searchChars) {
+-		if (isEmpty(cs) || ArrayUtils.isEmpty(searchChars)) {
++public static boolean containsAny(CharSequence s, char[] searchChars) {
++    if (s.isEmpty() || ArrayUtils.isEmpty(searchChars)) {
+         return false;
+     }
+-		int csLength = cs.length();
+-		int searchLength = searchChars.length;
+-		for (int i = 0; i < csLength; i++) {
+-			char ch = cs.charAt(i);
+-			for (int j = 0; j < searchLength; j++) {
++
++    for (int i = 0; i < s.length; i++) {
++        char ch = s.charAt(i);
++        for (int j = 0; j < searchChars.length; j++) {
+             if (searchChars[j] == ch) {
+-						// ch is a supplementary character
+-						// ch is in the Basic Multilingual Plane
+                 return true;
+             }
+         }
+     }
++
+     return false;
+ }
+\ No newline at end of file

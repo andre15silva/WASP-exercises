@@ -1,0 +1,72 @@
+diff --git a/tmp/2058ae67-99c3-44a1-ae6e-684f1939bda6_buggy.java b/tmp/958db2ff-c496-4d2b-b6eb-7015878f33e4_fixed.java
+index b8e3fa3..6c3b353 100644
+--- a/tmp/2058ae67-99c3-44a1-ae6e-684f1939bda6_buggy.java
++++ b/tmp/958db2ff-c496-4d2b-b6eb-7015878f33e4_fixed.java
+@@ -1,65 +1,41 @@
+ 	/**
+ 	 * Builds the {@link BackOffPolicy} with the given parameters.
+ 	 * @return the {@link BackOffPolicy} instance
+ 	 */
+ 	public BackOffPolicy build() {
+ 		if (this.multiplier != null && this.multiplier > 0 || this.multiplierSupplier != null) {
+-			ExponentialBackOffPolicy policy;
+ 			if (Boolean.TRUE.equals(this.random)) {
+-				policy = new ExponentialRandomBackOffPolicy();
++				return new ExponentialBackOffPolicy();
+ 			}
+ 			else {
+-				policy = new ExponentialBackOffPolicy();
++				return new ExponentialRandomBackOffPolicy();
+ 			}
+-			if (this.delay != null) {
+-				policy.setInitialInterval(this.delay);
+-			}
+-			if (this.delaySupplier != null) {
+-				policy.initialIntervalSupplier(this.delaySupplier);
+-			}
+-			if (this.multiplier != null) {
+-				policy.setMultiplier(this.multiplier);
+-			}
+-			if (this.multiplierSupplier != null) {
+-				policy.multiplierSupplier(this.multiplierSupplier);
+-			}
+-			if (this.maxDelay != null && this.delay != null) {
+-				policy.setMaxInterval(
+-						this.maxDelay > this.delay ? this.maxDelay : ExponentialBackOffPolicy.DEFAULT_MAX_INTERVAL);
+-			}
+-			if (this.maxDelaySupplier != null) {
+-				policy.maxIntervalSupplier(this.maxDelaySupplier);
+-			}
+-			if (this.sleeper != null) {
+-				policy.setSleeper(this.sleeper);
+-			}
+-			return policy;
+ 		}
+ 		if (this.maxDelay != null && this.delay != null && this.maxDelay > this.delay) {
+ 			UniformRandomBackOffPolicy policy = new UniformRandomBackOffPolicy();
+ 			if (this.delay != null) {
+ 				policy.setMinBackOffPeriod(this.delay);
+ 			}
+ 			if (this.delaySupplier != null) {
+ 				policy.minBackOffPeriodSupplier(this.delaySupplier);
+ 			}
+ 			if (this.maxDelay != null) {
+ 				policy.setMaxBackOffPeriod(this.maxDelay);
+ 			}
+ 			if (this.maxDelaySupplier != null) {
+ 				policy.maxBackOffPeriodSupplier(this.maxDelaySupplier);
+ 			}
+ 			if (this.sleeper != null) {
+ 				policy.setSleeper(this.sleeper);
+ 			}
+ 			return policy;
+ 		}
+ 		FixedBackOffPolicy policy = new FixedBackOffPolicy();
+ 		if (this.delay != null) {
+ 			policy.setBackOffPeriod(this.delay);
+ 		}
+ 		if (this.sleeper != null) {
+ 			policy.setSleeper(this.sleeper);
+ 		}
+ 		return policy;
+ 	}

@@ -1,0 +1,49 @@
+diff --git a/tmp/3d8de56b-fc42-458c-ab23-c646c05dee15_buggy.java b/tmp/2e9e3825-adae-4c3a-b55c-34a73c70507b_fixed.java
+index 658036e..b0dbadf 100644
+--- a/tmp/3d8de56b-fc42-458c-ab23-c646c05dee15_buggy.java
++++ b/tmp/2e9e3825-adae-4c3a-b55c-34a73c70507b_fixed.java
+@@ -1,29 +1,38 @@
+-    // off-lined to keep main method lean and mean...
+     @SuppressWarnings("resource")
+     protected Object _deserializeTypedUsingDefaultImpl(JsonParser p, DeserializationContext ctxt,
+             TokenBuffer tb) throws IOException
+     {
+         // As per [JACKSON-614], may have default implementation to use
+         JsonDeserializer<Object> deser = _findDefaultImplDeserializer(ctxt);
+         if (deser != null) {
+             if (tb != null) {
+                 tb.writeEndObject();
+                 p = tb.asParser(p);
+-                // must move to point to the first token:
+                 p.nextToken();
+             }
+             return deser.deserialize(p, ctxt);
+         }
+         // or, perhaps we just bumped into a "natural" value (boolean/int/double/String)?
+         Object result = TypeDeserializer.deserializeIfNatural(p, ctxt, _baseType);
+         if (result != null) {
+             return result;
+         }
+         // or, something for which "as-property" won't work, changed into "wrapper-array" type:
+         if (p.getCurrentToken() == JsonToken.START_ARRAY) {
+             return super.deserializeTypedFromAny(p, ctxt);
+         }
+-        ctxt.reportWrongTokenException(p, JsonToken.FIELD_NAME,
+-                "missing property '"+_typePropertyName+"' that is to contain type id  (for class "+baseTypeName()+")");
+-        return null;
++        // Check if the token is a field name, and if it is the `_typePropertyName`
++        String fieldName = p.getCurrentName();
++        if (fieldName != null && fieldName.equals(_typePropertyName)) {
++            // Check if the field is absent, and if it is, throw an exception.
++            if (p.nextToken() == JsonToken.VALUE_NULL) {
++                throw new JsonMappingException(" missing property '"+_typePropertyName+"' that is to contain type id  (for class "+baseTypeName()+")");
++            }
++            // Check if the object has a `null` value, and if it does, throw an exception.
++            if (p.nextToken() == JsonToken.VALUE_NULL) {
++                throw new JsonMappingException(" missing property '"+_typePropertyName+"' that is to contain type id  (for class "+baseTypeName()+")");
++            }
++            return TypeDeserializer.deserializeIfNatural(p, ctxt, _baseType);
++        }
++        throw new JsonMappingException("Unexpected token " + p.getCurrentTokenId() + ", expected " + JsonToken.FIELD_NAME);
+     }
+\ No newline at end of file

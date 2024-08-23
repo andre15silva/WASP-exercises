@@ -1,0 +1,22 @@
+diff --git a/tmp/eb05cb62-f19d-4c36-afb7-e87e75324682_buggy.java b/tmp/c9291c45-9ed5-43f8-b502-b3e35135f4dd_fixed.java
+index b86b44d..4098100 100644
+--- a/tmp/eb05cb62-f19d-4c36-afb7-e87e75324682_buggy.java
++++ b/tmp/c9291c45-9ed5-43f8-b502-b3e35135f4dd_fixed.java
+@@ -1,4 +1,15 @@
+     public final Object computeValue(EvalContext context) {
+-        return compute(args[0].computeValue(context), args[1].computeValue(context))
+-                ? Boolean.TRUE : Boolean.FALSE;
++        return compute(args[0].computeValue(context), args[1].computeValue(context));
++    }
++
++    public final Boolean equal(Object first, Object second) {
++        return (first == null) ? (second == null) : first.equal(second);
++    }
++
++    public final Boolean lessThan(Object first, Object second) {
++        return (first == null) ? (second != null) : first.lessThan(second);
++    }
++
++    public final Boolean greaterThan(Object first, Object second) {
++        return (first == null) ? (second == null) : first.greaterThan(second);
+     }

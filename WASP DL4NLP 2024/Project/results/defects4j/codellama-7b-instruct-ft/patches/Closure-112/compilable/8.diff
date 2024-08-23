@@ -1,0 +1,60 @@
+diff --git a/tmp/ba581eee-8862-48c0-8dd6-9fd9e755dd0d_buggy.java b/tmp/55b78c46-253a-48f1-9c16-e293657e45cd_fixed.java
+index 63641d0..966492d 100644
+--- a/tmp/ba581eee-8862-48c0-8dd6-9fd9e755dd0d_buggy.java
++++ b/tmp/55b78c46-253a-48f1-9c16-e293657e45cd_fixed.java
+@@ -1,33 +1,52 @@
+   /**
+    * For functions with function(this: T, ...) and T as parameters, type
+    * inference will set the type of this on a function literal argument to the
+    * the actual type of T.
+    */
+   private boolean inferTemplatedTypesForCall(
+       Node n, FunctionType fnType) {
+     final ImmutableList<TemplateType> keys = fnType.getTemplateTypeMap()
+         .getTemplateKeys();
+     if (keys.isEmpty()) {
+       return false;
+     }
+ 
+     // Try to infer the template types
+     Map<TemplateType, JSType> inferred =
+         inferTemplateTypesFromParameters(fnType, n);
+ 
+ 
+     // Replace all template types. If we couldn't find a replacement, we
+     // replace it with UNKNOWN.
+     TemplateTypeReplacer replacer = new TemplateTypeReplacer(
+         registry, inferred);
+     Node callTarget = n.getFirstChild();
+ 
+-    FunctionType replacementFnType = fnType.visit(replacer)
++    final FunctionType replacementFnType = fnType.visit(replacer)
+         .toMaybeFunctionType();
+-    Preconditions.checkNotNull(replacementFnType);
+-
++    if (!fnType.isConstructor() && replacementFnType != null) {
++      // If you have something like:
++      // var x = [];
++      // x.foo(...);
++      //
++      // The this type of the inferred function must be the constructor that
++      // created x. Since the this is the same as "this", it is a primitive.
++      // Since no concrete templates exist anywhere, we can't find a non-primitive
++      // type to use.
++      //
++      // It would be nice to be able to use x's type here, but x's type
++      // is {length: number, [x: string]: ?} at definition and at call, {}.
++      // The call is an array, but the definition is the constructor function
++      // for this array. As a result, we have no concrete type to use.
+       callTarget.setJSType(replacementFnType);
++    } else {
++      Preconditions.checkNotNull(callTarget.getJSType());
++    }
++    if (fnType.isConstructor() && replacementFnType != null) {
+       n.setJSType(replacementFnType.getReturnType());
++    } else {
++      n.setJSType(fnType.getReturnType());
++    }
+ 
+     return replacer.madeChanges;
+   }

@@ -1,0 +1,32 @@
+diff --git a/tmp/5f833a5c-dd88-4223-9005-a7e4d34849c3_buggy.java b/tmp/00aa3ab9-ce4b-4dba-9b4d-c8d42c21802f_fixed.java
+index bfa2423..f41e8ca 100644
+--- a/tmp/5f833a5c-dd88-4223-9005-a7e4d34849c3_buggy.java
++++ b/tmp/00aa3ab9-ce4b-4dba-9b4d-c8d42c21802f_fixed.java
+@@ -1,23 +1,21 @@
+     /**
+      * Generate a random sample from the distribution.
+      *
+      * @param sampleSize the number of random values to generate.
+      * @return an array representing the random sample.
+      * @throws NotStrictlyPositiveException if {@code sampleSize} is not
+      * positive.
+      */
+     public T[] sample(int sampleSize) throws NotStrictlyPositiveException {
+         if (sampleSize <= 0) {
+             throw new NotStrictlyPositiveException(LocalizedFormats.NUMBER_OF_SAMPLES,
+                     sampleSize);
+         }
+-
+         final T[]out = (T[]) java.lang.reflect.Array.newInstance(singletons.get(0).getClass(), sampleSize);
+-
++        final int s = singletons.size();
+         for (int i = 0; i < sampleSize; i++) {
+-            out[i] = sample();
++            int index = random.nextInt(s);
++            out[i] = singletons.get(index);
+         }
+-
+         return out;
+-
+     }
+\ No newline at end of file

@@ -1,0 +1,63 @@
+diff --git a/tmp/e461b0af-b5f7-4427-81f8-23b963994e6d_buggy.java b/tmp/1bbb6c95-a272-4c57-b905-407d126c3bb8_fixed.java
+index 9c25814..afe2923 100644
+--- a/tmp/e461b0af-b5f7-4427-81f8-23b963994e6d_buggy.java
++++ b/tmp/1bbb6c95-a272-4c57-b905-407d126c3bb8_fixed.java
+@@ -1,27 +1,55 @@
+     /**
+      * <p>Throws a {@link MissingOptionException} if all of the
+      * required options are no present.</p>
+      *
+      * @throws MissingOptionException if any of the required Options
+      * are not present.
+      */
+     private void checkRequiredOptions()
+         throws MissingOptionException
+     {
+         // if there are required options that have not been
+         // processsed
+         if (requiredOptions.size() > 0)
+         {
++            /* Create the missing options list, first element
++             * of the list being each option
++             * separated by space
++             */
++            final List/*<String>*/ missingOptions = new ArrayList();
+             Iterator iter = requiredOptions.iterator();
+-            StringBuffer buff = new StringBuffer();
+ 
+ 
+             // loop through the required options
+             while (iter.hasNext())
+             {
+-                buff.append(iter.next());
++                // for each option
++                final Option option = (Option) iter.next();
++                // if option is missing
++                if (! options.hasOption(option.getOpt()))
++                {
++                    missingOptions.add(option.getLongOpt());
++                    missingOptions.add(option.getOpt());
++                }
++            }
++
++            // If the required options are not missing we cannot
++            // have any errors, we must be good.
++            if (missingOptions.size() == 0) {
++                return;
+             }
+ 
+-            throw new MissingOptionException(buff.toString());
++            final StringBuffer message = new StringBuffer(
++                Messages.getMessage("missingOptions"));
++            int i = 0;
++            for (Iterator it = missingOptions.iterator(); it.hasNext(); ++i)
++            {
++                message.append(' ').append(it.next());
++                if (i < missingOptions.size() - 1)
++                {
++                    message.append(i < missingOptions.size() - 2 ? ", or " : " or ");
++                }
++            }
++            throw new MissingOptionException(message.toString());
+         }
+     }

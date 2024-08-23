@@ -1,0 +1,45 @@
+diff --git a/tmp/da717083-0eaf-4e88-8afb-9c5319d260d9_buggy.java b/tmp/ee4187f0-4f5e-4da4-bc11-785430eac532_fixed.java
+index d4e6d48..2605efa 100644
+--- a/tmp/da717083-0eaf-4e88-8afb-9c5319d260d9_buggy.java
++++ b/tmp/ee4187f0-4f5e-4da4-bc11-785430eac532_fixed.java
+@@ -1,23 +1,32 @@
+   private Node tryFoldSimpleFunctionCall(Node n) {
+     Preconditions.checkState(n.isCall());
+     Node callTarget = n.getFirstChild();
+     if (callTarget != null && callTarget.isName() &&
+           callTarget.getString().equals("String")) {
+-      // Fold String(a) to '' + (a) on immutable literals,
+-      // which allows further optimizations
+-      //
+-      // We can't do this in the general case, because String(a) has
+-      // slightly different semantics than '' + (a). See
+-      // http://code.google.com/p/closure-compiler/issues/detail?id=759
++      // fold String(a) to '' + (a), for immutable literals.  On the
++      // immutable literals ['', 0, false, function(){}, etc], this
++      // simplifies further optimizations that are dependent on this one.
+       Node value = callTarget.getNext();
+-      if (value != null) {
++      if (n.getChildCount() == 2) {
++        // Check for immutable literal
++        // NOTE:
++        // if the node is not a string/number literal, then n.getChildCount() == 3
++        // and we can detect cases like String(["a"])
++        Node literal = value;
++        while (literal.isDelProp() &&
++               (literal.getLastChild().isString() || literal.getFirstChild()
++                 .isNumber())) {
++          literal = literal.removeLastChild().removeFirstChild().detachFromParent();
++        }
++        if (NodeUtil.isLiteralValue(literal, true)) {
+           Node addition = IR.add(
+-            IR.string("").srcref(callTarget),
++              IR.string("").srcref(n),
+               value.detachFromParent());
+           n.getParent().replaceChild(n, addition);
+           reportCodeChange();
+           return addition;
+         }
+       }
++    }
+     return n;
+   }

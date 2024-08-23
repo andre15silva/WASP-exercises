@@ -1,0 +1,41 @@
+diff --git a/tmp/5ec07a5f-f379-4b1b-a792-408e7a5e14c6_buggy.java b/tmp/f5b491a9-bf8b-4af9-ac30-fcc5f587c928_fixed.java
+index 7e43c1c..5a9b062 100644
+--- a/tmp/5ec07a5f-f379-4b1b-a792-408e7a5e14c6_buggy.java
++++ b/tmp/f5b491a9-bf8b-4af9-ac30-fcc5f587c928_fixed.java
+@@ -1,19 +1,36 @@
+   /**
+    * Visits a NEW node.
+    */
+   private void visitNew(NodeTraversal t, Node n) {
+     Node constructor = n.getFirstChild();
+     JSType type = getJSType(constructor).restrictByNotNullOrUndefined();
+     if (type.isConstructor() || type.isEmptyType() || type.isUnknownType()) {
+       FunctionType fnType = type.toMaybeFunctionType();
+       if (fnType != null) {
+         visitParameterList(t, n, fnType);
+         ensureTyped(t, n, fnType.getInstanceType());
+       } else {
+         ensureTyped(t, n);
+       }
+     } else {
+       report(t, n, NOT_A_CONSTRUCTOR);
+       ensureTyped(t, n);
+     }
++    // Avoid reporting NOT_A_CONSTRUCTOR and NOT_A_NEW_STYLE_CONSTRUCTOR multiple
++    // times in the same compilation unit.
++    if (t.inGlobalScope()
++        && compiler.getCodingConvention().isHtmlTag(n.getFirstChild().getString())) {
++      for (Node ancestor = n; ancestor != null && ancestor != constructor;
++           ancestor = ancestor.getParent()) {
++        if (ancestor.isName()) {
++          JSType ancestorType = getJSType(ancestor);
++          if (!ancestorType.isConstructor() && ancestorType.isUnknownType()) {
++            // Not a constructor in that scope.
++            continue;
++          }
++        }
++        report(t, ancestor, NOT_A_NEW_STYLE_CONSTRUCTOR,
++               constructor.getQualifiedName());
++      }
++    }
+   }

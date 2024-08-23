@@ -1,0 +1,25 @@
+diff --git a/tmp/db671b60-14b6-4429-b472-1c73e600f393_buggy.java b/tmp/27e97990-3349-47e4-9dd9-70729fab5850_fixed.java
+index 19fe1b4..7138d1c 100644
+--- a/tmp/db671b60-14b6-4429-b472-1c73e600f393_buggy.java
++++ b/tmp/27e97990-3349-47e4-9dd9-70729fab5850_fixed.java
+@@ -1,17 +1,18 @@
+     public static boolean isJSIdentifier(String s) {
+       int length = s.length();
+ 
+       if (length == 0 ||
+           !Character.isJavaIdentifierStart(s.charAt(0))) {
+         return false;
+       }
+ 
+       for (int i = 1; i < length; i++) {
+-        if (
+-            !Character.isJavaIdentifierPart(s.charAt(i))) {
++        if (!Character.isJavaIdentifierPart(s.charAt(i)) &&
++            // When targeting ES5, identifiers may also be quoted string
++            !(F_COMPAT_5 && (s.charAt(i) == '.' || Character.isDigit(s.charAt(i))))) {
+           return false;
+         }
+       }
+ 
+       return true;
+     }

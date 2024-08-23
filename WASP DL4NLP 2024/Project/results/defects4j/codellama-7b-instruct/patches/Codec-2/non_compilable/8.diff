@@ -1,0 +1,85 @@
+diff --git a/tmp/731b39e0-966e-4c06-be90-7866e6b6f8da_buggy.java b/tmp/91683495-9fad-4dbb-93ee-e00b3a30c210_fixed.java
+index aea175a..7d4fcd7 100644
+--- a/tmp/731b39e0-966e-4c06-be90-7866e6b6f8da_buggy.java
++++ b/tmp/91683495-9fad-4dbb-93ee-e00b3a30c210_fixed.java
+@@ -1,76 +1,4 @@
+-    /**
+-     * <p>
+-     * Encodes all of the provided data, starting at inPos, for inAvail bytes.
+-     * Must be called at least twice:  once with the data to encode, and once
+-     * with inAvail set to "-1" to alert encoder that EOF has been reached,
+-     * so flush last remaining bytes (if not multiple of 3).
+-     * </p><p>
+-     * Thanks to "commons" project in ws.apache.org for the bitwise operations,
+-     * and general approach.
+-     * http://svn.apache.org/repos/asf/webservices/commons/trunk/modules/util/
+-     * </p>
+-     *
+-     * @param in byte[] array of binary data to base64 encode.
+-     * @param inPos Position to start reading data from.
+-     * @param inAvail Amount of bytes available from input for encoding.
+-     */
+-    void encode(byte[] in, int inPos, int inAvail) {
+-        if (eof) {
+-            return;
+-        }
+-        // inAvail < 0 is how we're informed of EOF in the underlying data we're
+-        // encoding.
+-        if (inAvail < 0) {
+-            eof = true;
+-            if (buf == null || buf.length - pos < encodeSize) {
+-                resizeBuf();
+-            }
+-            switch (modulus) {
+-                case 1:
+-                    buf[pos++] = encodeTable[(x >> 2) & MASK_6BITS];
+-                    buf[pos++] = encodeTable[(x << 4) & MASK_6BITS];
+-                    // URL-SAFE skips the padding to further reduce size.
+-                    if (encodeTable == STANDARD_ENCODE_TABLE) {
+-                        buf[pos++] = PAD;
+-                        buf[pos++] = PAD;
+-                    }
+-                    break;
++```
+ 
+-                case 2:
+-                    buf[pos++] = encodeTable[(x >> 10) & MASK_6BITS];
+-                    buf[pos++] = encodeTable[(x >> 4) & MASK_6BITS];
+-                    buf[pos++] = encodeTable[(x << 2) & MASK_6BITS];
+-                    // URL-SAFE skips the padding to further reduce size.
+-                    if (encodeTable == STANDARD_ENCODE_TABLE) {
+-                        buf[pos++] = PAD;
+-                    }
+-                    break;
+-            }
+-            if (lineLength > 0) {
+-                System.arraycopy(lineSeparator, 0, buf, pos, lineSeparator.length);
+-                pos += lineSeparator.length;
+-            }
+-        } else {
+-            for (int i = 0; i < inAvail; i++) {
+-                if (buf == null || buf.length - pos < encodeSize) {
+-                    resizeBuf();
+-                }
+-                modulus = (++modulus) % 3;
+-                int b = in[inPos++];
+-                if (b < 0) { b += 256; }
+-                x = (x << 8) + b;
+-                if (0 == modulus) {
+-                    buf[pos++] = encodeTable[(x >> 18) & MASK_6BITS];
+-                    buf[pos++] = encodeTable[(x >> 12) & MASK_6BITS];
+-                    buf[pos++] = encodeTable[(x >> 6) & MASK_6BITS];
+-                    buf[pos++] = encodeTable[x & MASK_6BITS];
+-                    currentLinePos += 4;
+-                    if (lineLength > 0 && lineLength <= currentLinePos) {
+-                        System.arraycopy(lineSeparator, 0, buf, pos, lineSeparator.length);
+-                        pos += lineSeparator.length;
+-                        currentLinePos = 0;
+-                    }
+-                }
+-            }
+-        }
+-    }
++[\INST0]
++To fix the buggy function, we need to replace the condition with a boolean expression that checks if the modulus is equal to 0, 1, or 2.
+\ No newline at end of file

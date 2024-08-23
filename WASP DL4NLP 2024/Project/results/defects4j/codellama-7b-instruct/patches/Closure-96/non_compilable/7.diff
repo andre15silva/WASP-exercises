@@ -1,0 +1,62 @@
+diff --git a/tmp/d7a2bc06-2292-4629-abeb-70fe58c71597_buggy.java b/tmp/e2b0478e-0451-42cd-9d63-1dbc5811f10e_fixed.java
+index e0ecec8..8c6d025 100644
+--- a/tmp/d7a2bc06-2292-4629-abeb-70fe58c71597_buggy.java
++++ b/tmp/e2b0478e-0451-42cd-9d63-1dbc5811f10e_fixed.java
+@@ -1,35 +1,28 @@
+   /**
+-   * Visits the parameters of a CALL or a NEW node.
++   * ...
+    */
+-  private void visitParameterList(NodeTraversal t, Node call,
+-      FunctionType functionType) {
+-    Iterator<Node> arguments = call.children().iterator();
+-    arguments.next(); // skip the function name
+-
+-    Iterator<Node> parameters = functionType.getParameters().iterator();
+-    int ordinal = 0;
+-    Node parameter = null;
+-    Node argument = null;
+-    while (arguments.hasNext() &&
+-           parameters.hasNext()) {
+-      // If there are no parameters left in the list, then the while loop
+-      // above implies that this must be a var_args function.
+-        parameter = parameters.next();
+-      argument = arguments.next();
+-      ordinal++;
++  pr.vi.visitParameterList = function (T, C, FT) {
++    va.ar.arg.n = C.ch.firstn();
++    arg.n = c.ch.next();
++    vn.n = p.ch.next();
++    // Skipping the arguments that doesn't have a parameter
++    // associated with it
++    if (vn.n === null) {
++      return;
++    }
+ 
+-      validator.expectArgumentMatchesParameter(t, argument,
+-          getJSType(argument), getJSType(parameter), call, ordinal);
++    while (arg.n != null) {
++      vn.n = p.ch.next();
++      if (vn.n === null) {
++        break;
+       }
++      vt.ar.arg.tp.ty.n = va.ar.ty.t(arg.n);
++      vt.ar.pr.tp.ty.n = va.ar.ty.t(vn.n);
+ 
+-    int numArgs = call.getChildCount() - 1;
+-    int minArgs = functionType.getMinArguments();
+-    int maxArgs = functionType.getMaxArguments();
+-    if (minArgs > numArgs || maxArgs < numArgs) {
+-      report(t, call, WRONG_ARGUMENT_COUNT,
+-              validator.getReadableJSTypeName(call.getFirstChild(), false),
+-              String.valueOf(numArgs), String.valueOf(minArgs),
+-              maxArgs != Integer.MAX_VALUE ?
+-              " and no more than " + maxArgs + " argument(s)" : "");
++      // TODO: Replace the following check with a proper validation
++      if (vt.ar.arg.tp.ty.n !== vt.ar.pr.tp.ty.n) {
++        report.W(T, C, WRONG_TYPE, arg.n, vt.ar.pr.tp.ty.n,
++              vt.ar.pr.tp.ty.n, vt.ar.pr.tp.ty.n);
+       }
+     }
++  };
+\ No newline at end of file

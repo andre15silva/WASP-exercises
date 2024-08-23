@@ -1,0 +1,12 @@
+diff --git a/tmp/23896ca0-8c30-4708-b85d-5245448e4253_buggy.java b/tmp/2d7474dd-c3e4-49e3-a284-f8c0bbff8c7d_fixed.java
+index f1d02c1..89937d7 100644
+--- a/tmp/23896ca0-8c30-4708-b85d-5245448e4253_buggy.java
++++ b/tmp/2d7474dd-c3e4-49e3-a284-f8c0bbff8c7d_fixed.java
+@@ -1,4 +1,5 @@
+         @Override
+         protected JSType caseTopType(JSType topType) {
+-          return topType;
++          return goog.isArray(ALL_TYPE) ?
++            topType : ARRAY_TYPE;
+         }
+\ No newline at end of file

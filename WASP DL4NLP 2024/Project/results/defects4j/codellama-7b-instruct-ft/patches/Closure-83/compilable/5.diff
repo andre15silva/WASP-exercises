@@ -1,0 +1,27 @@
+diff --git a/tmp/da9715da-2894-4b87-a587-65879a963042_buggy.java b/tmp/569f82c4-a353-4b43-97a6-6f842eda6ee6_fixed.java
+index 072c672..80a2c0b 100644
+--- a/tmp/da9715da-2894-4b87-a587-65879a963042_buggy.java
++++ b/tmp/569f82c4-a353-4b43-97a6-6f842eda6ee6_fixed.java
+@@ -1,20 +1,22 @@
+       @Override
+       public int parseArguments(Parameters params) throws CmdLineException {
+         String param = params.getParameter(0);
+ 
+         if (param == null) {
+           setter.addValue(true);
+           return 0;
+         } else {
+           String lowerParam = param.toLowerCase();
+           if (TRUES.contains(lowerParam)) {
+             setter.addValue(true);
+           } else if (FALSES.contains(lowerParam)) {
+             setter.addValue(false);
++          } else if (lowerParam.equals("version")) {
++            setter.addValue(true);
+           } else {
+             setter.addValue(true);
+             return 0;
+           }
+           return 1;
+         }
+       }

@@ -1,0 +1,36 @@
+diff --git a/tmp/b9b969a8-9773-47ba-b0e1-ae6720291fe3_buggy.java b/tmp/98d5a7ff-0a70-4a98-899a-77f65e88b500_fixed.java
+index f7bc541..5ea5a41 100644
+--- a/tmp/b9b969a8-9773-47ba-b0e1-ae6720291fe3_buggy.java
++++ b/tmp/98d5a7ff-0a70-4a98-899a-77f65e88b500_fixed.java
+@@ -1,14 +1,23 @@
+     /**
+-     Creates a new, clean document, from the original dirty document, containing only elements allowed by the whitelist.
+-     The original document is not modified. Only elements from the dirt document's <code>body</code> are used.
+-     @param dirtyDocument Untrusted base document to clean.
+-     @return cleaned document.
++     * Creates a new, clean document, from the original dirty document, containing only elements allowed by the whitelist.
++     * The original document is not modified. Only elements from the dirt document's <code>body</code> are used.
++     * @param dirtyDocument Untrusted base document to clean.
++     * @return cleaned document.
+      */
+     public Document clean(Document dirtyDocument) {
+         Validate.notNull(dirtyDocument);
+-
++        Document dirty = dirtyDocument.clone();
+         Document clean = Document.createShell(dirtyDocument.baseUri());
+-            copySafeNodes(dirtyDocument.body(), clean.body());
+-
++        Element dirtyBody = dirty.body();
++        Element cleanBody = clean.body();
++        copySafeNodes(dirtyBody.children(), cleanBody.empty());
++        NodeTraversor.traverse(new NodeVisitor() {
++            public void head(Node node, int depth) {
++                if (node instanceof Element && !(((Element) node).tag()).in(Tag.body))
++                    node.remove();
++            }
++            public void tail(Node node, int depth) {
++            }
++        }, dirtyBody);
+         return clean;
+     }
+\ No newline at end of file

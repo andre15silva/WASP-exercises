@@ -1,0 +1,46 @@
+diff --git a/tmp/cee04bab-9a5a-4daa-a213-3c3ce2d1e3ee_buggy.java b/tmp/d41c37b6-d086-4a0d-a7a6-f7acb913aba1_fixed.java
+index b2db1d6..60847d3 100644
+--- a/tmp/cee04bab-9a5a-4daa-a213-3c3ce2d1e3ee_buggy.java
++++ b/tmp/d41c37b6-d086-4a0d-a7a6-f7acb913aba1_fixed.java
+@@ -1,29 +1,40 @@
+     protected void _addMethodMixIns(Class<?> targetClass, AnnotatedMethodMap methods,
+             Class<?> mixInCls, AnnotatedMethodMap mixIns)
+     {
+         List<Class<?>> parents = new ArrayList<Class<?>>();
+         parents.add(mixInCls);
+         ClassUtil.findSuperTypes(mixInCls, targetClass, parents);
+         for (Class<?> mixin : parents) {
++        		if (mixin == Object.class) {
++        			continue;
++        		}
+             for (Method m : mixin.getDeclaredMethods()) {
+                 if (!_isIncludableMemberMethod(m)) {
+                     continue;
+                 }
+                 AnnotatedMethod am = methods.find(m);
+                 /* Do we already have a method to augment (from sub-class
+                  * that will mask this mixIn)? If so, add if visible
+                  * without masking (no such annotation)
+                  */
+                 if (am != null) {
+                     _addMixUnders(m, am);
+                     /* Otherwise will have precedence, but must wait
+                      * until we find the real method (mixIn methods are
+                      * just placeholder, can't be called)
+                      */
+                 } else {
+-                    // Well, or, as per [Issue#515], multi-level merge within mixins...
++                		/* 
++                		 * NOTE: should check visibility first, otherwise this rule would
++                		 * prevent non-public mixin methods...?
++	                     * Do it this way to minimize complexity of methods.find(m) 
++	                     * (since it's a costly lookup)
++	                     */
++	                	BeanDescription aBean = ClassUtil.createBeanDescription(mixin);
++	                    if (!aBean.findPropertyWriter(m.getName())) {
+ 	                        mixIns.add(_constructMethod(m));
+ 	                    }
+                 }
+             }
+         }
++    }

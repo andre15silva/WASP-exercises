@@ -1,0 +1,51 @@
+diff --git a/tmp/3c432bd7-d66c-4976-ae8d-0e02875a8cd6_buggy.java b/tmp/a8461e60-df4b-487a-a685-2b2cb302db03_fixed.java
+index 114ff20..bc1826a 100644
+--- a/tmp/3c432bd7-d66c-4976-ae8d-0e02875a8cd6_buggy.java
++++ b/tmp/a8461e60-df4b-487a-a685-2b2cb302db03_fixed.java
+@@ -1,41 +1,32 @@
+-    /**
+-     * Returns a (possibly empty) collection of legend items for the series
+-     * that this renderer is responsible for drawing.
+-     *
+-     * @return The legend item collection (never <code>null</code>).
+-     *
+-     * @see #getLegendItem(int, int)
+-     */
+ public LegendItemCollection getLegendItems() {
+     LegendItemCollection result = new LegendItemCollection();
+     if (this.plot == null) {
+         return result;
+     }
+     int index = this.plot.getIndexOf(this);
+     CategoryDataset dataset = this.plot.getDataset(index);
+-        if (dataset != null) {
++    if (dataset == null) {
+         return result;
+     }
+     int seriesCount = dataset.getRowCount();
+     if (plot.getRowRenderingOrder().equals(SortOrder.ASCENDING)) {
+         for (int i = 0; i < seriesCount; i++) {
+             if (isSeriesVisibleInLegend(i)) {
+-                    LegendItem item = getLegendItem(index, i);
++                LegendItem item = getLegendItem(i, index); // Fixed the order of parameters
+                 if (item != null) {
+                     result.add(item);
+                 }
+             }
+         }
+-        }
+-        else {
++    } else {
+         for (int i = seriesCount - 1; i >= 0; i--) {
+             if (isSeriesVisibleInLegend(i)) {
+-                    LegendItem item = getLegendItem(index, i);
++                LegendItem item = getLegendItem(i, index); // Fixed the order of parameters
+                 if (item != null) {
+                     result.add(item);
+                 }
+             }
+         }
+     }
+     return result;
+ }
+\ No newline at end of file

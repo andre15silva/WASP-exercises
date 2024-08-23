@@ -1,0 +1,29 @@
+diff --git a/tmp/af68f92b-dd14-4813-a4a8-a09873721646_buggy.java b/tmp/b86a5418-0aad-4eb4-bcd1-5ad350276564_fixed.java
+index f47d784..88eecca 100644
+--- a/tmp/af68f92b-dd14-4813-a4a8-a09873721646_buggy.java
++++ b/tmp/b86a5418-0aad-4eb4-bcd1-5ad350276564_fixed.java
+@@ -1,12 +1,23 @@
+ @Override
+ public void process(Node externs, Node root) {
+     NodeTraversal.traverse(compiler, root, this);
+     if (MAKE_LOCAL_NAMES_UNIQUE) {
+         MakeDeclaredNamesUnique renamer = new MakeDeclaredNamesUnique();
+         NodeTraversal t = new NodeTraversal(compiler, renamer);
+         t.traverseRoots(externs, root);
+     }
+     removeDuplicateDeclarations(root);
+     new PropogateConstantAnnotations(compiler, assertOnChange)
+         .process(externs, root);
++    
++    // Ensure that variables named 'arguments' are handled correctly.
++    NodeTraversal.traverse(compiler, root, new NodeTraversal.Callback() {
++        @Override
++        public void visit(NodeTraversal t, Node n, Node parent) {
++            if (n.isName() && n.getString().equals("arguments")) {
++                // Rename the 'arguments' identifier to avoid conflict.
++                n.setString(renamer.getUniqueName("arguments"));
++            }
++        }
++    });
+ }
+\ No newline at end of file

@@ -1,0 +1,23 @@
+diff --git a/tmp/92b04757-c55f-4049-8613-fa8c534d26f2_buggy.java b/tmp/21001d01-744d-4b6b-b7b8-0b5762fdfb72_fixed.java
+index 5bf31b1..2dc0bef 100644
+--- a/tmp/92b04757-c55f-4049-8613-fa8c534d26f2_buggy.java
++++ b/tmp/21001d01-744d-4b6b-b7b8-0b5762fdfb72_fixed.java
+@@ -1,17 +1,17 @@
+     private String consumeSubQuery() {
+         StringBuilder sq = StringUtil.borrowBuilder();
+         while (!tq.isEmpty()) {
+             if (tq.matches("("))
+                 sq.append("(").append(tq.chompBalanced('(', ')')).append(")");
+             else if (tq.matches("["))
+-                sq.append("[").append(tq.chompBalanced('[', ']')).append("]");
++                tq.consume(); // Don't consume the bracket, or append it to the StringBuilder
+             else if (tq.matchesAny(Combinators))
+                 if (sq.length() > 0)
+                     break;
+                 else
+                     tq.consume();
+             else
+                 sq.append(tq.consume());
+         }
+         return StringUtil.releaseBuilder(sq);
+     }

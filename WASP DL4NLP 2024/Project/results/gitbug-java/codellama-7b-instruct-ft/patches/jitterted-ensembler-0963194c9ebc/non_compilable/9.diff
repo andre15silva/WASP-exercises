@@ -1,0 +1,22 @@
+diff --git a/tmp/30b2331b-7cee-4217-9fb6-215955d0cd2d_buggy.java b/tmp/585390b3-a830-4ac8-b2ab-6a8191010fcf_fixed.java
+index 2bac745..b5abc2c 100644
+--- a/tmp/30b2331b-7cee-4217-9fb6-215955d0cd2d_buggy.java
++++ b/tmp/585390b3-a830-4ac8-b2ab-6a8191010fcf_fixed.java
+@@ -1,16 +1,12 @@
+     public static ParticipantAction from(MemberStatus memberStatus, boolean disabled) {
+         return switch (memberStatus) {
+             case UNKNOWN, DECLINED -> new ParticipantAction(
+                     "/member/accept",
+                     "Participate in Rotation &#x2328;",
+                     disabled);
+-            case PARTICIPANT -> new ParticipantAction(
++            case PARTICIPANT, SPECTATOR -> new ParticipantAction(
+                     "/member/decline",
+                     "Leave Rotation &#x1f44b;",
+                     false); // can always leave
+-            case SPECTATOR -> new ParticipantAction(
+-                    "/member/accept",
+-                    "Switch to Participant &#x1f44b;",
+-                    disabled);
+         };
+     }

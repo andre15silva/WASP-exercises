@@ -1,0 +1,18 @@
+diff --git a/tmp/da8e2e31-ddda-4372-8205-7e9f1571af57_buggy.java b/tmp/22d0ecfb-56df-4519-bc9a-66a24ab80bd7_fixed.java
+index a667cbe..58b012a 100644
+--- a/tmp/da8e2e31-ddda-4372-8205-7e9f1571af57_buggy.java
++++ b/tmp/22d0ecfb-56df-4519-bc9a-66a24ab80bd7_fixed.java
+@@ -1,10 +1,12 @@
+     /**
+      * Recalculate the hash code after deserialization. The hash code of some
+      * keys might have change (hash codes based on the system hash code are
+      * only stable for the same process).
+      * @return the instance with recalculated hash code
+      */
+     private Object readResolve() {
+         calculateHashCode(keys);
+-        return this;
++        // Make sure the object returned by equals() is always an instance of the current class
++        // This is useful when deserializing subclasses
++        return getClass().cast(this);
+     }

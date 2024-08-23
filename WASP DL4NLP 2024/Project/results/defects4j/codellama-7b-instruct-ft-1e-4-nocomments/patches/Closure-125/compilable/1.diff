@@ -1,0 +1,26 @@
+diff --git a/tmp/de48a1c8-7cfc-4fca-af44-204d8e3d68b0_buggy.java b/tmp/a16cb143-d7e7-418c-87e3-b60c8ddffa4a_fixed.java
+index 7e43c1c..478ec4b 100644
+--- a/tmp/de48a1c8-7cfc-4fca-af44-204d8e3d68b0_buggy.java
++++ b/tmp/a16cb143-d7e7-418c-87e3-b60c8ddffa4a_fixed.java
+@@ -1,19 +1,16 @@
+-  /**
+-   * Visits a NEW node.
+-   */
+   private void visitNew(NodeTraversal t, Node n) {
+     Node constructor = n.getFirstChild();
+     JSType type = getJSType(constructor).restrictByNotNullOrUndefined();
+-    if (type.isConstructor() || type.isEmptyType() || type.isUnknownType()) {
++    if (type.isConstructor()) {
+       FunctionType fnType = type.toMaybeFunctionType();
+       if (fnType != null) {
+         visitParameterList(t, n, fnType);
+         ensureTyped(t, n, fnType.getInstanceType());
+       } else {
+         ensureTyped(t, n);
+       }
+     } else {
+       report(t, n, NOT_A_CONSTRUCTOR);
+       ensureTyped(t, n);
+     }
+   }
+\ No newline at end of file

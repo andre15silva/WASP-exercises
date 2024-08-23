@@ -1,0 +1,26 @@
+diff --git a/tmp/8b84d16d-bff7-4018-ad18-4d10a36bab6e_buggy.java b/tmp/c55720b2-cd1f-4898-b868-786d9d8844bc_fixed.java
+index 42d4174..b6507b3 100644
+--- a/tmp/8b84d16d-bff7-4018-ad18-4d10a36bab6e_buggy.java
++++ b/tmp/c55720b2-cd1f-4898-b868-786d9d8844bc_fixed.java
+@@ -1,7 +1,15 @@
+-  /**
+-   * Returns the remainder of the line.
+-   */
+-  private String getRemainingJSDocLine() {
+-    String result = stream.getRemainingJSDocLine();
+-    return result;
++  public static boolean parse(String s, boolean preserveMarkdown, String errorMessage) {
++    int errorPos = -1;
++    try {
++      parse(s, preserveMarkdown);
++    } catch (IllegalArgumentException e) {
++      errorPos = e.getPosition();
++      assert errorMessage != null;
++      assert errorMessage.equals(e.getMessage());
++    }
++    if (errorPos != -1) {
++      throw new IllegalStateException("Bad record of position information " +
++          "(pos=" + errorPos + ", message=" + errorMessage + ")");
++    }
++    return true;
+   }

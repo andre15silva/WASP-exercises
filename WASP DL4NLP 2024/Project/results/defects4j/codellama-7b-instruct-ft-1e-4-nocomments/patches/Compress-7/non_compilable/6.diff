@@ -1,0 +1,37 @@
+diff --git a/tmp/b21febc4-84ef-4080-ae38-3829fa349a06_buggy.java b/tmp/41460e2a-b88a-4f53-b3de-5716e2f7385e_fixed.java
+index d6662c7..dfe131a 100644
+--- a/tmp/b21febc4-84ef-4080-ae38-3829fa349a06_buggy.java
++++ b/tmp/41460e2a-b88a-4f53-b3de-5716e2f7385e_fixed.java
+@@ -1,23 +1,18 @@
+     /**
+      * Parse an entry name from a buffer.
+      * Parsing stops when a NUL is found
+      * or the buffer length is reached.
+-     *
+      * @param buffer The buffer from which to parse.
+      * @param offset The offset into the buffer from which to parse.
+      * @param length The maximum number of bytes to parse.
+      * @return The entry name.
+      */
+-    public static String parseName(byte[] buffer, final int offset, final int length) {
+-        StringBuffer result = new StringBuffer(length);
+-        int          end = offset + length;
+-
+-        for (int i = offset; i < end; ++i) {
+-            if (buffer[i] == 0) {
+-                break;
+-            }
+-            result.append((char) buffer[i]);
+-        }
+-
+-        return result.toString();
++    public static String parseName(byte[] buffer, int offset, int length) {
++        java.nio.ByteBuffer buf =
++            java.nio.ByteBuffer.wrap(buffer, offset, length);
++        int i;
++        for (i = offset; i < offset+length && buffer[i]>=0 && buffer[i]<=127; ++i)
++            ;
++        String result = new String(buffer, offset, i-offset, "UTF-8");
++        return result;
+     }
+\ No newline at end of file

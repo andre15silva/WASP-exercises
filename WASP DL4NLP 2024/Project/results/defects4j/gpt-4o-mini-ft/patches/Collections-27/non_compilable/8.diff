@@ -1,0 +1,25 @@
+diff --git a/tmp/4797ba8d-de83-4afc-8c34-dd72a7756a53_buggy.java b/tmp/e49eb728-78b4-4658-bf68-59bf3a6fce8d_fixed.java
+index e69de29..3975e67 100644
+--- a/tmp/4797ba8d-de83-4afc-8c34-dd72a7756a53_buggy.java
++++ b/tmp/e49eb728-78b4-4658-bf68-59bf3a6fce8d_fixed.java
+@@ -0,0 +1,19 @@
++public class MultiValueMapTest {
++
++    @Test
++    public void testUnsafeDeSerialization() throws Exception {
++        MultiValueMap map1 = MultiValueMap.multiValueMap(new HashMap(), ArrayList.class);
++        byte[] bytes = serialize(map1);
++        Object result = deserialize(bytes);
++        assertEquals(map1, result);
++        
++        MultiValueMap map2 = MultiValueMap.multiValueMap(new HashMap(), (Class) String.class);
++        bytes = serialize(map2);
++        try {
++            result = deserialize(bytes);
++            fail("unsafe clazz accepted when de-serializing MultiValueMap");
++        } catch (UnsupportedOperationException ex) {
++            // expected
++        }
++    }
++}
+\ No newline at end of file

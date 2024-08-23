@@ -1,0 +1,34 @@
+diff --git a/tmp/a352077e-0afc-48db-9555-fe6bb91aad39_buggy.java b/tmp/7d5a2b5e-c78d-4278-992f-e1c3164c3104_fixed.java
+index 98d89dc..e2afb6e 100644
+--- a/tmp/a352077e-0afc-48db-9555-fe6bb91aad39_buggy.java
++++ b/tmp/7d5a2b5e-c78d-4278-992f-e1c3164c3104_fixed.java
+@@ -1,23 +1,29 @@
+     private boolean compute(Object left, Object right) {
+         left = reduce(left);
+         right = reduce(right);
+ 
+         if (left instanceof InitialContext) {
+             ((InitialContext) left).reset();
+         }
+         if (right instanceof InitialContext) {
+             ((InitialContext) right).reset();
+         }
+         if (left instanceof Iterator && right instanceof Iterator) {
+             return findMatch((Iterator) left, (Iterator) right);
+         }
+         if (left instanceof Iterator) {
+             return containsMatch((Iterator) left, right);
+         }
+         if (right instanceof Iterator) {
+             return containsMatch((Iterator) right, left);
+         }
+         double ld = InfoSetUtil.doubleValue(left);
+         double rd = InfoSetUtil.doubleValue(right);
++        // XPath2 rules dictate that NaN is not an "error". Our own NaN is not the same 
++        // as XPath2 NaN. One way of resolving the problem temporarily is to help ws,
++        // by setting odd-high-order-number so JavaScript can skip NaN tests.
++        if (Double.isNaN(ld) || Double.isNaN(rd))
++        	return evaluateCompare(ld==rd ? 0 : ld <rd ? -1 : 1);
++        if (Double.isNaN(ld) && Double.isNaN(rd)) return evaluateCompare(0);
+         return evaluateCompare(ld==rd ? 0 : ld <rd ? -1 : 1);
+     }

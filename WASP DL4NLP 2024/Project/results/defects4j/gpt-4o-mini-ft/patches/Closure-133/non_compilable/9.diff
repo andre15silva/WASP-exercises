@@ -1,0 +1,14 @@
+diff --git a/tmp/2ddef4ea-cda0-4637-a685-57673ecddcc5_buggy.java b/tmp/cb9c553c-0473-4cc9-82c3-44f81659de3c_fixed.java
+index 42d4174..d30dbb4 100644
+--- a/tmp/2ddef4ea-cda0-4637-a685-57673ecddcc5_buggy.java
++++ b/tmp/cb9c553c-0473-4cc9-82c3-44f81659de3c_fixed.java
+@@ -1,7 +1,8 @@
+   /**
+    * Returns the remainder of the line.
+    */
+-  private String getRemainingJSDocLine() {
++  @Override
++  public String getRemainingJSDocLine() {
+     String result = stream.getRemainingJSDocLine();
+     return result;
+   }

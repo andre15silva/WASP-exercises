@@ -1,0 +1,36 @@
+diff --git a/tmp/9f997c50-c63d-4618-a3cb-b59630807226_buggy.java b/tmp/1e69b524-f898-4816-a381-a099938da396_fixed.java
+index 351a97a..514fa98 100644
+--- a/tmp/9f997c50-c63d-4618-a3cb-b59630807226_buggy.java
++++ b/tmp/1e69b524-f898-4816-a381-a099938da396_fixed.java
+@@ -1,18 +1,20 @@
+-    /**
+-     * Tests the list for equality with another object (typically also a list).
+-     *
+-     * @param obj  the other object (<code>null</code> permitted).
+-     *
+-     * @return A boolean.
+-     */
+     public boolean equals(Object obj) {
+-
+         if (obj == this) {
+             return true;
+         }
+         if (!(obj instanceof ShapeList)) {
+             return false;
+         }
+-        return super.equals(obj);
+-
++        ShapeList that = (ShapeList) obj;
++        if (this.size() != that.size()) {
++            return false;
++        }
++        for (int i = 0; i < this.size(); i++) {
++            final Shape s1 = this.getShape(i);
++            final Shape s2 = that.getShape(i);
++            if (!Objects.equals(s1, s2)) {
++                return false;
++            }
++        }
++        return true;
+     }
+\ No newline at end of file

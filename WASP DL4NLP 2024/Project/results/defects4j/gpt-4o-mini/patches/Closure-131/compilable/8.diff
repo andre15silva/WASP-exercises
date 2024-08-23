@@ -1,0 +1,27 @@
+diff --git a/tmp/400301c9-8bc8-4cbf-856f-3138ccf2ae79_buggy.java b/tmp/d76140df-6bce-45aa-bea7-d0021837c3d1_fixed.java
+index 19fe1b4..01b6fab 100644
+--- a/tmp/400301c9-8bc8-4cbf-856f-3138ccf2ae79_buggy.java
++++ b/tmp/d76140df-6bce-45aa-bea7-d0021837c3d1_fixed.java
+@@ -1,17 +1,17 @@
+ public static boolean isJSIdentifier(String s) {
+     int length = s.length();
+ 
+-      if (length == 0 ||
+-          !Character.isJavaIdentifierStart(s.charAt(0))) {
++    if (length == 0 || !Character.isJavaIdentifierStart(s.charAt(0))) {
+         return false;
+     }
+ 
+     for (int i = 1; i < length; i++) {
+-        if (
+-            !Character.isJavaIdentifierPart(s.charAt(i))) {
++        char currentChar = s.charAt(i);
++        if (!Character.isJavaIdentifierPart(currentChar) &&
++            currentChar != '.' && currentChar != '\'') { // Allow dot and quotes for dotted properties and quoted keys
+             return false;
+         }
+     }
+ 
+     return true;
+ }
+\ No newline at end of file

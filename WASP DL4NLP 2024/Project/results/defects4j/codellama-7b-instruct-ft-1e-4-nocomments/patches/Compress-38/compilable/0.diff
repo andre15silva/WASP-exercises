@@ -1,0 +1,28 @@
+diff --git a/tmp/63551a8b-358f-4f40-8b42-46b9aaa8fd6d_buggy.java b/tmp/c2c9a2d9-c15b-41e4-a4d4-6d33886e748c_fixed.java
+index 192e83d..ecdbcff 100644
+--- a/tmp/63551a8b-358f-4f40-8b42-46b9aaa8fd6d_buggy.java
++++ b/tmp/c2c9a2d9-c15b-41e4-a4d4-6d33886e748c_fixed.java
+@@ -1,21 +1,18 @@
+     /**
+      * Return whether or not this entry represents a directory.
+      *
+      * @return True if this entry is a directory.
+      */
+     @Override
+     public boolean isDirectory() {
+         if (file != null) {
+             return file.isDirectory();
+         }
+-
+         if (linkFlag == LF_DIR) {
+             return true;
+         }
+-
+-        if (getName().endsWith("/")) {
++        if (getName().charAt(getName().length() - 1) == '/') {
+             return true;
+         }
+-
+         return false;
+     }
+\ No newline at end of file

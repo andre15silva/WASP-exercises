@@ -1,0 +1,29 @@
+diff --git a/tmp/e7c9d175-ad40-470f-9d3a-46f5169072d7_buggy.java b/tmp/7165a53b-82ab-43ec-9973-e2e29344c5f3_fixed.java
+index 07b0792..f4721d3 100644
+--- a/tmp/e7c9d175-ad40-470f-9d3a-46f5169072d7_buggy.java
++++ b/tmp/7165a53b-82ab-43ec-9973-e2e29344c5f3_fixed.java
+@@ -1,22 +1,23 @@
+     /**
+      * @return Whether the variable is only assigned a value once for its
+      *     lifetime.
+      */
+     boolean isAssignedOnceInLifetime() {
+       Reference ref = getOneAndOnlyAssignment();
+       if (ref == null) {
+         return false;
+       }
+ 
+-      // Make sure this assignment is not in a loop.
++      // Issue 1053: Do not count assignments to a variable which is
++      // reassigned from within a loop.
+       for (BasicBlock block = ref.getBasicBlock();
+            block != null; block = block.getParent()) {
+         if (block.isFunction) {
+           break;
+         } else if (block.isLoop) {
+           return false;
+         }
+       }
+ 
+       return true;
+     }

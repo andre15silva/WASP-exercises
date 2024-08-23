@@ -1,0 +1,15 @@
+diff --git a/tmp/2002d7b7-feac-46ce-8516-63e0a9d7bbf7_buggy.java b/tmp/39d27e7d-118d-401a-83ce-7cf6f07361ad_fixed.java
+index 50f3e2e..5aae447 100644
+--- a/tmp/2002d7b7-feac-46ce-8516-63e0a9d7bbf7_buggy.java
++++ b/tmp/39d27e7d-118d-401a-83ce-7cf6f07361ad_fixed.java
+@@ -1,7 +1,8 @@
+     /** Get a line with reversed direction.
+      * @return a new instance, with reversed direction
+      */
+     public Line revert() {
+-        final Line reverted = new Line(zero, zero.subtract(direction));
++        final Vector3D reversedDirection = direction.negate();
++        final Line reverted = new Line(zero, zero.add(reversedDirection));
+         return reverted;
+     }
+\ No newline at end of file

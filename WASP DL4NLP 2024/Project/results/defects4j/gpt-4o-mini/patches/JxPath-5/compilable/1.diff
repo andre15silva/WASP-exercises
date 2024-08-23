@@ -1,0 +1,50 @@
+diff --git a/tmp/932b989f-edc5-4290-8e64-4a3f9f6a7620_buggy.java b/tmp/d07d5945-c8c5-4694-a316-9281841bca94_fixed.java
+index 5f8ac1a..50387e7 100644
+--- a/tmp/932b989f-edc5-4290-8e64-4a3f9f6a7620_buggy.java
++++ b/tmp/d07d5945-c8c5-4694-a316-9281841bca94_fixed.java
+@@ -1,34 +1,34 @@
+ private int compareNodePointers(
+     NodePointer p1,
+     int depth1,
+     NodePointer p2,
+     int depth2) 
+ {
+     if (depth1 < depth2) {
+-            int r = compareNodePointers(p1, depth1, p2.parent, depth2 - 1);
+-            return r == 0 ? -1 : r;
++        return -1;  // Directly return -1 since p1 is shallower than p2
+     }
+     if (depth1 > depth2) {
+-            int r = compareNodePointers(p1.parent, depth1 - 1, p2, depth2);
+-            return r == 0 ? 1 : r;
++        return 1;   // Directly return 1 since p1 is deeper than p2
+     }
+     if (p1 == null && p2 == null) {
+-            return 0;
++        return 0;  // Both pointers are null
+     }
+ 
+-        if (p1 != null && p1.equals(p2)) {
+-            return 0;
+-        }
+-
+-        if (depth1 == 1) {
++    if (p1 == null || p2 == null) {
++        // If one is null, the other must be deeper
+         throw new JXPathException(
+                 "Cannot compare pointers that do not belong to the same tree: '"
+                         + p1 + "' and '" + p2 + "'");
+     }
++
++    if (p1.equals(p2)) {
++        return 0;  // They are the same NodePointer
++    }
++
+     int r = compareNodePointers(p1.parent, depth1 - 1, p2.parent, depth2 - 1);
+     if (r != 0) {
+         return r;
+     }
+ 
+     return p1.parent.compareChildNodePointers(p1, p2);
+ }
+\ No newline at end of file

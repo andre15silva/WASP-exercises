@@ -1,0 +1,40 @@
+diff --git a/tmp/b5fe3b8e-8364-4b76-83d5-25978514f984_buggy.java b/tmp/0a23d5fc-40dd-4a64-a971-a9fe50b1aaaf_fixed.java
+index 9033e1c..cd4016b 100644
+--- a/tmp/b5fe3b8e-8364-4b76-83d5-25978514f984_buggy.java
++++ b/tmp/0a23d5fc-40dd-4a64-a971-a9fe50b1aaaf_fixed.java
+@@ -1,11 +1,28 @@
+     /**
+-     * Returns true iff they are equal as defined by
+-     * {@link #equals(double,double,int) equals(x, y, 1)}.
++     * Returns {@code true} if the input arrays are equal.
+      *
+-     * @param x first value
+-     * @param y second value
+-     * @return {@code true} if the values are equal.
++     * @param x an array.
++     * @param y another array
++     * @return {@code true} if the arrays are equal.
++     * @throws NullPointerException if either argument is null.
++     *
++     * @deprecated See {@link Arrays#equals(double[],double[])}. The only exception is for
++     * null arrays as arrays are not permitted by the IEEE 754 standard (all
++     * bits are either 0 or 1).
+      */
+-    public static boolean equals(double x, double y) {
+-        return (Double.isNaN(x) && Double.isNaN(y)) || x == y;
++    public static boolean equals(double[] x, double[] y) {
++        Arrays.checkCopyIn(x);
++        Arrays.checkCopyIn(y);
++        if (x == y) {
++            return true;
++        }
++        if (x.length != y.length) {
++            return false;
++        }
++        for (int i = 0; i < x.length; i++) {
++            if (!equals(x[i], y[i])) {
++                return false;
++            }
++        }
++        return true;
+     }

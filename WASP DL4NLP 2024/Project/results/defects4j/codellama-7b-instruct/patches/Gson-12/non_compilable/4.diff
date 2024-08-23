@@ -1,0 +1,20 @@
+diff --git a/tmp/36694642-3930-437b-9f50-cb9ca15e517b_buggy.java b/tmp/6167ab00-1c2b-4d82-a78e-82d6a53b2c59_fixed.java
+index 6e155da..3cf51e8 100644
+--- a/tmp/36694642-3930-437b-9f50-cb9ca15e517b_buggy.java
++++ b/tmp/6167ab00-1c2b-4d82-a78e-82d6a53b2c59_fixed.java
+@@ -1,10 +1,4 @@
+-  @Override public void skipValue() throws IOException {
+-    if (peek() == JsonToken.NAME) {
+-      nextName();
+-      pathNames[stackSize - 2] = "null";
+-    } else {
+-      popStack();
+-        pathNames[stackSize - 1] = "null";
+-    }
+-      pathIndices[stackSize - 1]++;
+-  }
++
++### The bug is caused by the fact that the `skipValue` method is not properly handling the scenario where the first token is a `JsonToken.NAME`
++
++The fix is to update the `skipValue` method to properly handle this scenario by adding an additional check to see if the first token is a `JsonToken.NAME`, and if so, then skip the next token instead of the current one:
+\ No newline at end of file

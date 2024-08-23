@@ -1,0 +1,81 @@
+diff --git a/tmp/8a0e2ed6-6950-4d19-a781-f5a45a0424a0_buggy.java b/tmp/73499dbc-654e-4a02-9b35-d9c610eb9b8e_fixed.java
+index d80b7d0..cc16e86 100644
+--- a/tmp/8a0e2ed6-6950-4d19-a781-f5a45a0424a0_buggy.java
++++ b/tmp/73499dbc-654e-4a02-9b35-d9c610eb9b8e_fixed.java
+@@ -1,61 +1,65 @@
+     /**
+      * Checks dimensions and values of boundaries and inputSigma if defined.
+      */
+     private void checkParameters() {
+         final double[] init = getStartPoint();
+         final double[] lB = getLowerBound();
+         final double[] uB = getUpperBound();
+ 
+         // Checks whether there is at least one finite bound value.
+         boolean hasFiniteBounds = false;
+         for (int i = 0; i < lB.length; i++) {
+             if (!Double.isInfinite(lB[i]) ||
+                 !Double.isInfinite(uB[i])) {
+                 hasFiniteBounds = true;
+                 break;
+             }
+         }
+         // Checks whether there is at least one infinite bound value.
+         boolean hasInfiniteBounds = false;
+         if (hasFiniteBounds) {
+             for (int i = 0; i < lB.length; i++) {
+                 if (Double.isInfinite(lB[i]) ||
+                     Double.isInfinite(uB[i])) {
+                     hasInfiniteBounds = true;
+                     break;
+                 }
+             }
+ 
+             if (hasInfiniteBounds) {
+                 // If there is at least one finite bound, none can be infinite,
+                 // because mixed cases are not supported by the current code.
+                 throw new MathUnsupportedOperationException();
+-            } else {
+-                // Convert API to internal handling of boundaries.
+-                boundaries = new double[2][];
+-                boundaries[0] = lB;
+-                boundaries[1] = uB;
++            }
++        }
+ 
+         // Abort early if the normalization will overflow (cf. "encode" method).
++        if (hasFiniteBounds) {
++            final double max = Double.MAX_VALUE / 2;
++            final double tooLarge = FastMath.nextUp(max);
++            for (int i = 0; i < lB.length; i++) {
++                if (lB[i] < -tooLarge) {
++                    throw new NumberIsTooLargeException(lB[i], tooLarge, true);
++                }
++                if (uB[i] > tooLarge) {
++                    throw new NumberIsTooLargeException(uB[i], tooLarge, true);
++                }
+             }
+-        } else {
+-            // Convert API to internal handling of boundaries.
+-            boundaries = null;
+         }
+ 
+         if (inputSigma != null) {
+             if (inputSigma.length != init.length) {
+                 throw new DimensionMismatchException(inputSigma.length, init.length);
+             }
+             for (int i = 0; i < init.length; i++) {
+                 if (inputSigma[i] < 0) {
+                     throw new NotPositiveException(inputSigma[i]);
+                 }
+-                if (boundaries != null) {
+-                    if (inputSigma[i] > boundaries[1][i] - boundaries[0][i]) {
+-                        throw new OutOfRangeException(inputSigma[i], 0, boundaries[1][i] - boundaries[0][i]);
++                if (hasFiniteBounds) {
++                    if (inputSigma[i] > (uB[i] - lB[i])) {
++                        throw new OutOfRangeException(inputSigma[i], 0, uB[i] - lB[i]);
+                     }
+                 }
+             }
+         }
+     }

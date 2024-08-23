@@ -1,0 +1,24 @@
+diff --git a/tmp/c22ee41c-6fbd-4b8d-9bdb-38f02c215099_buggy.java b/tmp/49d8daaf-ed70-4421-ab05-d8aacfe1709c_fixed.java
+index 3fb3172..03a7bcc 100644
+--- a/tmp/c22ee41c-6fbd-4b8d-9bdb-38f02c215099_buggy.java
++++ b/tmp/49d8daaf-ed70-4421-ab05-d8aacfe1709c_fixed.java
+@@ -1,13 +1,6 @@
+-    /**
+-     * Creates a Base64 codec used for decoding (all modes) and encoding in URL-unsafe mode.
+-     * <p>
+-     * When encoding the line length is 0 (no chunking), and the encoding table is STANDARD_ENCODE_TABLE.
+-     * </p>
+-     * 
+-     * <p>
+-     * When decoding all variants are supported.
+-     * </p>
+-     */
+-    public Base64() {
+-        this(false);
++    public Base64(boolean urlSafe) {
++        // Initialize the Base64 encoder/decoder with the specified parameters
++        this.urlSafe = urlSafe;
++        this.lineLength = 0; // no chunking
++        this.encodeTable = STANDARD_ENCODE_TABLE; // using standard encoding table
+     }
+\ No newline at end of file

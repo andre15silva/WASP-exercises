@@ -1,0 +1,23 @@
+diff --git a/tmp/6428462d-02f9-4d82-b60a-1ebebe3afcf6_buggy.java b/tmp/ce4eb49d-cd4d-4372-b461-6f8b27802676_fixed.java
+index 00b39e0..588073a 100644
+--- a/tmp/6428462d-02f9-4d82-b60a-1ebebe3afcf6_buggy.java
++++ b/tmp/ce4eb49d-cd4d-4372-b461-6f8b27802676_fixed.java
+@@ -1,7 +1,18 @@
+     public void describeTo(Description description) {
+         description.appendText("same(");
+         appendQuoting(description);
+         description.appendText(wanted.toString());
+         appendQuoting(description);
+         description.appendText(")");
+     }
++
++    public void describeMismatch(Object item, Description description) {
++        if (wanted == null) {
++            description.appendText("null");
++        } else {
++            description.appendText(wanted.toString());
++        }
++        if (item != null) {
++            description.appendText(" but was " + item.toString());
++        }
++    }

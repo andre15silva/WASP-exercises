@@ -1,0 +1,24 @@
+diff --git a/tmp/b59ae51e-9ea4-4083-89d1-5a4b4a573723_buggy.java b/tmp/374f8032-b4e3-4e7e-a683-1d7d449870f5_fixed.java
+index b278cd0..ab7b448 100644
+--- a/tmp/b59ae51e-9ea4-4083-89d1-5a4b4a573723_buggy.java
++++ b/tmp/374f8032-b4e3-4e7e-a683-1d7d449870f5_fixed.java
+@@ -1,9 +1,18 @@
+     /**
+      * <p>Checks if the locale specified is in the list of available locales.</p>
+      *
+      * @param locale the Locale object to check if it is available
+      * @return true if the locale is a known locale
+      */
+     public static boolean isAvailableLocale(Locale locale) {
+         return cAvailableLocaleSet.contains(locale);
+     }
++    private static final Set cAvailableLocaleSet;
++    static {
++        Set set = new HashSet();
++        Locale[] jdkLocaleArray = Locale.getAvailableLocales();
++        List jdkLocaleList = Arrays.asList(jdkLocaleArray);
++        set.addAll(jdkLocaleList);
++        JdkLocaleUtils.knownLocaleSet(set);
++        cAvailableLocaleSet = Collections.unmodifiableSet(set);
++    }
+\ No newline at end of file

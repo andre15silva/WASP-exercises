@@ -1,0 +1,59 @@
+diff --git a/tmp/e52f3a9b-462c-4b16-b8f3-26b3096b92ab_buggy.java b/tmp/965326a7-6780-412a-be6c-e243b4cfa1ce_fixed.java
+index 904dba7..cabe415 100644
+--- a/tmp/e52f3a9b-462c-4b16-b8f3-26b3096b92ab_buggy.java
++++ b/tmp/965326a7-6780-412a-be6c-e243b4cfa1ce_fixed.java
+@@ -1,46 +1,52 @@
+   private String format(JSError error, boolean warning) {
+     // extract source excerpt
+     SourceExcerptProvider source = getSource();
+     String sourceExcerpt = source == null ? null :
+         excerpt.get(
+             source, error.sourceName, error.lineNumber, excerptFormatter);
+ 
+     // formatting the message
+     StringBuilder b = new StringBuilder();
+     if (error.sourceName != null) {
+       b.append(error.sourceName);
+       if (error.lineNumber > 0) {
+         b.append(':');
+         b.append(error.lineNumber);
+       }
+       b.append(": ");
+     }
+ 
+     b.append(getLevelName(warning ? CheckLevel.WARNING : CheckLevel.ERROR));
+     b.append(" - ");
+ 
+     b.append(error.description);
+     b.append('\n');
+     if (sourceExcerpt != null) {
+       b.append(sourceExcerpt);
+       b.append('\n');
+       int charno = error.getCharno();
+ 
+       // padding equal to the excerpt and arrow at the end
+-      // charno == sourceExpert.length() means something is missing
+-      // at the end of the line
++      // charno == sourceExpert.length() means that something is
++      // missing at the end of the line
+       if (excerpt.equals(LINE)
+           && 0 <= charno && charno < sourceExcerpt.length()) {
+         for (int i = 0; i < charno; i++) {
+           char c = sourceExcerpt.charAt(i);
+           if (Character.isWhitespace(c)) {
+             b.append(c);
+           } else {
+             b.append(' ');
+           }
+         }
+         b.append("^\n");
+       }
++      // If we have to guess a end of line we better put an extra one for
++      // javascript files.
++      else if (excerpt.equals(LINE) && getSource().getSourceFileRef().getType()
++          == SourceFile.JAVASCRIPT) {
++        b.append('\n');
++      }
+     }
+     return b.toString();
+   }

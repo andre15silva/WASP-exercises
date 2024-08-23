@@ -1,0 +1,27 @@
+diff --git a/tmp/58d785a1-9758-42b3-8a2c-b5c6959698a9_buggy.java b/tmp/11dfc47d-b5b2-450a-8c1a-273b044ad15a_fixed.java
+index 29d025a..0f23833 100644
+--- a/tmp/58d785a1-9758-42b3-8a2c-b5c6959698a9_buggy.java
++++ b/tmp/11dfc47d-b5b2-450a-8c1a-273b044ad15a_fixed.java
+@@ -1,13 +1,17 @@
+ private void _verifySharing()
+ {
+     if (_hashShared) {
+-            _hashArea = Arrays.copyOf(_hashArea, _hashArea.length);
+-            _names = Arrays.copyOf(_names, _names.length);
++        // Ensure we capture the current size before copying
++        int currentSize = _hashArea.length;
++        _hashArea = Arrays.copyOf(_hashArea, currentSize);
++        _names = Arrays.copyOf(_names, currentSize);
+         _hashShared = false;
+-            // 09-Sep-2015, tatu: As per [jackson-core#216], also need to ensure
+-            //    we rehash as needed, as need-rehash flag is not copied from parent
++
++        // Ensure we reset the need-rehash flag to true after copying,
++        // since the table size might have changed, indicating a rehash is needed
++        _needRehash = true;
+     }
+     if (_needRehash) {
+         rehash();
+     }
+ }
+\ No newline at end of file

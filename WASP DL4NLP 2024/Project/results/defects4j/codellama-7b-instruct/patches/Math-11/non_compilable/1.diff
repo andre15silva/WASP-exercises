@@ -1,0 +1,27 @@
+diff --git a/tmp/babfaf34-4aba-4b8e-b536-c7ef23d0b194_buggy.java b/tmp/c47ad331-0835-4e08-b551-af78251b5bba_fixed.java
+index 51a0115..cc68ea1 100644
+--- a/tmp/babfaf34-4aba-4b8e-b536-c7ef23d0b194_buggy.java
++++ b/tmp/c47ad331-0835-4e08-b551-af78251b5bba_fixed.java
+@@ -1,11 +1,12 @@
+-    /** {@inheritDoc} */
+-    public double density(final double[] vals) throws DimensionMismatchException {
+-        final int dim = getDimension();
+-        if (vals.length != dim) {
+-            throw new DimensionMismatchException(vals.length, dim);
++   /**
++     * MyFixes a string by removing all the dots.
++     */
++     public static String fix(String str) {
++       String newStr = "";
++       for (int i=0; i<str.length(); i++) {
++         if (str.charAt(i) != '.') {
++           newStr = newStr + str.charAt(i);
+          }
+-
+-        return FastMath.pow(2 * FastMath.PI, -dim / 2) *
+-            FastMath.pow(covarianceMatrixDeterminant, -0.5) *
+-            getExponentTerm(vals);
++       }
++       return newStr;
+      }
+\ No newline at end of file

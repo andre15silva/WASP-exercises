@@ -1,0 +1,35 @@
+diff --git a/tmp/c31345f6-9c28-43f1-a3b1-3cb94ea2d2dc_buggy.java b/tmp/6570b118-d4a2-4aec-9e61-34b9e2c4002b_fixed.java
+index 5c5286c..d2d5912 100644
+--- a/tmp/c31345f6-9c28-43f1-a3b1-3cb94ea2d2dc_buggy.java
++++ b/tmp/6570b118-d4a2-4aec-9e61-34b9e2c4002b_fixed.java
+@@ -1,6 +1,28 @@
+     public <T> void resetMock(T mock) {
+         MockHandlerInterface<T> oldMockHandler = getMockHandler(mock);
+         MockHandler<T> newMockHandler = new MockHandler<T>(oldMockHandler);
+-        MethodInterceptorFilter newFilter = new MethodInterceptorFilter(newMockHandler, (MockSettingsImpl) org.mockito.Mockito.withSettings().defaultAnswer(org.mockito.Mockito.RETURNS_DEFAULTS));
++        MethodInterceptorFilter newFilter = new MethodInterceptorFilter(newMockHandler, (MockSettingsImpl) org.mockito.Mockito.withSettings()
++                                                                                                        .defaultAnswer(org.mockito.Mockito.RETURNS_DEFAULTS)
++                                                                                                        .invocationListeners(report()));
+         ((Factory) mock).setCallback(0, newFilter);
+     }
++    private InvocationListener listener = new InvocationListener() {
++        public void intercepted(Object mock, Object[] realArgs) {
++            lastMock = mock;
++            lastArgs = realArgs; 
++            lastTimeIntercepted = new Date();
++        }
++        public void returning(Object returnValue) {
++            returnValueIntercepted = true; 
++            lastReturnValue = returnValue;
++        }
++        public void returningVoid() {
++            returningVoidIntercepted = true; 
++        }
++        public void returningEmpty() {
++            returningEmptyIntercepted = true; 
++        }
++    };
++    public InvocationListener report() {
++        return listener;
++    }
+\ No newline at end of file

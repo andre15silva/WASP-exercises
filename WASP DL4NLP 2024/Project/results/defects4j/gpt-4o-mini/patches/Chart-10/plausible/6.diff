@@ -1,0 +1,20 @@
+diff --git a/tmp/52007f66-075f-4a71-b4ab-78089e08640c_buggy.java b/tmp/03266091-4461-420d-bb7a-5a3f5e03bc79_fixed.java
+index 13db7da..6318e28 100644
+--- a/tmp/52007f66-075f-4a71-b4ab-78089e08640c_buggy.java
++++ b/tmp/03266091-4461-420d-bb7a-5a3f5e03bc79_fixed.java
+@@ -1,11 +1,5 @@
+-    /**
+-     * Generates a tooltip string to go in an HTML image map.
+-     *
+-     * @param toolTipText  the tooltip.
+-     * 
+-     * @return The formatted HTML area tag attribute(s).
+-     */
+ public String generateToolTipFragment(String toolTipText) {
+-        return " title=\"" + toolTipText
+-            + "\" alt=\"\"";
++    // Escaping double quotes in the tooltip text
++    String escapedToolTipText = toolTipText.replace("\"", "&quot;");
++    return " title=\"" + escapedToolTipText + "\" alt=\"\"";
+ }
+\ No newline at end of file

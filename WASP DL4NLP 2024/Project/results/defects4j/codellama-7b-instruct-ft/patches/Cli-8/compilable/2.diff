@@ -1,0 +1,53 @@
+diff --git a/tmp/ab321743-914e-497c-a489-04491cc07437_buggy.java b/tmp/7bfbee3f-07fe-4134-8136-7c4fe1ae2dce_fixed.java
+index 8e93a5e..ffdd101 100644
+--- a/tmp/ab321743-914e-497c-a489-04491cc07437_buggy.java
++++ b/tmp/7bfbee3f-07fe-4134-8136-7c4fe1ae2dce_fixed.java
+@@ -1,43 +1,43 @@
+     /**
+      * <p>Render the specified text and return the rendered Options
+      * in a StringBuffer.</p>
+      *
+      * @param sb The StringBuffer to place the rendered text into.
+      * @param width The number of characters to display per line
+      * @param nextLineTabStop The position on the next line for the first tab.
+      * @param text The text to be rendered.
+      *
+      * @return the StringBuffer with the rendered Options contents.
+      */
+     protected StringBuffer renderWrappedText(StringBuffer sb, int width, 
+                                              int nextLineTabStop, String text)
+     {
+         int pos = findWrapPos(text, width, 0);
++        int nextPos = findWrapPos(text, width, nextLineTabStop);
+ 
+-        if (pos == -1)
++        if ((pos == -1 && nextPos == -1) || (pos == 0 && "\n".equals(text)))
+         {
+             sb.append(rtrim(text));
+ 
+             return sb;
+         }
+         sb.append(rtrim(text.substring(0, pos))).append(defaultNewLine);
+ 
+-        // all following lines must be padded with nextLineTabStop space 
++        // for remaining lines use a default padding of nextLineTabStop space 
+         // characters
+         final String padding = createPadding(nextLineTabStop);
+ 
+         while (true)
+         {
+-            text = padding + text.substring(pos).trim();
++            text = padding + text.substring(pos);
+             pos = findWrapPos(text, width, nextLineTabStop);
+-
+             if (pos == -1)
+             {
+-                sb.append(text);
++                sb.append(rtrim(text));
+ 
+                 return sb;
+             }
+ 
+             sb.append(rtrim(text.substring(0, pos))).append(defaultNewLine);
+         }
+     }

@@ -1,0 +1,16 @@
+diff --git a/tmp/a9d0413c-f63b-449d-99ff-18acc8cc7a23_buggy.java b/tmp/73e7f896-3767-4872-8e49-c627b1b5dd2f_fixed.java
+index 84989ca..cd749d7 100644
+--- a/tmp/a9d0413c-f63b-449d-99ff-18acc8cc7a23_buggy.java
++++ b/tmp/73e7f896-3767-4872-8e49-c627b1b5dd2f_fixed.java
+@@ -1,6 +1,11 @@
+     boolean matchesLetter() {
+         if (isEmpty())
+             return false;
+         char c = input[pos];
++        if (c >= Character.MIN_HIGH_SURROGATE && c <= Character.MAX_HIGH_SURROGATE) {
++            final char lowSurrogate = input[pos + 1];
++            if (lowSurrogate >= Character.MIN_LOW_SURROGATE && lowSurrogate <= Character.MAX_LOW_SURROGATE)
++                c = Character.toCodePoint(c, lowSurrogate);
++        }
+         return (c >= 'A' && c <= 'Z') || (c >= 'a' && c <= 'z');
+     }

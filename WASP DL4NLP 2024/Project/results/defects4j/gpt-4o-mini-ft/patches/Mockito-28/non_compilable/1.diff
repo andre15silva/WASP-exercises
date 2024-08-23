@@ -1,0 +1,11 @@
+diff --git a/tmp/f7c568b5-313d-416d-84ea-f2dcb4788d1f_buggy.java b/tmp/2c7b1847-1235-4969-b90f-c4521bc7c21f_fixed.java
+index fa6828a..3b2e9f7 100644
+--- a/tmp/f7c568b5-313d-416d-84ea-f2dcb4788d1f_buggy.java
++++ b/tmp/2c7b1847-1235-4969-b90f-c4521bc7c21f_fixed.java
+@@ -1,5 +1,5 @@
+     private void injectMockCandidate(Class<?> awaitingInjectionClazz, Set<Object> mocks, Object fieldInstance) {
+         for(Field field : orderedInstanceFieldsFrom(awaitingInjectionClazz)) {
+-            mockCandidateFilter.filterCandidate(mocks, field, fieldInstance).thenInject();
++            mockCandidateFilter.filterCandidate(mocks, field, fieldInstance).thenInject(bestMatchingType(mocks, field));
+         }
+     }

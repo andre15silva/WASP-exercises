@@ -1,0 +1,29 @@
+diff --git a/tmp/bc87d1ea-3521-405c-a47f-9048544e4e94_buggy.java b/tmp/ac7d47ba-5c11-46fb-8f51-e3d3ac575299_fixed.java
+index 50f3e2e..5b6f28e 100644
+--- a/tmp/bc87d1ea-3521-405c-a47f-9048544e4e94_buggy.java
++++ b/tmp/ac7d47ba-5c11-46fb-8f51-e3d3ac575299_fixed.java
+@@ -1,7 +1,18 @@
+-    /** Get a line with reversed direction.
+-     * @return a new instance, with reversed direction
++
++    /** Check if a line is contained within a given polygon.
++     * @param polygon the polygon to check
++     * @return true if the line if contained within the polygon, false otherwise
+      */
+-    public Line revert() {
+-        final Line reverted = new Line(zero, zero.subtract(direction));
+-        return reverted;
++    public boolean isContainedInPolygon(Polygon polygon) {
++        for (int i = 0; i < polygon.getVertices().size(); i++) {
++            Vector3D vertex = polygon.getVertices().get(i);
++            Vector3D nextVertex = polygon.getVertices().get((i + 1) % polygon.getVertices().size());
++            Line segment = new Line(vertex, nextVertex);
++            if (segment.isParallelTo(this) &&
++                Math.abs(segment.project(this.getOrigin()).getScalarProjection()) <
++                   Math.abs(segment.project(this.getDirection()).getScalarProjection())) {
++                return true;
++            }
++        }
++        return false;
+     }
+\ No newline at end of file

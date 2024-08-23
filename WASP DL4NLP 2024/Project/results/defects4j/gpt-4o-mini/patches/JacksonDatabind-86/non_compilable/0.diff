@@ -1,0 +1,16 @@
+diff --git a/tmp/6a85bf45-4f8e-4941-ad49-cff47b0157b1_buggy.java b/tmp/42449724-c419-4893-91f1-42be43e0d236_fixed.java
+index e69de29..20eccb7 100644
+--- a/tmp/6a85bf45-4f8e-4941-ad49-cff47b0157b1_buggy.java
++++ b/tmp/42449724-c419-4893-91f1-42be43e0d236_fixed.java
+@@ -0,0 +1,10 @@
++public JavaType getSuperClass() {
++    if (superClass == null) {
++        if (getRawClass() == Object.class) {
++            // Prevent endless recursion for Object class
++            return null;
++        }
++        superClass = new ResolvedRecursiveType(this, findSuperClass());
++    }
++    return superClass;
++}
+\ No newline at end of file

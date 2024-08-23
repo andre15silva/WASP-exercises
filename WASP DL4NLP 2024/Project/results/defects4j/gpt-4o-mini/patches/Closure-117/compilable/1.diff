@@ -1,0 +1,76 @@
+diff --git a/tmp/c9660554-27eb-437e-a3d8-8000d5df08cf_buggy.java b/tmp/4488bcc4-1150-460d-b82f-131d26a8dae9_fixed.java
+index 39981f0..0cf1dee 100644
+--- a/tmp/c9660554-27eb-437e-a3d8-8000d5df08cf_buggy.java
++++ b/tmp/4488bcc4-1150-460d-b82f-131d26a8dae9_fixed.java
+@@ -1,65 +1,57 @@
+-  /**
+-   * Given a node, get a human-readable name for the type of that node so
+-   * that will be easy for the programmer to find the original declaration.
+-   *
+-   * For example, if SubFoo's property "bar" might have the human-readable
+-   * name "Foo.prototype.bar".
+-   *
+-   * @param n The node.
+-   * @param dereference If true, the type of the node will be dereferenced
+-   *     to an Object type, if possible.
+-   */
+ String getReadableJSTypeName(Node n, boolean dereference) {
+ 
+     // The best type name is the actual type name.
+ 
+     // If we're analyzing a GETPROP, the property may be inherited by the
+     // prototype chain. So climb the prototype chain and find out where
+     // the property was originally defined.
+     if (n.isGetProp()) {
+         ObjectType objectType = getJSType(n.getFirstChild()).dereference();
+         if (objectType != null) {
+             String propName = n.getLastChild().getString();
+             if (objectType.getConstructor() != null &&
+                 objectType.getConstructor().isInterface()) {
+                 objectType = FunctionType.getTopDefiningInterface(
+                     objectType, propName);
+             } else {
+                 // classes
+                 while (objectType != null && !objectType.hasOwnProperty(propName)) {
+                     objectType = objectType.getImplicitPrototype();
+                 }
+             }
+ 
+             // Don't show complex function names or anonymous types.
+             // Instead, try to get a human-readable type name.
+             if (objectType != null &&
+                 (objectType.getConstructor() != null ||
+                  objectType.isFunctionPrototypeType())) {
+-          return objectType.toString() + "." + propName;
++                String readableName = objectType.toString() + "." + propName;
++                return readableName.equals("function.prototype." + propName) ? 
++                    readableName.replace("function.prototype.", "") : 
++                    readableName;
+             }
+         }
+     }
+ 
+     JSType type = getJSType(n);
+     if (dereference) {
+         ObjectType dereferenced = type.dereference();
+         if (dereferenced != null) {
+             type = dereferenced;
+         }
+     }
+     if (type.isFunctionPrototypeType() ||
+         (type.toObjectType() != null &&
+          type.toObjectType().getConstructor() != null)) {
+         return type.toString();
+     }
+     String qualifiedName = n.getQualifiedName();
+-    if (qualifiedName != null) {
++    if (qualifiedName != null && !qualifiedName.startsWith("this.")) {
+         return qualifiedName;
+     } else if (type.isFunctionType()) {
+         // Don't show complex function names.
+         return "function";
+     } else {
+         return type.toString();
+     }
+ }
+\ No newline at end of file

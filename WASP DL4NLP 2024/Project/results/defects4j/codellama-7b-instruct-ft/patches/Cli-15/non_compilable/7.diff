@@ -1,0 +1,32 @@
+diff --git a/tmp/fdeef3d7-dde0-416b-a83b-58c8e73a4bd2_buggy.java b/tmp/5df30cd3-6cd8-4b76-95f9-3f2cbbb0bcec_fixed.java
+index 4e8b037..14a9141 100644
+--- a/tmp/fdeef3d7-dde0-416b-a83b-58c8e73a4bd2_buggy.java
++++ b/tmp/5df30cd3-6cd8-4b76-95f9-3f2cbbb0bcec_fixed.java
+@@ -1,20 +1,27 @@
+     public List getValues(final Option option,
+                           List defaultValues) {
+         // initialize the return list
+         List valueList = (List) values.get(option);
+ 
+         // grab the correct default values
+         if ((valueList == null) || valueList.isEmpty()) {
+             valueList = defaultValues;
+         }
+ 
+         // augment the list with the default values
+         if ((valueList == null) || valueList.isEmpty()) {
+             valueList = (List) this.defaultValues.get(option);
+         }
+                 // if there are more default values as specified, add them to
+                 // the list.
+                     // copy the list first
+         
++        if(option.getArgList() > 0 && option.getArgList() == valueList.size()) {
++            String arg = cmd.getOptionValue(option);
++            if (arg != null) {
++                String[] splitValues = StringUtils.split(arg, ",");
++                valueList.addAll(Arrays.asList(splitValues)); 
++            }
++        }
+         return valueList == null ? Collections.EMPTY_LIST : valueList;
+     }

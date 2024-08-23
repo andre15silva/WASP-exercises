@@ -1,0 +1,21 @@
+diff --git a/tmp/899d4442-2601-4018-bbbb-bcb12e1bdf06_buggy.java b/tmp/6748a645-8a7c-43f8-bbed-5f7dcc0d3b37_fixed.java
+index d56e399..4a5aa7b 100644
+--- a/tmp/899d4442-2601-4018-bbbb-bcb12e1bdf06_buggy.java
++++ b/tmp/6748a645-8a7c-43f8-bbed-5f7dcc0d3b37_fixed.java
+@@ -1,11 +1,9 @@
+-    /**
+-     * <p>Formats a <code>Date</code> object.</p>
+-     * 
+-     * @param date  the date to format
+-     * @return the formatted string
+-     */
+ public String format(Date date) {
+     Calendar c = new GregorianCalendar(mTimeZone);
+     c.setTime(date);
++    // Set the first day of the week to Monday according to ISO-8601
++    c.setFirstDayOfWeek(Calendar.MONDAY);
++    // Ensure the week numbering follows the specified ISO week date standard
++    c.setMinimalDaysInFirstWeek(4);
+     return applyRules(c, new StringBuffer(mMaxLengthEstimate)).toString();
+ }
+\ No newline at end of file

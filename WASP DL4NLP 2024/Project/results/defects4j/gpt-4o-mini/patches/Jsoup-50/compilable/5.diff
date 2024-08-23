@@ -1,0 +1,72 @@
+diff --git a/tmp/5c0e7641-f2bb-4155-8583-aa5a7c3f3091_buggy.java b/tmp/62c8daf8-1c44-4662-a580-20e1287e333f_fixed.java
+index 25ca093..5912f06 100644
+--- a/tmp/5c0e7641-f2bb-4155-8583-aa5a7c3f3091_buggy.java
++++ b/tmp/62c8daf8-1c44-4662-a580-20e1287e333f_fixed.java
+@@ -1,52 +1,62 @@
+-    // todo - this is getting gnarly. needs a rewrite.
+ static Document parseByteData(ByteBuffer byteData, String charsetName, String baseUri, Parser parser) {
+     String docData;
+     Document doc = null;
+ 
+     // look for BOM - overrides any other header or input
++    boolean isBOMDetected = false;
+ 
+     if (charsetName == null) { // determine from meta. safe parse as UTF-8
+         // look for <meta http-equiv="Content-Type" content="text/html;charset=gb2312"> or HTML5 <meta charset="gb2312">
+         docData = Charset.forName(defaultCharset).decode(byteData).toString();
+         doc = parser.parseInput(docData, baseUri);
+         Element meta = doc.select("meta[http-equiv=content-type], meta[charset]").first();
+         if (meta != null) { // if not found, will keep utf-8 as best attempt
+             String foundCharset = null;
+             if (meta.hasAttr("http-equiv")) {
+                 foundCharset = getCharsetFromContentType(meta.attr("content"));
+             }
+             if (foundCharset == null && meta.hasAttr("charset")) {
++                String charsetAttr = meta.attr("charset");
+                 try {
+-                        if (Charset.isSupported(meta.attr("charset"))) {
+-                            foundCharset = meta.attr("charset");
++                    // Validate charset only if supported
++                    if (Charset.isSupported(charsetAttr)) {
++                        foundCharset = charsetAttr;
+                     }
+                 } catch (IllegalCharsetNameException e) {
+                     foundCharset = null;
+                 }
+             }
+ 
+             if (foundCharset != null && foundCharset.length() != 0 && !foundCharset.equals(defaultCharset)) { // need to re-decode
+                 foundCharset = foundCharset.trim().replaceAll("[\"']", "");
+                 charsetName = foundCharset;
+                 byteData.rewind();
+                 docData = Charset.forName(foundCharset).decode(byteData).toString();
+                 doc = null;
+             }
+         }
+     } else { // specified by content type header (or by user on file load)
+         Validate.notEmpty(charsetName, "Must set charset arg to character set of file to parse. Set to null to attempt to detect from HTML");
+         docData = Charset.forName(charsetName).decode(byteData).toString();
+     }
++    
+     if (docData.length() > 0 && docData.charAt(0) == UNICODE_BOM) {
+         byteData.rewind();
+         docData = Charset.forName(defaultCharset).decode(byteData).toString();
++        if (docData.length() > 0) {
+             docData = docData.substring(1);
++        }
+         charsetName = defaultCharset;
+-            doc = null;
++        isBOMDetected = true;
+     }
++
+     if (doc == null) {
++        // If BOM was detected, we need to re-parse with the correct data
++        if (isBOMDetected) {
++            docData = Charset.forName(charsetName).decode(byteData).toString(); // Decode again after BOM processing
++        }
+         doc = parser.parseInput(docData, baseUri);
+         doc.outputSettings().charset(charsetName);
+     }
+     return doc;
+ }
+\ No newline at end of file

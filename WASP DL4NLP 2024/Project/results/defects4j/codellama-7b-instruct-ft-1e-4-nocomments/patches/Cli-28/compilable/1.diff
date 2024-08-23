@@ -1,0 +1,60 @@
+diff --git a/tmp/ab4ae53a-fec4-45fd-8299-579bf50e58af_buggy.java b/tmp/70a57538-af4a-40e7-940b-1e8bb6c5e10a_fixed.java
+index a7549f0..c2bb651 100644
+--- a/tmp/ab4ae53a-fec4-45fd-8299-579bf50e58af_buggy.java
++++ b/tmp/70a57538-af4a-40e7-940b-1e8bb6c5e10a_fixed.java
+@@ -1,50 +1,40 @@
+-    /**
+-     * Sets the values of Options using the values in <code>properties</code>.
+-     *
+-     * @param properties The value properties to be processed.
+-     */
+     protected void processProperties(Properties properties)
+     {
+         if (properties == null)
+         {
+             return;
+         }
+-
+         for (Enumeration e = properties.propertyNames(); e.hasMoreElements();)
+         {
+             String option = e.nextElement().toString();
+-
++            if (!option.startsWith("-") && !option.startsWith("--"))
++            {
++                continue;
++            }
+             if (!cmd.hasOption(option))
+             {
+                 Option opt = getOptions().getOption(option);
+-
+-                // get the value from the properties instance
+                 String value = properties.getProperty(option);
+-
+                 if (opt.hasArg())
+                 {
+                     if (opt.getValues() == null || opt.getValues().length == 0)
+                     {
+                         try
+                         {
+                             opt.addValueForProcessing(value);
+                         }
+                         catch (RuntimeException exp)
+                         {
+-                            // if we cannot add the value don't worry about it
+                         }
+                     }
+                 }
+                 else if (!("yes".equalsIgnoreCase(value)
+                             || "true".equalsIgnoreCase(value)
+                             || "1".equalsIgnoreCase(value)))
+                 {
+-                    // if the value is not yes, true or 1 then don't add the
+-                    // option to the CommandLine
+                     break;
+                 }
+-
+                 cmd.addOption(opt);
+             }
+         }
+     }
+\ No newline at end of file

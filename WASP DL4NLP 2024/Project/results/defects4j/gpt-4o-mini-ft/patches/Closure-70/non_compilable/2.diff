@@ -1,0 +1,47 @@
+diff --git a/tmp/3e91231f-50a6-4706-b759-21bf9a9e9f93_buggy.java b/tmp/e117885f-a115-43f8-b05b-02523c0f12cc_fixed.java
+index 1530b34..8e31feb 100644
+--- a/tmp/3e91231f-50a6-4706-b759-21bf9a9e9f93_buggy.java
++++ b/tmp/e117885f-a115-43f8-b05b-02523c0f12cc_fixed.java
+@@ -1,23 +1,40 @@
+     /**
+      * Declares all of a function's arguments.
+      */
+     private void declareArguments(Node functionNode) {
+       Node astParameters = functionNode.getFirstChild().getNext();
+       Node body = astParameters.getNext();
+       FunctionType functionType = (FunctionType) functionNode.getJSType();
+       if (functionType != null) {
+         Node jsDocParameters = functionType.getParametersNode();
+         if (jsDocParameters != null) {
+           Node jsDocParameter = jsDocParameters.getFirstChild();
+           for (Node astParameter : astParameters.children()) {
+             if (jsDocParameter != null) {
+-              defineSlot(astParameter, functionNode,
+-                  jsDocParameter.getJSType(), true);
++              JSType jsDocType = jsDocParameter.getJSType();
++              if (jsDocType != null) {
++                if (!locals.addSlot(jsDocParameter.getString())) {
++                  // Subsequent declaration of the same variable.
++                  // Avoid name of local variable 'var'.
++                  if (jsDocParameter.getNodeType() == Node.GETPROP) {
++                    jsDocType = null; // Suppress warning.
++                  } else {
++                    report(JSError.make(
++                        TypeCheck.NO_DESC_METHOD_VAR, 
++                      jsDocParameter.getString(), 
++                      jsDocParameter.getLineno(), 
++                      jsDocParameter.getSourceFile(), 
++                      null));
++                    jsDocType = null; // Suppress warning.
++                  }
++                }
++                defineSlot(astParameter, functionNode, jsDocType, true);
++              }
+               jsDocParameter = jsDocParameter.getNext();
+             } else {
+               defineSlot(astParameter, functionNode, null, true);
+             }
+           }
+         }
+       }
+     } // end declareArguments

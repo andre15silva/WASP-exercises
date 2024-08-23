@@ -1,0 +1,126 @@
+diff --git a/tmp/adcc1a59-fe14-4936-988e-057d5b16e893_buggy.java b/tmp/0d252cb5-2616-4309-83b5-87436f58c920_fixed.java
+index 9033e1c..f5fddd1 100644
+--- a/tmp/adcc1a59-fe14-4936-988e-057d5b16e893_buggy.java
++++ b/tmp/0d252cb5-2616-4309-83b5-87436f58c920_fixed.java
+@@ -1,11 +1,120 @@
+     /**
+      * Returns true iff they are equal as defined by
+      * {@link #equals(double,double,int) equals(x, y, 1)}.
+      *
+      * @param x first value
+      * @param y second value
+      * @return {@code true} if the values are equal.
+      */
+     public static boolean equals(double x, double y) {
+         return (Double.isNaN(x) && Double.isNaN(y)) || x == y;
+     }
++    /**
++     * Returns true iff they are equal as defined by
++     * {@link #equals(int,int,int) equals(x, y, 1)}.
++     *
++     * @param x first value
++     * @param y second value
++     * @return {@code true} if the values are equal.
++     */
++    public static boolean equals(int x, int y) {
++        return x == y;
++    }
++    /**
++     * Returns true iff they are equal as defined by
++     * {@link #equals(double,double,int) equals(x, y, 1)}.
++     *
++     * @param x first value
++     * @param y second value
++     * @return {@code true} if the values are equal.
++     */
++    public static boolean equals(float x, float y) {
++        return x == y;
++    }
++    /**
++     * Returns true iff they are equal as defined by
++     * {@link #equals(Object,Object) equals(x, y)}.
++     *
++     * @param x first value
++     * @param y second value
++     * @return {@code true} if the values are equal.
++     */
++    public static boolean equals(Object x, Object y) {
++        return (x == null) ? (y == null) : x.equals(y);
++    }
++    /**
++     * Returns true iff the arrays are the same length and
++     * contain the same elements.
++     * @param xs {@code null} permitted
++     * @param ys {@code null} permitted
++     * @return
++     */
++    public static boolean equals(double[] xs, double[] ys) {
++        final int len = xs.length;
++        if ((ys.length != len) || (xs == ys)) {
++            return false;
++        }
++        for (int i = 0; i < len; i++) {
++            if (!MathUtils.equals(xs[i], ys[i])) {
++                return false;
++            }
++        }
++        return true;
++    }
++    /**
++     * Returns true iff the arrays are the same length and
++     * contain the same elements.
++     * @param xs {@code null} permitted
++     * @param ys {@code null} permitted
++     * @return
++     */
++    public static boolean equals(float[] xs, float[] ys) {
++        final int len = xs.length;
++        if ((ys.length != len)  || (xs == ys)) {
++            return false;
++        }
++        for (int i = 0; i < len; i++) {
++            if (!MathUtils.equals(xs[i], ys[i])) {
++                return false;
++            }
++        }
++        return true;
++    }
++    /**
++     * Returns true iff the arrays are the same length and
++     * contain the same elements.
++     * @param xs {@code null} permitted
++     * @param ys {@code null} permitted
++     * @return
++     */
++    public static boolean equals(int[] xs, int[] ys) {
++        final int len = xs.length;
++        if (ys.length != len) {
++            return false;
++        }
++        for (int i = 0; i < len; i++) {
++            if (!MathUtils.equals(xs[i], ys[i])) {
++                return false;
++            }
++        }
++        return true;
++    }
++    /**
++     * Returns true iff the arrays are the same length and
++     * contain the same elements.
++     * @param xs {@code null} permitted
++     * @param ys {@code null} permitted
++     * @return
++     */
++    public static boolean equals(Object[] xs, Object[] ys) {
++        final int len = xs.length;
++        if (ys.length != len)  {
++            return false;
++        }
++        for (int i = 0; i < len; i++) {
++            if (!MathUtils.equals(xs[i], ys[i])) {
++                return false;
++            }
++        }
++        return true;
++    }
+\ No newline at end of file

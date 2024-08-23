@@ -1,0 +1,37 @@
+diff --git a/tmp/0198d3b4-fae5-49ba-bd19-c7ba6d848c55_buggy.java b/tmp/4bed8315-5ce2-4066-9b70-66b1626d16a7_fixed.java
+index e8705ac..26f1f0e 100644
+--- a/tmp/0198d3b4-fae5-49ba-bd19-c7ba6d848c55_buggy.java
++++ b/tmp/4bed8315-5ce2-4066-9b70-66b1626d16a7_fixed.java
+@@ -1,24 +1,31 @@
+     /**
+      * There are two types of calls we are interested in calls without explicit
+      * "this" values (what we are call "free" calls) and direct call to eval.
+      */
+     private void annotateCalls(Node n) {
+       Preconditions.checkState(n.isCall());
+ 
+       // Keep track of of the "this" context of a call.  A call without an
+       // explicit "this" is a free call.
+       Node first = n.getFirstChild();
+ 
+       // ignore cast nodes.
+ 
+       if (!NodeUtil.isGet(first)) {
+         n.putBooleanProp(Node.FREE_CALL, true);
+       }
+ 
+       // Keep track of the context in which eval is called. It is important
+       // to distinguish between "(0, eval)()" and "eval()".
+       if (first.isName() &&
+-          "eval".equals(first.getString())) {
++          "eval".equals(first.getString()) && compiler.getOptions().
++            getCompilationLevel() != CompilationLevel.SIMPLE &&
++            compiler.getOptions().getWarningLevel(
++                DiagnosticGroups.CHECK_TYPES) < DiagnosticGroups.OFF &&
++              first.isQualifiedName()) {
++        // This test is to catch
++        //     console.log(f(/** @type{function(string):string} */((new x())['abc']))(x));
++        // And warn with INVALID_CAST_COMPARED_TO_NULL.
+         first.putBooleanProp(Node.DIRECT_EVAL, true);
+       }
+     }

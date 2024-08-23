@@ -1,0 +1,93 @@
+diff --git a/tmp/c3480a88-3781-4907-af7c-6fd315b2c019_buggy.java b/tmp/65057721-cfa8-4b2f-85d9-51f243b0329a_fixed.java
+index 851ffc2..f408e31 100644
+--- a/tmp/c3480a88-3781-4907-af7c-6fd315b2c019_buggy.java
++++ b/tmp/65057721-cfa8-4b2f-85d9-51f243b0329a_fixed.java
+@@ -1,70 +1,87 @@
+     /**
+      * Replace the provide statement.
+      *
+      * If we're providing a name with no definition, then create one.
+      * If we're providing a name with a duplicate definition, then make sure
+      * that definition becomes a declaration.
+      */
+     void replace() {
+       if (firstNode == null) {
+         // Don't touch the base case ('goog').
+         replacementNode = candidateDefinition;
+         return;
+       }
+ 
+       // Handle the case where there is a duplicate definition for an explicitly
+       // provided symbol.
+       if (candidateDefinition != null && explicitNode != null) {
+         explicitNode.detachFromParent();
+         compiler.reportCodeChange();
+ 
+         // Does this need a VAR keyword?
+         replacementNode = candidateDefinition;
+         if (NodeUtil.isExpressionNode(candidateDefinition)) {
+           candidateDefinition.putBooleanProp(Node.IS_NAMESPACE, true);
+           Node assignNode = candidateDefinition.getFirstChild();
+           Node nameNode = assignNode.getFirstChild();
+           if (nameNode.getType() == Token.NAME) {
+             // Need to convert this assign to a var declaration.
+             Node valueNode = nameNode.getNext();
+             assignNode.removeChild(nameNode);
+             assignNode.removeChild(valueNode);
+             nameNode.addChildToFront(valueNode);
+             Node varNode = new Node(Token.VAR, nameNode);
+             varNode.copyInformationFrom(candidateDefinition);
+             candidateDefinition.getParent().replaceChild(
+                 candidateDefinition, varNode);
+             nameNode.setJSDocInfo(assignNode.getJSDocInfo());
+             compiler.reportCodeChange();
+             replacementNode = varNode;
+           }
+         }
+       } else {
+         // Handle the case where there's not a duplicate definition.
+         replacementNode = createDeclarationNode();
+         if (firstModule == minimumModule) {
+           firstNode.getParent().addChildBefore(replacementNode, firstNode);
+         } else {
+           // In this case, the name was implicitly provided by two independent
+           // modules. We need to move this code up to a common module.
+           int indexOfDot = namespace.indexOf('.');
+           if (indexOfDot == -1) {
+             // Any old place is fine.
+             compiler.getNodeForCodeInsertion(minimumModule)
+                 .addChildToBack(replacementNode);
+-          } else {
++          } else if (indexOfDot > 0) {
+             // Add it after the parent namespace.
+             ProvidedName parentName =
+                 providedNames.get(namespace.substring(0, indexOfDot));
+             Preconditions.checkNotNull(parentName);
+             Preconditions.checkNotNull(parentName.replacementNode);
+             parentName.replacementNode.getParent().addChildAfter(
+                 replacementNode, parentName.replacementNode);
++          } else {
++            // We might create an "empty module", but that's not what we really
++            // want. We'll just move the namespace decl to the front.
++            ProvidedName parentName =
++                providedNames.get(namespace.substring(0, namespace.length()));
++            Preconditions.checkNotNull(parentName);
++            Preconditions.checkNotNull(parentName.replacementNode);
++            Node nsDecl = null;
++            for (Node node = parentName.replacementNode.getFirstChild();
++                 node != null; node = node.getNext()) {
++              if (node.getType() == Token.VAR && node.hasProp(Node.SUPPRESS_USE_MAP)) {
++                nsDecl = node;
++              }
++            }
++            CHECK(nsDecl != null);
++            parentName.replacementNode.getParent().addChildBefore(
++                replacementNode, nsDecl);
+           }
+         }
+         if (explicitNode != null) {
+           explicitNode.detachFromParent();
+         }
+         compiler.reportCodeChange();
+       }
+     }

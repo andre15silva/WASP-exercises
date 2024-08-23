@@ -1,0 +1,40 @@
+diff --git a/tmp/3ebc423c-576d-41ba-ac47-8ada4503a144_buggy.java b/tmp/a8857880-569f-48bb-8070-5592b33cde07_fixed.java
+index 1530b34..e131233 100644
+--- a/tmp/3ebc423c-576d-41ba-ac47-8ada4503a144_buggy.java
++++ b/tmp/a8857880-569f-48bb-8070-5592b33cde07_fixed.java
+@@ -1,23 +1,34 @@
+     /**
+      * Declares all of a function's arguments.
+      */
+     private void declareArguments(Node functionNode) {
+       Node astParameters = functionNode.getFirstChild().getNext();
+       Node body = astParameters.getNext();
+       FunctionType functionType = (FunctionType) functionNode.getJSType();
+       if (functionType != null) {
+         Node jsDocParameters = functionType.getParametersNode();
+         if (jsDocParameters != null) {
+           Node jsDocParameter = jsDocParameters.getFirstChild();
+           for (Node astParameter : astParameters.children()) {
+             if (jsDocParameter != null) {
++              JSType jsDocParameterType = jsDocParameter.getJSType();
++              JSType astParameterType = astParameter.getJSType();
++              if (jsDocParameterType != null && astParameterType != null &&
++                  !jsDocParameterType.isSubtype(astParameterType)) {
++                compiler.report(JSError.make(
++                    VAR_REDEFINED,
++                    jsDocParameter.getSourceLocation(),
++                    jsDocParameter.getString(),
++                    astParameterType,
++                    jsDocParameterType));
++              }
+               defineSlot(astParameter, functionNode,
+-                  jsDocParameter.getJSType(), true);
++                  jsDocParameterType, true);
+               jsDocParameter = jsDocParameter.getNext();
+             } else {
+               defineSlot(astParameter, functionNode, null, true);
+             }
+           }
+         }
+       }
+     } // end declareArguments

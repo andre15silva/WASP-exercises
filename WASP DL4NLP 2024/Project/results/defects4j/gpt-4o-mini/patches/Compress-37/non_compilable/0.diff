@@ -1,0 +1,69 @@
+diff --git a/tmp/db80970c-14af-452d-b723-e591ef7b871c_buggy.java b/tmp/4f93b79b-d82e-442a-be9f-6489ac200930_fixed.java
+index 4b7e1e4..44b283d 100644
+--- a/tmp/db80970c-14af-452d-b723-e591ef7b871c_buggy.java
++++ b/tmp/4f93b79b-d82e-442a-be9f-6489ac200930_fixed.java
+@@ -1,52 +1,56 @@
+-    // https://www.gnu.org/software/tar/manual/html_section/tar_92.html#SEC188
+ Map<String, String> parsePaxHeaders(final InputStream i)
+     throws IOException {
+-        final Map<String, String> headers = new HashMap<String, String>(globalPaxHeaders);
++    final Map<String, String> headers = new HashMap<>(globalPaxHeaders);
+     // Format is "length keyword=value\n";
+     while (true) { // get length
+         int ch;
+         int len = 0;
+         int read = 0;
+         while ((ch = i.read()) != -1) {
+             read++;
+             if (ch == ' ') {
+                 // Get keyword
+                 final ByteArrayOutputStream coll = new ByteArrayOutputStream();
+                 while ((ch = i.read()) != -1) {
+                     read++;
+                     if (ch == '=') { // end of keyword
+                         final String keyword = coll.toString(CharsetNames.UTF_8);
+                         // Get rest of entry
+-                            final int restLen = len - read;
+-                            if (restLen == 1) { // only NL
+-                                headers.remove(keyword);
++                        final int restLen = len - read + 1; // Adjust for '=' character
++                        if (restLen < 1) { // at least one byte (for NL) must be remaining
++                            headers.remove(keyword); // If no data follows
+                         } else {
+                             final byte[] rest = new byte[restLen];
+                             final int got = IOUtils.readFully(i, rest);
+                             if (got != restLen) {
+                                 throw new IOException("Failed to read "
+                                         + "Paxheader. Expected "
+                                         + restLen
+                                         + " bytes, read "
+                                         + got);
+                             }
+                             // Drop trailing NL
+                             final String value = new String(rest, 0,
+                                     restLen - 1, CharsetNames.UTF_8);
+                             headers.put(keyword, value);
+                         }
+                         break;
+                     }
+                     coll.write((byte) ch);
+                 }
+                 break; // Processed single header
+             }
+-                len *= 10;
+-                len += ch - '0';
++            if (ch >= '0' && ch <= '9') {
++                len = len * 10 + (ch - '0'); // Handle decimal numbers
++            } else {
++                // Handle unexpected characters or situations, if necessary
++                // In this case, we can just break if it's not a digit or space
++                break;
++            }
+         }
+         if (ch == -1) { // EOF
+             break;
+         }
+     }
+     return headers;
+ }
+\ No newline at end of file

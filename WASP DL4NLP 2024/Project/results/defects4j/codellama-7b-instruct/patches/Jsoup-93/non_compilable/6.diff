@@ -1,0 +1,55 @@
+diff --git a/tmp/dc53eacb-e3e0-4192-9a86-9196b63dead4_buggy.java b/tmp/c22075fb-2887-48ee-ba18-b040c21c6622_fixed.java
+index aa351ad..fdee1c2 100644
+--- a/tmp/dc53eacb-e3e0-4192-9a86-9196b63dead4_buggy.java
++++ b/tmp/c22075fb-2887-48ee-ba18-b040c21c6622_fixed.java
+@@ -1,41 +1,46 @@
+     /**
+      * Get the data that this form submits. The returned list is a copy of the data, and changes to the contents of the
+      * list will not be reflected in the DOM.
+      * @return a list of key vals
+      */
+     public List<Connection.KeyVal> formData() {
+         ArrayList<Connection.KeyVal> data = new ArrayList<>();
+ 
+         // iterate the form control elements and accumulate their values
+         for (Element el: elements) {
+             if (!el.tag().isFormSubmittable()) continue; // contents are form listable, superset of submitable
+             if (el.hasAttr("disabled")) continue; // skip disabled form inputs
+             String name = el.attr("name");
+             if (name.length() == 0) continue;
+             String type = el.attr("type");
+ 
+ 
+-            if ("select".equals(el.normalName())) {
++            if (el instanceof FormSubmittable) {
++                data.add(HttpConnection.KeyVal.create(name, el.val()));
++            } else if (el instanceof Select) {
+                 Elements options = el.select("option[selected]");
+                 boolean set = false;
+                 for (Element option: options) {
+                     data.add(HttpConnection.KeyVal.create(name, option.val()));
+                     set = true;
+                 }
+                 if (!set) {
+                     Element option = el.select("option").first();
+                     if (option != null)
+                         data.add(HttpConnection.KeyVal.create(name, option.val()));
+                 }
+-            } else if ("checkbox".equalsIgnoreCase(type) || "radio".equalsIgnoreCase(type)) {
+-                // only add checkbox or radio if they have the checked attribute
++            } else if (el instanceof Checkbox) {
++                // only add checkbox if they have the checked attribute
+                 if (el.hasAttr("checked")) {
+                     final String val = el.val().length() >  0 ? el.val() : "on";
+                     data.add(HttpConnection.KeyVal.create(name, val));
+                 }
+-            } else {
++            } else if (el instanceof Radio) {
++                // only add radio if they have the checked attribute
++                if (el.hasAttr("checked")) {
+                     data.add(HttpConnection.KeyVal.create(name, el.val()));
+                 }
+             }
++        }
+         return data;
+     }

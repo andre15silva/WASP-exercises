@@ -1,0 +1,26 @@
+diff --git a/tmp/de6bdc80-a487-4d52-83c4-aec86aad4aa6_buggy.java b/tmp/b39b445d-cf42-43fb-8449-62968d75ff28_fixed.java
+index 46799da..71bdacd 100644
+--- a/tmp/de6bdc80-a487-4d52-83c4-aec86aad4aa6_buggy.java
++++ b/tmp/b39b445d-cf42-43fb-8449-62968d75ff28_fixed.java
+@@ -1,8 +1,14 @@
+-        /**
+-         * @param x Normalized objective variables.
+-         * @return the original objective variables, possibly repaired.
+-         */
+     public double[] repairAndDecode(final double[] x) {
+-            return
+-                decode(x);
++        double[] result = new double[x.Length];
++        for (int i = 0; i < x.Length; i++) {
++            // Repair the objective variable if it is out of bounds
++            if (x[i] > upper[i]) {
++                result[i] = upper[i];
++            } else if (x[i] < lower[i]) {
++                result[i] = lower[i];
++            } else {
++                result[i] = x[i];
++            }
++        }
++        return result;
+     }
+\ No newline at end of file

@@ -1,0 +1,22 @@
+diff --git a/tmp/886f3799-50ea-46e6-a042-81203ab69e14_buggy.java b/tmp/60b6d7f7-2bfc-45b3-aa3b-1cad90ea59a6_fixed.java
+index fa6828a..2a89b79 100644
+--- a/tmp/886f3799-50ea-46e6-a042-81203ab69e14_buggy.java
++++ b/tmp/60b6d7f7-2bfc-45b3-aa3b-1cad90ea59a6_fixed.java
+@@ -1,5 +1,16 @@
+     private void injectMockCandidate(Class<?> awaitingInjectionClazz, Set<Object> mocks, Object fieldInstance) {
+         for(Field field : orderedInstanceFieldsFrom(awaitingInjectionClazz)) {
+             mockCandidateFilter.filterCandidate(mocks, field, fieldInstance).thenInject();
+         }
+     }
++
++    private List<Field> orderedInstanceFieldsFrom(Class<?> clazz) {
++        List<Field> instanceFields = new ArrayList<>();
++        for(Field field : clazz.getDeclaredFields()) {
++            if(Modifier.isStatic(field.getModifiers())) {
++                continue;
++            }
++            instanceFields.add(field);
++        }
++        return instanceFields;
++    }
+\ No newline at end of file

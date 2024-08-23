@@ -1,0 +1,21 @@
+diff --git a/tmp/584793f9-e87d-4def-8565-1a9d92b36dc8_buggy.java b/tmp/b5d44ba0-dbf1-466d-80c6-42aeedc9c057_fixed.java
+index 22640dd..356bb2f 100644
+--- a/tmp/584793f9-e87d-4def-8565-1a9d92b36dc8_buggy.java
++++ b/tmp/b5d44ba0-dbf1-466d-80c6-42aeedc9c057_fixed.java
+@@ -1,3 +1,15 @@
+   private boolean hasExceptionHandler(Node cfgNode) {
++    Node grandParent = cfgNode.getGrandparent();
++    if (cfgNode.isFirstChildOf(grandParent) &&
++      grandParent.getChildAfter(cfgNode) != null) {
++      Node maybeCatchHandler = grandParent.getNext();
++      maybeCatchHandler = maybeCatchHandler.getNext();
++      if (maybeCatchHandler.isCatch()) {
++        Catch n = maybeCatchHandler.getCatch();
++        Node v = n.getVariable();
++        return v.isName() &&
++          v.getFirstChild().getString().equals("e");
++      }
++    }
+     return false;
+   }
+\ No newline at end of file

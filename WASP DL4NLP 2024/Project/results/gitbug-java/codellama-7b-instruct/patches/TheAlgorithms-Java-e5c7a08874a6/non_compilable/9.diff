@@ -1,0 +1,36 @@
+diff --git a/tmp/712eb67d-1ffa-4cea-ad4c-d2d7b9d9f06c_buggy.java b/tmp/608c75a0-6904-44dc-865d-bded7796da17_fixed.java
+index 2444d12..d76cf9c 100644
+--- a/tmp/712eb67d-1ffa-4cea-ad4c-d2d7b9d9f06c_buggy.java
++++ b/tmp/608c75a0-6904-44dc-865d-bded7796da17_fixed.java
+@@ -1,29 +1 @@
+-    // Evaluates the given postfix expression string and returns the result.
+-    public static int postfixEvaluate(final String exp) {
+-        Stack<Integer> s = new Stack<Integer>();
+-        Scanner tokens = new Scanner(exp);
+-
+-        while (tokens.hasNext()) {
+-            if (tokens.hasNextInt()) {
+-                s.push(tokens.nextInt()); // If int then push to stack
+-            } else { // else pop top two values and perform the operation
+-                int num2 = s.pop();
+-                int num1 = s.pop();
+-                String op = tokens.next();
+-
+-                switch (op) {
+-                    case "+" -> s.push(num1 + num2);
+-                    case "-" -> s.push(num1 - num2);
+-                    case "*" -> s.push(num1 * num2);
+-                    case "/" -> s.push(num1 / num2);
+-                    default -> throw new IllegalArgumentException("exp contains an unknown operation.");
+-                }
+-                //  "+", "-", "*", "/"
+-            }
+-        }
+-        tokens.close();
+-        if (s.size() != 1) {
+-            throw new IllegalArgumentException("exp is not a proper postfix expression.");
+-        }
+-        return s.pop();
+-    }
++tokens.next()
+\ No newline at end of file

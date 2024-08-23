@@ -1,0 +1,11 @@
+diff --git a/tmp/57ece854-5568-4e61-83cd-48308c325f0f_buggy.java b/tmp/570af244-b9ce-4911-9153-a40c8f1b11a0_fixed.java
+index 0878b6b..5f1834d 100644
+--- a/tmp/57ece854-5568-4e61-83cd-48308c325f0f_buggy.java
++++ b/tmp/570af244-b9ce-4911-9153-a40c8f1b11a0_fixed.java
+@@ -1,3 +1,5 @@
+   public final boolean isEmptyType() {
+-    return isNoType() || isNoObjectType() || isNoResolvedType();
++    return isNoType() || isNoObjectType() || isNoResolvedType() ||
++        (registry.getNativeFunctionType(
++             JSTypeNative.LEAST_FUNCTION_TYPE) == this);
+   }

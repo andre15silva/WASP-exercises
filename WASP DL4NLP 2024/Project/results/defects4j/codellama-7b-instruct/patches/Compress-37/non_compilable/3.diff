@@ -1,0 +1,88 @@
+diff --git a/tmp/8b1bdf72-fe6f-4eaa-bcaa-6eb9648d1c7e_buggy.java b/tmp/020eb480-ccf6-4081-8297-2894bcaf6f47_fixed.java
+index 4b7e1e4..c49faa8 100644
+--- a/tmp/8b1bdf72-fe6f-4eaa-bcaa-6eb9648d1c7e_buggy.java
++++ b/tmp/020eb480-ccf6-4081-8297-2894bcaf6f47_fixed.java
+@@ -1,52 +1,38 @@
+-    // https://www.gnu.org/software/tar/manual/html_section/tar_92.html#SEC188
+-    Map<String, String> parsePaxHeaders(final InputStream i)
+-        throws IOException {
+-        final Map<String, String> headers = new HashMap<String, String>(globalPaxHeaders);
+-        // Format is "length keyword=value\n";
+-        while(true){ // get length
+-            int ch;
+-            int len = 0;
++private static final String PAX_HEADERS_END_MARKER = "=";
++
++public Map<String, String> parsePaxHeaders(final InputStream i) throws IOException {
++    final Map<String, String> headers = new HashMap<>();
++    int headerNameLength = 0;
++    String headerName = null;
++    int headerValueLength = 0;
++    String headerValue = null;
++    boolean hasEndMarker = false;
+     int read = 0;
++    int ch;
+     while ((ch = i.read()) != -1) {
+         read++;
+-                if (ch == ' '){
+-                    // Get keyword
+-                    final ByteArrayOutputStream coll = new ByteArrayOutputStream();
+-                    while((ch = i.read()) != -1) {
+-                        read++;
+-                        if (ch == '='){ // end of keyword
+-                            final String keyword = coll.toString(CharsetNames.UTF_8);
+-                            // Get rest of entry
+-                            final int restLen = len - read;
+-                            if (restLen == 1) { // only NL
+-                                headers.remove(keyword);
+-                            } else {
+-                                final byte[] rest = new byte[restLen];
+-                                final int got = IOUtils.readFully(i, rest);
+-                                if (got != restLen) {
+-                                    throw new IOException("Failed to read "
+-                                                          + "Paxheader. Expected "
+-                                                          + restLen
+-                                                          + " bytes, read "
+-                                                          + got);
+-                                }
+-                                // Drop trailing NL
+-                                final String value = new String(rest, 0,
+-                                                          restLen - 1, CharsetNames.UTF_8);
+-                                headers.put(keyword, value);
+-                            }
+-                            break;
+-                        }
+-                        coll.write((byte) ch);
+-                    }
+-                    break; // Processed single header
+-                }
+-                len *= 10;
+-                len += ch - '0';
++        if (read == 1) {
++            headerNameLength = ch - '0';
++            if (headerNameLength < 0) {
++                throw new IOException("Invalid PAX header length");
++            }
++        } else if (read == 2) {
++            headerName = new String(new byte[] { (byte) ch}, CharsetNames.UTF_8);
++        } else if (read > 2 && !hasEndMarker) {
++            headerValueLength = read - 2;
++            headerValue = new String(new byte[] { (byte) ch}, CharsetNames.UTF_8);
++            hasEndMarker = true;
++        } else if (hasEndMarker && (ch == '\r' || ch == '\n')) {
++            headers.put(headerName, headerValue);
++            headerName = headerValue = null;
++            hasEndMarker = false;
++            return headers;
+         }
+-            if (ch == -1){ // EOF
+-                break;
+     }
++
++    // Process incomplete PAX header
++    if (headerName != null && headerValue != null) {
++        headers.put(headerName, headerValue);
+     }
+     return headers;
+ }
+\ No newline at end of file

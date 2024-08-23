@@ -1,0 +1,22 @@
+diff --git a/tmp/aea1926c-f5cc-4dcf-acc9-9721ddb53c72_buggy.java b/tmp/a3af319e-5f42-4f0b-839d-b9e5a5a1b112_fixed.java
+index fa6828a..eae4f79 100644
+--- a/tmp/aea1926c-f5cc-4dcf-acc9-9721ddb53c72_buggy.java
++++ b/tmp/a3af319e-5f42-4f0b-839d-b9e5a5a1b112_fixed.java
+@@ -1,5 +1,16 @@
+ private void injectMockCandidate(Class<?> awaitingInjectionClazz, Set<Object> mocks, Object fieldInstance) {
+     for(Field field : orderedInstanceFieldsFrom(awaitingInjectionClazz)) {
+-            mockCandidateFilter.filterCandidate(mocks, field, fieldInstance).thenInject();
++        if (mockCandidateFilter.filterCandidate(mocks, field, fieldInstance)) {
++            injectMock(field, fieldInstance, mocks);
++        }
++    }
++}
++
++private void injectMock(Field field, Object fieldInstance, Set<Object> mocks) {
++    field.setAccessible(true);
++    try {
++        field.set(fieldInstance, mocks.iterator().next());
++    } catch (IllegalAccessException e) {
++        e.printStackTrace();
+     }
+ }

@@ -1,0 +1,31 @@
+diff --git a/tmp/d0650603-cd5c-46ee-864a-880dec873524_buggy.java b/tmp/01fdf302-3b30-4e1a-ae10-fa8d1223371d_fixed.java
+index 47915ed..cb848f0 100644
+--- a/tmp/d0650603-cd5c-46ee-864a-880dec873524_buggy.java
++++ b/tmp/01fdf302-3b30-4e1a-ae10-fa8d1223371d_fixed.java
+@@ -1,22 +1,18 @@
+-    /* (non-Javadoc)
+-     * @see org.mockito.stubbing.Answer#answer(org.mockito.invocation.InvocationOnMock)
+-     */
+     public Object answer(InvocationOnMock invocation) {
+         if (methodsGuru.isToString(invocation.getMethod())) {
+             Object mock = invocation.getMock();
+             MockName name = mockUtil.getMockName(mock);
+             if (name.isDefault()) {
+                 return "Mock for " + mockUtil.getMockSettings(mock).getTypeToMock().getSimpleName() + ", hashCode: " + mock.hashCode();
+             } else {
+                 return name.toString();
+             }
+         } else if (methodsGuru.isCompareToMethod(invocation.getMethod())) {
+-            //see issue 184.
+-            //mocks by default should return 0 if references are the same, otherwise some other value because they are not the same. Hence we return 1 (anything but 0 is good).
+-            //Only for compareTo() method by the Comparable interface
++            if (invocation.getArguments()[0].equals(invocation.getMock())) {
++                return 0;
++            }
+             return 1;
+         }
+-        
+         Class<?> returnType = invocation.getMethod().getReturnType();
+         return returnValueFor(returnType);
+     }
+\ No newline at end of file

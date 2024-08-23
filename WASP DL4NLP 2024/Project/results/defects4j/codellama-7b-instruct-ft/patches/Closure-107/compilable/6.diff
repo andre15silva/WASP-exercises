@@ -1,0 +1,77 @@
+diff --git a/tmp/4174ac11-9daa-4740-afd6-11076af70957_buggy.java b/tmp/ee7f2601-6366-4a6e-8fc6-124653bb1a29_fixed.java
+index fa9dfcc..fd3818a 100644
+--- a/tmp/4174ac11-9daa-4740-afd6-11076af70957_buggy.java
++++ b/tmp/ee7f2601-6366-4a6e-8fc6-124653bb1a29_fixed.java
+@@ -1,61 +1,68 @@
+   @Override
+   protected CompilerOptions createOptions() {
+     CompilerOptions options = new CompilerOptions();
+     if (flags.processJqueryPrimitives) {
+       options.setCodingConvention(new JqueryCodingConvention());
+     } else {
+       options.setCodingConvention(new ClosureCodingConvention());
+     }
+ 
+     options.setExtraAnnotationNames(flags.extraAnnotationName);
+ 
+     CompilationLevel level = flags.compilationLevel;
+     level.setOptionsForCompilationLevel(options);
+ 
+     if (flags.debug) {
+       level.setDebugOptionsForCompilationLevel(options);
+     }
+ 
+     if (flags.useTypesForOptimization) {
+       level.setTypeBasedOptimizationOptions(options);
+     }
+ 
+     if (flags.generateExports) {
+       options.setGenerateExports(flags.generateExports);
+     }
+ 
+     WarningLevel wLevel = flags.warningLevel;
+     wLevel.setOptionsForWarningLevel(options);
+     for (FormattingOption formattingOption : flags.formatting) {
+       formattingOption.applyToOptions(options);
+     }
+ 
+     options.closurePass = flags.processClosurePrimitives;
+ 
+     options.jqueryPass = CompilationLevel.ADVANCED_OPTIMIZATIONS == level &&
+         flags.processJqueryPrimitives;
+ 
+     options.angularPass = flags.angularPass;
+ 
+     if (!flags.translationsFile.isEmpty()) {
+       try {
+         options.messageBundle = new XtbMessageBundle(
+             new FileInputStream(flags.translationsFile),
+             flags.translationsProject);
+       } catch (IOException e) {
+         throw new RuntimeException("Reading XTB file", e);
+       }
+     } else if (CompilationLevel.ADVANCED_OPTIMIZATIONS == level) {
+       // In SIMPLE or WHITESPACE mode, if the user hasn't specified a
+       // translations file, they might reasonably try to write their own
+       // implementation of goog.getMsg that makes the substitution at
+-      // run-time.
++      // run-time. However, that's not really i18n.
+       //
+-      // In ADVANCED mode, goog.getMsg is going to be renamed anyway,
+-      // so we might as well inline it. But shut off the i18n warnings,
+-      // because the user didn't really ask for i18n.
++      // In ADVANCED mode, we're inlining so that the getMsg-like
++      // function is no longer needed. Let them do their own
++      // type-checking in their client code.
+       options.messageBundle = new EmptyMessageBundle();
++      // There is no warning in this case.
++    } else {
++      // SIMPLE mode doesn't need wire getMsg calls.
++      // WHITESPACE mode needs them for whitespace-sensitive syntax.
++      //
++      // We could just check ADVANCED_OPTIMIZATIONS but not SIMPLE, so
++      // that the warning isn't redundant with this error.
+     }
+ 
+     return options;
+   }

@@ -1,0 +1,36 @@
+diff --git a/tmp/0418d358-737c-4b24-98a6-d8d1fbb3d4fd_buggy.java b/tmp/d68351f8-d51d-4edb-bc92-9e12a7973b0a_fixed.java
+index a7d4ff8..dc007d7 100644
+--- a/tmp/0418d358-737c-4b24-98a6-d8d1fbb3d4fd_buggy.java
++++ b/tmp/d68351f8-d51d-4edb-bc92-9e12a7973b0a_fixed.java
+@@ -1,28 +1,31 @@
+   void addNumber(double x) {
+     // This is not pretty printing. This is to prevent misparsing of x- -4 as
+     // x--4 (which is a syntax error).
+     char prev = getLastChar();
+     boolean negativeZero = isNegativeZero(x);
+     if (x < 0 && prev == '-') {
++      if (negativeZero) {
++        add('-');
++      }
+       add(" ");
+     }
+ 
+     if ((long) x == x && !negativeZero) {
+       long value = (long) x;
+       long mantissa = value;
+       int exp = 0;
+       if (Math.abs(x) >= 100) {
+         while (mantissa / 10 * Math.pow(10, exp + 1) == value) {
+           mantissa /= 10;
+           exp++;
+         }
+       }
+       if (exp > 2) {
+         add(Long.toString(mantissa) + "E" + Integer.toString(exp));
+       } else {
+         add(Long.toString(value));
+       }
+     } else {
+       add(String.valueOf(x));
+     }
+   }

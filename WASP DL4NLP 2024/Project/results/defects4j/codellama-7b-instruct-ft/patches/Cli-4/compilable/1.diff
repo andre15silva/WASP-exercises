@@ -1,0 +1,38 @@
+diff --git a/tmp/6ffa0f4e-2157-4d89-9341-5244efa35142_buggy.java b/tmp/763e4c38-2a5d-41d5-93dc-9c1304b4b5d1_fixed.java
+index 9c25814..092c38f 100644
+--- a/tmp/6ffa0f4e-2157-4d89-9341-5244efa35142_buggy.java
++++ b/tmp/763e4c38-2a5d-41d5-93dc-9c1304b4b5d1_fixed.java
+@@ -1,27 +1,29 @@
+     /**
+      * <p>Throws a {@link MissingOptionException} if all of the
+      * required options are no present.</p>
+      *
+      * @throws MissingOptionException if any of the required Options
+      * are not present.
+      */
+     private void checkRequiredOptions()
+         throws MissingOptionException
+     {
+         // if there are required options that have not been
+-        // processsed
++        // processed
+         if (requiredOptions.size() > 0)
+         {
+-            Iterator iter = requiredOptions.iterator();
++            // create the sorted list
+             StringBuffer buff = new StringBuffer();
++            Iterator iter = requiredOptions.iterator();
+ 
+-
+-            // loop through the required options
+             while (iter.hasNext())
+             {
+                 buff.append(iter.next());
++                if (iter.hasNext()) {
++                    buff.append(", ");
++                }
+             }
+ 
+             throw new MissingOptionException(buff.toString());
+         }
+     }

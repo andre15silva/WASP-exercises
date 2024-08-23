@@ -1,0 +1,53 @@
+diff --git a/tmp/f5cc8c8b-1036-411f-8311-49997dccb39d_buggy.java b/tmp/06c28693-aeb7-42bb-9697-cdfefc5f6502_fixed.java
+index 822447c..dcb42bf 100644
+--- a/tmp/f5cc8c8b-1036-411f-8311-49997dccb39d_buggy.java
++++ b/tmp/06c28693-aeb7-42bb-9697-cdfefc5f6502_fixed.java
+@@ -1,37 +1,30 @@
+-    /**
+-     * <p>
+-     * Escapes the characters in the <code>String</code> passed and writes the result to the <code>Writer</code>
+-     * passed.
+-     * </p>
+-     * 
+-     * @param writer
+-     *            The <code>Writer</code> to write the results of the escaping to. Assumed to be a non-null value.
+-     * @param str
+-     *            The <code>String</code> to escape. Assumed to be a non-null value.
+-     * @throws IOException
+-     *             when <code>Writer</code> passed throws the exception from calls to the {@link Writer#write(int)}
+-     *             methods.
+-     * 
+-     * @see #escape(String)
+-     * @see Writer
+-     */
+ public void escape(Writer writer, String str) throws IOException {
+     int len = str.length();
+     for (int i = 0; i < len; i++) {
+         char c = str.charAt(i);
++        // Check if the character is a high surrogate
++        if (Character.isHighSurrogate(c) && (i + 1 < len) && Character.isLowSurrogate(str.charAt(i + 1))) {
++            // Combine high and low surrogate to get the complete Unicode codepoint
++            int codePoint = Character.toCodePoint(c, str.charAt(i + 1));
++            writer.write("&#");
++            writer.write(Integer.toString(codePoint, 10));
++            writer.write(';');
++            i++; // Skip the next character as it is part of the surrogate pair
++        } else {
+             String entityName = this.entityName(c);
+             if (entityName == null) {
+                 if (c > 0x7F) {
+                     writer.write("&#");
+                     writer.write(Integer.toString(c, 10));
+                     writer.write(';');
+                 } else {
+                     writer.write(c);
+                 }
+             } else {
+                 writer.write('&');
+                 writer.write(entityName);
+                 writer.write(';');
+             }
+         }
+     }
++}
+\ No newline at end of file

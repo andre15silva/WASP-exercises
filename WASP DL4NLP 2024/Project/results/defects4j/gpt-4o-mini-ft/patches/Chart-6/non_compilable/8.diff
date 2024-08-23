@@ -1,0 +1,63 @@
+diff --git a/tmp/bf410a25-b653-4522-a4e3-ce27b869c95a_buggy.java b/tmp/d8422dc8-fd14-44db-8ec3-46a97a1d8f77_fixed.java
+index 351a97a..c1dd103 100644
+--- a/tmp/bf410a25-b653-4522-a4e3-ce27b869c95a_buggy.java
++++ b/tmp/d8422dc8-fd14-44db-8ec3-46a97a1d8f77_fixed.java
+@@ -1,18 +1,57 @@
++    /**
++     * Instantiates a new <code>ShapeList</code> object using the
++     * shape data from the specified serializable object.
++     *
++     * @param object  the serializable object (<code>null</code> not
++     *        permitted).
++     *
++     * @return A <code>ShapeList</code> object.
++     */
++    public static ShapeList getInstance(Serializable object) {
++        ShapeList shapeList;
++        if (object instanceof ShapeList) {
++            shapeList = (ShapeList) object;
++        }
++        else {
++            shapeList = new ShapeList();
++            shapeList.addAll((Collection<? extends Shape>) object);
++        }
++        return shapeList;
++    }
++
+     /**
+      * Tests the list for equality with another object (typically also a list).
+      *
+      * @param obj  the other object (<code>null</code> permitted).
+      *
+      * @return A boolean.
+      */
+     public boolean equals(Object obj) {
+ 
+         if (obj == this) {
+             return true;
+         }
+         if (!(obj instanceof ShapeList)) {
+             return false;
+         }
+-        return super.equals(obj);
++        ShapeList other = (ShapeList) obj;
++        if (this.size() != other.size()) {
++            return false;
++        }
++        for (int i=0; i<size(); i++) {
++            Shape shape1 = getShape(i);
++            Shape shape2 = other.getShape(i);
++            if (shape1 == null) {
++                if (shape2 != null) {
++                    return false;
++                }
++            }
++            else {
++                if (shape1.equals(shape2) != true) {
++                    return false;
++                }
++            }
++        }
++        return true;
+ 
+     }

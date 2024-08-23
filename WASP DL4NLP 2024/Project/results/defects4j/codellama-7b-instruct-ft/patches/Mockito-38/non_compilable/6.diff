@@ -1,0 +1,10 @@
+diff --git a/tmp/d03f530e-eb4a-4cea-a07e-30cbf97f7640_buggy.java b/tmp/a07faa50-e4e6-4502-96d5-308be765f218_fixed.java
+index db60019..378a090 100644
+--- a/tmp/d03f530e-eb4a-4cea-a07e-30cbf97f7640_buggy.java
++++ b/tmp/a07faa50-e4e6-4502-96d5-308be765f218_fixed.java
+@@ -1,3 +1,4 @@
+     private boolean toStringEquals(Matcher m, Object arg) {
+-        return StringDescription.toString(m).equals(arg.toString());
++         Object[] args = m.getFormattedArgs();
++         return args != null && args.length > 0 && args[0] != arg && arg.toString().equals(StringDescription.toString(m));
+     }

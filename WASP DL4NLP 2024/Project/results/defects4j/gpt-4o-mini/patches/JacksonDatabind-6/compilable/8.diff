@@ -1,0 +1,107 @@
+diff --git a/tmp/3d0cca29-57a9-43ea-ac83-61738d5adff8_buggy.java b/tmp/98c14910-0ea5-408d-8d0c-60b0defdf560_fixed.java
+index cd412d2..7907db3 100644
+--- a/tmp/3d0cca29-57a9-43ea-ac83-61738d5adff8_buggy.java
++++ b/tmp/98c14910-0ea5-408d-8d0c-60b0defdf560_fixed.java
+@@ -1,76 +1,71 @@
+-    protected Date parseAsISO8601(String dateStr, ParsePosition pos)
+-    {
+-        /* 21-May-2009, tatu: DateFormat has very strict handling of
+-         * timezone  modifiers for ISO-8601. So we need to do some scrubbing.
+-         */
+-
+-        /* First: do we have "zulu" format ('Z' == "GMT")? If yes, that's
+-         * quite simple because we already set date format timezone to be
+-         * GMT, and hence can just strip out 'Z' altogether
+-         */
++protected Date parseAsISO8601(String dateStr, ParsePosition pos) {
++    // Same initial comments and setup
+     int len = dateStr.length();
+     char c = dateStr.charAt(len - 1);
+     DateFormat df;
+ 
+-        // [JACKSON-200]: need to support "plain" date...
++    // Handling plain date
+     if (len <= 10 && Character.isDigit(c)) {
+         df = _formatPlain;
+         if (df == null) {
+             df = _formatPlain = _cloneFormat(DATE_FORMAT_PLAIN, DATE_FORMAT_STR_PLAIN, _timezone, _locale);
+         }
+     } else if (c == 'Z') {
+         df = _formatISO8601_z;
+         if (df == null) {
+             df = _formatISO8601_z = _cloneFormat(DATE_FORMAT_ISO8601_Z, DATE_FORMAT_STR_ISO8601_Z, _timezone, _locale);
+         }
+-            // [JACKSON-334]: may be missing milliseconds... if so, add
+-            if (dateStr.charAt(len-4) == ':') {
++        // Add milliseconds if necessary
++        if (dateStr.length() > 19 && dateStr.charAt(len - 4) == ':') {
+             StringBuilder sb = new StringBuilder(dateStr);
+             sb.insert(len - 1, ".000");
+             dateStr = sb.toString();
+         }
+     } else {
+-            // Let's see if we have timezone indicator or not...
++        // Check for timezone
+         if (hasTimeZone(dateStr)) {
+             c = dateStr.charAt(len - 3);
+-                if (c == ':') { // remove optional colon
+-                    // remove colon
++            if (c == ':') {
++                // Remove optional colon
+                 StringBuilder sb = new StringBuilder(dateStr);
+                 sb.delete(len - 3, len - 2);
+                 dateStr = sb.toString();
+-                } else if (c == '+' || c == '-') { // missing minutes
+-                    // let's just append '00'
+-                    dateStr += "00";
++            } else if (c == '+' || c == '-') {
++                // Append '00' for minutes if missing
++                if (len == 18) { // Format "yyyy-MM-dd'T'HH:mmXXXX" (missing seconds)
++                    dateStr += ":00"; // Ensure seconds are included
+                 }
+-                // Milliseconds partial or missing; and even seconds are optional
++                dateStr += "00"; // Ensure minutes are included
++            }
++            // Check for milliseconds
+             len = dateStr.length();
+-                // remove 'T', '+'/'-' and 4-digit timezone-offset
+-                c = dateStr.charAt(len-9);
+-                if (Character.isDigit(c)) {
++            if (len >= 20 && Character.isDigit(dateStr.charAt(len - 9))) {
++                // For the format with second digits
+                 StringBuilder sb = new StringBuilder(dateStr);
+-                    sb.insert(len-5, ".000");
++                if (dateStr.charAt(len - 10) != '.') {
++                    sb.insert(len - 8, ".000");
+                     dateStr = sb.toString();
+                 }
++            }
+             df = _formatISO8601;
+             if (_formatISO8601 == null) {
+                 df = _formatISO8601 = _cloneFormat(DATE_FORMAT_ISO8601, DATE_FORMAT_STR_ISO8601, _timezone, _locale);
+             }
+         } else { 
+-                // If not, plain date. Easiest to just patch 'Z' in the end?
++            // Handling plain date with Zulu format
+             StringBuilder sb = new StringBuilder(dateStr);
+-                // And possible also millisecond part if missing
++            // Handle missing seconds and milliseconds
+             int timeLen = len - dateStr.lastIndexOf('T') - 1;
+             if (timeLen <= 8) {
+-                        sb.append(".000");
++                sb.append(".000"); // Append milliseconds if missing
+             }
+-                sb.append('Z');
++            sb.append('Z'); // Add 'Z' at the end
+             dateStr = sb.toString();
+             df = _formatISO8601_z;
+             if (df == null) {
+-                    df = _formatISO8601_z = _cloneFormat(DATE_FORMAT_ISO8601_Z, DATE_FORMAT_STR_ISO8601_Z,
+-                            _timezone, _locale);
++                df = _formatISO8601_z = _cloneFormat(DATE_FORMAT_ISO8601_Z, DATE_FORMAT_STR_ISO8601_Z, _timezone, _locale);
+             }
+         }
+     }
+     return df.parse(dateStr, pos);
+ }
+\ No newline at end of file

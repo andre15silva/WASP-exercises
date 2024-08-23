@@ -1,0 +1,50 @@
+diff --git a/tmp/cd3e1af3-a813-4611-b5e8-c94e70e55fe1_buggy.java b/tmp/828ec885-fce5-4860-a009-2f666bf4d103_fixed.java
+index 6cfa79b..32bac03 100644
+--- a/tmp/cd3e1af3-a813-4611-b5e8-c94e70e55fe1_buggy.java
++++ b/tmp/828ec885-fce5-4860-a009-2f666bf4d103_fixed.java
+@@ -1,12 +1,42 @@
+     /**
+-     * For this disbution, X, this method returns P(X &lt; <code>x</code>).
++     * For this distribution, X, this method returns P(X &lt; <code>x</code>).
+      * @param x the value at which the CDF is evaluated.
+      * @return CDF evaluted at <code>x</code>. 
+      * @throws MathException if the algorithm fails to converge; unless
+      * x is more than 20 standard deviations from the mean, in which case the
+      * convergence exception is caught and 0 or 1 is returned.
+      */
+     public double cumulativeProbability(double x) throws MathException {
+-            return 0.5 * (1.0 + Erf.erf((x - mean) /
+-                    (standardDeviation * Math.sqrt(2.0))));
++        // The standard deviation must be positive to assure that (alpha / 2) is
++        // within the domain of the error function.  If the error function returns
++        // 1, then the P(X < x) == 0, which means that X is more than n standard
++        // deviations from the mean.  We do not want to assume that X is then
++        // either greater or less than the mean, which would break the rules of
++        // probability (see http://www.math.ohio-state.edu/~wangde/papers/sandi2.pdf)
++        if ( x * standardDeviation * 2 < alpha || alpha < x *
++            -standardDeviation * 2 ) throw new MathException("x must be more "
++            + "than 20 standard deviations from the mean for normalized "
++            + "CDF approximation to be valid.", null);
++        // If x is too far away from the mean, the error function may blow up.
++        // Theoretical constants are the product of (Euler's constant, square
++        // root of 2 Pi, alpha/2).
++        final double errorFunctionUpperConstant = 9.908268e+30;
++        final double errorFunctionLowerConstant = 2.582664e-30;
++        // Calculate the error function
++        double fx = (x - mean) / (standardDeviation *
++            (Math.sqrt(2) / Math.sqrt(errorFunctionUpperConstant)));
++        // Check to see if x is above and beyond the error function upper limit.
++        // If it is, it is safe to treat the function like it is a constant and
++        // its value is 1.
++        if (fx > errorFunctionUpperConstant) {
++            return 1;
++            // TODO Check to see if x is far enough below the error function
++            // lower limit.  If it is, the probability of -0.5 can be returned.
++        }
++        // Now the cdf is approximated using the error function
++        double retval = 0.5 * (1.0 + Erf.erf(fx));
++        // If the error function is too large and large numbers are used,
++        // this normalization of the standard deviation will prevent errors with
++        // precision.
++        return retval / (standardDeviation * Math.sqrt(2.0 * errorFunctionUpperConstant));
+     }

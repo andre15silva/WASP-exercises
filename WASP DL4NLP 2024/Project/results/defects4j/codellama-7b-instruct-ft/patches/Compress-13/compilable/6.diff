@@ -1,0 +1,14 @@
+diff --git a/tmp/2ad95988-2d68-418d-b39e-6f2ae706cd47_buggy.java b/tmp/47e244e7-aa51-40c8-a6c4-f26e46e1d572_fixed.java
+index 1c92640..9139631 100644
+--- a/tmp/2ad95988-2d68-418d-b39e-6f2ae706cd47_buggy.java
++++ b/tmp/47e244e7-aa51-40c8-a6c4-f26e46e1d572_fixed.java
+@@ -1,7 +1,8 @@
+     /**
+      * Set the name of the entry.
+      * @param name the name to use
+      */
+     protected void setName(String name) {
+-        this.name = name;
++        // winzip files store "/" instead of "\".
++        this.name = name.replace('/', File.separatorChar);
+     }

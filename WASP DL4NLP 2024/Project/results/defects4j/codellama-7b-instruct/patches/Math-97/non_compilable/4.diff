@@ -1,0 +1,107 @@
+diff --git a/tmp/24870ef1-6193-44f8-8c80-07b57a18d1bd_buggy.java b/tmp/ecf48cae-3036-4b0f-93f0-29fddec14ece_fixed.java
+index 88647d1..18053b9 100644
+--- a/tmp/24870ef1-6193-44f8-8c80-07b57a18d1bd_buggy.java
++++ b/tmp/ecf48cae-3036-4b0f-93f0-29fddec14ece_fixed.java
+@@ -1,44 +1,61 @@
+-    /**
+-     * Find a zero in the given interval.
+-     * <p>
+-     * Requires that the values of the function at the endpoints have opposite
+-     * signs. An <code>IllegalArgumentException</code> is thrown if this is not
+-     * the case.</p>
+-     * 
+-     * @param min the lower bound for the interval.
+-     * @param max the upper bound for the interval.
+-     * @return the value where the function is zero
+-     * @throws MaxIterationsExceededException if the maximum iteration count is exceeded
+-     * @throws FunctionEvaluationException if an error occurs evaluating the
+-     * function 
+-     * @throws IllegalArgumentException if min is not less than max or the
+-     * signs of the values of the function at the endpoints are not opposites
+-     */
+-    public double solve(double min, double max) throws MaxIterationsExceededException, 
+-        FunctionEvaluationException {
+-        
+-        clearResult();
+-        verifyInterval(min, max);
+-        
+-        double ret = Double.NaN;
+-        
+-        double yMin = f.value(min);
+-        double yMax = f.value(max);
+-        
+-        // Verify bracketing
+-        double sign = yMin * yMax;
+-        if (sign >= 0) {
+-            // check if either value is close to a zero
+-                // neither value is close to zero and min and max do not bracket root.
+-                throw new IllegalArgumentException
+-                ("Function values at endpoints do not have different signs." +
+-                        "  Endpoints: [" + min + "," + max + "]" + 
+-                        "  Values: [" + yMin + "," + yMax + "]");
++class SinFunction implements UnivariateRealFunction {
++  public double value(double x) {
++    return Math.sin(x);
++  }
++}
++
++class BrentSolver extends UnivariateRealSolver {
++  public BrentSolver(UnivariateRealFunction f) {
++    super(f);
++  }
++
++  public double solve(double min, double max) {
++    return solve(min, max, min, max, 0);
++  }
++
++  protected double solve(double min, double max, double a, double b, double c) {
++    double fa = functionValue(a);
++    double fb = functionValue(b);
++    double fc = functionValue(c);
++    double d = (max - min) > 0 ? 1 : -1;
++
++    if (fa * fc < 0) {
++      // if (fa * fb > 0)
++      //   return min;
++      // else
++      //   return max;
++      return c;
++    }
++
++    double m = a + 0.5 * (b - a);
++    double fm = functionValue(m);
++    double tol = Math.abs(min) * 0.00000000000001;
++
++    while (Math.abs(max - min) > tol) {
++      if (fa * fm < 0) {
++        b = m;
++        fb = fm;
+       } else {
+-            // solve using only the first endpoint as initial guess
+-            ret = solve(min, yMin, max, yMax, min, yMin);
+-            // either min or max is a root
++        a = m;
++        fa = fm;
+       }
+ 
+-        return ret;
++      if (Math.abs(fa) < Math.abs(fb)) {
++        c = a;
++        fc = fa;
++      } else {
++        c = b;
++        fc = fb;
++      }
++
++      m = c + d * (c - b);
++      fm = functionValue(m);
++    }
++
++    return m;
++  }
++
++  protected double functionValue(double x) {
++    return function.value(x);
++  }
+ }
+\ No newline at end of file

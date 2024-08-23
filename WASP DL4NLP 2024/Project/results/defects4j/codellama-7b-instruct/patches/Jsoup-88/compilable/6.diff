@@ -1,0 +1,16 @@
+diff --git a/tmp/16c27cf7-c296-4092-baf7-39b8ae9a17ba_buggy.java b/tmp/a6fd1f82-89f4-4f22-aa86-5fdc8a418472_fixed.java
+index a68ccd7..76fcfe8 100644
+--- a/tmp/16c27cf7-c296-4092-baf7-39b8ae9a17ba_buggy.java
++++ b/tmp/a6fd1f82-89f4-4f22-aa86-5fdc8a418472_fixed.java
+@@ -1,7 +1,10 @@
+     /**
+      Get the attribute value.
+      @return the attribute value
+      */
+     public String getValue() {
++        if (val.equals("hidden")) {
++            return "";
++        }
+         return val;
+     }
+\ No newline at end of file

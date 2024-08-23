@@ -1,0 +1,28 @@
+diff --git a/tmp/ef810c61-6e67-4e10-878e-965813a76153_buggy.java b/tmp/32a172fe-df23-4034-a27e-c0b05805c667_fixed.java
+index c9c2b44..c560441 100644
+--- a/tmp/ef810c61-6e67-4e10-878e-965813a76153_buggy.java
++++ b/tmp/32a172fe-df23-4034-a27e-c0b05805c667_fixed.java
+@@ -1,13 +1,21 @@
+         @Override
+         public boolean matches(Element root, Element element) {
+-            // evaluate from last to first
+             for (int i = evaluators.size() -1; i >= 0; --i) {
+                 if (element == null)
+                     return false;
++                Element selectContext = evaluators.get(i).isDataNode() ? root : element;
+                 Evaluator eval = evaluators.get(i);
+                 if (!eval.matches(root, element))
+                     return false;
+                 element = element.parent();
++                if (i > 0) {
++                    Elements sameSelector = selectContext.getElementsByTag(eval.getMatchSelector());
++                    for (i = 0; i < sameSelector.size() - 1; i++)
++                        if (selectContext == sameSelector.get(i))
++                            break;
++                    if (i == sameSelector.size() - 1)
++                        element = null;
++                }
+             }
+             return true;
+         }
+\ No newline at end of file

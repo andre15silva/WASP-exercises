@@ -1,0 +1,68 @@
+diff --git a/tmp/5b818fc7-9e2e-4e19-9315-769b48bc0629_buggy.java b/tmp/3e11fe50-5c42-4473-b269-93a780108528_fixed.java
+index 88647d1..f8fbba3 100644
+--- a/tmp/5b818fc7-9e2e-4e19-9315-769b48bc0629_buggy.java
++++ b/tmp/3e11fe50-5c42-4473-b269-93a780108528_fixed.java
+@@ -1,44 +1,59 @@
+     /**
+      * Find a zero in the given interval.
+      * <p>
+      * Requires that the values of the function at the endpoints have opposite
+      * signs. An <code>IllegalArgumentException</code> is thrown if this is not
+      * the case.</p>
+      * 
+      * @param min the lower bound for the interval.
+      * @param max the upper bound for the interval.
+      * @return the value where the function is zero
+      * @throws MaxIterationsExceededException if the maximum iteration count is exceeded
+      * @throws FunctionEvaluationException if an error occurs evaluating the
+      * function 
+      * @throws IllegalArgumentException if min is not less than max or the
+      * signs of the values of the function at the endpoints are not opposites
+      */
+     public double solve(double min, double max) throws MaxIterationsExceededException, 
+         FunctionEvaluationException {
+         
+         clearResult();
+         verifyInterval(min, max);
+         
+         double ret = Double.NaN;
+         
+         double yMin = f.value(min);
+         double yMax = f.value(max);
+         
+         // Verify bracketing
+         double sign = yMin * yMax;
+         if (sign >= 0) {
+             // check if either value is close to a zero
++            double zero = 1e-3 * Math.min(Math.abs(min), Math.abs(max));
++            if (Math.abs(min - max) <= zero) {
+                 // neither value is close to zero and min and max do not bracket root. 
+-                throw new IllegalArgumentException
+-                ("Function values at endpoints do not have different signs." +
+-                        "  Endpoints: [" + min + "," + max + "]" + 
+-                        "  Values: [" + yMin + "," + yMax + "]");
++            }
++            if (Math.abs(min) > zero) {
++                // check if max is a root
++                double yMaxMax = f.value(max);
++                if (zero > Math.abs(yMaxMax) && 0 != ((yMaxMax-yMax) * (yMax-yMin))){
++                    // min and max bracket a root and min=max is not a root
++                    ret = max;
++                }
++            }
++            if (Math.abs(max) > zero && Double.isInfinite(ret)) {
++                // check if min is a root
++                double yMinMin = f.value(min);
++                if (zero > Math.abs(yMinMin) && 0 != ((yMin-yMinMin) * (yMinMin-yMax))){
++                    // max and min bracket a root and max=min is not a root
++                    ret = min;
++                }
++            }
+         } else {
+             // solve using only the first endpoint as initial guess
+             ret = solve(min, yMin, max, yMax, min, yMin);
+             // either min or max is a root
+         }   
+ 
+         return ret;
+     }

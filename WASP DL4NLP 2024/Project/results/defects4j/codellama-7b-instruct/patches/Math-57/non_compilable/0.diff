@@ -1,0 +1,95 @@
+diff --git a/tmp/614400eb-09e7-4a7f-8e25-73b9f7193655_buggy.java b/tmp/43f0f832-b666-418a-85c5-a1603b4460a3_fixed.java
+index ad4b0d8..f313305 100644
+--- a/tmp/614400eb-09e7-4a7f-8e25-73b9f7193655_buggy.java
++++ b/tmp/43f0f832-b666-418a-85c5-a1603b4460a3_fixed.java
+@@ -1,47 +1,79 @@
+-    /**
+-     * Use K-means++ to choose the initial centers.
+-     *
+-     * @param <T> type of the points to cluster
+-     * @param points the points to choose the initial centers from
+-     * @param k the number of centers to choose
+-     * @param random random generator to use
+-     * @return the initial centers
+-     */
+     private static <T extends Clusterable<T>> List<Cluster<T>>
+         chooseInitialCenters(final Collection<T> points, final int k, final Random random) {
+ 
+         final List<T> pointSet = new ArrayList<T>(points);
+         final List<Cluster<T>> resultSet = new ArrayList<Cluster<T>>();
+ 
+         // Choose one center uniformly at random from among the data points.
+         final T firstPoint = pointSet.remove(random.nextInt(pointSet.size()));
+         resultSet.add(new Cluster<T>(firstPoint));
+ 
+         final double[] dx2 = new double[pointSet.size()];
+         while (resultSet.size() < k) {
+             // For each data point x, compute D(x), the distance between x and
+             // the nearest center that has already been chosen.
+             int sum = 0;
+             for (int i = 0; i < pointSet.size(); i++) {
+                 final T p = pointSet.get(i);
+                 final Cluster<T> nearest = getNearestCluster(resultSet, p);
+-                final double d = p.distanceFrom(nearest.getCenter());
+-                sum += d * d;
++                sum += p.distanceFrom(nearest.getCenter()) * p.distanceFrom(nearest.getCenter());
+                 dx2[i] = sum;
+             }
+ 
+             // Add one new data point as a center. Each point x is chosen with
+             // probability proportional to D(x)2
+             final double r = random.nextDouble() * sum;
+             for (int i = 0 ; i < dx2.length; i++) {
+                 if (dx2[i] >= r) {
+                     final T p = pointSet.remove(i);
+                     resultSet.add(new Cluster<T>(p));
+                     break;
+                 }
+             }
+         }
+ 
++        // Calculate the distances between the points and the centers
++        // using the Euclidean distance metric
++        dist = getEuclideanDistance(points, resultSet);
++
++        // Normalize the distances so they sum to 1
++        for (int i = 0; i < dist.length; i++) {
++            dist[i] /= sum;
++        }
++
++        // Choose each point as a center according to its distance
++        // probability
++        for (int i = 0; i < points.size(); i++) {
++            double r = random.nextDouble();
++            for (int j = 0; j < dist.length; j++) {
++                if (r <= dist[i]) {
++                    resultSet.add(new Cluster<T>(points.get(i)));
++                    break;
++                }
++            }
++        }
++
+         return resultSet;
+ 
+     }
++
++    private static <E extends Clusterable<E>> double[] getEuclideanDistance(
++        Collection<E> points, Collection<Cluster<E>> clusters) {
++        double[] dist = new double[points.size()];
++        for (int i = 0; i < dist.length; i++) {
++            dist[i] = getEuclideanDistance(points.get(i), clusters);
++        }
++        return dist;
++    }
++
++    private static <E extends Clusterable<E>> double getEuclideanDistance(
++        E point, Collection<Cluster<E>> clusters) {
++        double min = Double.MAX_VALUE;
++        for (Cluster<E> cluster : clusters) {
++            double d = point.distanceFrom(cluster.getCenter());
++            if (d < min) {
++                min = d;
++            }
++        }
++        return min;
++    }

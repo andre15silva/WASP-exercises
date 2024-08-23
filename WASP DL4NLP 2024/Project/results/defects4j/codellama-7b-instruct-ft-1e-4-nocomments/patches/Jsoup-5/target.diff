@@ -1,0 +1,37 @@
+diff --git a/tmp/d70a1b47-918d-4298-8823-d5513a10ca63_buggy.java b/tmp/a226c5eb-4115-4b09-9d5e-a7480f962a82_fixed.java
+index 39dd8e7..d8c5153 100644
+--- a/tmp/d70a1b47-918d-4298-8823-d5513a10ca63_buggy.java
++++ b/tmp/a226c5eb-4115-4b09-9d5e-a7480f962a82_fixed.java
+@@ -1,30 +1,31 @@
+     private Attribute parseAttribute() {
+         tq.consumeWhitespace();
+         String key = tq.consumeAttributeKey();
+         String value = "";
+         tq.consumeWhitespace();
+         if (tq.matchChomp("=")) {
+             tq.consumeWhitespace();
+ 
+             if (tq.matchChomp(SQ)) {
+                 value = tq.chompTo(SQ);
+             } else if (tq.matchChomp(DQ)) {
+                 value = tq.chompTo(DQ);
+             } else {
+                 StringBuilder valueAccum = new StringBuilder();
+                 // no ' or " to look for, so scan to end tag or space (or end of stream)
+                 while (!tq.matchesAny("<", "/>", ">") && !tq.matchesWhitespace() && !tq.isEmpty()) {
+                     valueAccum.append(tq.consume());
+                 }
+                 value = valueAccum.toString();
+             }
+             tq.consumeWhitespace();
+         }
+         if (key.length() != 0)
+             return Attribute.createFromEncoded(key, value);
+         else {
+-            tq.consume();
++            if (value.length() == 0) // no key, no val; unknown char, keep popping so not get stuck
++                tq.advance();
+                 
+             return null;
+         }
+     }

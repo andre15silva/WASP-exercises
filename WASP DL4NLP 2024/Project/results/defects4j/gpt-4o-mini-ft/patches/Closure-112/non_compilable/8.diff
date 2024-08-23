@@ -1,0 +1,47 @@
+diff --git a/tmp/3a7ef9f9-a2fa-41f9-91b2-820238922d8f_buggy.java b/tmp/37b4e88d-9e7e-4d14-a804-d38c60e9429f_fixed.java
+index 63641d0..440bab1 100644
+--- a/tmp/3a7ef9f9-a2fa-41f9-91b2-820238922d8f_buggy.java
++++ b/tmp/37b4e88d-9e7e-4d14-a804-d38c60e9429f_fixed.java
+@@ -1,33 +1,38 @@
+   /**
+-   * For functions with function(this: T, ...) and T as parameters, type
+-   * inference will set the type of this on a function literal argument to the
+-   * the actual type of T.
++   * For function calls with the function having a template parameter, JSCompiler
++   * will infer the type(s) of a template parameter with respect to the function.
++   * If multiple template parameters are seen, VS will try to combine those into
++   * one and then only throw out a warning if types do not match.
+    */
+   private boolean inferTemplatedTypesForCall(
+       Node n, FunctionType fnType) {
+-    final ImmutableList<TemplateType> keys = fnType.getTemplateTypeMap()
++    JSType returnType = fnType.getReturnType();
++    if (!returnType.isUnknown()) {
++      return false;
++    }
++    ImmutableList<TemplateType> keys = fnType.getTemplateTypeMap()
+         .getTemplateKeys();
+     if (keys.isEmpty()) {
+       return false;
+     }
+ 
+     // Try to infer the template types
+     Map<TemplateType, JSType> inferred =
+         inferTemplateTypesFromParameters(fnType, n);
+ 
+ 
+     // Replace all template types. If we couldn't find a replacement, we
+     // replace it with UNKNOWN.
+     TemplateTypeReplacer replacer = new TemplateTypeReplacer(
+         registry, inferred);
+     Node callTarget = n.getFirstChild();
+ 
+     FunctionType replacementFnType = fnType.visit(replacer)
+         .toMaybeFunctionType();
+     Preconditions.checkNotNull(replacementFnType);
+ 
+     callTarget.setJSType(replacementFnType);
+     n.setJSType(replacementFnType.getReturnType());
+ 
+     return replacer.madeChanges;
+   }

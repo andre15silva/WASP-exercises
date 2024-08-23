@@ -1,0 +1,43 @@
+diff --git a/tmp/4cf96c2e-1577-473c-b3b2-ebc1b2f10976_buggy.java b/tmp/c2941cab-dbda-4507-8a6f-9055155bb64b_fixed.java
+index 23f078d..46db05f 100644
+--- a/tmp/4cf96c2e-1577-473c-b3b2-ebc1b2f10976_buggy.java
++++ b/tmp/c2941cab-dbda-4507-8a6f-9055155bb64b_fixed.java
+@@ -1,14 +1,26 @@
+-    private static void appendToAscii(String s, boolean spaceAsPlus, StringBuilder sb) throws UnsupportedEncodingException {
+-        // minimal normalization of Unicode -> Ascii, and space normal. Existing escapes are left as-is.
+-        for (int i = 0; i < s.length(); i++) {
+-            int c = s.codePointAt(i);
+-            if (c == ' ') {
+-                sb.append(spaceAsPlus ? '+' : "%20");
+-            } else if (c > 127) { // out of ascii range
+-                sb.append(URLEncoder.encode(new String(Character.toChars(c)), UTF_8.name()));
+-                // ^^ is a bit heavy-handed - if perf critical, we could optimize
+-            } else {
+-                sb.append((char) c);
++    public static String toExternalForm(URL url) {
++        try {
++            URL canonURL = new URL(url.toExternalForm());
++            if (canonURL.getProtocol().equals(url.getProtocol()) &&
++                canonURL.getHost().equals(url.getHost()) &&
++                canonURL.getPort() == url.getPort()) {
++                return url.toExternalForm();
+             }
++            StringBuilder result = new StringBuilder();
++            result.append(canonURL.getProtocol());
++            result.append("://");
++            result.append(canonURL.getHost());
++            if (canonURL.getPort() != -1) {
++                result.append(":");
++                result.append(canonURL.getPort());
++            }
++            result.append(canonURL.getPath());
++            if (url.getQuery() != null) {
++                result.append("?");
++                result.append(url.getQuery());
++            }
++            return result.toString();
++        } catch (MalformedURLException mue) {
++            return url.toExternalForm();
+         }
+     }
+\ No newline at end of file

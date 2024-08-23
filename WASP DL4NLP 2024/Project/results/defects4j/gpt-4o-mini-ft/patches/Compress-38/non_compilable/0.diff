@@ -1,0 +1,33 @@
+diff --git a/tmp/7b426fe2-dc31-4569-9bfc-b7c768c0a86a_buggy.java b/tmp/eb5117c0-0c5b-4cc7-bd8d-a8e94ba81b94_fixed.java
+index 192e83d..b3f5880 100644
+--- a/tmp/7b426fe2-dc31-4569-9bfc-b7c768c0a86a_buggy.java
++++ b/tmp/eb5117c0-0c5b-4cc7-bd8d-a8e94ba81b94_fixed.java
+@@ -1,21 +1,26 @@
+     /**
+      * Return whether or not this entry represents a directory.
+      *
+      * @return True if this entry is a directory.
+      */
+     @Override
+     public boolean isDirectory() {
+         if (file != null) {
+             return file.isDirectory();
+         }
+ 
+         if (linkFlag == LF_DIR) {
+             return true;
+         }
+ 
+-        if (getName().endsWith("/")) {
+-            return true;
++        // if the name ends in "/" (and corresponds to a TAR entry),
++        // then preserve the "/" at the end when composing
++        // for the output stream of .tar, but remove for tar.gz/gzip streams.
++        String name = getName();
++        if (name.endsWith("/") && (linkFlag != LF_GNUTAR_LONGLINK)) {
++            name = name.substring(0, name.length() - 1);
+         }
+ 
++        // TODO: return true for "/" [COMPRESS-356, COMPRESS-463]
+         return false;
+     }

@@ -1,0 +1,24 @@
+diff --git a/tmp/dfb01a7e-0cf5-4d7c-bed1-9c05aaa25f4b_buggy.java b/tmp/d46abfa8-3763-4583-b1a6-c9e7860ae4e2_fixed.java
+index 7030ef0..ec1ee9b 100644
+--- a/tmp/dfb01a7e-0cf5-4d7c-bed1-9c05aaa25f4b_buggy.java
++++ b/tmp/d46abfa8-3763-4583-b1a6-c9e7860ae4e2_fixed.java
+@@ -1,15 +1,18 @@
+     /**
+-     Add a list of allowed elements to a safelist. (If a tag is not allowed, it will be removed from the HTML.)
++     Add a list of allowed elenents to a Safelist. (If a tag is not allowed, it will be removed from the HTML.)
+ 
+      @param tags tag names to allow
+      @return this (for chaining)
+      */
+     public Safelist addTags(String... tags) {
+         Validate.notNull(tags);
+ 
+         for (String tagName : tags) {
+             Validate.notEmpty(tagName);
++            if (tagName.equals("NOSCRIPT")) { // only jsoup special cases noscript
++                continue;
++            }
+             tagNames.add(TagName.valueOf(tagName));
+         }
+         return this;
+     }

@@ -1,0 +1,36 @@
+diff --git a/tmp/aef02e03-011d-4b87-8d94-9fcbbaf8e87a_buggy.java b/tmp/5fbf3475-d944-471a-bafe-6a0915318151_fixed.java
+index 57c40b2..6758998 100644
+--- a/tmp/aef02e03-011d-4b87-8d94-9fcbbaf8e87a_buggy.java
++++ b/tmp/5fbf3475-d944-471a-bafe-6a0915318151_fixed.java
+@@ -1,27 +1,29 @@
+   /**
+    * Visits a GETPROP node.
+    *
+    * @param t The node traversal object that supplies context, such as the
+    * scope chain to use in name lookups as well as error reporting.
+    * @param n The node being visited.
+    * @param parent The parent of <code>n</code>
+    */
+   private void visitGetProp(NodeTraversal t, Node n, Node parent) {
+     // obj.prop or obj.method()
+     // Lots of types can appear on the left, a call to a void function can
+     // never be on the left. getPropertyType will decide what is acceptable
+     // and what isn't.
+     Node property = n.getLastChild();
+     Node objNode = n.getFirstChild();
+     JSType childType = getJSType(objNode);
+ 
+     if (childType.isDict()) {
+       report(t, property, TypeValidator.ILLEGAL_PROPERTY_ACCESS, "'.'", "dict");
+     } else if (n.getJSType() != null && parent.isAssign()) {
+-      return;
++      return; // If there's an ASGN C's variable being SET, don't mess with it
+     } else if (validator.expectNotNullOrUndefined(t, n, childType,
+-        "No properties on this expression", getNativeType(OBJECT_TYPE))) {
++        "No properties on this expression.", getNativeType(OBJECT_TYPE)) &&
++        (childType.hasAnyTemplate(TypeTemplate.OBJECT) ||
++            childType.hasAnyTemplate(TypeTemplate.STRONG_OBJECT))) {
+       checkPropertyAccess(childType, property.getString(), t, n);
+     }
+     ensureTyped(t, n);
+   }

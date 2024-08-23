@@ -1,0 +1,21 @@
+diff --git a/tmp/ced8f91a-0643-4c43-9129-c7a478dad672_buggy.java b/tmp/a8ed725f-3578-4579-8b1a-4b3e19be879f_fixed.java
+index 0e18f59..b31aa5c 100644
+--- a/tmp/ced8f91a-0643-4c43-9129-c7a478dad672_buggy.java
++++ b/tmp/a8ed725f-3578-4579-8b1a-4b3e19be879f_fixed.java
+@@ -1,13 +1,14 @@
+         @Override
+         InputStream decode(final InputStream in, final Coder coder,
+                 byte[] password) throws IOException {
+             byte propsByte = coder.properties[0];
+             long dictSize = coder.properties[1];
+             for (int i = 1; i < 4; i++) {
+-                dictSize |= (coder.properties[i + 1] << (8 * i));
++                // FIXME: This should use X86.readLittleEndianUint32(data[i], 0);
++                dictSize |= (coder.properties[i + 1] & 0xFF) << (8 * i);
+             }
+-            if (dictSize > LZMAInputStream.DICT_SIZE_MAX) {
++            if (dictSize > X86.readLittleEndianUint32(coder.properties, 0)) {
+                 throw new IOException("Dictionary larger than 4GiB maximum size");
+             }
+             return new LZMAInputStream(in, -1, propsByte, (int) dictSize);
+         }

@@ -1,0 +1,25 @@
+diff --git a/tmp/b8d20c30-e2bb-4f23-8b85-ade52ddf7f69_buggy.java b/tmp/20581d60-e368-40a0-8f2e-d689bba0cce4_fixed.java
+index 351a97a..88b61aa 100644
+--- a/tmp/b8d20c30-e2bb-4f23-8b85-ade52ddf7f69_buggy.java
++++ b/tmp/20581d60-e368-40a0-8f2e-d689bba0cce4_fixed.java
+@@ -1,18 +1,10 @@
+-    /**
+-     * Tests the list for equality with another object (typically also a list).
+-     *
+-     * @param obj  the other object (<code>null</code> permitted).
+-     *
+-     * @return A boolean.
+-     */
++    private transient Object mutableShape;
+     public boolean equals(Object obj) {
+-
+         if (obj == this) {
+             return true;
+         }
+         if (!(obj instanceof ShapeList)) {
+             return false;
+         }
+         return super.equals(obj);
+-
+     }
+\ No newline at end of file

@@ -1,0 +1,13 @@
+diff --git a/tmp/40786d1a-55a3-4b2a-980b-cdf013af4289_buggy.java b/tmp/a424f14e-e9f9-4d81-957e-e4b72aa4e4b7_fixed.java
+index 1c92640..06093be 100644
+--- a/tmp/40786d1a-55a3-4b2a-980b-cdf013af4289_buggy.java
++++ b/tmp/a424f14e-e9f9-4d81-957e-e4b72aa4e4b7_fixed.java
+@@ -1,7 +1,7 @@
+     /**
+      * Set the name of the entry.
+      * @param name the name to use
+      */
+-    protected void setName(String name) {
++    public void setName(String name) {
+         this.name = name;
+     }

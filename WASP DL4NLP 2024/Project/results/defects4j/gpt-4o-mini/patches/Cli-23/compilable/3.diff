@@ -1,0 +1,63 @@
+diff --git a/tmp/b7296662-019f-47ef-b172-0c9849fd9299_buggy.java b/tmp/e522a1f0-562c-4c41-8f16-9cfde5c89c6e_fixed.java
+index 227a4ef..e5659ac 100644
+--- a/tmp/b7296662-019f-47ef-b172-0c9849fd9299_buggy.java
++++ b/tmp/e522a1f0-562c-4c41-8f16-9cfde5c89c6e_fixed.java
+@@ -1,48 +1,40 @@
+-    /**
+-     * Render the specified text and return the rendered Options
+-     * in a StringBuffer.
+-     *
+-     * @param sb The StringBuffer to place the rendered text into.
+-     * @param width The number of characters to display per line
+-     * @param nextLineTabStop The position on the next line for the first tab.
+-     * @param text The text to be rendered.
+-     *
+-     * @return the StringBuffer with the rendered Options contents.
+-     */
+ protected StringBuffer renderWrappedText(StringBuffer sb, int width, 
+                                          int nextLineTabStop, String text)
+ {
++    // Ensure the text is not empty or null initially
++    if (text == null || text.isEmpty()) {
++        return sb; // Return empty sb if there's nothing to render
++    }
++    
+     int pos = findWrapPos(text, width, 0);
+ 
+     if (pos == -1)
+     {
+         sb.append(rtrim(text));
+-
+         return sb;
+     }
+     sb.append(rtrim(text.substring(0, pos))).append(defaultNewLine);
+ 
+-        // all following lines must be padded with nextLineTabStop space 
+-        // characters
++    // All following lines must be padded with nextLineTabStop space characters
+     final String padding = createPadding(nextLineTabStop);
+ 
+     while (true)
+     {
+         int lastPos = pos;
+         text = padding + text.substring(pos).trim();
+         pos = findWrapPos(text, width, 0);
+ 
++        // Ensure we are not trying to wrap a blank line or padding
+         if (pos == -1)
+         {
+             sb.append(text);
+-
+             return sb;
+-            } else
+-            if (pos == lastPos)
++        }
++        else if (pos == lastPos || text.isEmpty())
+         {
+             throw new RuntimeException("Text too long for line - throwing exception to avoid infinite loop [CLI-162]: " + text);
+         }
+ 
+         sb.append(rtrim(text.substring(0, pos))).append(defaultNewLine);
+     }
+ }
+\ No newline at end of file

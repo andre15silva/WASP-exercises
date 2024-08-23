@@ -1,0 +1,11 @@
+diff --git a/tmp/6212d6df-be97-4c55-bd6d-66f42e80fcc3_buggy.java b/tmp/0929051a-7ccc-4d4b-9991-3f558945332e_fixed.java
+index 8bae155..8591d87 100644
+--- a/tmp/6212d6df-be97-4c55-bd6d-66f42e80fcc3_buggy.java
++++ b/tmp/0929051a-7ccc-4d4b-9991-3f558945332e_fixed.java
+@@ -1,5 +1,5 @@
+     @Override
+     public String asStringLiteral()
+     {
+-        return '"' + this.value + '"';
++        return this.value.indexOf('\"') == -1 ? '"' + this.value + '"' : '\'' + this.value + '\'';
+     }

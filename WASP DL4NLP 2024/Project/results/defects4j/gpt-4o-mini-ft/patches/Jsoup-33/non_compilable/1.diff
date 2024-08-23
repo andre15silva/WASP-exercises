@@ -1,0 +1,33 @@
+diff --git a/tmp/3eb1c604-8208-47e2-a127-267f66ea6fa2_buggy.java b/tmp/2c727656-7347-431d-a312-7dbc3783ccca_fixed.java
+index dc93be3..e29460c 100644
+--- a/tmp/3eb1c604-8208-47e2-a127-267f66ea6fa2_buggy.java
++++ b/tmp/2c727656-7347-431d-a312-7dbc3783ccca_fixed.java
+@@ -1,14 +1,27 @@
+     Element insert(Token.StartTag startTag) {
+         // handle empty unknown tags
++        // TODO: when we've sorted out our whitespace problem, remove any attributes that don't match. Not working towards it yet because we want to still see the bug 
++        //  <html><head><title>xxx</title><script src="foo" /> </head><body id="xxx"><div id="1" /></div></body></html>
++        //  (remove the script, it's appearing without the title, even tho the script tags get parsed into the head as insertion is internal
+         // when the spec expects an empty tag, will directly hit insertEmpty, so won't generate this fake end tag.
+-        if (startTag.isSelfClosing()) {
++        if (startTag.isSelfClosing() && (isKnownEmptyBlock(startTag.name().toLowerCase().replaceAll("^<|/?>$", "")) || theParser().isUnknownTag(jacoco.$jsoup$parser$Parser$$html, startTag.name()))) {
+             Element el = insertEmpty(startTag);
+             stack.add(el);
+             tokeniser.emit(new Token.EndTag(el.tagName()));  // ensure we get out of whatever state we are in. emitted for yielded processing
++            //Alert.debug("selfclosing "+startTag.name()+" emit: "+el.debugString()+" as "+el.outerHtml());
+             return el;
++        } else {
++            //Alert.debug("non-selfclosing "+startTag.name());
+         }
+         
+         Element el = new Element(Tag.valueOf(startTag.name()), baseUri, startTag.attributes);
+         insert(el);
+         return el;
+     }
++
++    private boolean isKnownEmptyBlock(String tagName) {
++        if (tagName.equalsIgnoreCase("iframe") || tagName.equalsIgnoreCase("script") || tagName.equalsIgnoreCase("a") || tagName.equalsIgnoreCase("hr") || tagName.equalsIgnoreCase("style")) {
++            return true;
++        }
++        return false;
++    }

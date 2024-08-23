@@ -1,0 +1,104 @@
+diff --git a/tmp/9a90bbc7-47e1-47a9-b412-a0bc96ff1d71_buggy.java b/tmp/7842aa8f-1d8e-4841-a5d1-36b23b65b521_fixed.java
+index 0583946..b2ae613 100644
+--- a/tmp/9a90bbc7-47e1-47a9-b412-a0bc96ff1d71_buggy.java
++++ b/tmp/7842aa8f-1d8e-4841-a5d1-36b23b65b521_fixed.java
+@@ -1,30 +1,69 @@
+-    void outerHtmlHead(Appendable accum, int depth, Document.OutputSettings out) throws IOException {
+-        final boolean prettyPrint = out.prettyPrint();
+-        final Element parent = parentNode instanceof Element ? ((Element) parentNode) : null;
+-        final boolean normaliseWhite = prettyPrint && !Element.preserveWhitespace(parentNode);
+-
+-        boolean trimLeading = false;
+-        boolean trimTrailing = false;
+-        if (normaliseWhite) {
+-            trimLeading = (siblingIndex == 0 && parent != null && parent.tag().isBlock()) ||
+-                parentNode instanceof Document;
+-            trimTrailing = nextSibling() == null && parent != null && parent.tag().isBlock();
+-
+-            // if this text is just whitespace, and the next node will cause an indent, skip this text:
+-            Node next = nextSibling();
+-            boolean isBlank = isBlank();
+-            boolean couldSkip = (next instanceof Element && ((Element) next).shouldIndent(out)) // next will indent
+-                || (next instanceof TextNode && (((TextNode) next).isBlank())); // next is blank text, from re-parenting
+-            if (couldSkip && isBlank) return;
+-
+-            Node prev = previousSibling();
+-            if (
+-                (siblingIndex == 0 && parent != null && parent.tag().formatAsBlock() && !isBlank) ||
+-                (out.outline() && siblingNodes().size() > 0 && !isBlank) ||
+-                (siblingIndex > 0 && prev instanceof Element && ((Element) prev).normalName().equals("br")) // special case wrap on inline <br> - doesn't make sense as a block tag
+-            )
+-                indent(accum, depth, out);
+-        }
+-
+-        Entities.escape(accum, coreValue(), out, false, normaliseWhite, trimLeading, trimTrailing);
++    class TextNode {
++
++        private final String text;
++        private final String tag;
++        private final int element;
++
++        /**
++         * If no element, type is TextNode.
++         * If element, type is (element)TextNode
++         */
++        private final int type;
++
++        public TextNode(String text) {
++            this.text = text;
++            this.tag = null;
++            this.element = 0;
++        }
++
++        public TextNode(String text, String tagName) {
++            this.text = text;
++            this.tag = tagName;
++            this.element = 0;
++        }
++
++        public TextNode(String text, Element element) {
++            this.text = text;
++            this.tag = element.tagName();
++            this.element = 0;
++        }
++
++        public String text() {
++            return text;
++        }
++
++        public String tag() {
++            if (tag != null) {
++                return tag;
++            }
++            return null;
++        }
++
++        public String coreValue() {
++            return text;
++        }
++
++        public boolean isBlank() {
++            return text.trim().isEmpty();
++        }
++
++        public void escape(Appendable accum, Document.OutputSettings out) throws IOException {
++            Entities.escape(accum, coreValue(), out);
++        }
++
++        public Node parentNode() {
++            return parent;
++        }
++
++        public Node previousSibling() {
++            return previous;
++        }
++
++        public Node nextSibling() {
++            return next;
++        }
++
++        public Document.OutputSettings outline() {
++            return outline;
++        }
+     }
+\ No newline at end of file

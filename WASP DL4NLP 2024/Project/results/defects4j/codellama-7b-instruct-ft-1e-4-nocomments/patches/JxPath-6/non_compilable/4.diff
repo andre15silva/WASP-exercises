@@ -1,0 +1,55 @@
+diff --git a/tmp/0c386062-ee68-42c5-8bbc-b9cf2c344ab5_buggy.java b/tmp/61b06563-ae6c-4045-bb4e-0b41430c1bbe_fixed.java
+index f650982..0a7239e 100644
+--- a/tmp/0c386062-ee68-42c5-8bbc-b9cf2c344ab5_buggy.java
++++ b/tmp/61b06563-ae6c-4045-bb4e-0b41430c1bbe_fixed.java
+@@ -1,42 +1,37 @@
+-    /**
+-     * Compares two values
+-     */
+     protected boolean equal(
+         EvalContext context,
+         Expression left,
+         Expression right) 
+     {
+         Object l = left.compute(context);
+         Object r = right.compute(context);
+-
+-//        System.err.println("COMPARING: " +
+-//            (l == null ? "null" : l.getClass().getName()) + " " +
+-//            (r == null ? "null" : r.getClass().getName()));
+-
+         if (l instanceof InitialContext || l instanceof SelfContext) {
+             l = ((EvalContext) l).getSingleNodePointer();
+         }
+-
+         if (r instanceof InitialContext || r instanceof SelfContext) {
+             r = ((EvalContext) r).getSingleNodePointer();
+         }
+-
+         if (l instanceof Collection) {
+             l = ((Collection) l).iterator();
+         }
+-
+         if (r instanceof Collection) {
+             r = ((Collection) r).iterator();
+         }
+-
++        if (
++            (l instanceof Expression && ((Expression) l).isVariable())
++            || (r instanceof Expression && ((Expression) r).isVariable())
++        ) {
++            l = null;
++            r = null;
++        }
+         if ((l instanceof Iterator) && !(r instanceof Iterator)) {
+             return contains((Iterator) l, r);
+         }
+         if (!(l instanceof Iterator) && (r instanceof Iterator)) {
+             return contains((Iterator) r, l);
+         }
+         if (l instanceof Iterator && r instanceof Iterator) {
+             return findMatch((Iterator) l, (Iterator) r);
+         }
+         return equal(l, r);
+     }
+\ No newline at end of file

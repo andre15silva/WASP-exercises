@@ -1,0 +1,12 @@
+diff --git a/tmp/904ce751-0213-40af-a586-2abd0c388104_buggy.java b/tmp/25857ce0-1ce8-4af8-833b-4d59a2372a68_fixed.java
+index 3ecd591..62289c5 100644
+--- a/tmp/904ce751-0213-40af-a586-2abd0c388104_buggy.java
++++ b/tmp/25857ce0-1ce8-4af8-833b-4d59a2372a68_fixed.java
+@@ -1,6 +1,5 @@
+     private boolean isInlineable(Document.OutputSettings out) {
+         return tag().isInline()
+             && (parent() == null || parent().isBlock())
+-            && previousSibling() != null
+-            && !out.outline();
++            && !(tag().tagName().equalsIgnoreCase("a") && parent().name().equalsIgnoreCase("a"));
+     }

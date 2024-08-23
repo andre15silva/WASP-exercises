@@ -1,0 +1,56 @@
+diff --git a/tmp/4450ba33-a902-4c4a-88ae-39e4f59ef2a2_buggy.java b/tmp/26543483-5a8f-4b0a-b482-07510be90ea2_fixed.java
+index 712f277..227f365 100644
+--- a/tmp/4450ba33-a902-4c4a-88ae-39e4f59ef2a2_buggy.java
++++ b/tmp/26543483-5a8f-4b0a-b482-07510be90ea2_fixed.java
+@@ -1,48 +1,51 @@
+     /**
+      * Renders the given input to the target Appendable.
+      *
+      * @param input
+      *            source to render
+      * @param target
+      *            render onto this target Appendable.
+      * @return the given Appendable
+      * @throws IOException
+      *             If an I/O error occurs
+      */
+     public static Appendable render(final String input, Appendable target) throws IOException {
+ 
+         int i = 0;
+         int j, k;
+ 
+         while (true) {
+             j = input.indexOf(BEGIN_TOKEN, i);
+             if (j == -1) {
+                 if (i == 0) {
+                     target.append(input);
+                     return target;
+                 }
+                 target.append(input.substring(i));
+                 return target;
+             }
+             target.append(input.substring(i, j));
+             k = input.indexOf(END_TOKEN, j);
+ 
+             if (k == -1) {
+                 target.append(input);
+                 return target;
+             }
+             j += BEGIN_TOKEN_LEN;
+             String spec = input.substring(j, k);
+ 
+             String[] items = spec.split(CODE_TEXT_SEPARATOR, 2);
+             if (items.length == 1) {
+                 target.append(input);
+                 return target;
+             }
+             String replacement = render(items[1], items[0].split(CODE_LIST_SEPARATOR));
+ 
+             target.append(replacement);
+ 
+             i = k + END_TOKEN_LEN;
++            if (i < j) {
++                throw new IllegalArgumentException("@" + BEGIN_TOKEN + END_TOKEN + "");
++            }
+         }
+     }

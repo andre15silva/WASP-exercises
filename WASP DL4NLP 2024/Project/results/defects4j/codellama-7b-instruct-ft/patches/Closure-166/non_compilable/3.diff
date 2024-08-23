@@ -1,0 +1,33 @@
+diff --git a/tmp/2c0f8201-e5fa-4314-b543-40de7eb239aa_buggy.java b/tmp/c0703a7e-28a2-4c8e-bad0-91624cda6234_fixed.java
+index 5f96616..3c06e5d 100644
+--- a/tmp/2c0f8201-e5fa-4314-b543-40de7eb239aa_buggy.java
++++ b/tmp/c0703a7e-28a2-4c8e-bad0-91624cda6234_fixed.java
+@@ -1,20 +1,26 @@
+   @Override
+   public void matchConstraint(JSType constraint) {
+     // We only want to match constraints on anonymous types.
+     if (hasReferenceName()) {
+       return;
+     }
+ 
+-    // Handle the case where the constraint object is a record type.
++    // Handle the cases where the constraint object is a record type. Because
++    // of {@link #fromObjectLiteral}, this can also be an object literal with an
++    // inference marker on it.
+     //
+     // param constraint {{prop: (number|undefined)}}
+     // function f(constraint) {}
+     // f({});
+     //
+     // We want to modify the object literal to match the constraint, by
+     // taking any each property on the record and trying to match
+     // properties on this object.
+-    if (constraint.isRecordType()) {
++    //
++    // Note that if the constraint is a record type, we don't want to convert
++    // a record type that corresponds to a generic instantiated record type.
++    if (constraint.isRecordType() ||
++        fromObjectLiteral.isUnresolvedInference()) {
+       matchRecordTypeConstraint(constraint.toObjectType());
+     }
+   }

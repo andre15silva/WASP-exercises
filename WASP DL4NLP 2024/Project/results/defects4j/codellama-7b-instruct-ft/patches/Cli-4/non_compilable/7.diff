@@ -1,0 +1,48 @@
+diff --git a/tmp/cdad50c6-6790-42ae-b45c-cf192abdf07d_buggy.java b/tmp/d8c316bc-f36f-4f59-9641-4c02de778cbe_fixed.java
+index 9c25814..217a17f 100644
+--- a/tmp/cdad50c6-6790-42ae-b45c-cf192abdf07d_buggy.java
++++ b/tmp/d8c316bc-f36f-4f59-9641-4c02de778cbe_fixed.java
+@@ -1,27 +1,42 @@
+     /**
+      * <p>Throws a {@link MissingOptionException} if all of the
+      * required options are no present.</p>
+      *
+      * @throws MissingOptionException if any of the required Options
+      * are not present.
+      */
+     private void checkRequiredOptions()
+         throws MissingOptionException
+     {
+         // if there are required options that have not been
+         // processsed
+         if (requiredOptions.size() > 0)
+         {
+             Iterator iter = requiredOptions.iterator();
+             StringBuffer buff = new StringBuffer();
+ 
+ 
+             // loop through the required options
+             while (iter.hasNext())
+             {
+-                buff.append(iter.next());
++                Option option = (Option) iter.next();
++                boolean displayOpt = true;
++                // if we have already seen this option then don't
++                // display it
++                for (Option opt : optionsProcessed) {
++                    if (opt.getOpt().equals(option.getOpt())) {
++                        displayOpt = false;
++                        break;
++                    }
++                }
++                if (displayOpt) {
++                    if (buff.length() > 0) {
++                        buff.append(Option.SEPARATOR);
++                    }
++                    buff.append(option.getOpt());
++                }
+             }
+ 
+             throw new MissingOptionException(buff.toString());
+         }
+     }

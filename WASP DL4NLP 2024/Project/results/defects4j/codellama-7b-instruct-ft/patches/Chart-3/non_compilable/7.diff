@@ -1,0 +1,56 @@
+diff --git a/tmp/4d4552c3-faea-4278-af2f-fba7eb12e989_buggy.java b/tmp/c92f958b-96ca-4319-b031-eb9a40c19c54_fixed.java
+index 388771b..9d983bf 100644
+--- a/tmp/4d4552c3-faea-4278-af2f-fba7eb12e989_buggy.java
++++ b/tmp/c92f958b-96ca-4319-b031-eb9a40c19c54_fixed.java
+@@ -1,37 +1,51 @@
+     /**
+      * Creates a new timeseries by copying a subset of the data in this time
+      * series.
+      *
+      * @param start  the index of the first time period to copy.
+      * @param end  the index of the last time period to copy.
+      *
+      * @return A series containing a copy of this times series from start until
+      *         end.
+      *
+      * @throws CloneNotSupportedException if there is a cloning problem.
+      */
+     public TimeSeries createCopy(int start, int end)
+             throws CloneNotSupportedException {
+         if (start < 0) {
+             throw new IllegalArgumentException("Requires start >= 0.");
+         }
+         if (end < start) {
+             throw new IllegalArgumentException("Requires start <= end.");
+         }
+         TimeSeries copy = (TimeSeries) super.clone();
+         copy.data = new java.util.ArrayList();
+         if (this.data.size() > 0) {
++            if (this.getMinY() == this.getMaxY()) {
++                if (start < this.period.getIndex()) {
++                    copy.minYValue = this.minYValue;
++                }
++                if (end > this.period.getIndex()) {
++                    copy.maxYValue = this.maxYValue;
++                }
++            }
+             for (int index = start; index <= end; index++) {
+                 TimeSeriesDataItem item
+                         = (TimeSeriesDataItem) this.data.get(index);
+                 TimeSeriesDataItem clone = (TimeSeriesDataItem) item.clone();
+                 try {
+                     copy.add(clone);
++                    if (copy.getMinY() < copy.minYValue) {
++                        copy.minYValue = copy.getMinY();
++                    }
++                    if (copy.getMaxY() > copy.maxYValue) {
++                        copy.maxYValue = copy.getMaxY();
++                    }
+                 }
+                 catch (SeriesException e) {
+                     e.printStackTrace();
+                 }
+             }
+         }
+         return copy;
+     }

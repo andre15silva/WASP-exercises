@@ -1,0 +1,25 @@
+diff --git a/tmp/b0c9925f-50c6-4d88-94d8-bcbba7b32047_buggy.java b/tmp/d8c7da37-cccc-4656-9dfb-66959c7bf0ec_fixed.java
+index 4aff4e4..13886d2 100644
+--- a/tmp/b0c9925f-50c6-4d88-94d8-bcbba7b32047_buggy.java
++++ b/tmp/d8c7da37-cccc-4656-9dfb-66959c7bf0ec_fixed.java
+@@ -1,15 +1,20 @@
+     private boolean testValidProtocol(Element el, Attribute attr, Set<Protocol> protocols) {
+         // try to resolve relative urls to abs, and optionally update the attribute so output html has abs.
+         // rels without a baseuri get removed
+         String value = el.absUrl(attr.getKey());
+         if (!preserveRelativeLinks)
+             attr.setValue(value);
+         
+         for (Protocol protocol : protocols) {
+             String prot = protocol.toString() + ":";
+             if (value.toLowerCase().startsWith(prot)) {
+                 return true;
+             }
+         }
++        // if we are using a custom protocol for images, and that protocol is being called for this element
++        if (whitelist.isProtocolBasedWhiteList() && whitelist.is(Whitelist.Type.IMAGE) 
++                && protocols.contains(Protocol.CUSTOM)) {
++            return true;
++        }
+         return false;
+     }

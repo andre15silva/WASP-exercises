@@ -1,0 +1,58 @@
+diff --git a/tmp/ecb17d84-f517-41e1-9ec0-2442f1d36b4e_buggy.java b/tmp/908cac8d-f8d7-430a-a2f5-7996634ff857_fixed.java
+index 40f74f7..d52ca26 100644
+--- a/tmp/ecb17d84-f517-41e1-9ec0-2442f1d36b4e_buggy.java
++++ b/tmp/908cac8d-f8d7-430a-a2f5-7996634ff857_fixed.java
+@@ -1,50 +1,51 @@
+     public static boolean testNode(Node node, NodeTest test) {
+         if (test == null) {
+             return true;
+         }
++        if (node.getOwnerDocument() == null || test.getContainer().getModel() == DocumentContainer.MODEL_DOM) {
+             if (test instanceof NodeNameTest) {
+                 if (node.getNodeType() != Node.ELEMENT_NODE) {
+                     return false;
+                 }
+-
+                 NodeNameTest nodeNameTest = (NodeNameTest) test;
+                 QName testName = nodeNameTest.getNodeName();
+                 String namespaceURI = nodeNameTest.getNamespaceURI();
+                 boolean wildcard = nodeNameTest.isWildcard();
+                 String testPrefix = testName.getPrefix();
+                 if (wildcard && testPrefix == null) {
+                     return true;
+                 }
+                 if (wildcard
+                     || testName.getName()
+                             .equals(DOMNodePointer.getLocalName(node))) {
+                     String nodeNS = DOMNodePointer.getNamespaceURI(node);
+                     return equalStrings(namespaceURI, nodeNS);
+                 }
+                 return false;
+             }
+             if (test instanceof NodeTypeTest) {
+                 int nodeType = node.getNodeType();
+                 switch (((NodeTypeTest) test).getNodeType()) {
+                     case Compiler.NODE_TYPE_NODE :
+                         return nodeType == Node.ELEMENT_NODE
+                                 || nodeType == Node.DOCUMENT_NODE;
+                     case Compiler.NODE_TYPE_TEXT :
+                         return nodeType == Node.CDATA_SECTION_NODE
+                             || nodeType == Node.TEXT_NODE;
+                     case Compiler.NODE_TYPE_COMMENT :
+                         return nodeType == Node.COMMENT_NODE;
+                     case Compiler.NODE_TYPE_PI :
+                         return nodeType == Node.PROCESSING_INSTRUCTION_NODE;
+                 }
+                 return false;
+             }
++        }
+         if (test instanceof ProcessingInstructionTest) {
+             if (node.getNodeType() == Node.PROCESSING_INSTRUCTION_NODE) {
+                 String testPI = ((ProcessingInstructionTest) test).getTarget();
+                 String nodePI = ((ProcessingInstruction) node).getTarget();
+                 return testPI.equals(nodePI);
+             }
+         }
+         return false;
+     }
+\ No newline at end of file

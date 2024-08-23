@@ -1,0 +1,26 @@
+diff --git a/tmp/5decfa8c-3a66-4c3a-aa23-424014275d4e_buggy.java b/tmp/033f12ca-e881-485c-b5f8-e57d1a8a472e_fixed.java
+index 6c0aa19..bca50f4 100644
+--- a/tmp/5decfa8c-3a66-4c3a-aa23-424014275d4e_buggy.java
++++ b/tmp/033f12ca-e881-485c-b5f8-e57d1a8a472e_fixed.java
+@@ -1,20 +1,21 @@
+     /**
+      * @param encoding the encoding to use for file names, use null
+      * for the platform's default encoding
+      * @param useUnicodeExtraFields whether to use InfoZIP Unicode
+      * Extra Fields (if present) to set the file names.
+      * @param allowStoredEntriesWithDataDescriptor whether the stream
+      * will try to read STORED entries that use a data descriptor
+      * @since 1.1
+      */
+     public ZipArchiveInputStream(InputStream inputStream,
+                                  String encoding,
+                                  boolean useUnicodeExtraFields,
+                                  boolean allowStoredEntriesWithDataDescriptor) {
+         zipEncoding = ZipEncodingHelper.getZipEncoding(encoding);
+         this.useUnicodeExtraFields = useUnicodeExtraFields;
+         in = new PushbackInputStream(inputStream, buf.capacity());
++        br = new BufferedInputStream(in);
+         this.allowStoredEntriesWithDataDescriptor =
+             allowStoredEntriesWithDataDescriptor;
+         // haven't read anything so far
+     }

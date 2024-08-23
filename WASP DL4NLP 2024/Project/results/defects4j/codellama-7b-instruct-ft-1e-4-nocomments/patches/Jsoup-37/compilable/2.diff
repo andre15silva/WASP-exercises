@@ -1,0 +1,19 @@
+diff --git a/tmp/8bf23118-8c9a-4b5c-b56a-6ba8362feb21_buggy.java b/tmp/b74446bc-886c-4cb0-8954-4c08dfaf8489_fixed.java
+index 7498011..089d984 100644
+--- a/tmp/8bf23118-8c9a-4b5c-b56a-6ba8362feb21_buggy.java
++++ b/tmp/b74446bc-886c-4cb0-8954-4c08dfaf8489_fixed.java
+@@ -1,12 +1,11 @@
+     /**
+      * Retrieves the element's inner HTML. E.g. on a {@code <div>} with one empty {@code <p>}, would return
+      * {@code <p></p>}. (Whereas {@link #outerHtml()} would return {@code <div><p></p></div>}.)
+-     * 
+      * @return String of HTML.
+      * @see #outerHtml()
+      */
+     public String html() {
+         StringBuilder accum = new StringBuilder();
+         html(accum);
+-        return accum.toString().trim();
++        return this.baseUri.equals(accum.toString()) ? "" : accum.toString().trim();
+     }
+\ No newline at end of file

@@ -1,0 +1,19 @@
+diff --git a/tmp/6e4cea97-f70c-47b6-870c-00bfa75f2282_buggy.java b/tmp/4fcdf63f-0e56-4413-88dc-6da41a1332c6_fixed.java
+index a6f008f..acb2cd7 100644
+--- a/tmp/6e4cea97-f70c-47b6-870c-00bfa75f2282_buggy.java
++++ b/tmp/4fcdf63f-0e56-4413-88dc-6da41a1332c6_fixed.java
+@@ -1,11 +1,11 @@
+     /**
+      * Method that can be called on backends that support passing opaque datatypes of
+      * non-JSON formats
+      *
+      * @since 2.8
+      */
+     public void writeEmbeddedObject(Object object) throws IOException {
+-        // 01-Sep-2016, tatu: As per [core#318], handle small number of cases
+-        throw new JsonGenerationException("No native support for writing embedded objects",
+-                this);
++        // ... as per [core#318], for now; could do more to support binary content without
++        //    quoting... but base-64 encoding would be used anyways...
++        writeQuoted(Bytes.asBase64(Bytes.asBytes(object)));
+     }

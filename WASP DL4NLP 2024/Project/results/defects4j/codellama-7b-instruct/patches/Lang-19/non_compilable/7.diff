@@ -1,0 +1,59 @@
+diff --git a/tmp/a80b71b7-72a1-4d4d-83ee-bcb61e93761f_buggy.java b/tmp/3ae370e7-a3f2-41d3-ae5d-b9875c4207dd_fixed.java
+index 72a422c..0d2d945 100644
+--- a/tmp/a80b71b7-72a1-4d4d-83ee-bcb61e93761f_buggy.java
++++ b/tmp/3ae370e7-a3f2-41d3-ae5d-b9875c4207dd_fixed.java
+@@ -1,51 +1,3 @@
+-    /**
+-     * {@inheritDoc}
+-     */
+-    @Override
+-    public int translate(CharSequence input, int index, Writer out) throws IOException {
+-        int seqEnd = input.length();
+-        // Uses -2 to ensure there is something after the &#
+-        if(input.charAt(index) == '&' && index < seqEnd - 1 && input.charAt(index + 1) == '#') {
+-            int start = index + 2;
+-            boolean isHex = false;
+-
+-            char firstChar = input.charAt(start);
+-            if(firstChar == 'x' || firstChar == 'X') {
+-                start++;
+-                isHex = true;
+-
+-                // Check there's more than just an x after the &#
+-            }
+-
+-            int end = start;
+-            // Note that this supports character codes without a ; on the end
+-            while(input.charAt(end) != ';')
+-            {
+-                end++;
+-            }
+-
+-            int entityValue;
+-            try {
+-                if(isHex) {
+-                    entityValue = Integer.parseInt(input.subSequence(start, end).toString(), 16);
+-                } else {
+-                    entityValue = Integer.parseInt(input.subSequence(start, end).toString(), 10);
+-                }
+-            } catch(NumberFormatException nfe) {
+-            System.err.println("FAIL: " + input.subSequence(start, end) + "[" + start +"]["+ end +"]");
+-                return 0;
+-            }
+-
+-            if(entityValue > 0xFFFF) {
+-                char[] chrs = Character.toChars(entityValue);
+-                out.write(chrs[0]);
+-                out.write(chrs[1]);
+-            } else {
+-                out.write(entityValue);
+-            }
+-
+-
+-            return 2 + (end - start) + (isHex ? 1 : 0) + 1;
+-        }
+-        return 0;
++    public static void main(String[] args) {
++        System.out.println("Hello, world!");
+     }
+\ No newline at end of file

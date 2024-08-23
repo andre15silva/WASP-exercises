@@ -1,0 +1,25 @@
+diff --git a/tmp/51200bc4-1e09-4499-b4fc-1650f6ef73f7_buggy.java b/tmp/c74c7233-d96a-4691-997b-842b76486408_fixed.java
+index 7030ef0..d477a3c 100644
+--- a/tmp/51200bc4-1e09-4499-b4fc-1650f6ef73f7_buggy.java
++++ b/tmp/c74c7233-d96a-4691-997b-842b76486408_fixed.java
+@@ -1,15 +1,18 @@
+     /**
+      Add a list of allowed elements to a safelist. (If a tag is not allowed, it will be removed from the HTML.)
+ 
+      @param tags tag names to allow
+      @return this (for chaining)
+      */
+     public Safelist addTags(String... tags) {
+         Validate.notNull(tags);
+ 
+         for (String tagName : tags) {
+-            Validate.notEmpty(tagName);
+-            tagNames.add(TagName.valueOf(tagName));
++            TagName tagNameOrNoscriptSafe = TagName.valueOf(tagName);
++            if (tagNameOrNoscriptSafe.equals("NOSCRIPT")) {
++                return new Safelist(this).addTags("SCRIPT"); // browsers will ignore NOSCRIPT
++            }
++            tagNames.add(tagNameOrNoscriptSafe);
+         }
+         return this;
+     }

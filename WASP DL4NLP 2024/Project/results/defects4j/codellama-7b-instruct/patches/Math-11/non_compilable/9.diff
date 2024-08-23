@@ -1,0 +1,21 @@
+diff --git a/tmp/912bb25c-cf0e-4871-bfab-d47ec6131c5a_buggy.java b/tmp/184e3fc8-d86e-4388-881f-d620eb0bf84d_fixed.java
+index 51a0115..f6e9cda 100644
+--- a/tmp/912bb25c-cf0e-4871-bfab-d47ec6131c5a_buggy.java
++++ b/tmp/184e3fc8-d86e-4388-881f-d620eb0bf84d_fixed.java
+@@ -1,11 +1,4 @@
+-    /** {@inheritDoc} */
+-    public double density(final double[] vals) throws DimensionMismatchException {
+-        final int dim = getDimension();
+-        if (vals.length != dim) {
+-            throw new DimensionMismatchException(vals.length, dim);
+-        }
+-
+-        return FastMath.pow(2 * FastMath.PI, -dim / 2) *
+-            FastMath.pow(covarianceMatrixDeterminant, -0.5) *
+-            getExponentTerm(vals);
+-    }
++final double[] mu = { -1.5 };
++final double[][] sigma = { { 1 } };
++final MultivariateNormalDistribution multi = new MultivariateNormalDistribution(mu, sigma);
++final double density = multi.density();
+\ No newline at end of file

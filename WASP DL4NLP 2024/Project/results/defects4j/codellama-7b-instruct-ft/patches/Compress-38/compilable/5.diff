@@ -1,0 +1,33 @@
+diff --git a/tmp/552f7f12-3cd5-484a-b889-f1bd5f4f9e13_buggy.java b/tmp/aa159510-3076-4412-98e4-5133aea0f2be_fixed.java
+index 192e83d..0a250e0 100644
+--- a/tmp/552f7f12-3cd5-484a-b889-f1bd5f4f9e13_buggy.java
++++ b/tmp/aa159510-3076-4412-98e4-5133aea0f2be_fixed.java
+@@ -1,21 +1,27 @@
+     /**
+      * Return whether or not this entry represents a directory.
+      *
+      * @return True if this entry is a directory.
+      */
+     @Override
+     public boolean isDirectory() {
+         if (file != null) {
+             return file.isDirectory();
+         }
+ 
+         if (linkFlag == LF_DIR) {
+             return true;
+         }
+ 
+         if (getName().endsWith("/")) {
+             return true;
+         }
+ 
+-        return false;
++        // NB: There may be files in this directory that are directories or
++        // files. Without inspecting the entries contents, it's not possible to
++        // know which is which. Therefore, we always return true if the entry
++        // has a trailing slash, such as the root of a directory hierarchy.
++        //
++        // This is because directories are simply files that *contain* files.
++        return true;
+     }

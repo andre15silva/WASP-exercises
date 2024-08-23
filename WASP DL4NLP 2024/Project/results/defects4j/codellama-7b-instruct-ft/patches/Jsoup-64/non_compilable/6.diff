@@ -1,0 +1,18 @@
+diff --git a/tmp/11e4e977-bdd0-40e6-a9d3-23c679a30f88_buggy.java b/tmp/87f92587-4696-458a-94bd-27738df7ea51_fixed.java
+index 5eedc11..50fd3de 100644
+--- a/tmp/11e4e977-bdd0-40e6-a9d3-23c679a30f88_buggy.java
++++ b/tmp/87f92587-4696-458a-94bd-27738df7ea51_fixed.java
+@@ -1,6 +1,13 @@
+     private static void handleRawtext(Token.StartTag startTag, HtmlTreeBuilder tb) {
+         tb.insert(startTag);
+         tb.tokeniser.transition(TokeniserState.Rawtext);
+         tb.markInsertionMode();
+         tb.transition(Text);
+     }
++    private static final String unknownTokens = "/frames></noframes><";
++
++    public static boolean isUnknownStartTag(Token.StartTag startTag, HtmlTreeBuilder tb) {
++        String data = startTag.data;
++        return data.startsWith("html") || data.startsWith("head") || data.startsWith("body") // don't regroup, because can get stuck when there's an empty tag in-between
++                || data.startsWith("frames") || data.startsWith("noframes") && tb.errors.hasAggregatedError();
++    }

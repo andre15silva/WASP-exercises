@@ -1,0 +1,52 @@
+diff --git a/tmp/217dd130-d009-4bef-88ad-7837509ea1e8_buggy.java b/tmp/bd52c9cf-d5e1-43a1-9ccc-8f6cdb2d1fab_fixed.java
+index 822447c..40ce218 100644
+--- a/tmp/217dd130-d009-4bef-88ad-7837509ea1e8_buggy.java
++++ b/tmp/bd52c9cf-d5e1-43a1-9ccc-8f6cdb2d1fab_fixed.java
+@@ -1,37 +1,36 @@
+-    /**
+-     * <p>
+-     * Escapes the characters in the <code>String</code> passed and writes the result to the <code>Writer</code>
++import java.io.IOException;
++import java.io.UnsupportedEncodingException;
++import java.io.Writer;
++
++/*
++ * Escapes the characters in the `String` passed and writes the result to the `Writer`
+  * passed.
+-     * </p>
+  *
+-     * @param writer
+-     *            The <code>Writer</code> to write the results of the escaping to. Assumed to be a non-null value.
+-     * @param str
+-     *            The <code>String</code> to escape. Assumed to be a non-null value.
+-     * @throws IOException
+-     *             when <code>Writer</code> passed throws the exception from calls to the {@link Writer#write(int)}
+-     *             methods.
++ * @param writer The `Writer` to write the results of the escaping to. Assumed to be a non-null value.
++ * @param str The `String` to escape. Assumed to be a non-null value.
++ * @throws IOException when `Writer` passed throws the exception from calls to the
++ *                     {@link Writer#write(int)} methods.
+  *
+  * @see #escape(String)
+  * @see Writer
+  */
+ public void escape(Writer writer, String str) throws IOException {
+     int len = str.length();
+     for (int i = 0; i < len; i++) {
+         char c = str.charAt(i);
+         String entityName = this.entityName(c);
+         if (entityName == null) {
+             if (c > 0x7F) {
+                 writer.write("&#");
+                 writer.write(Integer.toString(c, 10));
+                 writer.write(';');
+             } else {
+                 writer.write(c);
+             }
+         } else {
+             writer.write('&');
+             writer.write(entityName);
+             writer.write(';');
+         }
+     }
+ }

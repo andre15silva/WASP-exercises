@@ -1,0 +1,28 @@
+diff --git a/tmp/825e1938-ba85-4844-8a87-452246917467_buggy.java b/tmp/17ec3c41-e67f-40bb-bcc6-f4e29c04fe24_fixed.java
+index 855afa5..2fffcbf 100644
+--- a/tmp/825e1938-ba85-4844-8a87-452246917467_buggy.java
++++ b/tmp/17ec3c41-e67f-40bb-bcc6-f4e29c04fe24_fixed.java
+@@ -1,13 +1,16 @@
+     static URL encodeUrl(URL u) {
+-	    u = punyUrl(u);
+-        try {
++	    final String urlString = u.toString();
+ 	    //  odd way to encode urls, but it works!
+-            String urlS = u.toExternalForm(); // URL external form may have spaces which is illegal in new URL() (odd asymmetry)
+-            urlS = urlS.replace(" ", "%20");
+-            final URI uri = new URI(urlS);
+-            return new URL(uri.toASCIIString());
++	    //  This is because, unlike the Url class constructor, which takes a string, doesn't let you provide
++	    //  a charset that is not UTF-8, and you can't add or remove encoding from a String in Java.
++	    String newUrlS = urlString;
++        try {
++            final URI uri = new URI(newUrlS);
++            final URL newUrl = new URL(uri.toASCIIString());
++            //  now convert the encoded String to the charset of the original URL
++            newUrlS = newUrl.toString();
+         } catch (URISyntaxException | MalformedURLException e) {
+             // give up and return the original input
+-            return u;
+         }
++        return new URL(newUrlS);
+     }

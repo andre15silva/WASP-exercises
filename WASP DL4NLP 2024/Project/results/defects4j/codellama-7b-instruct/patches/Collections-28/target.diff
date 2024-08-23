@@ -1,0 +1,15 @@
+diff --git a/tmp/ae00ebc3-e23d-4139-b1fe-d2402a4f8987_buggy.java b/tmp/11e8b7eb-af69-4a76-b4a6-01439b201648_fixed.java
+index e69de29..d273953 100644
+--- a/tmp/ae00ebc3-e23d-4139-b1fe-d2402a4f8987_buggy.java
++++ b/tmp/11e8b7eb-af69-4a76-b4a6-01439b201648_fixed.java
+@@ -0,0 +1,10 @@
++        @Override
++        public void clear() {
++            Iterator<Map.Entry<K, V>> it = AbstractPatriciaTrie.this.entrySet().iterator();
++            Set<K> currentKeys = keySet();
++            while (it.hasNext()) {
++                if (currentKeys.contains(it.next().getKey())) {
++                    it.remove();
++                }
++            }
++        }

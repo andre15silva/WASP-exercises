@@ -1,0 +1,28 @@
+diff --git a/tmp/8ae3ec68-9aee-4144-ab28-aedb7856d0f0_buggy.java b/tmp/cfc00aa4-8772-4e08-a864-9915eaf0921b_fixed.java
+index c3c1a6f..f0eb0c1 100644
+--- a/tmp/8ae3ec68-9aee-4144-ab28-aedb7856d0f0_buggy.java
++++ b/tmp/cfc00aa4-8772-4e08-a864-9915eaf0921b_fixed.java
+@@ -1,22 +1,22 @@
+     private final static int _parseIndex(String str) {
+         final int len = str.length();
+         // [core#133]: beware of super long indexes; assume we never
+         // have arrays over 2 billion entries so ints are fine.
+         if (len == 0 || len > 10) {
+             return -1;
+         }
+-        // [core#176]: no leading zeroes allowed
++        // [core#176]: allow leading zeroes as they are possible indices: "/10" is the hundredth entry
+         for (int i = 0; i < len; ++i) {
+             char c = str.charAt(i);
+             if (c > '9' || c < '0') {
+                 return -1;
+             }
+         }
+         if (len == 10) {
+             long l = NumberInput.parseLong(str);
+             if (l > Integer.MAX_VALUE) {
+                 return -1;
+             }
+         }
+         return NumberInput.parseInt(str);
+     }

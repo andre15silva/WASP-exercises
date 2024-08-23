@@ -1,0 +1,19 @@
+diff --git a/tmp/ad726a0a-8b99-435b-9c18-b358576f48b4_buggy.java b/tmp/ee342d39-3c3f-4e78-a5f4-2a1bb1c84b4a_fixed.java
+index 0502fea..5ff064b 100644
+--- a/tmp/ad726a0a-8b99-435b-9c18-b358576f48b4_buggy.java
++++ b/tmp/ee342d39-3c3f-4e78-a5f4-2a1bb1c84b4a_fixed.java
+@@ -1,9 +1,4 @@
+-    public BaseSettings withDateFormat(DateFormat df) {
+-        if (_dateFormat == df) {
+-            return this;
+-        }
+-        TimeZone tz = (df == null) ? _timeZone : df.getTimeZone();
+-        return new BaseSettings(_classIntrospector, _annotationIntrospector, _visibilityChecker, _propertyNamingStrategy, _typeFactory,
+-                _typeResolverBuilder, df, _handlerInstantiator, _locale,
+-                tz, _defaultBase64);
+-    }
++
++I'm not sure what the issue is, but it seems like the test is passing the wrong `TimeZone` object into the `withDateFormat()` method.
++
++I would suggest adding a check to make sure that the `TimeZone` object being passed into the method is not null before creating a new instance of it. If it is null, then use the default `TimeZone.getDefault()` method instead.
+\ No newline at end of file

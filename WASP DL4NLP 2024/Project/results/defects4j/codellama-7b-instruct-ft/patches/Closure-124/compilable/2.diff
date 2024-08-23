@@ -1,0 +1,37 @@
+diff --git a/tmp/8b995799-f727-479d-a7e9-30e871958b14_buggy.java b/tmp/d5382333-9cff-4844-a50d-8c2e9e09c838_fixed.java
+index 2573d30..45b6469 100644
+--- a/tmp/8b995799-f727-479d-a7e9-30e871958b14_buggy.java
++++ b/tmp/d5382333-9cff-4844-a50d-8c2e9e09c838_fixed.java
+@@ -1,20 +1,29 @@
+   /**
+    * Checks name referenced in node to determine if it might have
+    * changed.
+    * @return Whether the replacement can be made.
+    */
+   private boolean isSafeReplacement(Node node, Node replacement) {
+     // No checks are needed for simple names.
+     if (node.isName()) {
+       return true;
+     }
+     Preconditions.checkArgument(node.isGetProp());
+ 
+-      node = node.getFirstChild();
+-    if (node.isName()
+-        && isNameAssignedTo(node.getString(), replacement)) {
++    final Node left = node.getFirstChild();
++    if (left.isName()) {
++      if (!isNameAssignedTo(left.getString(), replacement)) {
++        return false;
++      }
++    }
++
++    // Because of issue 1017, for a.parentNode.parentNode, a.parentNode
++    // doesn't get replaced, but its' parent might get replaced.
++    // However, we shouldn't get here if the replacement was done by
++    // collapsePropertyAccess() and the object hasn't been modified.
++    if (left.isGetProp() && !left.getParent().isCall()) {
+       return false;
+     }
+ 
+     return true;
+   }

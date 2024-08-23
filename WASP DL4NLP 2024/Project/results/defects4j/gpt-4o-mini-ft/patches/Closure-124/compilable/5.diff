@@ -1,0 +1,26 @@
+diff --git a/tmp/67faa373-a275-4db8-a38e-f5c678fbd500_buggy.java b/tmp/390bca71-1998-4214-b5e0-e1dcc4758273_fixed.java
+index 2573d30..cdec3ec 100644
+--- a/tmp/67faa373-a275-4db8-a38e-f5c678fbd500_buggy.java
++++ b/tmp/390bca71-1998-4214-b5e0-e1dcc4758273_fixed.java
+@@ -1,20 +1,20 @@
+   /**
+    * Checks name referenced in node to determine if it might have
+    * changed.
+    * @return Whether the replacement can be made.
+    */
+   private boolean isSafeReplacement(Node node, Node replacement) {
+     // No checks are needed for simple names.
+     if (node.isName()) {
+       return true;
+     }
+     Preconditions.checkArgument(node.isGetProp());
+ 
+     node = node.getFirstChild();
+     if (node.isName()
+-        && isNameAssignedTo(node.getString(), replacement)) {
++        && !isNameAssignedTo(node.getString(), replacement)) {
+       return false;
+     }
+ 
+     return true;
+   }

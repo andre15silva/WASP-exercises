@@ -1,0 +1,32 @@
+diff --git a/tmp/c29e4b05-5bda-4d59-b644-d612538e7f45_buggy.java b/tmp/3541ac0e-5923-4db3-99da-afc4808d0180_fixed.java
+index 2573d30..56dc98d 100644
+--- a/tmp/c29e4b05-5bda-4d59-b644-d612538e7f45_buggy.java
++++ b/tmp/3541ac0e-5923-4db3-99da-afc4808d0180_fixed.java
+@@ -1,20 +1,24 @@
+   /**
+    * Checks name referenced in node to determine if it might have
+    * changed.
+    * @return Whether the replacement can be made.
+    */
+   private boolean isSafeReplacement(Node node, Node replacement) {
+     // No checks are needed for simple names.
+     if (node.isName()) {
+       return true;
+     }
+     Preconditions.checkArgument(node.isGetProp());
+ 
++    // Correctly traverse to the right child for property access checks.
+     node = node.getFirstChild();
+-    if (node.isName()
+-        && isNameAssignedTo(node.getString(), replacement)) {
++    if (node.isName()) {
++      // We need to check the parent node as well for chained property accesses
++      Node parent = node.getParent();
++      if (parent != null && parent.isGetProp() && isNameAssignedTo(node.getString(), replacement)) {
+         return false;
+       }
++    }
+ 
+     return true;
+   }
+\ No newline at end of file

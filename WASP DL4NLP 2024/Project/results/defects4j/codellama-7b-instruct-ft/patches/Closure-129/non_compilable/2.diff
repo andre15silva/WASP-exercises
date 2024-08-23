@@ -1,0 +1,48 @@
+diff --git a/tmp/fe96d21d-563a-49dd-937a-b80bdaca81d7_buggy.java b/tmp/c3e96b8c-93f1-49b5-bee4-259783980a77_fixed.java
+index e8705ac..1b29886 100644
+--- a/tmp/fe96d21d-563a-49dd-937a-b80bdaca81d7_buggy.java
++++ b/tmp/c3e96b8c-93f1-49b5-bee4-259783980a77_fixed.java
+@@ -1,24 +1,43 @@
+     /**
+      * There are two types of calls we are interested in calls without explicit
+      * "this" values (what we are call "free" calls) and direct call to eval.
+      */
+     private void annotateCalls(Node n) {
+       Preconditions.checkState(n.isCall());
+ 
+       // Keep track of of the "this" context of a call.  A call without an
+       // explicit "this" is a free call.
+       Node first = n.getFirstChild();
+ 
+       // ignore cast nodes.
+ 
+       if (!NodeUtil.isGet(first)) {
+         n.putBooleanProp(Node.FREE_CALL, true);
++      } else if ("console".equals(NodeUtil.getFirstChild(first).getQualifiedName())) {
++        Node call = first.getNext();
++        Node firstArg = (call.getChildCount() > 0) ? call.getChildAtIndex(0) : null;
++        if (NodeUtil.isFunctionInvocation(firstArg) ||
++            NodeUtil.isQualifiedName(firstArg) &&
++            "abc".equals(firstArg.getQualifiedName())) {
++          NodeUtil.nullOutParent(call.getChildAtIndex(0));
++          NodeUtil.nullOutParent(firstArg.getParent());
++        }
++        if (NodeUtil.isFunctionInvocation(first)) {
++          Node firstArg = (call.getChildCount() > 0) ? call.getChildAtIndex(0) : null;
++          NodeUtil.nullOutParent(firstArg.getGrandparent().getParent());
++        }
++        if (NodeUtil.isFunctionInvocation(call.getNext()) &&
++            call.getChildCount() >= 1 &&
++            NodeUtil.isGet(call.getChildAtIndex(0)) && firstArg.isGetProp()) {
++          NodeUtil.nullOutParent(call.getChildAtIndex(0));
++          NodeUtil.nullOutParent(firstArg.getGrandparent().getParent());
++        }
+       }
+ 
+       // Keep track of the context in which eval is called. It is important
+       // to distinguish between "(0, eval)()" and "eval()".
+       if (first.isName() &&
+           "eval".equals(first.getString())) {
+         first.putBooleanProp(Node.DIRECT_EVAL, true);
+       }
+     }

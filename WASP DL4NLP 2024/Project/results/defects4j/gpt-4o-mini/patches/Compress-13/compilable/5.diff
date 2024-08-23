@@ -1,0 +1,14 @@
+diff --git a/tmp/80abf1ed-ddd0-479f-a298-554fa40f8a47_buggy.java b/tmp/24717ebe-d693-4132-91e4-8a537a030d28_fixed.java
+index 1c92640..924166d 100644
+--- a/tmp/80abf1ed-ddd0-479f-a298-554fa40f8a47_buggy.java
++++ b/tmp/24717ebe-d693-4132-91e4-8a537a030d28_fixed.java
+@@ -1,7 +1,7 @@
+     /**
+      * Set the name of the entry.
+      * @param name the name to use
+      */
+     protected void setName(String name) {
+-        this.name = name;
++        this.name = name.replace("\\", "/"); // Replace backslashes with forward slashes
+     }
+\ No newline at end of file

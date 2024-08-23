@@ -1,0 +1,32 @@
+diff --git a/tmp/a31e9aa3-bff2-4d1c-926d-0b830801b7d6_buggy.java b/tmp/ee077920-a1da-42fe-ad6d-234ad2b722d5_fixed.java
+index c6cb157..3feaa05 100644
+--- a/tmp/a31e9aa3-bff2-4d1c-926d-0b830801b7d6_buggy.java
++++ b/tmp/ee077920-a1da-42fe-ad6d-234ad2b722d5_fixed.java
+@@ -1,14 +1,14 @@
+-    /**
+-     * Method called to expand size of the current segment, to
+-     * accommodate for more contiguous content. Usually only
+-     * used when parsing tokens like names if even then.
+-     */
+-    public char[] expandCurrentSegment()
++@Test
++public void testExpand()
+ {
+-        final char[] curr = _currentSegment;
+-        // Let's grow by 50% by default
+-        final int len = curr.length;
+-        // but above intended maximum, slow to increase by 25%
+-        int newLen = (len == MAX_SEGMENT_LEN) ? (MAX_SEGMENT_LEN+1) : Math.min(MAX_SEGMENT_LEN, len + (len >> 1));
+-        return (_currentSegment = Arrays.copyOf(curr, newLen));
++  TextBuffer tb = new TextBuffer(new BufferRecycler());
++  char[] buf = tb.getCurrentSegment();
++
++  while (buf.length < 500 1000) {
++    char[] old = buf;
++    buf = tb.expandCurrentSegment();
++    if (old.length < buf.length) {
++      fail("Expected buffer of " + old.length + " to expand, did not, length now " + buf.length);
++    }
++  }
+ }
+\ No newline at end of file

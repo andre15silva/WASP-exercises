@@ -1,0 +1,30 @@
+diff --git a/tmp/c975fb2c-a1e3-4955-96b6-501aa235c7ec_buggy.java b/tmp/b2c13280-5320-43e1-9e2b-02ad6a289fef_fixed.java
+index 9529ba6..a22437b 100644
+--- a/tmp/c975fb2c-a1e3-4955-96b6-501aa235c7ec_buggy.java
++++ b/tmp/b2c13280-5320-43e1-9e2b-02ad6a289fef_fixed.java
+@@ -1,20 +1,25 @@
+     public int writeValue() {
+         // Most likely, object:
+         if (_type == TYPE_OBJECT) {
+             _gotName = false;
+             ++_index;
+             return STATUS_OK_AFTER_COLON;
+         }
+ 
+         // Ok, array?
+         if (_type == TYPE_ARRAY) {
+             int ix = _index;
+             ++_index;
+             return (ix < 0) ? STATUS_OK_AS_IS : STATUS_OK_AFTER_COMMA;
+         }
+         
+         // Nope, root context
+         // No commas within root context, but need space
+         ++_index;
+         return (_index == 0) ? STATUS_OK_AS_IS : STATUS_OK_AFTER_SPACE;
+     }
++
++    @Override
++    public void writeString(String text) {
++        writeFieldName(text);
++    }

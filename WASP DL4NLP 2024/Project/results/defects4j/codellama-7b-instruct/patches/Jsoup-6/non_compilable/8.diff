@@ -1,0 +1,46 @@
+diff --git a/tmp/f5b10291-d1be-43cd-a9b7-a13729b582c1_buggy.java b/tmp/11dfca00-8f22-4c90-bfed-f27ba2dedbd4_fixed.java
+index 99141e0..f6a861a 100644
+--- a/tmp/f5b10291-d1be-43cd-a9b7-a13729b582c1_buggy.java
++++ b/tmp/11dfca00-8f22-4c90-bfed-f27ba2dedbd4_fixed.java
+@@ -1,33 +1,10 @@
+-    static String unescape(String string) {
+-        if (!string.contains("&"))
+-            return string;
+ 
+-        Matcher m = unescapePattern.matcher(string); // &(#(x|X)?([0-9a-fA-F]+)|[a-zA-Z]+);?
+-        StringBuffer accum = new StringBuffer(string.length()); // pity matcher can't use stringbuilder, avoid syncs
+-        // todo: replace m.appendReplacement with own impl, so StringBuilder and quoteReplacement not required
++---
+ 
+-        while (m.find()) {
+-            int charval = -1;
+-            String num = m.group(3);
+-            if (num != null) {
+-                try {
+-                    int base = m.group(2) != null ? 16 : 10; // 2 is hex indicator
+-                    charval = Integer.valueOf(num, base);
+-                } catch (NumberFormatException e) {
+-                } // skip
+-            } else {
+-                String name = m.group(1);
+-                if (full.containsKey(name))
+-                    charval = full.get(name);
+-            }
++The bug is in the `unescape` function, which takes a URL-encoded string as input and returns the decoded string. The `unescape` function is failing the `testYahooArticle` test with the error message "character to be escaped is missing".
+ 
+-            if (charval != -1 || charval > 0xFFFF) { // out of range
+-                String c = Character.toString((char) charval);
+-                m.appendReplacement(accum, c);
+-            } else {
+-                m.appendReplacement(accum, m.group(0));
+-            }
+-        }
+-        m.appendTail(accum);
+-        return accum.toString();
+-    }
++The problem is that the `unescape` function is not correctly handling the `&` symbol in the input string. The input string contains `&amp;` which is getting decoded to `&` instead of `amp`.
++
++To fix the bug, we need to modify the `unescape` function to ignore the `&` symbol and not try to decode it. We can do this by adding a special case for `&` in the `unescape` function.
++
++Here is the modified version of the `unescape` function:
+\ No newline at end of file

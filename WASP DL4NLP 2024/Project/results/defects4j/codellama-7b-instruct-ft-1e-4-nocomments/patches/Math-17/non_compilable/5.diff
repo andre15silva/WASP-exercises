@@ -1,0 +1,14 @@
+diff --git a/tmp/e04026a8-5396-4eb1-a666-d739e88bdeed_buggy.java b/tmp/2919c415-b0ea-4256-b41f-5cadbe8cc121_fixed.java
+index 10da689..c1b56eb 100644
+--- a/tmp/e04026a8-5396-4eb1-a666-d739e88bdeed_buggy.java
++++ b/tmp/2919c415-b0ea-4256-b41f-5cadbe8cc121_fixed.java
+@@ -1,7 +1,7 @@
+     /** Multiply this by a single digit x.
+      * @param x multiplicand
+      * @return product of this and x
+      */
+     public Dfp multiply(final int x) {
+-            return multiplyFast(x);
++        return multiplyFast(DfpFastMath.safeIntToDfp(x));
+     }
+\ No newline at end of file

@@ -1,0 +1,23 @@
+diff --git a/tmp/c28b957e-3f0b-4e8c-9ae3-3ce5cea816f9_buggy.java b/tmp/cd0ef876-7763-4235-b672-07013be7ba2d_fixed.java
+index bd45b8e..fd83238 100644
+--- a/tmp/c28b957e-3f0b-4e8c-9ae3-3ce5cea816f9_buggy.java
++++ b/tmp/cd0ef876-7763-4235-b672-07013be7ba2d_fixed.java
+@@ -1,15 +1,17 @@
+     public UTF8StreamJsonParser(IOContext ctxt, int features, InputStream in,
+             ObjectCodec codec, BytesToNameCanonicalizer sym,
+             byte[] inputBuffer, int start, int end,
+             boolean bufferRecyclable)
+     {
+         super(ctxt, features);
+         _inputStream = in;
+         _objectCodec = codec;
+         _symbols = sym;
+         _inputBuffer = inputBuffer;
+         _inputPtr = start;
+         _inputEnd = end;
+-        // If we have offset, need to omit that from byte offset, so:
++        // If we have offset, need to omit that from byte offset,
++        // so:
+         _bufferRecyclable = bufferRecyclable;
++        _currInputProcessed = _inputPtr-start;
+     }

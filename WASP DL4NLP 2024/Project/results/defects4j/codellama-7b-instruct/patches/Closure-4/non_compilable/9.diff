@@ -1,0 +1,67 @@
+diff --git a/tmp/086e992d-2164-417c-a09e-57ff655668de_buggy.java b/tmp/0c6b13c9-fecd-402c-8b9b-0b298dfe8007_fixed.java
+index d6a560a..0f3b833 100644
+--- a/tmp/086e992d-2164-417c-a09e-57ff655668de_buggy.java
++++ b/tmp/0c6b13c9-fecd-402c-8b9b-0b298dfe8007_fixed.java
+@@ -1,33 +1,31 @@
++Thanks for the detailed response!
++
++I will provide ```
+  /**
+-   * Resolve the referenced type within the enclosing scope.
++     * An empty object that can be used as a sentinel to detect a missing property, rather
++     * than null or undefined. This allows us to avoid adding null/undefined checks in the
++     * type checker.
++     * @private
+      */
+-  @Override
+-  JSType resolveInternal(ErrorReporter t, StaticScope<JSType> enclosing) {
+-    // TODO(user): Investigate whether it is really necessary to keep two
+-    // different mechanisms for resolving named types, and if so, which order
+-    // makes more sense. Now, resolution via registry is first in order to
+-    // avoid triggering the warnings built into the resolution via properties.
+-    boolean resolved = resolveViaRegistry(t, enclosing);
+-    if (detectImplicitPrototypeCycle()) {
+-      handleTypeCycle(t);
+-    }
++    static final DiagnosticType MISSING_PROPERTY = DiagnosticType.warning(
++        "JSC_MISSING_PROPERTY",
++        "The property {0} is missing");
++    static final DiagnosticType MISSING_PROPERTY_BUT_INHERITED = DiagnosticType.warning(
++        "JSC_MISSING_PROPERTY_BUT_INHERITED",
++        "The property {0} is missing on type {1}, but has been inherited from {2}");
++    static final DiagnosticType MISSING_PROPERTY_ALLOW_INHERITANCE = DiagnosticType.warning(
++        "JSC_MISSING_PROPERTY_ALLOW_INHERITANCE",
++        "The property {0} is missing on type {1}, which allows it to be inherited " +
++        "but does not actually define it");
++    static final DiagnosticType MISSING_PROPERTY_DEFINE_ON_SUPER = DiagnosticType.warning(
++        "JSC_MISSING_PROPERTY_DEFINE_ON_SUPER",
++        "The property {0} is missing on type {1}, but a super type {2} defines it");
++    static final DiagnosticType MISSING_PROPERTY_DEFINE_ON_SUPER_WITH_INHERITANCE = DiagnosticType
++        .warning(
++            "JSC_MISSING_PROPERTY_DEFINE_ON_SUPER_WITH_INHERITANCE",
++            "The property {0} is missing on type {1}, but a super type {2} defines it, " +
++            "and has been inherited");
++ ```
++ and modify the resolveViaProperties() function accordingly.
+ 
+-    if (resolved) {
+-      super.resolveInternal(t, enclosing);
+-      finishPropertyContinuations();
+-      return registry.isLastGeneration() ?
+-          getReferencedType() : this;
+-    }
+-
+-    resolveViaProperties(t, enclosing);
+-    if (detectImplicitPrototypeCycle()) {
+-      handleTypeCycle(t);
+-    }
+-
+-    super.resolveInternal(t, enclosing);
+-    if (isResolved()) {
+-      finishPropertyContinuations();
+-    }
+-    return registry.isLastGeneration() ?
+-        getReferencedType() : this;
+-  }
++Thanks for the help!
+\ No newline at end of file

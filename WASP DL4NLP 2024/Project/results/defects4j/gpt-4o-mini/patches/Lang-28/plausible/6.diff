@@ -1,0 +1,66 @@
+diff --git a/tmp/5eabb3d9-a6b8-488a-ace7-a87af4989305_buggy.java b/tmp/b02e31ba-4db5-481f-af26-a4367b21814d_fixed.java
+index 4bbd561..1754020 100644
+--- a/tmp/5eabb3d9-a6b8-488a-ace7-a87af4989305_buggy.java
++++ b/tmp/b02e31ba-4db5-481f-af26-a4367b21814d_fixed.java
+@@ -1,37 +1,50 @@
+-    /**
+-     * {@inheritDoc}
+-     */
+ @Override
+ public int translate(CharSequence input, int index, Writer out) throws IOException {
+-        // TODO: Protect from ArrayIndexOutOfBounds
+-        if(input.charAt(index) == '&' && input.charAt(index + 1) == '#') {
++    // Protect from ArrayIndexOutOfBounds
++    if (index + 1 >= input.length() || input.charAt(index) != '&' || input.charAt(index + 1) != '#') {
++        return 0;
++    }
++
+     int start = index + 2;
+     boolean isHex = false;
+ 
+-            char firstChar = input.charAt(start);
+-            if(firstChar == 'x' || firstChar == 'X') {
++    if (start < input.length() && (input.charAt(start) == 'x' || input.charAt(start) == 'X')) {
+         start++;
+         isHex = true;
+     }
+ 
+     int end = start;
+-            while(input.charAt(end) != ';') {
++    while (end < input.length() && input.charAt(end) != ';') {
+         end++;
+     }
+ 
++    // If we reached the end of the input without finding a semicolon, return
++    if (end >= input.length()) {
++        return 0;
++    }
++
+     int entityValue;
+     try {
+         if (isHex) {
+             entityValue = Integer.parseInt(input.subSequence(start, end).toString(), 16);
+         } else {
+             entityValue = Integer.parseInt(input.subSequence(start, end).toString(), 10);
+         }
+     } catch (NumberFormatException nfe) {
+         return 0;
+     }
+ 
++    // Handle supplementary characters properly.
++    if (entityValue >= 0x10000) {
++        // Convert to surrogate pair
++        entityValue -= 0x10000;
++        char highSurrogate = (char) ((entityValue >> 10) + 0xD800);
++        char lowSurrogate = (char) ((entityValue & 0x3FF) + 0xDC00);
++        out.write(highSurrogate);
++        out.write(lowSurrogate);
++    } else {
+         out.write(entityValue);
++    }
++
+     return 2 + (end - start) + (isHex ? 1 : 0) + 1;
+ }
+\ No newline at end of file
+-        return 0;
+-    }

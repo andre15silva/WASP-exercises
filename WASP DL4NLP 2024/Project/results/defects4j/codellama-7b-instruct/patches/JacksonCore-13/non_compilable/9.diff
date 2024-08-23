@@ -1,0 +1,19 @@
+diff --git a/tmp/802dd425-be90-4190-8ba4-3b2866bf4c9d_buggy.java b/tmp/ed8e2997-798c-4c88-a5b4-0285242b18e5_fixed.java
+index e69de29..c6daaa8 100644
+--- a/tmp/802dd425-be90-4190-8ba4-3b2866bf4c9d_buggy.java
++++ b/tmp/ed8e2997-798c-4c88-a5b4-0285242b18e5_fixed.java
+@@ -0,0 +1,13 @@
++public void _testFieldNameQuotingEnabled(JsonFactory factory, boolean enableQuoting, boolean useQuotes, String expectedJson) throws IOException {
++    // ...
++
++    if (enableQuoting && useQuotes) {
++        // ...
++    } else if (enableQuoting) {
++        // ...
++    } else {
++        // ...
++    }
++
++    // ...
++}
+\ No newline at end of file

@@ -1,0 +1,17 @@
+diff --git a/tmp/572b8b5a-ca97-46c8-9aab-e6d510ec1289_buggy.java b/tmp/23f7a8a9-ff78-41d0-bfb9-4cd47feb5c10_fixed.java
+index bdde834..3298bb0 100644
+--- a/tmp/572b8b5a-ca97-46c8-9aab-e6d510ec1289_buggy.java
++++ b/tmp/23f7a8a9-ff78-41d0-bfb9-4cd47feb5c10_fixed.java
+@@ -1,10 +1,8 @@
+   static boolean isNonRetryableHTTPCode(CloseableHttpResponse response, boolean retryHTTP403) {
+     return response != null
+         && (response.getStatusLine().getStatusCode() < 500
+             || // service unavailable
+             response.getStatusLine().getStatusCode() >= 600)
+-        && // gateway timeout
+-        response.getStatusLine().getStatusCode() != 408
+-        && // request timeout
+-        (!retryHTTP403 || response.getStatusLine().getStatusCode() != 403);
++        && (!retryHTTP403 || response.getStatusLine().getStatusCode() != 403)
++        && response.getStatusLine().getStatusCode() != 408;
+   }

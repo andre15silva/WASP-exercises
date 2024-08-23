@@ -1,0 +1,67 @@
+diff --git a/tmp/73e9733a-d477-4aba-9a85-a5335425574a_buggy.java b/tmp/5dd833bd-2153-47fd-8919-d964af3d3ffc_fixed.java
+index d8cf56e..5f15f03 100644
+--- a/tmp/73e9733a-d477-4aba-9a85-a5335425574a_buggy.java
++++ b/tmp/5dd833bd-2153-47fd-8919-d964af3d3ffc_fixed.java
+@@ -1,47 +1,43 @@
+     /**
+      * Converts an old style id to a new style id.
+      * 
+      * @param id  the old style id
+      * @return the new style id, null if not found
+      */
+     private static synchronized String getConvertedId(String id) {
+         Map<String, String> map = cZoneIdConversion;
+         if (map == null) {
+             // Backwards compatibility with TimeZone.
+             map = new HashMap<String, String>();
+             map.put("GMT", "UTC");
++            // JDK/CLDR mapping from JDK ID to TZDB ID, for the most part. Not a
++            // perfect mapping.
++            // See http://cldr.unicode.org/Develop/data/out/shrinkwrap/alldata.html
++            map.put("WET", "Europe/London");
++            map.put("CET", "Europe/Madrid");
++            map.put("MET", "Europe/Paris");
++            map.put("ECT", "Europe/Chisinau");
++            map.put("EET", "Europe/Yerevan");
++            map.put("AGT", "America/Argentina/Buenos_Aires");
++            map.put("EAT", "Africa/Addis_Ababa");
++            map.put("BET", "America/Sao_Paulo");
++            map.put("ART", "Africa/Cairo");
++            map.put("CAT", "Africa/Harare");
+             map.put("MIT", "Pacific/Apia");
+             map.put("HST", "Pacific/Honolulu");  // JDK 1.1 compatible
+             map.put("AST", "America/Anchorage");
+             map.put("PST", "America/Los_Angeles");
+             map.put("MST", "America/Denver");  // JDK 1.1 compatible
+             map.put("PNT", "America/Phoenix");
+             map.put("CST", "America/Chicago");
+             map.put("EST", "America/New_York");  // JDK 1.1 compatible
+-            map.put("IET", "America/Indianapolis");
++            map.put("IET", "America/Indiana/Indianapolis");
+             map.put("PRT", "America/Puerto_Rico");
+             map.put("CNT", "America/St_Johns");
+-            map.put("AGT", "America/Buenos_Aires");
+-            map.put("BET", "America/Sao_Paulo");
+-            map.put("WET", "Europe/London");
+-            map.put("ECT", "Europe/Paris");
+-            map.put("ART", "Africa/Cairo");
+-            map.put("CAT", "Africa/Harare");
+-            map.put("EET", "Europe/Bucharest");
+-            map.put("EAT", "Africa/Addis_Ababa");
+-            map.put("MET", "Asia/Tehran");
+-            map.put("NET", "Asia/Yerevan");
+-            map.put("PLT", "Asia/Karachi");
+-            map.put("IST", "Asia/Calcutta");
+-            map.put("BST", "Asia/Dhaka");
+-            map.put("VST", "Asia/Saigon");
+-            map.put("CTT", "Asia/Shanghai");
+-            map.put("JST", "Asia/Tokyo");
+-            map.put("ACT", "Australia/Darwin");
+-            map.put("AET", "Australia/Sydney");
++            map.put("AWT", "Australia/Perth");
+             map.put("SST", "Pacific/Guadalcanal");
+             map.put("NST", "Pacific/Auckland");
+             cZoneIdConversion = map;
+         }
+         return map.get(id);
+     }

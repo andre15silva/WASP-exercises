@@ -1,0 +1,17 @@
+diff --git a/tmp/da0ad89c-63fe-4a76-8f53-42fabc3a2185_buggy.java b/tmp/cdcf5b8f-5329-444b-9baf-84a3c5ebde0d_fixed.java
+index a5093b1..820d0ba 100644
+--- a/tmp/da0ad89c-63fe-4a76-8f53-42fabc3a2185_buggy.java
++++ b/tmp/cdcf5b8f-5329-444b-9baf-84a3c5ebde0d_fixed.java
+@@ -1,11 +1,11 @@
+     private static <E extends Element> Integer indexInList(Element search, List<E> elements) {
+         Validate.notNull(search);
+         Validate.notNull(elements);
+ 
+         for (int i = 0; i < elements.size(); i++) {
+             E element = elements.get(i);
+-            if (element.equals(search))
++            if (search.contentEquals(element)) // using equals() would return true on a different tag. #contentequals!
+                 return i;
+         }
+         return null;
+     }

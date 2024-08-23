@@ -1,0 +1,20 @@
+diff --git a/tmp/bbe1abce-9d48-4a55-8b64-d18f9de68038_buggy.java b/tmp/b3b6994c-a30a-4fe3-8393-5c13e02738df_fixed.java
+index 51430e1..ad40611 100644
+--- a/tmp/bbe1abce-9d48-4a55-8b64-d18f9de68038_buggy.java
++++ b/tmp/b3b6994c-a30a-4fe3-8393-5c13e02738df_fixed.java
+@@ -1,12 +1,3 @@
+-    @Override
+-    public void serialize(Object value, JsonGenerator jgen, SerializerProvider provider) throws IOException {
+-        String str;
++```
+ 
+-        if (value instanceof Date) {
+-            provider.defaultSerializeDateKey((Date) value, jgen);
+-            return;
+-        } else {
+-            str = value.toString();
+-        }
+-        jgen.writeFieldName(str);
+-    }
++The fixed function should produce the correct output for the testClassKey test:
+\ No newline at end of file

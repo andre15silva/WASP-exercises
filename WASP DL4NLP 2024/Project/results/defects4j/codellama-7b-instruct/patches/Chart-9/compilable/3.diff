@@ -1,0 +1,64 @@
+diff --git a/tmp/bde9baed-c63d-4781-a190-6dc030a9576d_buggy.java b/tmp/36df8f1c-3131-4043-894d-ffc55a8613a6_fixed.java
+index b4af58a..18e4e3a 100644
+--- a/tmp/bde9baed-c63d-4781-a190-6dc030a9576d_buggy.java
++++ b/tmp/36df8f1c-3131-4043-894d-ffc55a8613a6_fixed.java
+@@ -1,53 +1,31 @@
+-    /**
+-     * Creates a new timeseries by copying a subset of the data in this time
+-     * series.
+-     *
+-     * @param start  the first time period to copy (<code>null</code> not
+-     *         permitted).
+-     * @param end  the last time period to copy (<code>null</code> not
+-     *         permitted).
+-     *
+-     * @return A time series containing a copy of this time series from start
+-     *         until end.
+-     *
+-     * @throws CloneNotSupportedException if there is a cloning problem.
+-     */
+ public TimeSeries createCopy(RegularTimePeriod start, RegularTimePeriod end)
+         throws CloneNotSupportedException {
+ 
+     if (start == null) {
+         throw new IllegalArgumentException("Null 'start' argument.");
+     }
+     if (end == null) {
+         throw new IllegalArgumentException("Null 'end' argument.");
+     }
+     if (start.compareTo(end) > 0) {
+         throw new IllegalArgumentException(
+-                    "Requires start on or before end.");
++                "Requires start <= end.");
+     }
+-        boolean emptyRange = false;
++
+     int startIndex = getIndex(start);
+     if (startIndex < 0) {
+         startIndex = -(startIndex + 1);
+-            if (startIndex == this.data.size()) {
+-                emptyRange = true;  // start is after last data item
+-            }
+     }
+     int endIndex = getIndex(end);
+-        if (endIndex < 0) {             // end period is not in original series
+-            endIndex = -(endIndex + 1); // this is first item AFTER end period
+-            endIndex = endIndex - 1;    // so this is last item BEFORE end
+-        }
+     if (endIndex < 0) {
+-            emptyRange = true;
++        endIndex = -(endIndex + 1);
+     }
+-        if (emptyRange) {
+-            TimeSeries copy = (TimeSeries) super.clone();
+-            copy.data = new java.util.ArrayList();
+-            return copy;
++
++    if (startIndex >= this.data.size()) {
++        return (TimeSeries) super.clone();
+     }
+     else {
+         return createCopy(startIndex, endIndex);
+     }
+ 
+ }

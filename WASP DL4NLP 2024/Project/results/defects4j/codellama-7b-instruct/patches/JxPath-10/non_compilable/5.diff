@@ -1,0 +1,18 @@
+diff --git a/tmp/4058f0b3-87e9-4a9c-ae23-d4ea8079352e_buggy.java b/tmp/a7a74fce-4b02-4fa9-a97d-92e2c3258756_fixed.java
+index b86b44d..88c7f02 100644
+--- a/tmp/4058f0b3-87e9-4a9c-ae23-d4ea8079352e_buggy.java
++++ b/tmp/a7a74fce-4b02-4fa9-a97d-92e2c3258756_fixed.java
+@@ -1,4 +1,10 @@
+     public final Object computeValue(EvalContext context) {
+-        return compute(args[0].computeValue(context), args[1].computeValue(context))
+-                ? Boolean.TRUE : Boolean.FALSE;
++        Object arg1 = args[0] != null ? args[0].computeValue(context) : null;
++        Object arg2 = args[1] != null ? args[1].computeValue(context) : null;
++
++        if (arg1 == null || arg2 == null || arg1 == XPathConstants.EMPTY_NODE_SET || arg2 == XPathConstants.EMPTY_NODE_SET) {
++            return Boolean.FALSE;
++        } else {
++            return (Boolean) compute(arg1, arg2);
++        }
+     }
+\ No newline at end of file

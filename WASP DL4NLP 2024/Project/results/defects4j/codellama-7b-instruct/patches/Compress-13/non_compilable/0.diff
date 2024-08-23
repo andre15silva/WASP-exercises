@@ -1,0 +1,19 @@
+diff --git a/tmp/346ae78f-cf2f-4960-98b5-5ae6e9338cb9_buggy.java b/tmp/2589c276-c7d9-4a6b-9d6c-0011a12bcfdb_fixed.java
+index 1c92640..3a76cc5 100644
+--- a/tmp/346ae78f-cf2f-4960-98b5-5ae6e9338cb9_buggy.java
++++ b/tmp/2589c276-c7d9-4a6b-9d6c-0011a12bcfdb_fixed.java
+@@ -1,7 +1,12 @@
+     /**
+      * Set the name of the entry.
+      * @param name the name to use
+      */
+     protected void setName(String name) {
+-        this.name = name;
++        // Buggy code
++        this.name = getLastNameComponent(name);
++    }
++
++    private String getLastNameComponent(String name) {
++        // implement me
+     }
+\ No newline at end of file

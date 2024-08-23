@@ -1,0 +1,57 @@
+diff --git a/tmp/61a28188-6858-478d-a24d-8a4cc5e3b3cf_buggy.java b/tmp/87fb5b86-3a54-4b36-b2a4-06c293701d32_fixed.java
+index 71189c3..586c448 100644
+--- a/tmp/61a28188-6858-478d-a24d-8a4cc5e3b3cf_buggy.java
++++ b/tmp/87fb5b86-3a54-4b36-b2a4-06c293701d32_fixed.java
+@@ -1,46 +1,52 @@
+     public void validate(final WriteableCommandLine commandLine)
+         throws OptionException {
+         // number of options found
+         int present = 0;
+ 
+         // reference to first unexpected option
+         Option unexpected = null;
+ 
+         for (final Iterator i = options.iterator(); i.hasNext();) {
+             final Option option = (Option) i.next();
+ 
+             // needs validation?
+             boolean validate = option.isRequired() || option instanceof Group;
+             if (validate) {
+                 option.validate(commandLine);
+             }
+ 
+             // if the child option is present then validate it
+             if (commandLine.hasOption(option)) {
+                 if (++present > maximum) {
+                     unexpected = option;
+ 
+                     break;
+                 }
+ 
+                 option.validate(commandLine);
+             }
+         }
+ 
+         // too many options
+         if (unexpected != null) {
+             throw new OptionException(this, ResourceConstants.UNEXPECTED_TOKEN,
+                                       unexpected.getPreferredName());
+         }
+ 
+         // too few option
+         if (present < minimum) {
+             throw new OptionException(this, ResourceConstants.MISSING_OPTION);
+         }
+ 
+         // validate each anonymous argument
+         for (final Iterator i = anonymous.iterator(); i.hasNext();) {
+             final Option option = (Option) i.next();
+             option.validate(commandLine);
++            // this is a workaround for http://issues.apache.org/cli/browse/CLI-148.
++            // the FileValidator has to return the String argument
++            if (option.hasArgument()) {
++                commandLine.setOptionArgument(option,
++                    (String)commandLine.getOptionArgument(option));
++            }
+         }
+     }

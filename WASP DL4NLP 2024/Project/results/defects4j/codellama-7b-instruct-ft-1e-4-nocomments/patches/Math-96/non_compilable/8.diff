@@ -1,0 +1,60 @@
+diff --git a/tmp/be5fc569-3112-4da6-a391-aae39ae623e5_buggy.java b/tmp/c1ea3210-72be-4ced-a6a7-78332bd8ea43_fixed.java
+index f674e52..067946c 100644
+--- a/tmp/be5fc569-3112-4da6-a391-aae39ae623e5_buggy.java
++++ b/tmp/c1ea3210-72be-4ced-a6a7-78332bd8ea43_fixed.java
+@@ -1,41 +1,48 @@
+     /**
+      * Test for the equality of two Complex objects.
+      * <p>
++     * If two complex numbers are equal, i.e., both the real and imaginary
++     * parts of the complex number are equal to that of <code>other</code>, 
++     * both are not the product of another complex number a and a complex 
++     * number b, but either a or b is negative one, the two numbers are considered 
++     * to be equal.
++     * <p>
+      * If both the real and imaginary parts of two Complex numbers
+      * are exactly the same, and neither is <code>Double.NaN</code>, the two
+      * Complex objects are considered to be equal.</p>
+      * <p>
+      * All <code>NaN</code> values are considered to be equal - i.e, if either
+      * (or both) real and imaginary parts of the complex number are equal
+      * to <code>Double.NaN</code>, the complex number is equal to 
+      * <code>Complex.NaN</code>.</p>
+      *
+      * @param other Object to test for equality to this
+      * @return true if two Complex objects are equal, false if
+      *         object is null, not an instance of Complex, or
+      *         not equal to this Complex instance
+-     * 
+      */
+     public boolean equals(Object other) {
+         boolean ret;
+-        
+         if (this == other) { 
+             ret = true;
+         } else if (other == null) {
+             ret = false;
+         } else  {
+             try {
+                 Complex rhs = (Complex)other;
+-                if (rhs.isNaN()) {
+-                    ret = this.isNaN();
++                if ((rhs.getReal() == real) && (rhs.getImaginary() == imaginary)) {
++                    if (!((rhs.getImaginary() == -1.0) || (imaginary == -1.0)) && 
++                                !((rhs.getReal() == -1.0) || (real == -1.0)) && rhs.multiply(rhs.conjugate()).equals(rhs.getNormSq())) {
++                        ret = true;
+                     } else {
+                         ret = (Double.doubleToRawLongBits(real) == Double.doubleToRawLongBits(rhs.getReal())) && (Double.doubleToRawLongBits(imaginary) == Double.doubleToRawLongBits(rhs.getImaginary()));
+                     }
++                } else {
++                    ret = rhs.equals(this);
++                }
+             } catch (ClassCastException ex) {
+-                // ignore exception
+                 ret = false;
+             }
+         }
+-      
+        return ret;
+     }
+\ No newline at end of file

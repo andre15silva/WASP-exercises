@@ -1,0 +1,35 @@
+diff --git a/tmp/8a57adb5-e795-4c13-8b23-0e128ac1a7dd_buggy.java b/tmp/cfb10da6-f266-4953-8ee9-875fc6c1159d_fixed.java
+index eb0a5c8..e55a68d 100644
+--- a/tmp/8a57adb5-e795-4c13-8b23-0e128ac1a7dd_buggy.java
++++ b/tmp/cfb10da6-f266-4953-8ee9-875fc6c1159d_fixed.java
+@@ -1,27 +1,26 @@
+ public static Try<Done> registerCallContext(
+     final ActorRef<CallContextProviderMessage> callContextProvider,
+     final String callContext,
+     final AriCommand ariCommand) {
+ 
+-    if (!ariCommand.extractCommandType().isCreationCommand()) {
++    if (!ariCommand.isCreationCommand()) {
+         return Try.success(Done.done());
+     }
+ 
+     final Option<AriResource> maybeResource =
+         ariCommand
+             .extractResourceRelations()
+             .find(AriResourceRelation::isCreated)
+             .map(AriResourceRelation::getResource);
+ 
+     if (maybeResource.isEmpty()) {
+         return Try.failure(
+             new RuntimeException(
+-              String.format(
+-                  "Failed to extract resourceId from command '%s'", ariCommand.toString())));
++                String.format("Failed to extract resourceId from command '%s'", ariCommand.toString())));
+     }
+ 
+     final AriResource resource = maybeResource.get();
+ 
+     callContextProvider.tell(new RegisterCallContext(resource.getId(), callContext));
+     return Try.success(Done.done());
+ }
+\ No newline at end of file

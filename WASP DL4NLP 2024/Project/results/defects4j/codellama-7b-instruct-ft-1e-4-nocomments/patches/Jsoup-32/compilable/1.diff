@@ -1,0 +1,13 @@
+diff --git a/tmp/70d8e98a-c63f-4550-bae9-def9a4be882e_buggy.java b/tmp/742b1f30-a5ce-4408-8314-a0527b1be613_fixed.java
+index 91469b4..82f2ea6 100644
+--- a/tmp/70d8e98a-c63f-4550-bae9-def9a4be882e_buggy.java
++++ b/tmp/742b1f30-a5ce-4408-8314-a0527b1be613_fixed.java
+@@ -1,6 +1,6 @@
+     @Override
+     public Element clone() {
+         Element clone = (Element) super.clone();
+-        clone.classNames();
++        clone.classNames(classNames);
+         return clone;
+     }
+\ No newline at end of file

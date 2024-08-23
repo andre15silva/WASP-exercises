@@ -1,0 +1,73 @@
+diff --git a/tmp/6514fa52-e3fa-4707-afd8-09c40b18a1b8_buggy.java b/tmp/c8c63375-c9d2-41ac-9c5b-d6d95c8204a1_fixed.java
+index 14b78fb..345d5f5 100644
+--- a/tmp/6514fa52-e3fa-4707-afd8-09c40b18a1b8_buggy.java
++++ b/tmp/c8c63375-c9d2-41ac-9c5b-d6d95c8204a1_fixed.java
+@@ -1,56 +1,35 @@
+-    /**
+-     * Finds the next text wrap position after <code>startPos</code> for the
+-     * text in <code>text</code> with the column width <code>width</code>.
+-     * The wrap point is the last position before startPos+width having a 
+-     * whitespace character (space, \n, \r). If there is no whitespace character
+-     * before startPos+width, it will return startPos+width.
+-     *
+-     * @param text The text being searched for the wrap position
+-     * @param width width of the wrapped text
+-     * @param startPos position from which to start the lookup whitespace
+-     * character
+-     * @return postion on which the text must be wrapped or -1 if the wrap
+-     * position is at the end of the text
+-     */
+ protected int findWrapPos(String text, int width, int startPos)
+ {
+     int pos;
+     
+-        // the line ends before the max wrap pos or a new line char found
+-        if (((pos = text.indexOf('\n', startPos)) != -1 && pos <= width)
+-                || ((pos = text.indexOf('\t', startPos)) != -1 && pos <= width))
++    // Check for new line or tab character before the max wrap pos
++    if (((pos = text.indexOf('\n', startPos)) != -1 && pos <= startPos + width)
++            || ((pos = text.indexOf('\t', startPos)) != -1 && pos <= startPos + width))
+     {
+         return pos + 1;
+     }
+     else if (startPos + width >= text.length())
+     {
+         return -1;
+     }
+ 
+-
+-        // look for the last whitespace character before startPos+width
+-        pos = startPos + width;
++    // Look for the last whitespace character before startPos + width
++    pos = startPos + width - 1; // Start from the last position within the range
+ 
+     char c;
+ 
+-        while ((pos >= startPos) && ((c = text.charAt(pos)) != ' ')
+-                && (c != '\n') && (c != '\r'))
++    while (pos >= startPos && (c = text.charAt(pos)) != ' '
++            && c != '\n' && c != '\r')
+     {
+         --pos;
+     }
+ 
+-        // if we found it - just return
+-        if (pos > startPos)
++    // If we found a whitespace character, return its position
++    if (pos >= startPos)
+     {
+         return pos;
+     }
+     
+-        // if we didn't find one, simply chop at startPos+width
+-        pos = startPos + width;
+-        while ((pos <= text.length()) && ((c = text.charAt(pos)) != ' ')
+-               && (c != '\n') && (c != '\r'))
+-        {
+-            ++pos;
+-        }
+-        return pos == text.length() ? -1 : pos;
++    // If we didn't find one, simply return the wrap position at startPos + width
++    return startPos + width;
+ }
+\ No newline at end of file

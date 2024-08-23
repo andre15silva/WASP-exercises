@@ -1,0 +1,30 @@
+diff --git a/tmp/668d771a-dafe-4780-98ef-dee38b589cc2_buggy.java b/tmp/d9ff479c-72b4-456f-a44d-5377933dbfe1_fixed.java
+index 192e83d..c485991 100644
+--- a/tmp/668d771a-dafe-4780-98ef-dee38b589cc2_buggy.java
++++ b/tmp/d9ff479c-72b4-456f-a44d-5377933dbfe1_fixed.java
+@@ -1,21 +1,24 @@
+     /**
+      * Return whether or not this entry represents a directory.
+      *
+      * @return True if this entry is a directory.
+      */
+     @Override
+     public boolean isDirectory() {
+         if (file != null) {
+             return file.isDirectory();
+         }
+ 
+         if (linkFlag == LF_DIR) {
+             return true;
+         }
+ 
+-        if (getName().endsWith("/")) {
++        String name = getName();
++        if (name != null) {
++	        if (name.endsWith("/")) {
+ 	            return true;
+ 	        }
++        }
+ 
+         return false;
+     }

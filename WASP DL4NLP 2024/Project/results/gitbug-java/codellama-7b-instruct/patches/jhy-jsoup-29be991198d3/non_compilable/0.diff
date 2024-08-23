@@ -1,0 +1,36 @@
+diff --git a/tmp/904c6e40-1da7-42d2-9ae5-57eabf54e62c_buggy.java b/tmp/3b642ec0-8a8f-412f-b886-7900825ed60e_fixed.java
+index 862c60c..18cbfd6 100644
+--- a/tmp/904c6e40-1da7-42d2-9ae5-57eabf54e62c_buggy.java
++++ b/tmp/3b642ec0-8a8f-412f-b886-7900825ed60e_fixed.java
+@@ -1,25 +1,28 @@
+     void outerHtmlHead(Appendable accum, int depth, Document.OutputSettings out) throws IOException {
+         final boolean prettyPrint = out.prettyPrint();
+         final Element parent = parentNode instanceof Element ? ((Element) parentNode) : null;
+         final boolean normaliseWhite = prettyPrint && !Element.preserveWhitespace(parentNode);
+ 
+         boolean trimLeading = false;
+         boolean trimTrailing = false;
+         if (normaliseWhite) {
+             trimLeading = (siblingIndex == 0 && parent != null && parent.tag().isBlock()) ||
+                 parentNode instanceof Document;
+             trimTrailing = nextSibling() == null && parent != null && parent.tag().isBlock();
+ 
++            // Modified condition to check for blank text nodes:
++            if ((isBlank() && (nextSibling() instanceof TextNode && ((TextNode) nextSibling()).isBlank())) ||
++                ((siblingIndex == 0 && parent != null && parent.tag().formatAsBlock() && !isBlank()) ||
++                (out.outline() && siblingNodes().size() > 0 && !isBlank())))
++                indent(accum, depth, out);
++
+             // if this text is just whitespace, and the next node will cause an indent, skip this text:
+             Node next = this.nextSibling();
+             boolean couldSkip = (next instanceof Element && ((Element) next).shouldIndent(out)) // next will indent
+                 || (next instanceof TextNode && (((TextNode) next).isBlank())); // next is blank text, from re-parenting
+             if (couldSkip && isBlank()) return;
+ 
+-            if ((siblingIndex == 0 && parent != null && parent.tag().formatAsBlock() && !isBlank()) ||
+-                (out.outline() && siblingNodes().size() > 0 && !isBlank()))
+-                indent(accum, depth, out);
+         }
+ 
+         Entities.escape(accum, coreValue(), out, false, normaliseWhite, trimLeading, trimTrailing);
+     }

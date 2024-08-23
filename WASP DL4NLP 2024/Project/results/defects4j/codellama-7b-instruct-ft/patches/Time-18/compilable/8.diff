@@ -1,0 +1,47 @@
+diff --git a/tmp/5552b448-5f03-49da-bcc3-f658cf59d8e8_buggy.java b/tmp/b13d2b22-49f5-4569-a34b-388c308af9a0_fixed.java
+index be2af16..e3e10aa 100644
+--- a/tmp/5552b448-5f03-49da-bcc3-f658cf59d8e8_buggy.java
++++ b/tmp/b13d2b22-49f5-4569-a34b-388c308af9a0_fixed.java
+@@ -1,29 +1,35 @@
+     public long getDateTimeMillis(int year, int monthOfYear, int dayOfMonth,
+                                   int hourOfDay, int minuteOfHour,
+                                   int secondOfMinute, int millisOfSecond)
+         throws IllegalArgumentException
+     {
+         Chronology base;
+         if ((base = getBase()) != null) {
+             return base.getDateTimeMillis
+                 (year, monthOfYear, dayOfMonth,
+                  hourOfDay, minuteOfHour, secondOfMinute, millisOfSecond);
+         }
+ 
+         // Assume date is Gregorian.
+         long instant;
+             instant = iGregorianChronology.getDateTimeMillis
+                 (year, monthOfYear, dayOfMonth,
+                  hourOfDay, minuteOfHour, secondOfMinute, millisOfSecond);
+-        if (instant < iCutoverMillis) {
+-            // Maybe it's Julian.
+-            instant = iJulianChronology.getDateTimeMillis
+-                (year, monthOfYear, dayOfMonth,
+-                 hourOfDay, minuteOfHour, secondOfMinute, millisOfSecond);
+         if (instant >= iCutoverMillis) {
+-                // Okay, it's in the illegal cutover gap.
+-                throw new IllegalArgumentException("Specified date does not exist");
++            // Okay, it's in the Gregorian cutover gap.  Check for leap year.
++            if (iJulianChronology.isLeapYear(year)) {
++                // It's in a leap year.  Make sure it's OK in the Julian chrono.
++                try {
++                    iJulianChronology.getDateTimeMillis
++                        (year, monthOfYear, dayOfMonth,
++                         hourOfDay, minuteOfHour, secondOfMinute, millisOfSecond);
++                }
++                catch (IllegalFieldValueException ex) {
++                    // Day does not exist in Julian calendar.
++                    throw new IllegalArgumentException(
++                                            "Specified date does not exist");
++                }
+             }
+         }
+         return instant;
+     }

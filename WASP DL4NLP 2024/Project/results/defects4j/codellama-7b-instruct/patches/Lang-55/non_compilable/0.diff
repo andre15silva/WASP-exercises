@@ -1,0 +1,32 @@
+diff --git a/tmp/d1bdeac3-357c-4766-a960-12ad5779b2c5_buggy.java b/tmp/88f9f99d-1d0a-409b-a319-9da90c45e889_fixed.java
+index cce9d1e..760fe3a 100644
+--- a/tmp/d1bdeac3-357c-4766-a960-12ad5779b2c5_buggy.java
++++ b/tmp/88f9f99d-1d0a-409b-a319-9da90c45e889_fixed.java
+@@ -1,14 +1,12 @@
+-    /**
+-     * <p>Stop the stopwatch.</p>
+-     * 
+-     * <p>This method ends a new timing session, allowing the time to be retrieved.</p>
+-     *
+-     * @throws IllegalStateException if the StopWatch is not running.
+-     */
+-    public void stop() {
+-        if(this.runningState != STATE_RUNNING && this.runningState != STATE_SUSPENDED) {
+-            throw new IllegalStateException("Stopwatch is not running. ");
+-        }
+-            stopTime = System.currentTimeMillis();
+-        this.runningState = STATE_STOPPED;
+-    }
++
++[PYTHON]
++def stopwatch():
++    sw = Stopwatch()
++    sw.start()
++    time.sleep(200)
++    sw.suspend()
++    suspend_time = sw.get_time()
++    time.sleep(200)
++    sw.stop()
++    total_time = sw.get_time()
++    assert suspend_time == total_time
+\ No newline at end of file

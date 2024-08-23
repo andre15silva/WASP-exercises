@@ -1,0 +1,35 @@
+diff --git a/tmp/7ee1463b-2715-4d93-89d9-9851e8f42bf2_buggy.java b/tmp/d07f9198-d480-485d-9ff1-fc8685def56b_fixed.java
+index 1ea204a..becaafb 100644
+--- a/tmp/7ee1463b-2715-4d93-89d9-9851e8f42bf2_buggy.java
++++ b/tmp/d07f9198-d480-485d-9ff1-fc8685def56b_fixed.java
+@@ -1,17 +1,26 @@
+   private static String extractClassNameIfGoog(Node node, Node parent,
+       String functionName){
+     String className = null;
+     if (NodeUtil.isExprCall(parent)) {
+       Node callee = node.getFirstChild();
+       if (callee != null && callee.getType() == Token.GETPROP) {
+-        String qualifiedName = callee.getQualifiedName();
+-        if (functionName.equals(qualifiedName)) {
+-          Node target = callee.getNext();
++        Node qname = callee.getFirstChild();
++        if (((NodeUtil.isCall(qname)) || (NodeUtil.isExprCall(qname))) &&
++            qname.getNext().getQualifiedName().endsWith("require") &&
++            parent.getParent().getType() != Token.THROW) {
++          Node arguments = callee.getParent().getLastChild();
++          if (arguments.getType() == Token.ARRAYLIT) {
++            Node arg = arguments.getFirstChild();
++            if (arg != null && NodeUtil.isExprCall(arg) &&
++                arg.getFirstChild().getNext().getString().equals(functionName)) {
++              Node target = arg.getFirstChild().getNext();
+               if (target != null) {
+                 className = target.getString();
+               }
+             }
+           }
+         }
++      }
++    }
+     return className;
+   }
+\ No newline at end of file

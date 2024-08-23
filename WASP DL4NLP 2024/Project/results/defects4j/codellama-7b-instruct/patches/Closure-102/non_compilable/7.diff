@@ -1,0 +1,26 @@
+diff --git a/tmp/e77f0df2-30b2-4ccb-94c5-828e5af399d4_buggy.java b/tmp/b485404a-5506-45a7-86be-df155ea36d7f_fixed.java
+index f47d784..56e9c0d 100644
+--- a/tmp/e77f0df2-30b2-4ccb-94c5-828e5af399d4_buggy.java
++++ b/tmp/b485404a-5506-45a7-86be-df155ea36d7f_fixed.java
+@@ -1,12 +1,20 @@
++
++Here is the fixed code for the buggy function:
++
+   @Override
+   public void process(Node externs, Node root) {
+     NodeTraversal.traverse(compiler, root, this);
+     if (MAKE_LOCAL_NAMES_UNIQUE) {
+       MakeDeclaredNamesUnique renamer = new MakeDeclaredNamesUnique();
+       NodeTraversal t = new NodeTraversal(compiler, renamer);
+       t.traverseRoots(externs, root);
+     }
+     removeDuplicateDeclarations(root);
+     new PropogateConstantAnnotations(compiler, assertOnChange)
+         .process(externs, root);
++    if (compiler.getOptions().getEnvironment() == compiler.getOptions().getEnvType().BROWSER) {
++      renameArguments(root);
++    }
++  }
++
+ }
+\ No newline at end of file

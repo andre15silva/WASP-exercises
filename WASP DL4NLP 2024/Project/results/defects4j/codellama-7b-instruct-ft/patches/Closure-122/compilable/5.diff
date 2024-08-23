@@ -1,0 +1,18 @@
+diff --git a/tmp/9d2c6915-cf67-4a47-a5bd-dd8e47e5923e_buggy.java b/tmp/bf6e8e46-0324-4c3b-9041-87946f2da092_fixed.java
+index 308b324..d35943d 100644
+--- a/tmp/9d2c6915-cf67-4a47-a5bd-dd8e47e5923e_buggy.java
++++ b/tmp/bf6e8e46-0324-4c3b-9041-87946f2da092_fixed.java
+@@ -1,11 +1,13 @@
+   /**
+    * Check to see if the given block comment looks like it should be JSDoc.
+    */
+   private void handleBlockComment(Comment comment) {
+     if (comment.getValue().indexOf("/*@") != -1 || comment.getValue().indexOf("\n *@") != -1) {
++      // NOTE: If the @ is in a " /*@... */ ", then it looks really like a block
++      // comment, but we must be suspicious since it is a JSDoc comment.
+       errorReporter.warning(
+           SUSPICIOUS_COMMENT_WARNING,
+           sourceName,
+           comment.getLineno(), "", 0);
+     }
+   }

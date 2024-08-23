@@ -1,0 +1,24 @@
+diff --git a/tmp/45cdbc80-fbf7-4844-bb6a-87ab5a14e3eb_buggy.java b/tmp/ce78dd49-2d5a-4dd8-a1e4-8b9e2e6231fb_fixed.java
+index dc93be3..47137da 100644
+--- a/tmp/45cdbc80-fbf7-4844-bb6a-87ab5a14e3eb_buggy.java
++++ b/tmp/ce78dd49-2d5a-4dd8-a1e4-8b9e2e6231fb_fixed.java
+@@ -1,14 +1,19 @@
+     Element insert(Token.StartTag startTag) {
+         // handle empty unknown tags
+         // when the spec expects an empty tag, will directly hit insertEmpty, so won't generate this fake end tag.
+         if (startTag.isSelfClosing()) {
++            // if known tag, allow self closing outside of spec (so p, for example, doesnt generate empty start tag.
++            if (Tag.isKnownTag(startTag.name()) && !Tag.valueOf(startTag.name()).isEmptyTag() && !Tokeniser.isEmptyWhitespaceTag(startTag)) {
+                 Element el = insertEmpty(startTag);
+                 stack.add(el);
+                 tokeniser.emit(new Token.EndTag(el.tagName()));  // ensure we get out of whatever state we are in. emitted for yielded processing
+                 return el;
++            } else {
++                return insertAutoEmpty(startTag);
++            }
+         }
+         
+         Element el = new Element(Tag.valueOf(startTag.name()), baseUri, startTag.attributes);
+         insert(el);
+         return el;
+     }

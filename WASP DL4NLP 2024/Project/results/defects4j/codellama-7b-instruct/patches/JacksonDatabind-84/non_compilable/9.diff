@@ -1,0 +1,14 @@
+diff --git a/tmp/b892d5d1-3893-4b43-9f45-bc93369763d5_buggy.java b/tmp/f970e4e5-af19-4f3e-9d27-41283e7e9f45_fixed.java
+index e69de29..9c77aed 100644
+--- a/tmp/b892d5d1-3893-4b43-9f45-bc93369763d5_buggy.java
++++ b/tmp/f970e4e5-af19-4f3e-9d27-41283e7e9f45_fixed.java
+@@ -0,0 +1,8 @@
++   ...
++}
++
++private static ObjectMapper objectMapper() {
++    ObjectMapper mapper = new ObjectMapper();
++    mapper.enable(DeserializationFeature.USE_BIG_INTEGER_FOR_INTS);
++    return mapper;
++}
+\ No newline at end of file

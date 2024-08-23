@@ -1,0 +1,18 @@
+diff --git a/tmp/795bd615-d196-4bc8-a5fa-7cdbff5a1f9b_buggy.java b/tmp/03b67f2e-6dbe-421b-bf6d-10827b74d309_fixed.java
+index dd3b100..f76a4e6 100644
+--- a/tmp/795bd615-d196-4bc8-a5fa-7cdbff5a1f9b_buggy.java
++++ b/tmp/03b67f2e-6dbe-421b-bf6d-10827b74d309_fixed.java
+@@ -1,12 +1,12 @@
+         public TreeNode lowestCommonAncestor(TreeNode root, TreeNode p, TreeNode q) {
+             if (root == null || p == root || q == root) {
+                 return root;
+             }
+-            if ((root.val - p.val) * (root.val - q.val) > 0) {
++            if (Math.signum((float) (root.val - p.val) * (root.val - q.val)) == -1) {
+                 if (root.val - p.val > 0) {
+                     return lowestCommonAncestor(root.left, p, q);
+                 }
+                 return lowestCommonAncestor(root.right, p, q);
+             }
+             return root;
+         }

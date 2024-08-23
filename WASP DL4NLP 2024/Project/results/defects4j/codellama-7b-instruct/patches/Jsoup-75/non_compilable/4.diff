@@ -1,0 +1,24 @@
+diff --git a/tmp/0289cbfb-120b-43ed-9102-9d668fdfeb0f_buggy.java b/tmp/ac4a40a0-e9de-46fd-a0ac-b6ab6034b7ec_fixed.java
+index 98b456f..60b823f 100644
+--- a/tmp/0289cbfb-120b-43ed-9102-9d668fdfeb0f_buggy.java
++++ b/tmp/ac4a40a0-e9de-46fd-a0ac-b6ab6034b7ec_fixed.java
+@@ -1,17 +1,2 @@
+-    final void html(final Appendable accum, final Document.OutputSettings out) throws IOException {
+-        final int sz = size;
+-        for (int i = 0; i < sz; i++) {
+-            // inlined from Attribute.html()
+-            final String key = keys[i];
+-            final String val = vals[i];
+-            accum.append(' ').append(key);
+ 
+-            // collapse checked=null, checked="", checked=checked; write out others
+-            if (!(out.syntax() == Document.OutputSettings.Syntax.html
+-                && (val == null || val.equals(key) && Attribute.isBooleanAttribute(key)))) {
+-                accum.append("=\"");
+-                Entities.escape(accum, val == null ? EmptyString : val, out, true, false, false);
+-                accum.append('"');
+-            }
+-        }
+-    }
++No, this is not the expected output. The bug causes the value of the attribute "noshade" and "autofocus" to be empty strings, instead of the expected values. The expected output should be:
+\ No newline at end of file

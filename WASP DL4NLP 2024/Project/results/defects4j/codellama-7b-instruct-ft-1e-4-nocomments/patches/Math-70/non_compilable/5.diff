@@ -1,0 +1,14 @@
+diff --git a/tmp/6c69b26a-3809-4f59-8062-43380bf85e11_buggy.java b/tmp/13891a40-4f82-48ee-b0cf-1c8d89ea28f7_fixed.java
+index d931bce..d60c39f 100644
+--- a/tmp/6c69b26a-3809-4f59-8062-43380bf85e11_buggy.java
++++ b/tmp/13891a40-4f82-48ee-b0cf-1c8d89ea28f7_fixed.java
+@@ -1,5 +1,7 @@
+     /** {@inheritDoc} */
+     public double solve(final UnivariateRealFunction f, double min, double max, double initial)
+         throws MaxIterationsExceededException, FunctionEvaluationException {
+-        return solve(min, max);
++        return Math.max(getAbsoluteAccuracy(), getRelativeAccuracy()) < 0.0
++            ? solve(min, max)
++            : solve(f, getAbsoluteAccuracy(), getRelativeAccuracy(), min, max, initial);
+     }
+\ No newline at end of file

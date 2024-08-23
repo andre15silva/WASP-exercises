@@ -1,0 +1,48 @@
+diff --git a/tmp/6207b4f5-e70f-415a-9393-780c2bd23e89_buggy.java b/tmp/a4efd77f-031a-441e-861c-ed54343f615f_fixed.java
+index 658036e..6dcec78 100644
+--- a/tmp/6207b4f5-e70f-415a-9393-780c2bd23e89_buggy.java
++++ b/tmp/a4efd77f-031a-441e-861c-ed54343f615f_fixed.java
+@@ -1,29 +1,17 @@
+-    // off-lined to keep main method lean and mean...
+-    @SuppressWarnings("resource")
+-    protected Object _deserializeTypedUsingDefaultImpl(JsonParser p, DeserializationContext ctxt,
+-            TokenBuffer tb) throws IOException
+-    {
+-        // As per [JACKSON-614], may have default implementation to use
+-        JsonDeserializer<Object> deser = _findDefaultImplDeserializer(ctxt);
+-        if (deser != null) {
+-            if (tb != null) {
+-                tb.writeEndObject();
+-                p = tb.asParser(p);
+-                // must move to point to the first token:
+-                p.nextToken();
++    public Object deserializeTypedUsingDefaultImpl(JsonParser p, DeserializationContext ctxt) throws IOException {
++        // Find the default implementation serializer.
++        JsonDeserializer<Object> deserializer = ctxt.getDefaultImplDeserializer();
++
++        // If a default implementation serializer was found,
++        if (deserializer != null) {
++            // And the input stream supports the deserializer,
++            if (p.hasDefaultImplementationDeserializer() && deserializer.getObjectIdReader() != null) {
++                // Deserialize the input stream using the default implementation serializer.
++                return deserializer.deserialize(p, ctxt);
+             }
+-            return deser.deserialize(p, ctxt);
+         }
+-        // or, perhaps we just bumped into a "natural" value (boolean/int/double/String)?
+-        Object result = TypeDeserializer.deserializeIfNatural(p, ctxt, _baseType);
+-        if (result != null) {
+-            return result;
+-        }
+-        // or, something for which "as-property" won't work, changed into "wrapper-array" type:
+-        if (p.getCurrentToken() == JsonToken.START_ARRAY) {
+-            return super.deserializeTypedFromAny(p, ctxt);
+-        }
+-        ctxt.reportWrongTokenException(p, JsonToken.FIELD_NAME,
+-                "missing property '"+_typePropertyName+"' that is to contain type id  (for class "+baseTypeName()+")");
+-        return null;
++
++        // If the input stream doesn't support the default implementation deserializer or is unable to be deserialized,
++        // Default to using a "natural" deserializer.
++        return super.deserializeTypedUsingDefaultImpl(p, ctxt);
+     }

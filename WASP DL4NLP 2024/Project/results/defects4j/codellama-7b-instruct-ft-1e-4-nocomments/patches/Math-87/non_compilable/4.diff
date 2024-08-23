@@ -1,0 +1,27 @@
+diff --git a/tmp/48f6fda0-ec0b-40b6-9a1a-8ef8ccbdf63a_buggy.java b/tmp/d1b30406-6e8a-4b4d-a29e-406e5739cfd7_fixed.java
+index 70cafe0..a1725e1 100644
+--- a/tmp/48f6fda0-ec0b-40b6-9a1a-8ef8ccbdf63a_buggy.java
++++ b/tmp/d1b30406-6e8a-4b4d-a29e-406e5739cfd7_fixed.java
+@@ -1,18 +1,15 @@
+-    /**
+-     * Checks whether the given column is basic.
+-     * @param col index of the column to check
+-     * @return the row that the variable is basic in.  null if the column is not basic
+-     */
+     private Integer getBasicRow(final int col) {
+         Integer row = null;
+         for (int i = getNumObjectiveFunctions(); i < getHeight(); i++) {
+             if (!MathUtils.equals(getEntry(i, col), 0.0, epsilon)) {
+                 if (row == null) {
+                 row = i;
+-                } else {
++                countConstraints = false;
++                }
++                if (countConstraints) {
+                     return null;
+                 }
+             }
+         }
+         return row;
+     }
+\ No newline at end of file

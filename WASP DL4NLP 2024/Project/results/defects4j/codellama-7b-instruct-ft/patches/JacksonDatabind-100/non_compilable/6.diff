@@ -1,0 +1,80 @@
+diff --git a/tmp/c4394335-1828-49b5-9f81-2a0c8f28ddc9_buggy.java b/tmp/f31794df-d5c4-4066-b20b-7ac018f8e7f7_fixed.java
+index fc8c302..d666427 100644
+--- a/tmp/c4394335-1828-49b5-9f81-2a0c8f28ddc9_buggy.java
++++ b/tmp/f31794df-d5c4-4066-b20b-7ac018f8e7f7_fixed.java
+@@ -1,23 +1,71 @@
+     @Override
+     public byte[] getBinaryValue(Base64Variant b64variant)
+         throws IOException, JsonParseException
+     {
+-        // Multiple possibilities...
++        // First, let's see if we can locate a 'binary' mode (POJO or byte[])
+         JsonNode n = currentNode();
+         if (n != null) {
+-            // [databind#2096]: although `binaryValue()` works for real binary node
+-            // and embedded "POJO" node, coercion from TextNode may require variant, so:
++            // [databind#2096]: although `binaryValue()` works for binary and "POJO" nodes;
++            // coercion might need variant, so:
+             byte[] data = n.binaryValue();
+             if (data != null) {
+                 return data;
+             }
+             if (n.isPojo()) {
+                 Object ob = ((POJONode) n).getPojo();
+                 if (ob instanceof byte[]) {
+                     return (byte[]) ob;
+                 }
+             }
+         }
+-        // otherwise return null to mark we have no binary content
++        // Otherwise, let's try parsing in more detail
++        // 12-Oct-2019, tatu: as per [databind#2113], not necessary to fail
++        // but may need to skip base64 encoded text node?
++        if (isBinary()) {
++            return getBinaryValue();
++        }
++        if (b64variant == null) {
++            return null;
++        }
++        // Although the encoding could be done with standard base64 variant, some
++        // users rely on encoded text (e.g. "data Used in tests)" having the
++        // same encoding style.
++        int len = valueLength();
++        String value = valueAsString();
++        byte[] result = new byte[len];
++        boolean brokenEncoding = false;
++        // first check if we're ok with plain base64 variant, then try other
++        try {
++            result = b64variant.decode(value);
++        } catch (IllegalArgumentException e) {
++            brokenEncoding = true;
++            try {
++                result = b64variant.decode(value, len);
++            } catch (IllegalArgumentException e0) {
++                brokenEncoding = true;
++            }
++        }
++        if (!brokenEncoding) {
++            return result;
++        }
++        // 15-Aug-2018, tatu: [databind#2096] requires another test
++        JsonParser p = this;
++        JsonNode node = readUsedNode();
++        p = new TreeTraversingParser(p, getNodeFactory());
++        p.setcurrentNodeFactory(getNodeFactory());
++        p.enable(JsonParser.Feature.ALLOW_TRAILING_COMMA);
++        try {
++            // Should work in all cases but that last line... which may cause
++            // issues when base-64 encoding is not valid to begin with:
++            p.setSource(node);
++            data = p.getBinaryValue(b64variant);
++        } catch (Exception e0) {
++            brokenEncoding = true;
++        }
++        // Ok; if we had problem, let's try again (but, honestly, maybe not so useful
++        // and not worth the cost to make it work?!
++        if (!brokenEncoding) {
++            return result;
++        }
+         return null;
+     }

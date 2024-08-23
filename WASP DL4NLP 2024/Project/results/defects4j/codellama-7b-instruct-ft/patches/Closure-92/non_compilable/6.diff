@@ -1,0 +1,109 @@
+diff --git a/tmp/aab1abfa-2328-4614-9980-9dad3771967c_buggy.java b/tmp/f2b71a79-d9ec-49fc-b779-94c92bc1e95a_fixed.java
+index 851ffc2..83d110d 100644
+--- a/tmp/aab1abfa-2328-4614-9980-9dad3771967c_buggy.java
++++ b/tmp/f2b71a79-d9ec-49fc-b779-94c92bc1e95a_fixed.java
+@@ -1,70 +1,89 @@
+     /**
+      * Replace the provide statement.
+      *
+      * If we're providing a name with no definition, then create one.
+      * If we're providing a name with a duplicate definition, then make sure
+      * that definition becomes a declaration.
+      */
+     void replace() {
+       if (firstNode == null) {
+         // Don't touch the base case ('goog').
+         replacementNode = candidateDefinition;
+         return;
+       }
+ 
+       // Handle the case where there is a duplicate definition for an explicitly
+       // provided symbol.
+       if (candidateDefinition != null && explicitNode != null) {
+         explicitNode.detachFromParent();
+         compiler.reportCodeChange();
+ 
+         // Does this need a VAR keyword?
+         replacementNode = candidateDefinition;
+         if (NodeUtil.isExpressionNode(candidateDefinition)) {
+           candidateDefinition.putBooleanProp(Node.IS_NAMESPACE, true);
+           Node assignNode = candidateDefinition.getFirstChild();
+           Node nameNode = assignNode.getFirstChild();
+           if (nameNode.getType() == Token.NAME) {
+             // Need to convert this assign to a var declaration.
+             Node valueNode = nameNode.getNext();
+             assignNode.removeChild(nameNode);
+             assignNode.removeChild(valueNode);
+             nameNode.addChildToFront(valueNode);
+             Node varNode = new Node(Token.VAR, nameNode);
+             varNode.copyInformationFrom(candidateDefinition);
+             candidateDefinition.getParent().replaceChild(
+                 candidateDefinition, varNode);
+             nameNode.setJSDocInfo(assignNode.getJSDocInfo());
+             compiler.reportCodeChange();
+             replacementNode = varNode;
+           }
+         }
+-      } else {
++      } else if (candidateDefinition == null && firstModule == minimumModule) {
+         // Handle the case where there's not a duplicate definition.
+         replacementNode = createDeclarationNode();
+-        if (firstModule == minimumModule) {
+         firstNode.getParent().addChildBefore(replacementNode, firstNode);
+-        } else {
+-          // In this case, the name was implicitly provided by two independent
+-          // modules. We need to move this code up to a common module.
++        compiler.reportCodeChange();
++      } else if (candidateDefinition == null && firstNode.getNext() == explicitNode) {
++        // A user provided (via goog.) a fully qualified name of unprovided namespace
++        // in two independent modules.
++        // We need to move the declaration to a common module.
++        firstNodeForProvideOrGoogNamespace.detachFromParent();
++        replacementNode = createDeclarationNode();
+         int indexOfDot = namespace.indexOf('.');
+         if (indexOfDot == -1) {
+           // Any old place is fine.
+-            compiler.getNodeForCodeInsertion(minimumModule)
+-                .addChildToBack(replacementNode);
++          compiler.getNodeForCodeInsertion(minimumModule).addChildToBack(
++              replacementNode);
++        } else {
++          ProvidedName parentName = getParentName();
++          if (parentName == null) {
++            // This should never happen, a dependent has a provided name that
++            // is not part of the provide namespace of the parent.
++            // Any old place is fine.
++            compiler.reportCodeChange();
++            replacementNode.getParent().addChildAfter(
++                replacementNode, replacementNode.getParent().getParent());
+           } else {
+-            // Add it after the parent namespace.
+-            ProvidedName parentName =
+-                providedNames.get(namespace.substring(0, indexOfDot));
+-            Preconditions.checkNotNull(parentName);
+-            Preconditions.checkNotNull(parentName.replacementNode);
+             parentName.replacementNode.getParent().addChildAfter(
+                 replacementNode, parentName.replacementNode);
+           }
+         }
+-        if (explicitNode != null) {
+-          explicitNode.detachFromParent();
+-        }
++        firstNodeForProvideOrGoogNamespace = null;
++      } else if (candidateDefinition != null && firstModule > minimumModule) {
++        // A module has a require of a var from a previous independent module.
++        // We need to move the declaration to a common module.
++        final Node script = minimumModule.getParent();
++        final Node node = ReplacingScriptVisitor.searchDeclarationInOtherModule(
++            candidateDefinition, script, compiler.getCodingConvention(),
++            compiler.getToken(candidateDefinition));
++        candidateDefinition.detachFromParent();
++        node.getParent().addChildToBack(candidateDefinition);
++        candidateDefinition.setJSDocInfo(node.getJSDocInfo());
++        candidateDefinition.getParent().removeChild(candidateDefinition);
++        candidateDefinition.getParent().getParent().replaceChild(
++            node, candidateDefinition);
+         compiler.reportCodeChange();
++        replacementNode = node;
+       }
+     }

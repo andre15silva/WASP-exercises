@@ -1,0 +1,54 @@
+diff --git a/tmp/cd8d47a7-c7c9-41d5-a404-c2b4ab32fa3b_buggy.java b/tmp/4d0ca8e5-458f-4c5b-8d46-3e477d4f09c0_fixed.java
+index 1bd0d7e..ab57605 100644
+--- a/tmp/cd8d47a7-c7c9-41d5-a404-c2b4ab32fa3b_buggy.java
++++ b/tmp/4d0ca8e5-458f-4c5b-8d46-3e477d4f09c0_fixed.java
+@@ -1,31 +1,35 @@
+     /**
+      * Get the ns uri of the specified node.
+      * @param node Node to check
+      * @return String ns uri
+      */
+     public static String getNamespaceURI(Node node) {
+         if (node instanceof Document) {
+             node = ((Document) node).getDocumentElement();
+         }
+ 
+         Element element = (Element) node;
+ 
+         String uri = element.getNamespaceURI();
+         if (uri == null) {
+-            String prefix = getPrefix(node);
+-            String qname = prefix == null ? "xmlns" : "xmlns:" + prefix;
+-    
+-            Node aNode = node;
+-            while (aNode != null) {
+-                if (aNode.getNodeType() == Node.ELEMENT_NODE) {
+-                    Attr attr = ((Element) aNode).getAttributeNode(qname);
+-                    if (attr != null) {
+-                        return attr.getValue();
+-                    }
+-                }
+-                aNode = aNode.getParentNode();
+-            }
+-            return null;
++            final String prefix = getPrefix(node);
++            final String attrName = "xmlns:" + (prefix == null ? "xmlns" : prefix);
++            Element nsElement = element.getElementsByTagNameNS(null, attrName)
++            .item(0)
++            .getParentNode()
++            .getParentNode()
++            .getNodeType() == Node.ELEMENT_NODE?
++                (Element) element
++                               .getElementsByTagNameNS(null, attrName)
++                               .item(0)
++                               .getParentNode()
++                               .getParentNode()
++            : null;
++            if (nsElement != null)  // The namespace attribute may be empty
++                                    // in DOCUMENT-MODE and DOM.
++                nsElement = (Element) ((Element) nsElement.cloneNode(true)).
++                    removeAttributeNode(getAttribute(nsElement, null, attrName));
++            uri = nsElement != null? nsElement.getNamespaceURI() : null;
+         }
+         return uri;
+     }

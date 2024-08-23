@@ -1,0 +1,37 @@
+diff --git a/tmp/61d4fbda-9161-4b3d-91b6-60a7dea45083_buggy.java b/tmp/e4dcbbbf-c836-450c-9e81-fb9a2a157ec6_fixed.java
+index 939f49b..8082690 100644
+--- a/tmp/61d4fbda-9161-4b3d-91b6-60a7dea45083_buggy.java
++++ b/tmp/e4dcbbbf-c836-450c-9e81-fb9a2a157ec6_fixed.java
+@@ -1,21 +1,25 @@
+ private boolean isPrototypePropertyAssign(Node assign) {
+     Node n = assign.getFirstChild();
+     if (n != null && NodeUtil.isVarOrSimpleAssignLhs(n, assign)
+-          && n.getType() == Token.GETPROP
+-          ) {
++        && n.getType() == Token.GETPROP) {
+         // We want to exclude the assignment itself from the usage list
+-        boolean isChainedProperty =
+-            n.getFirstChild().getType() == Token.GETPROP;
++        boolean isChainedProperty = n.getFirstChild().getType() == Token.GETPROP;
+ 
+         if (isChainedProperty) {
+             Node child = n.getFirstChild().getFirstChild().getNext();
+ 
+-          if (child.getType() == Token.STRING &&
+-              child.getString().equals("prototype")) {
++            // Change the condition to check if we have a GETPROP and not just a STRING
++            if (child.getType() == Token.GETPROP) {
++                Node target = child.getFirstChild();
++
++                // Check if the target is a STRING that equals "prototype"
++                if (target.getType() == Token.STRING &&
++                    target.getString().equals("prototype")) {
+                     return true;
+                 }
+             }
+         }
++    }
+ 
+     return false;
+ }
+\ No newline at end of file

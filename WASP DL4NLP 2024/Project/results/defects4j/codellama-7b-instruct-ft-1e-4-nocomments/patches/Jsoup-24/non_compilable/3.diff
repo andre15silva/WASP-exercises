@@ -1,0 +1,52 @@
+diff --git a/tmp/a417351b-b868-4789-8a85-97e086870a66_buggy.java b/tmp/fb55b1da-ac0e-4a0f-a5d3-4a11e3025c87_fixed.java
+index b2d53db..5a9b2c3 100644
+--- a/tmp/a417351b-b868-4789-8a85-97e086870a66_buggy.java
++++ b/tmp/fb55b1da-ac0e-4a0f-a5d3-4a11e3025c87_fixed.java
+@@ -1,34 +1,45 @@
+         void read(Tokeniser t, CharacterReader r) {
+             if (r.matchesLetter()) {
+                 String name = r.consumeLetterSequence();
+                 t.tagPending.appendTagName(name.toLowerCase());
+                 t.dataBuffer.append(name);
+                 r.advance();
+                 return;
+             }
+-
+             if (t.isAppropriateEndTagToken() && !r.isEmpty()) {
+                 char c = r.consume();
+                 switch (c) {
+                     case '\t':
+                     case '\n':
+                     case '\f':
+                     case ' ':
+                         t.transition(BeforeAttributeName);
+                         break;
+                     case '/':
+                         t.transition(SelfClosingStartTag);
+                         break;
+                     case '>':
+                         t.emitTagPending();
+                         t.transition(Data);
+                         break;
++                    case '\'':
++                    case '"':
++                        anythingElse(t, r);
++                        t.tokeniser.transition(ScriptDataDoubleEscaped);
++                        break;
++                    case '-':
++                    case '<':
++                    case '=':
++                    case '>':
++                        anythingElse(t, r);
++                        t.tokeniser.transition(ScriptDataEscaped);
++                        break;
+                     default:
+                         t.dataBuffer.append(c);
+                         anythingElse(t, r);
+                         break;
+                 }
+             } else {
+                 anythingElse(t, r);
+             }
+         }
+\ No newline at end of file

@@ -1,0 +1,45 @@
+diff --git a/tmp/77bb5902-8870-4bc4-9baa-55406a8837b2_buggy.java b/tmp/ba448f24-1c09-4b97-a213-e88dbe5ab2fa_fixed.java
+index 6ea5795..6e7d8ab 100644
+--- a/tmp/77bb5902-8870-4bc4-9baa-55406a8837b2_buggy.java
++++ b/tmp/ba448f24-1c09-4b97-a213-e88dbe5ab2fa_fixed.java
+@@ -1,37 +1,4 @@
+-    /**
+-     * Appends the usage clause for an Option to a StringBuffer.  
+-     *
+-     * @param buff the StringBuffer to append to
+-     * @param option the Option to append
+-     * @param required whether the Option is required or not
+-     */
+-    private static void appendOption(final StringBuffer buff, 
+-                                     final Option option, 
+-                                     final boolean required)
+-    {
+-        if (!required)
+-        {
+-            buff.append("[");
+-        }
+ 
+-        if (option.getOpt() != null)
+-        {
+-            buff.append("-").append(option.getOpt());
+-        }
+-        else
+-        {
+-            buff.append("--").append(option.getLongOpt());
+-        }
++In this case, the bug is that the function `appendOption` is not correctly outputting the optional option name when the `Option` object has an empty `argName` and is not required. The `argName` of an `Option` object is the name of the argument for this option.
+ 
+-        // if the Option has a value
+-        if (option.hasArg() && (option.getArgName() != null))
+-        {
+-            buff.append(" <").append(option.getArgName()).append(">");
+-        }
+-
+-        // if the Option is not a required option
+-        if (!required)
+-        {
+-            buff.append("]");
+-        }
+-    }
++Here is the corrected `appendOption` function:
+\ No newline at end of file

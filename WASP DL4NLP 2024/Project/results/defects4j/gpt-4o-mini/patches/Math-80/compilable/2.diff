@@ -1,0 +1,33 @@
+diff --git a/tmp/9351275c-c1e8-4bf3-a111-5867c4997f63_buggy.java b/tmp/644dafc2-1330-48c3-984a-b1d333f681e5_fixed.java
+index fbd0884..e1f1206 100644
+--- a/tmp/9351275c-c1e8-4bf3-a111-5867c4997f63_buggy.java
++++ b/tmp/644dafc2-1330-48c3-984a-b1d333f681e5_fixed.java
+@@ -1,23 +1,15 @@
+-    /**
+-     * Flip qd array if warranted.
+-     * @param n number of rows in the block
+-     * @param step within the array (1 for flipping all elements, 2 for flipping
+-     * only every other element)
+-     * @return true if qd array was flipped
+-     */
+ private boolean flipIfWarranted(final int n, final int step) {
+     if (1.5 * work[pingPong] < work[4 * (n - 1) + pingPong]) {
+         // flip array
+-            int j = 4 * n - 1;
+-            for (int i = 0; i < j; i += 4) {
++        int j = 4 * (n - 1); // Adjust the loop to appropriately reflect the last index for flipping
++        for (int i = 0; i <= j; i += 4) { // Change the condition to i <= j to include the last set of elements
+             for (int k = 0; k < 4; k += step) {
+                 final double tmp = work[i + k];
+-                    work[i + k] = work[j - k];
+-                    work[j - k] = tmp;
++                work[i + k] = work[j - (i - (j - 4)) + k]; // Correct the indexing for it to be symmetrical on flip
++                work[j - (i - (j - 4)) + k] = tmp; // Adjust the index correctly for the opposite side
+             }
+-                j -= 4;
+         }
+         return true;
+     }
+     return false;
+ }
+\ No newline at end of file

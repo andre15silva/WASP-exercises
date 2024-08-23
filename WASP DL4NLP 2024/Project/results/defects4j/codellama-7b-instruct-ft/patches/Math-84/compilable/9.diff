@@ -1,0 +1,50 @@
+diff --git a/tmp/9cacec6b-a26d-46fb-b824-226c7f0fb5b4_buggy.java b/tmp/7f330153-72df-4daf-90c0-cf97b1e6b20c_fixed.java
+index 5f1dcf2..d653c1e 100644
+--- a/tmp/9cacec6b-a26d-46fb-b824-226c7f0fb5b4_buggy.java
++++ b/tmp/7f330153-72df-4daf-90c0-cf97b1e6b20c_fixed.java
+@@ -1,41 +1,42 @@
+     /** {@inheritDoc} */
+     @Override
+     protected void iterateSimplex(final Comparator<RealPointValuePair> comparator)
+         throws FunctionEvaluationException, OptimizationException, IllegalArgumentException {
+ 
+         while (true) {
+ 
+             incrementIterationsCounter();
+ 
+             // save the original vertex
+             final RealPointValuePair[] original = simplex;
+             final RealPointValuePair best = original[0];
+ 
+             // perform a reflection step
+-            final RealPointValuePair reflected = evaluateNewSimplex(original, 1.0, comparator);
+-            if (comparator.compare(reflected, best) < 0) {
++            final RealPointValuePair minimized = evaluateNewSimplex(original, 1.0, comparator);
++            final RealPointValuePair reflected = evaluateNewSimplex(original, khi, comparator);
++            if (comparator.compare(minimized, reflected) <= 0) {
+ 
+                 // compute the expanded simplex
+                 final RealPointValuePair[] reflectedSimplex = simplex;
+-                final RealPointValuePair expanded = evaluateNewSimplex(original, khi, comparator);
++                final RealPointValuePair expanded = evaluateNewSimplex(original, khi + 1, comparator);
+                 if (comparator.compare(reflected, expanded) <= 0) {
+                     // accept the reflected simplex
+                     simplex = reflectedSimplex;
+                 }
+ 
+                 return;
+ 
+             }
+ 
+             // compute the contracted simplex
+             final RealPointValuePair contracted = evaluateNewSimplex(original, gamma, comparator);
+             if (comparator.compare(contracted, best) < 0) {
+                 // accept the contracted simplex
+ 
+             // check convergence
+                 return;
+             }
+ 
+         }
+ 
+     }

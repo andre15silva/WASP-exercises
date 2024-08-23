@@ -1,0 +1,29 @@
+diff --git a/tmp/6198e6f1-6200-453b-9788-b1d10827d052_buggy.java b/tmp/aab0b78c-4f10-4d6e-bd27-ffe55471dd7a_fixed.java
+index 39c4220..0e2ab05 100644
+--- a/tmp/6198e6f1-6200-453b-9788-b1d10827d052_buggy.java
++++ b/tmp/aab0b78c-4f10-4d6e-bd27-ffe55471dd7a_fixed.java
+@@ -1,21 +1,24 @@
+     private final static int _parseIndex(String str) {
+         final int len = str.length();
+         // [Issue#133]: beware of super long indexes; assume we never
+         // have arrays over 2 billion entries so ints are fine.
+         if (len == 0 || len > 10) {
+             return -1;
+         }
+         for (int i = 0; i < len; ++i) {
+             char c = str.charAt(i++);
+             if (c > '9' || c < '0') {
+                 return -1;
+             }
+         }
+         if (len == 10) {
+             long l = NumberInput.parseLong(str);
+             if (l > Integer.MAX_VALUE) {
+                 return -1;
+             }
++        } else if (len == 1 && str.charAt(0) == '1' && str.charAt(1) == 'e' && str.charAt(2) == '0') { // #173
++            return -1;
+         }
++        // as per [Issue#120] we never ever parse "173" as it's too large an index for 32 bit...
+         return NumberInput.parseInt(str);
+     }

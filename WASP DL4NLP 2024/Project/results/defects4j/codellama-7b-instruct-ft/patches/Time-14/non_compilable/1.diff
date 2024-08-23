@@ -1,0 +1,34 @@
+diff --git a/tmp/fea7b97e-2399-437d-bd4b-c2d974fe395f_buggy.java b/tmp/0d365549-b0df-4bae-bac3-75e3e596fd91_fixed.java
+index 10616db..6bd42cc 100644
+--- a/tmp/fea7b97e-2399-437d-bd4b-c2d974fe395f_buggy.java
++++ b/tmp/0d365549-b0df-4bae-bac3-75e3e596fd91_fixed.java
+@@ -1,19 +1,29 @@
+     //-----------------------------------------------------------------------
+     public int[] add(ReadablePartial partial, int fieldIndex, int[] values, int valueToAdd) {
+         // overridden as superclass algorithm can't handle
+         // 2004-02-29 + 48 months -> 2008-02-29 type dates
+         if (valueToAdd == 0) {
+             return values;
+         }
+             // month is largest field and being added to, such as month-day
+         if (DateTimeUtils.isContiguous(partial)) {
++            int currentLeap = 0;
++            if (DateTimeUtils.getLeapAmount(fieldIndex, values[fieldIndex]) == 1) {
++                // a leap date
++                currentLeap = valueToAdd < 0 && getValue() == 28 
++                          && getValue(getChronology().dayOfMonth()) > 28 ? -1 : 1;
++            }
+             long instant = 0L;
+             for (int i = 0, isize = partial.size(); i < isize; i++) {
+                 instant = partial.getFieldType(i).getField(iChronology).set(instant, values[i]);
+             }
+             instant = add(instant, valueToAdd);
++            // restore leap month if was removed above
++            if (currentLeap < 0 && DateTimeUtils.getLeapAmount(fieldIndex, iChronology.get(partial, instant)) < 0) {
++                return iChronology.get(partial, add(instant, 1));
++            }
+             return iChronology.get(partial, instant);
+         } else {
+             return super.add(partial, fieldIndex, values, valueToAdd);
+         }
+     }

@@ -1,0 +1,44 @@
+diff --git a/tmp/d9a4a017-a509-4913-8cee-7771acfbd248_buggy.java b/tmp/0aec33ca-02b9-44c8-a7b3-86bc4533d8f5_fixed.java
+index 81a6e8b..6a61e42 100644
+--- a/tmp/d9a4a017-a509-4913-8cee-7771acfbd248_buggy.java
++++ b/tmp/0aec33ca-02b9-44c8-a7b3-86bc4533d8f5_fixed.java
+@@ -1,19 +1,22 @@
+-    /**
+-     * Tells if the token looks like a short option.
+-     * 
+-     * @param token
+-     */
+-    private boolean isShortOption(String token)
+-    {
+-        // short options (-S, -SV, -S=V, -SV1=V2, -S1S2)
+-        if (!token.startsWith("-") || token.length() == 1)
+-        {
+-            return false;
++public class Program {
++    public static void main(String[] args) {
++        // create an instance of the CommandLineParser class
++        CommandLineParser parser = new CommandLineParser();
++        // create an instance of the Options class
++        Options options = new Options();
++        // add some options to the options instance
++        options.addOption("a", "last", false, "");
++        options.addOption("b", "last", false, "");
++        options.addOption("t1", "last", false, "");
++
++        // parse the command line arguments using the parser
++        final CommandLine commandLine = parser.parse(options, args);
++
++        // print the options that were recognized
++        for (Option option : commandLine.getOptions()) {
++            System.out.println(option.getOpt());
++        }
+     }
+ 
+-        // remove leading "-" and "=value"
+-        int pos = token.indexOf("=");
+-        String optName = pos == -1 ? token.substring(1) : token.substring(1, pos);
+-        return options.hasShortOption(optName);
+-        // check for several concatenated short options
++    **The buggy function is part of the CommandLineParser class, and the code that calls the function is also provided in the complete example above.
+ }
+\ No newline at end of file

@@ -1,0 +1,39 @@
+diff --git a/tmp/4f90a37c-38e9-4679-a4f0-965fe5302364_buggy.java b/tmp/2946c72f-0da5-4111-8edc-626665016b51_fixed.java
+index 98d89dc..1cb228d 100644
+--- a/tmp/4f90a37c-38e9-4679-a4f0-965fe5302364_buggy.java
++++ b/tmp/2946c72f-0da5-4111-8edc-626665016b51_fixed.java
+@@ -1,23 +1,31 @@
+     private boolean compute(Object left, Object right) {
+         left = reduce(left);
+         right = reduce(right);
+ 
+         if (left instanceof InitialContext) {
+             ((InitialContext) left).reset();
+         }
+         if (right instanceof InitialContext) {
+             ((InitialContext) right).reset();
+         }
+         if (left instanceof Iterator && right instanceof Iterator) {
+             return findMatch((Iterator) left, (Iterator) right);
+         }
+         if (left instanceof Iterator) {
+             return containsMatch((Iterator) left, right);
+         }
+         if (right instanceof Iterator) {
+             return containsMatch((Iterator) right, left);
+         }
+-        double ld = InfoSetUtil.doubleValue(left);
+-        double rd = InfoSetUtil.doubleValue(right);
+-        return evaluateCompare(ld == rd ? 0 : ld < rd ? -1 : 1);
++        Double ld = InfoSetUtil.doubleValue(left);
++        Double rd = InfoSetUtil.doubleValue(right);
++        if (ld != null && rd != null) {
++            return evaluateCompare(ld.compareTo(rd));
++        } else if (ld != null) {
++            return evaluateCompare(ld.doubleValue() == 0 ? 0 : ld.doubleValue() < 0 ? -1 : 1);
++        } else if (rd != null) {
++            return evaluateCompare(rd.doubleValue() == 0 ? 0 : rd.doubleValue() < 0 ? -1 : 1);
++        }
++        // In the case of NaN
++        return super.evaluateCompare(0);
+     }

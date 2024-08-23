@@ -1,0 +1,66 @@
+diff --git a/tmp/5f9f6c37-5ca8-4014-8532-17c1352919be_buggy.java b/tmp/a89f2777-7337-455e-9999-2b52110784cc_fixed.java
+index 9033e1c..83d458d 100644
+--- a/tmp/5f9f6c37-5ca8-4014-8532-17c1352919be_buggy.java
++++ b/tmp/a89f2777-7337-455e-9999-2b52110784cc_fixed.java
+@@ -1,11 +1,60 @@
+     /**
+      * Returns true iff they are equal as defined by
+      * {@link #equals(double,double,int) equals(x, y, 1)}.
+      *
+      * @param x first value
+      * @param y second value
+      * @return {@code true} if the values are equal.
+      */
+     public static boolean equals(double x, double y) {
+         return (Double.isNaN(x) && Double.isNaN(y)) || x == y;
+     }
++    /**
++     * Compares the two arrays for equality.
++     * <p>
++     * Two arrays are considered equal if their corresponding elements are
++     * all equal.
++     * </p>
++     * @param object1 the first array to compare
++     * @param object2 the second array to compare
++     * @return <code>true</code> if both arrays are <code>null</code>,
++     * or if both arrays have the same length and all corresponding pairs
++     * of elements are equal, <code>false</code> otherwise
++     */
++    public static boolean arrayEquals(double [] object1,
++                                      double [] object2) {
++        internalArrayEquals(object1, object2);
++        return true;
++    }
++    /**
++     * Compares the two arrays for equality.
++     * <p>
++     * Two arrays are considered equal if both arrays contain the same data
++     * (regardless of representation/type of the stored data). This
++     * comparison is both null safe, and handles {@link Double}
++     * wrappers by unwrapping them.
++     * </p>
++     * @param array1 the first array to compare
++     * @param array2 the second array to compare
++     * @return <code>true</code> if both arrays are <code>null</code>,
++     * or if both arrays have the same length and all corresponding pairs
++     * of elements are equal, <code>false</code> otherwise
++     */
++    public static boolean arrayEquals(double [] array1,
++                                      double [] array2) {
++        if (array1 == array2) {
++            return true;
++        }
++        if (array1 == null || array2 == null) {
++            return false;
++        }
++        if (array1.length != array2.length) {
++            return false;
++        }
++        for (int i = 0; i < array1.length; i++) {
++            if (DoubleUtils.isEqual(array1[i], array2[i]) == false) {
++                return false;
++            }
++        }
++        return true;
++    }
+\ No newline at end of file

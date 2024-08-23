@@ -1,0 +1,24 @@
+diff --git a/tmp/e0264e08-2f5a-453d-8e61-35cb2e164fd0_buggy.java b/tmp/efa4daa4-b4fc-4b0f-98ff-cc7293ad4564_fixed.java
+index dd3b100..13bd8db 100644
+--- a/tmp/e0264e08-2f5a-453d-8e61-35cb2e164fd0_buggy.java
++++ b/tmp/efa4daa4-b4fc-4b0f-98ff-cc7293ad4564_fixed.java
+@@ -1,12 +1,8 @@
+-        public TreeNode lowestCommonAncestor(TreeNode root, TreeNode p, TreeNode q) {
+-            if (root == null || p == root || q == root) {
+-                return root;
++    class Test {
++        public static void main(String[] args) {
++            TreeNode root = TreeUtils.constructBinaryTree(Arrays.asList(0, -1000000000, 1000000000));
++            TreeNode p = TreeUtils.constructBinaryTree(Arrays.asList(-1000000000));
++            TreeNode q = TreeUtils.constructBinaryTree(Arrays.asList(1000000000));
++            assertEquals(root, solution.lowestCommonAncestor(root, p, q));
+         }
+-            if ((root.val - p.val) * (root.val - q.val) > 0) {
+-                if (root.val - p.val > 0) {
+-                    return lowestCommonAncestor(root.left, p, q);
+-                }
+-                return lowestCommonAncestor(root.right, p, q);
+-            }
+-            return root;
+     }
+\ No newline at end of file

@@ -1,0 +1,24 @@
+diff --git a/tmp/aa565700-f86e-4244-8ff7-db40e7e30667_buggy.java b/tmp/314a3509-6d4e-4f03-80f2-dce8fe73e371_fixed.java
+index ae3784d..3f395f4 100644
+--- a/tmp/aa565700-f86e-4244-8ff7-db40e7e30667_buggy.java
++++ b/tmp/314a3509-6d4e-4f03-80f2-dce8fe73e371_fixed.java
+@@ -1,14 +1,4 @@
+-    /**
+-     Remove an attribute by key. <b>Case insensitive.</b>
+-     @param key attribute key to remove
+-     */
+-    public void removeIgnoreCase(String key) {
+-        Validate.notEmpty(key);
+-        if (attributes == null)
+-            return;
+-        for (Iterator<String> it = attributes.keySet().iterator(); it.hasNext(); ) {
+-            String attrKey = it.next();
+-            if (attrKey.equalsIgnoreCase(key))
+-                attributes.remove(attrKey);
+-        }
+-    }
++
++The issue with the original code is that the concurrent modification exception occurs because of the usage of the iterator in the for loop. The iterator is created by the `keySet().iterator()` method, and the `attributes.remove(attrKey)` method is called on it, which modifies the attributes map. This causes the iterator to throw a `ConcurrentModificationException`.
++
++To fix this issue, we need to use a different approach to iterate over the attributes. One possible solution is to use an enhanced for loop instead of a traditional for loop, like this:
+\ No newline at end of file

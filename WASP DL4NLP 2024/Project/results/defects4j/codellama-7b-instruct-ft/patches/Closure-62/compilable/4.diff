@@ -1,0 +1,70 @@
+diff --git a/tmp/b3bc8dc7-44c5-4580-acaf-1ecadcb3ac88_buggy.java b/tmp/ac110b47-9bf8-4868-91a6-ac11b99285d6_fixed.java
+index 904dba7..d301036 100644
+--- a/tmp/b3bc8dc7-44c5-4580-acaf-1ecadcb3ac88_buggy.java
++++ b/tmp/ac110b47-9bf8-4868-91a6-ac11b99285d6_fixed.java
+@@ -1,46 +1,60 @@
+   private String format(JSError error, boolean warning) {
+     // extract source excerpt
+     SourceExcerptProvider source = getSource();
+     String sourceExcerpt = source == null ? null :
+         excerpt.get(
+             source, error.sourceName, error.lineNumber, excerptFormatter);
+ 
+     // formatting the message
+     StringBuilder b = new StringBuilder();
+     if (error.sourceName != null) {
+       b.append(error.sourceName);
+       if (error.lineNumber > 0) {
+         b.append(':');
+         b.append(error.lineNumber);
+       }
+       b.append(": ");
+     }
+ 
+     b.append(getLevelName(warning ? CheckLevel.WARNING : CheckLevel.ERROR));
+     b.append(" - ");
+ 
+     b.append(error.description);
+     b.append('\n');
+     if (sourceExcerpt != null) {
+       b.append(sourceExcerpt);
+       b.append('\n');
+       int charno = error.getCharno();
+ 
+       // padding equal to the excerpt and arrow at the end
+-      // charno == sourceExpert.length() means something is missing
+-      // at the end of the line
+-      if (excerpt.equals(LINE)
+-          && 0 <= charno && charno < sourceExcerpt.length()) {
++      if (0 <= charno && charno < sourceExcerpt.length()) {
+         for (int i = 0; i < charno; i++) {
+           char c = sourceExcerpt.charAt(i);
+           if (Character.isWhitespace(c)) {
+             b.append(c);
++          } else if (c == '\\') {
++            // Skip over the escaped character.
++            if (i + 1 < sourceExcerpt.length()) {
++              c = sourceExcerpt.charAt(i + 1);
++              i++;
+             } else {
+-            b.append(' ');
++              // We'll make up a character if needed.
++              c = ' ';
+             }
++          } else if (c == '\n') {
++            // If an escaped newline is followed by the end of the line,
++            // just add a newline to the excerpt and continue.
++            sourceExcerpt = sourceExcerpt.substring(0, i + 1) + '\n' +
++                sourceExcerpt.substring(i + 1);
++            continue;
++          } else {
++            // Otherwise we'll add some space to represent the character.
++            c = ' ';
++          }
++          b.append(c);
+         }
+         b.append("^\n");
+       }
+     }
+     return b.toString();
+   }

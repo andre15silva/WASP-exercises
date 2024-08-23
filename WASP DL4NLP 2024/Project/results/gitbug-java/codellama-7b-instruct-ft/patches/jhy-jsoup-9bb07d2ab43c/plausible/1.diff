@@ -1,0 +1,22 @@
+diff --git a/tmp/b30d12a0-6c16-4254-a7f3-8bf6d43db97b_buggy.java b/tmp/1674bad2-cf7a-4193-89fd-7e88ba7ccc3f_fixed.java
+index dcc36a4..3b28bb3 100644
+--- a/tmp/b30d12a0-6c16-4254-a7f3-8bf6d43db97b_buggy.java
++++ b/tmp/1674bad2-cf7a-4193-89fd-7e88ba7ccc3f_fixed.java
+@@ -1,12 +1,17 @@
+     protected void replaceChild(Node out, Node in) {
+         Validate.isTrue(out.parentNode == this);
+         Validate.notNull(in);
+         if (in.parentNode != null)
+             in.parentNode.removeChild(in);
+ 
+         final int index = out.siblingIndex;
+         ensureChildNodes().set(index, in);
+         in.parentNode = this;
+         in.setSiblingIndex(index);
+         out.parentNode = null;
++        try {
++            out.replaceWith(out);
++        } catch (IndexOutOfBoundsException e) {
++            // safeguard if you are replacing a node with with itself
++        }
+     }

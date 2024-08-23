@@ -1,0 +1,13 @@
+diff --git a/tmp/ad756e0d-f5a1-4e51-a40a-293a620bc1c0_buggy.java b/tmp/fe238846-3580-4b57-bd20-03911fc1ed8f_fixed.java
+index a68ccd7..408b85e 100644
+--- a/tmp/ad756e0d-f5a1-4e51-a40a-293a620bc1c0_buggy.java
++++ b/tmp/fe238846-3580-4b57-bd20-03911fc1ed8f_fixed.java
+@@ -1,7 +1,7 @@
+     /**
+      Get the attribute value.
+      @return the attribute value
+      */
+     public String getValue() {
+-        return val;
++        return (attr == null || attr.getValue() == null) ? "" : val;
+     }

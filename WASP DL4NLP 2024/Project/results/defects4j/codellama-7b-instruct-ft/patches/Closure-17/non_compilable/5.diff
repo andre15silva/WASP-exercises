@@ -1,0 +1,113 @@
+diff --git a/tmp/b0d86795-443a-4bd9-ad99-13bb75d291b1_buggy.java b/tmp/5067152e-1512-4bdd-ac3f-76e9ac0cd4d9_fixed.java
+index eb9ce9f..df98848 100644
+--- a/tmp/b0d86795-443a-4bd9-ad99-13bb75d291b1_buggy.java
++++ b/tmp/5067152e-1512-4bdd-ac3f-76e9ac0cd4d9_fixed.java
+@@ -1,60 +1,99 @@
+     /**
+      * Look for a type declaration on a property assignment
+      * (in an ASSIGN or an object literal key).
+      *
+      * @param info The doc info for this property.
+      * @param lValue The l-value node.
+      * @param rValue The node that {@code n} is being initialized to,
+      *     or {@code null} if this is a stub declaration.
+      */
+     private JSType getDeclaredType(String sourceName, JSDocInfo info,
+         Node lValue, @Nullable Node rValue) {
+       if (info != null && info.hasType()) {
+         return getDeclaredTypeInAnnotation(sourceName, lValue, info);
+       } else if (rValue != null && rValue.isFunction() &&
+           shouldUseFunctionLiteralType(
+               JSType.toMaybeFunctionType(rValue.getJSType()), info, lValue)) {
+         return rValue.getJSType();
+-      } else if (info != null) {
+-        if (info.hasEnumParameterType()) {
+-          if (rValue != null && rValue.isObjectLit()) {
++      } else if (info != null &&
++          (info.isConstant() || // For @const declarations, the l-value can contain
++              // the object literal that is its default value. In that case,
++              // info.type will be null and the type of the l-value must be
++              // computed on-the-fly.
++              info.hasEnumParameterType() || // For enum declarations, the l-value
++              // can be the value of the object literal that sets the enum.
++              info.isInterface() ||
++              (info.isConstructor() &&
++                   (rValue == null ||
++                    (rValue != null && rValue.isQualifiedName() &&
++                        rValue.getJSType().isEnumType()))))) {
++        // TODO(nicksantos): This is a hack.
++        // We really want the context to know that {@code const x = {};} is for
++        // setting the default value of a constant x (which isn't
++        // yet a declared type), and we want to use the type of that
++        // default value.
++        //
++        // So we're doing duck typing as a partial hack. Here are some known
++        // use cases to be wary of:
++        //   - Issue 688: When defining constants that hold an obj-literal value,
++        //     then "var {default: TYPE} = {default: {}};"
++        //     will fail a "inconsistent return type".
++        //     We need more context to resolve this case.
++        JSType knownType = null;
++        if (rValue != null) {
++          if (rValue.getJSType() != null && !rValue.getJSType().isUnknownType()) {
++            // If rValue has a type-cast, we use the type in the type-cast.
++            // If rValue's type was already computed during scope creation,
++            // then we can safely use that.
+             return rValue.getJSType();
+-          } else {
+-            return createEnumTypeFromNodes(
+-                rValue, lValue.getQualifiedName(), info, lValue);
++          } else if (rValue.isOr()) {
++            // Check for a very specific JS idiom:
++            // var x = x || TYPE;
++            // This is used by Closure's base namespace for esoteric
++            // reasons.
++            Node firstClause = rValue.getFirstChild();
++            Node secondClause = firstClause.getNext();
++            boolean namesMatch = firstClause.isName()
++                && lValue.isName()
++                && firstClause.getString().equals(lValue.getString());
++            if (namesMatch && secondClause.getJSType() != null
++                && !secondClause.getJSType().isUnknownType()) {
++              return secondClause.getJSType();
+             }
+-        } else if (info.isConstructor() || info.isInterface()) {
+-          return createFunctionTypeFromNodes(
+-              rValue, lValue.getQualifiedName(), info, lValue);
++          }
++        }
++          return createObjectType(
++              rValue, ObjectType.make(rValue.getQualifiedName()));
+       } else {
+         // Check if this is constant, and if it has a known type.
++        if (info != null) {
+           if (info.isConstant()) {
+             JSType knownType = null;
+             if (rValue != null) {
+               if (rValue.getJSType() != null && !rValue.getJSType().isUnknownType()) {
+                 // If rValue has a type-cast, we use the type in the type-cast.
+                 // If rValue's type was already computed during scope creation,
+                 // then we can safely use that.
+                 return rValue.getJSType();
+               } else if (rValue.isOr()) {
+                 // Check for a very specific JS idiom:
+                 // var x = x || TYPE;
+                 // This is used by Closure's base namespace for esoteric
+                 // reasons.
+                 Node firstClause = rValue.getFirstChild();
+                 Node secondClause = firstClause.getNext();
+                 boolean namesMatch = firstClause.isName()
+                     && lValue.isName()
+                     && firstClause.getString().equals(lValue.getString());
+                 if (namesMatch && secondClause.getJSType() != null
+                     && !secondClause.getJSType().isUnknownType()) {
+                   return secondClause.getJSType();
+                 }
+               }
+             }
+           }
+         }
+       }
+ 
+       return getDeclaredTypeInAnnotation(sourceName, lValue, info);
+     }

@@ -1,0 +1,60 @@
+diff --git a/tmp/3cba0a6a-7922-428a-a1f3-821836391136_buggy.java b/tmp/1e906b65-eee7-4ff5-875c-11c1e37ed004_fixed.java
+index 8ff679b..0d1e294 100644
+--- a/tmp/3cba0a6a-7922-428a-a1f3-821836391136_buggy.java
++++ b/tmp/1e906b65-eee7-4ff5-875c-11c1e37ed004_fixed.java
+@@ -1,39 +1,42 @@
+-  /**
+-   * Check whether there's any property conflict for for a particular super
+-   * interface
+-   * @param t The node traversal object that supplies context
+-   * @param n The node being visited
+-   * @param functionName The function name being checked
+-   * @param properties The property names in the super interfaces that have
+-   * been visited
+-   * @param currentProperties The property names in the super interface
+-   * that have been visited
+-   * @param interfaceType The super interface that is being visited
+-   */
+   private void checkInterfaceConflictProperties(NodeTraversal t, Node n,
+       String functionName, HashMap<String, ObjectType> properties,
+       HashMap<String, ObjectType> currentProperties,
+       ObjectType interfaceType) {
++    if (interfaceType == null) {
++      // handle the case where interfaceType is null
++      // by skipping the rest of the function and returning immediately
++      return;
++    }
++
+     ObjectType implicitProto = interfaceType.getImplicitPrototype();
+     Set<String> currentPropertyNames;
++    try {
+       // This can be the case if interfaceType is proxy to a non-existent
+       // object (which is a bad type annotation, but shouldn't crash).
+       currentPropertyNames = implicitProto.getOwnPropertyNames();
++    } catch (NullPointerException e) {
++      // This should not happen, but it's better to handle the exception
++      // just in case.
++      // If the exception is thrown, skip the rest of the function
++      // and return immediately.
++      return;
++    }
++
+     for (String name : currentPropertyNames) {
+       ObjectType oType = properties.get(name);
+       if (oType != null) {
+         if (!interfaceType.getPropertyType(name).isEquivalentTo(
+             oType.getPropertyType(name))) {
+           compiler.report(
+               t.makeError(n, INCOMPATIBLE_EXTENDED_PROPERTY_TYPE,
+                   functionName, name, oType.toString(),
+                   interfaceType.toString()));
+         }
+       }
+       currentProperties.put(name, interfaceType);
+     }
+     for (ObjectType iType : interfaceType.getCtorExtendedInterfaces()) {
+       checkInterfaceConflictProperties(t, n, functionName, properties,
+           currentProperties, iType);
+     }
+   }
+\ No newline at end of file

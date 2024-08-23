@@ -1,0 +1,42 @@
+diff --git a/tmp/f7a67807-aaf5-4c4c-b868-d7183a77e285_buggy.java b/tmp/ac9033c1-672a-41c3-a81f-79caf27a5e19_fixed.java
+index 546f262..fea6912 100644
+--- a/tmp/f7a67807-aaf5-4c4c-b868-d7183a77e285_buggy.java
++++ b/tmp/ac9033c1-672a-41c3-a81f-79caf27a5e19_fixed.java
+@@ -1,29 +1,21 @@
+-    /**
+-     * <p>Throws a {@link MissingOptionException} if all of the
+-     * required options are no present.</p>
+-     *
+-     * @throws MissingOptionException if any of the required Options
+-     * are not present.
+-     */
+     protected void checkRequiredOptions()
+         throws MissingOptionException
+     {
+-        // if there are required options that have not been
+-        // processsed
+         if (getRequiredOptions().size() > 0)
+         {
+             Iterator iter = getRequiredOptions().iterator();
+-            StringBuffer buff = new StringBuffer("Missing required option");
+-            buff.append(getRequiredOptions().size() == 1 ? "" : "s");
++            StringBuffer buff = new StringBuffer("Missing required options");
+             buff.append(": ");
+-
+-
+-            // loop through the required options
++            boolean isCommaAdded = false;
+             while (iter.hasNext())
+             {
++                if (isCommaAdded)
++                {
++                    buff.append(", ");
++                }
+                 buff.append(iter.next());
++                isCommaAdded = true;
+             }
+-
+             throw new MissingOptionException(buff.toString());
+         }
+     }
+\ No newline at end of file

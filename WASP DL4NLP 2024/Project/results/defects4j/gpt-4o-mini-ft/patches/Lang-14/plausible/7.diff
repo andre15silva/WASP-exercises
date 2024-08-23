@@ -1,0 +1,38 @@
+diff --git a/tmp/6575aca3-015c-4001-ab9a-e4ca8e8e449c_buggy.java b/tmp/8c3d5b57-8479-480a-acbd-719f872a12d0_fixed.java
+index c18eb8b..9b39a28 100644
+--- a/tmp/6575aca3-015c-4001-ab9a-e4ca8e8e449c_buggy.java
++++ b/tmp/8c3d5b57-8479-480a-acbd-719f872a12d0_fixed.java
+@@ -1,30 +1,32 @@
+     /**
+      * <p>Compares two CharSequences, returning {@code true} if they represent
+      * equal sequences of characters.</p>
+      *
+      * <p>{@code null}s are handled without exceptions. Two {@code null}
+      * references are considered to be equal. The comparison is case sensitive.</p>
+      *
+      * <pre>
+      * StringUtils.equals(null, null)   = true
+      * StringUtils.equals(null, "abc")  = false
+      * StringUtils.equals("abc", null)  = false
+      * StringUtils.equals("abc", "abc") = true
+      * StringUtils.equals("abc", "ABC") = false
+      * </pre>
+      *
+      * @see java.lang.CharSequence#equals(Object)
+      * @param cs1  the first CharSequence, may be {@code null}
+      * @param cs2  the second CharSequence, may be {@code null}
+      * @return {@code true} if the CharSequences are equal (case-sensitive), or both {@code null}
+      * @since 3.0 Changed signature from equals(String, String) to equals(CharSequence, CharSequence)
+      */
+     public static boolean equals(CharSequence cs1, CharSequence cs2) {
+         if (cs1 == cs2) {
+             return true;
+         }
+         if (cs1 == null || cs2 == null) {
+             return false;
+         }
+-            return cs1.equals(cs2);
++        String s1 = cs1.toString();
++        String s2 = cs2.toString();
++        return s1.equals(s2);
+     }

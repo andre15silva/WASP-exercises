@@ -1,0 +1,33 @@
+diff --git a/tmp/63eb6113-5591-4850-9a4f-d1c53a371cc5_buggy.java b/tmp/b7b958a0-eece-4703-9afb-3165998a0dcb_fixed.java
+index 0b7c52e..d73a2c1 100644
+--- a/tmp/63eb6113-5591-4850-9a4f-d1c53a371cc5_buggy.java
++++ b/tmp/b7b958a0-eece-4703-9afb-3165998a0dcb_fixed.java
+@@ -1,27 +1,18 @@
+-    /**
+-     * Processes a OBJECTLIT node.
+-     */
+     private void handleObjectLit(NodeTraversal t, Node n) {
+       for (Node child = n.getFirstChild();
+           child != null;
+           child = child.getNext()) {
+-        // Maybe STRING, GET, SET
+-
+-        // We should never see a mix of numbers and strings.
+         String name = child.getString();
+         T type = typeSystem.getType(getScope(), n, name);
+-
+         Property prop = getProperty(name);
+         if (!prop.scheduleRenaming(child,
+                                    processProperty(t, prop, type, null))) {
+-          // TODO(user): It doesn't look like the user can do much in this
+-          // case right now.
+           if (propertiesToErrorFor.containsKey(name)) {
+             compiler.report(JSError.make(
+                 t.getSourceName(), child, propertiesToErrorFor.get(name),
+                 Warnings.INVALIDATION, name,
+                 (type == null ? "null" : type.toString()), n.toString(), ""));
+           }
+         }
+       }
+     }
+\ No newline at end of file

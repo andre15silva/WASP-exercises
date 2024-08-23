@@ -1,0 +1,18 @@
+diff --git a/tmp/c0575f8a-3fc8-4f9f-bfbf-766dbe93f5ff_buggy.java b/tmp/3a97ccaf-91ca-4487-9b17-2c05237aeb6c_fixed.java
+index 7be2eb0..50cdbbc 100644
+--- a/tmp/c0575f8a-3fc8-4f9f-bfbf-766dbe93f5ff_buggy.java
++++ b/tmp/3a97ccaf-91ca-4487-9b17-2c05237aeb6c_fixed.java
+@@ -1,11 +1,2 @@
+-  @Override
+-  public boolean equals(Object object) {
+-    if (!(object instanceof KeyPair)) {
+-      return false;
+-    }
+ 
+-    KeyPair other = (KeyPair) object;
+-    return this.mPrivateKey.equals(other.mPrivateKey) &&
+-            this.mPublicKey.equals(other.mPublicKey);
+-
+-  }
++This is the buggy function from the code sample:
+\ No newline at end of file

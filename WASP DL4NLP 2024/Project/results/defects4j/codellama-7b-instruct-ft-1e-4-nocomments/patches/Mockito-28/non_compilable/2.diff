@@ -1,0 +1,20 @@
+diff --git a/tmp/b74d95f5-0601-4457-8b66-b313256efe7f_buggy.java b/tmp/47539b42-60ff-436e-9f42-718b4a7f768f_fixed.java
+index fa6828a..3f8acfb 100644
+--- a/tmp/b74d95f5-0601-4457-8b66-b313256efe7f_buggy.java
++++ b/tmp/47539b42-60ff-436e-9f42-718b4a7f768f_fixed.java
+@@ -1,5 +1,13 @@
+     private void injectMockCandidate(Class<?> awaitingInjectionClazz, Set<Object> mocks, Object fieldInstance) {
+         for(Field field : orderedInstanceFieldsFrom(awaitingInjectionClazz)) {
+-            mockCandidateFilter.filterCandidate(mocks, field, fieldInstance).thenInject();
++            Optional<Object> bestMatchingMock = mockCandidateFilter.filterCandidate(mocks, field, fieldInstance);
++            if(bestMatchingMock.isPresent()) {
++                field.setAccessible(true);
++                try {
++                    field.set(fieldInstance, bestMatchingMock.get());
++                } catch (IllegalAccessException e) {
++                    throw new MockExaminationException(new RuntimeException(e), "Failed to assign mock", field.getType());
++                }
++            }
+         }
+     }
+\ No newline at end of file

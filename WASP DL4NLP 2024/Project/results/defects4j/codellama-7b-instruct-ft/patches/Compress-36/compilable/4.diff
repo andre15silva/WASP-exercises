@@ -1,0 +1,25 @@
+diff --git a/tmp/ba77be4e-86e3-45d5-beb5-5ed3f5dbb140_buggy.java b/tmp/3c4785e7-792c-48f1-a3b5-1e94935ee1bb_fixed.java
+index d357c7e..99588e9 100644
+--- a/tmp/ba77be4e-86e3-45d5-beb5-5ed3f5dbb140_buggy.java
++++ b/tmp/3c4785e7-792c-48f1-a3b5-1e94935ee1bb_fixed.java
+@@ -1,16 +1,18 @@
+     private InputStream getCurrentStream() throws IOException {
+         if (deferredBlockStreams.isEmpty()) {
+-            throw new IllegalStateException("No current 7z entry (call getNextEntry() first).");
++            throw new IllegalStateException("No current 7z entry. This is likely a bug (COMPRESS-348). Call getNextEntry() first or use getNextEntry() and peekNextEntry() judiciously.");
+         }
+         
+         while (deferredBlockStreams.size() > 1) {
+             // In solid compression mode we need to decompress all leading folder'
+             // streams to get access to an entry. We defer this until really needed
+             // so that entire blocks can be skipped without wasting time for decompression.
++            // COMPRESS-348: Do not close the stream so that we can test its next entry.
+             final InputStream stream = deferredBlockStreams.remove(0);
+             IOUtils.skip(stream, Long.MAX_VALUE);
+-            stream.close();
++            // COMPRESS-348: Do not close the stream so that we can test its next entry.
++            // stream.close();
+         }
+ 
+         return deferredBlockStreams.get(0);
+     }

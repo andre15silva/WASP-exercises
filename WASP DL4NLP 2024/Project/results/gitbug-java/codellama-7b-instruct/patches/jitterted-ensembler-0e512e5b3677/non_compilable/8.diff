@@ -1,0 +1,20 @@
+diff --git a/tmp/e7402d4b-45df-4c5b-95ca-ab8d38b04e55_buggy.java b/tmp/5794e0b7-8069-42af-9d04-88c2c3277ede_fixed.java
+index d630b0e..5bd994a 100644
+--- a/tmp/e7402d4b-45df-4c5b-95ca-ab8d38b04e55_buggy.java
++++ b/tmp/5794e0b7-8069-42af-9d04-88c2c3277ede_fixed.java
+@@ -1,14 +1,12 @@
+-    public static EnsembleSummaryView toView(Ensemble ensemble, MemberId memberId, MemberService memberService) {
+     List<MemberView> participantViews = transform(memberService, ensemble.acceptedMembers());
+     return new EnsembleSummaryView(ensemble.getId().id(),
+                                    ensemble.name(),
+                                    DateTimeFormatting.formatAsDateTimeForCommonIso8601(ensemble.startDateTime()),
+                                    ensemble.acceptedCount(),
+                                    participantViews,
+                                    participantViews,
+                                    memberStatusToViewString(ensemble, memberId),
+                                    ensemble.meetingLink().toString(),
+                                    new GoogleCalendarLinkCreator().createFor(ensemble),
+                                    ensemble.recordingLink().toString()
+     );
+\ No newline at end of file
+-    }

@@ -1,0 +1,56 @@
+diff --git a/tmp/283a977c-d21b-47ca-965b-d0a2e58fe82f_buggy.java b/tmp/d6570d68-b0d2-47f0-a1a6-8c04f483dd71_fixed.java
+index 800e6e1..f7c2fd2 100644
+--- a/tmp/283a977c-d21b-47ca-965b-d0a2e58fe82f_buggy.java
++++ b/tmp/d6570d68-b0d2-47f0-a1a6-8c04f483dd71_fixed.java
+@@ -1,32 +1,51 @@
+     /**
+      * Visit a node in a local scope, and add any local variables or catch
+      * parameters into the local symbol table.
+      *
+      * @param t The node traversal.
+      * @param n The node being visited.
+      * @param parent The parent of n
+      */
+     @Override public void visit(NodeTraversal t, Node n, Node parent) {
+       if (n == scope.getRootNode()) return;
+ 
+       if (n.getType() == Token.LP && parent == scope.getRootNode()) {
+         handleFunctionInputs(parent);
+         return;
+       }
+ 
+       attachLiteralTypes(n);
+       switch (n.getType()) {
+         case Token.FUNCTION:
+           if (parent.getType() == Token.NAME) {
+             return;
+           }
+           defineDeclaredFunction(n, parent);
+           break;
+         case Token.CATCH:
+           defineCatch(n, parent);
+           break;
+         case Token.VAR:
+           defineVar(n, parent);
+           break;
++        case Token.NAME:
++          if (n.getString().indexOf('.') < 0) {
++            break;
++          }
++          Node namespace = n.getParent();
++          if (namespace.getType() != Token.VAR) {
++            break;
++          }
++          Node var = namespace.getFirstChild();
++          while (var != null) {
++            if (var.getString().indexOf('.') < 0) {
++              break;
++            }
++            var = var.getNext();
++          }
++          if (var != null) {
++            return;
++          }
++          break;
+       }
+     }

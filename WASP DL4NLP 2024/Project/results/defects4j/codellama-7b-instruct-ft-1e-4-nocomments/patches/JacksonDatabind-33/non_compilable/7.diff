@@ -1,0 +1,39 @@
+diff --git a/tmp/16d3c8c3-5853-4e52-b87a-fb9f4607eedb_buggy.java b/tmp/815450b0-da62-434b-80af-227ce26d61ce_fixed.java
+index 3cb9232..5d0fd6c 100644
+--- a/tmp/16d3c8c3-5853-4e52-b87a-fb9f4607eedb_buggy.java
++++ b/tmp/815450b0-da62-434b-80af-227ce26d61ce_fixed.java
+@@ -1,26 +1,28 @@
+     @Override
+     public PropertyName findNameForSerialization(Annotated a)
+     {
+         String name = null;
+-
+         JsonGetter jg = _findAnnotation(a, JsonGetter.class);
+         if (jg != null) {
+             name = jg.value();
+         } else {
+             JsonProperty pann = _findAnnotation(a, JsonProperty.class);
+             if (pann != null) {
+                 name = pann.value();
+-                /* 22-Apr-2014, tatu: Should figure out a better way to do this, but
+-                 *   it's actually bit tricky to do it more efficiently (meta-annotations
+-                 *   add more lookups; AnnotationMap costs etc)
+-                 */
+             } else if (_hasAnnotation(a, JsonSerialize.class)
+                     || _hasAnnotation(a, JsonView.class)
+                     || _hasAnnotation(a, JsonRawValue.class)) {
+                 name = "";
++            } else if (a.hasAnnotation(JsonUnwrapped.class)) {
++                name = a.getName();
++            } else if ((a.getAnnotated() instanceof AnnotatedMethod)
++                    && (((AnnotatedMethod) a.getAnnotated())
++                            .getRawMember().getDeclaringClass()
++                    == a.getRawType())) {
++                name = a.getName();
+             } else {
+                 return null;
+             }
+         }
+         return PropertyName.construct(name);
+     }
+\ No newline at end of file

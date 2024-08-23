@@ -1,0 +1,17 @@
+diff --git a/tmp/db65bcbc-12b8-4947-a00a-56e507168dd5_buggy.java b/tmp/d9021713-9dbb-4462-8a82-3943f58c75e7_fixed.java
+index 6f49dcb..a092745 100644
+--- a/tmp/db65bcbc-12b8-4947-a00a-56e507168dd5_buggy.java
++++ b/tmp/d9021713-9dbb-4462-8a82-3943f58c75e7_fixed.java
+@@ -1,9 +1,2 @@
+-    @Override
+-    public StringBuilder getGenericSignature(StringBuilder sb)
+-    {
+-        _classSignature(_class, sb, false);
+-        sb.append('<');
+-        sb = _referencedType.getGenericSignature(sb);
+-        sb.append(';');
+-        return sb;
+-    }
++
++Here is a possible fix for the code:
+\ No newline at end of file

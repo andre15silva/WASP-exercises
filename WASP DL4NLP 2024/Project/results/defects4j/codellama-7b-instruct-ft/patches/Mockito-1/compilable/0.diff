@@ -1,0 +1,40 @@
+diff --git a/tmp/29ffd2f0-d474-4edf-bf5b-8c05d585b1b0_buggy.java b/tmp/d220444b-d05b-4e0e-ac48-42affa785867_fixed.java
+index 1c875ad..77ea2e9 100644
+--- a/tmp/29ffd2f0-d474-4edf-bf5b-8c05d585b1b0_buggy.java
++++ b/tmp/d220444b-d05b-4e0e-ac48-42affa785867_fixed.java
+@@ -1,31 +1,35 @@
+     public void captureArgumentsFrom(Invocation invocation) {
+         if (invocation.getMethod().isVarArgs()) {
+             int indexOfVararg = invocation.getRawArguments().length - 1;
+             throw new UnsupportedOperationException();
+ 
+         } else {
+             for (int position = 0; position < matchers.size(); position++) {
+                 Matcher m = matchers.get(position);
+                 if (m instanceof CapturesArguments) {
++                    try {
+                         ((CapturesArguments) m).captureFrom(invocation.getArgumentAt(position, Object.class));
++                    } catch (Exception e) {
++                        //do nothing don't care about this matcher at this point.
++                    }
+                 }
+             }
+         }
+ 
+ //        for (int position = 0; position < matchers.size(); position++) {
+ //            Matcher m = matchers.get(position);
+ //            if (m instanceof CapturesArguments && invocation.getRawArguments().length > position) {
+ //                //TODO SF - this whole lot can be moved captureFrom implementation
+ //                if(isVariableArgument(invocation, position) && isVarargMatcher(m)) {
+ //                    Object array = invocation.getRawArguments()[position];
+ //                    for (int i = 0; i < Array.getLength(array); i++) {
+ //                        ((CapturesArguments) m).captureFrom(Array.get(array, i));
+ //                    }
+ //                    //since we've captured all varargs already, it does not make sense to process other matchers.
+ //                    return;
+ //                } else {
+ //                    ((CapturesArguments) m).captureFrom(invocation.getRawArguments()[position]);
+ //                }
+ //            }
+ //        }
+     }

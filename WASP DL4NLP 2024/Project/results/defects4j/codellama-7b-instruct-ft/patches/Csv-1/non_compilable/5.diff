@@ -1,0 +1,16 @@
+diff --git a/tmp/c8cd4fb8-52cb-45ce-b9fa-7166131dfb5b_buggy.java b/tmp/0099dc55-7f93-4e04-a48c-c2297b4a507d_fixed.java
+index 3ba614a..09c9b03 100644
+--- a/tmp/c8cd4fb8-52cb-45ce-b9fa-7166131dfb5b_buggy.java
++++ b/tmp/0099dc55-7f93-4e04-a48c-c2297b4a507d_fixed.java
+@@ -1,9 +1,11 @@
+     @Override
+     public int read() throws IOException {
+         int current = super.read();
+         if (current == '\n') {
++            if (in != null && in.getLineSeparator() == '\r') {
+                 lineCounter++;
+             }
++        }
+         lastChar = current;
+         return lastChar;
+     }

@@ -1,0 +1,40 @@
+diff --git a/tmp/1fc080be-63bc-4163-acd6-16e45e3776bb_buggy.java b/tmp/084d1578-795f-4f0c-a461-add9ead3d2c2_fixed.java
+index bcd80aa..3606b37 100644
+--- a/tmp/1fc080be-63bc-4163-acd6-16e45e3776bb_buggy.java
++++ b/tmp/084d1578-795f-4f0c-a461-add9ead3d2c2_fixed.java
+@@ -1,25 +1,31 @@
+         void processResponseHeaders(Map<String, List<String>> resHeaders) {
+             for (Map.Entry<String, List<String>> entry : resHeaders.entrySet()) {
+                 String name = entry.getKey();
+                 if (name == null)
+                     continue; // http/1.1 line
+ 
+                 List<String> values = entry.getValue();
+                 if (name.equalsIgnoreCase("Set-Cookie")) {
+                     for (String value : values) {
+                         if (value == null)
+                             continue;
+                         TokenQueue cd = new TokenQueue(value);
+                         String cookieName = cd.chompTo("=").trim();
+                         String cookieVal = cd.consumeTo(";").trim();
+                         // ignores path, date, domain, validateTLSCertificates et al. req'd?
+                         // name not blank, value not null
+                         if (cookieName.length() > 0)
+                             cookie(cookieName, cookieVal);
+                     }
+-                } else { // combine same header names with comma: http://www.w3.org/Protocols/rfc2616/rfc2616-sec4.html#sec4.2
+-                    if (!values.isEmpty())
+-                        header(name, values.get(0));
++                } else {
++                    String headerValue = "";
++                    for (String value : values) {
++                        if (value != null && value.length() > 0) {
++                            headerValue += value + ", ";
++                        }
++                    }
++                    headerValue = headerValue.replaceAll(", $", "");
++                    header(name, headerValue);
+                 }
+             }
+         }
+\ No newline at end of file

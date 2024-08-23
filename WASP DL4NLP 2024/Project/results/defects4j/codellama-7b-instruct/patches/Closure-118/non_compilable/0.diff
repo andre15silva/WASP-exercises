@@ -1,0 +1,40 @@
+diff --git a/tmp/9a155bde-4770-4f3b-8d37-6322059d1bd0_buggy.java b/tmp/72f43a16-9fb7-4e4f-8bfd-f4d4d3b3113f_fixed.java
+index 0b7c52e..de83f0f 100644
+--- a/tmp/9a155bde-4770-4f3b-8d37-6322059d1bd0_buggy.java
++++ b/tmp/72f43a16-9fb7-4e4f-8bfd-f4d4d3b3113f_fixed.java
+@@ -1,27 +1,35 @@
+     /**
+      * Processes a OBJECTLIT node.
+      */
+     private void handleObjectLit(NodeTraversal t, Node n) {
+       for (Node child = n.getFirstChild();
+           child != null;
+           child = child.getNext()) {
+         // Maybe STRING, GET, SET
+ 
+         // We should never see a mix of numbers and strings.
+         String name = child.getString();
+         T type = typeSystem.getType(getScope(), n, name);
+ 
++        // Added the check for node type
++        if (child.isString() {
++          String name = child.getString();
++          T type = typeSystem.getType(getScope(), n, name);
+           Property prop = getProperty(name);
+           if (!prop.scheduleRenaming(child,
+                                      processProperty(t, prop, type, null))) {
+             // TODO(user): It doesn't look like the user can do much in this
+             // case right now.
+             if (propertiesToErrorFor.containsKey(name)) {
+               compiler.report(JSError.make(
+                   t.getSourceName(), child, propertiesToErrorFor.get(name),
+                   Warnings.INVALIDATION, name,
+                   (type == null ? "null" : type.toString()), n.toString(), ""));
+             }
+           }
++        } else {
++          // Return an empty string if the node is not a string node
++          return "";
++        }
+       }
+     }

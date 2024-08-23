@@ -1,0 +1,62 @@
+diff --git a/tmp/42a80d77-cfe2-40f9-b41f-f5250e33e347_buggy.java b/tmp/f0b88fd8-bc35-48e4-8558-5fc773d4e558_fixed.java
+index d666a67..d91247b 100644
+--- a/tmp/42a80d77-cfe2-40f9-b41f-f5250e33e347_buggy.java
++++ b/tmp/f0b88fd8-bc35-48e4-8558-5fc773d4e558_fixed.java
+@@ -1,36 +1,57 @@
++private static final int maxStringCacheLen = 50;
++    private static final String[] stringCache;
++
++    static {
++        stringCache = new String[maxStringCacheLen];
++    }
++
++
++    private static boolean rangeEquals(final char[] charBuf, final int start, final int count, final String str) {
++        if (str.length() != count)
++            return false;
++
++        final char[] chars = str.toCharArray();
++
++        for (int i = 0; i < count; i++) {
++            if (chars[i] != charBuf[start + i])
++                return false;
++        }
++        return true;
++    }
++
+     /**
+      * Caches short strings, as a flywheel pattern, to reduce GC load. Just for this doc, to prevent leaks.
+      * <p />
+      * Simplistic, and on hash collisions just falls back to creating a new string, vs a full HashMap with Entry list.
+      * That saves both having to create objects as hash keys, and running through the entry list, at the expense of
+      * some more duplicates.
+      */
+     private static String cacheString(final char[] charBuf, final String[] stringCache, final int start, final int count) {
+         // limit (no cache):
+         if (count > maxStringCacheLen)
+             return new String(charBuf, start, count);
+ 
+         // calculate hash:
+         int hash = 0;
+         int offset = start;
+         for (int i = 0; i < count; i++) {
+             hash = 31 * hash + charBuf[offset++];
+         }
+ 
+         // get from cache
+         final int index = hash & stringCache.length - 1;
+         String cached = stringCache[index];
+ 
+         if (cached == null) { // miss, add
+             cached = new String(charBuf, start, count);
+             stringCache[index] = cached;
+         } else { // hashcode hit, check equality
+             if (rangeEquals(charBuf, start, count, cached)) { // hit
+                 return cached;
+             } else { // hashcode conflict
+                 cached = new String(charBuf, start, count);
+                 stringCache[index] = cached; // update the cache, as recently used strings are more likely to show up again
+             }
+         }
+         return cached;
+     }

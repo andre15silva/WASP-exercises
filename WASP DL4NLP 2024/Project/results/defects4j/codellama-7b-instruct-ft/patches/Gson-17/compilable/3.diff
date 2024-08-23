@@ -1,0 +1,29 @@
+diff --git a/tmp/03355d52-4d8a-4fe8-8d9d-11e0fa51ea04_buggy.java b/tmp/6cbe8628-ad04-43a4-8734-1d03f986878c_fixed.java
+index 85f5680..435cea5 100644
+--- a/tmp/03355d52-4d8a-4fe8-8d9d-11e0fa51ea04_buggy.java
++++ b/tmp/6cbe8628-ad04-43a4-8734-1d03f986878c_fixed.java
+@@ -1,17 +1,21 @@
+   @Override
+   public Date read(JsonReader in) throws IOException {
+-    if (in.peek() != JsonToken.STRING) {
+-      throw new JsonParseException("The date should be a string value");
++    Date date = null;
++    if (in.peek() == JsonToken.STRING) {
++      date = deserializeToDate(in.nextString());
++    } else {
++      // The date is either null or a JSON object, so return null and
++      // the real object will be read from the other direction.
++      return null;
+     }
+-    Date date = deserializeToDate(in.nextString());
+     if (dateType == Date.class) {
+       return date;
+     } else if (dateType == Timestamp.class) {
+       return new Timestamp(date.getTime());
+     } else if (dateType == java.sql.Date.class) {
+       return new java.sql.Date(date.getTime());
+     } else {
+       // This must never happen: dateType is guarded in the primary constructor
+       throw new AssertionError();
+     }
+   }

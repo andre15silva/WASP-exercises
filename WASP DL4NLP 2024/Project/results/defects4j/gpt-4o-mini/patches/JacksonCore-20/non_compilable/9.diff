@@ -1,0 +1,25 @@
+diff --git a/tmp/c452e7cd-200a-4a1a-a5e2-452542cfc009_buggy.java b/tmp/32383f47-dacf-42b8-98de-26900775300e_fixed.java
+index a6f008f..74915e2 100644
+--- a/tmp/c452e7cd-200a-4a1a-a5e2-452542cfc009_buggy.java
++++ b/tmp/32383f47-dacf-42b8-98de-26900775300e_fixed.java
+@@ -1,11 +1,10 @@
+-    /**
+-     * Method that can be called on backends that support passing opaque datatypes of
+-     * non-JSON formats
+-     *
+-     * @since 2.8
+-     */
+ public void writeEmbeddedObject(Object object) throws IOException {
+-        // 01-Sep-2016, tatu: As per [core#318], handle small number of cases
+-        throw new JsonGenerationException("No native support for writing embedded objects",
+-                this);
++    if (object instanceof byte[]) {
++        // Convert byte array to Base64 encoded String
++        String encoded = Base64.getEncoder().encodeToString((byte[]) object);
++        // Write the Base64 string as an embedded object
++        writeString(encoded);
++    } else {
++        throw new JsonGenerationException("No native support for writing embedded objects", this);
++    }
+ }
+\ No newline at end of file

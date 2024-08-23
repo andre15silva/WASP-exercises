@@ -1,0 +1,19 @@
+diff --git a/tmp/c932eaaa-d134-41ca-a9d1-61b64d747ba6_buggy.java b/tmp/edef26c8-01a4-45cf-8cfa-f843bf3750d5_fixed.java
+index 42d4174..a3e9e18 100644
+--- a/tmp/c932eaaa-d134-41ca-a9d1-61b64d747ba6_buggy.java
++++ b/tmp/edef26c8-01a4-45cf-8cfa-f843bf3750d5_fixed.java
+@@ -1,7 +1,12 @@
+   /**
+    * Returns the remainder of the line.
+    */
+   private String getRemainingJSDocLine() {
++    try {
+       String result = stream.getRemainingJSDocLine();
+-    return result;
++      return result.trim(); // Ensure any leading or trailing whitespace is removed
++    } catch (IllegalStateException e) {
++      // Handle the exception appropriately, possibly logging or rethrowing with more context
++      throw new IllegalStateException("Failed to retrieve remaining JSDoc line", e);
++    }
+   }
+\ No newline at end of file

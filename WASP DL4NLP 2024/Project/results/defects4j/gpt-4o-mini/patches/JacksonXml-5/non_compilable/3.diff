@@ -1,0 +1,16 @@
+diff --git a/tmp/196eea0e-26bc-4fe5-b83e-a3f6bea06189_buggy.java b/tmp/32c872cb-8378-4d61-ba48-15ac623e2046_fixed.java
+index 1ed78d0..646f246 100644
+--- a/tmp/196eea0e-26bc-4fe5-b83e-a3f6bea06189_buggy.java
++++ b/tmp/32c872cb-8378-4d61-ba48-15ac623e2046_fixed.java
+@@ -1,9 +1,6 @@
+-    /**
+-     * @since 2.8.9
+-     */
+     protected XmlSerializerProvider(XmlSerializerProvider src) {
+         super(src);
+         // 21-May-2018, tatu: As per [dataformat-xml#282], should NOT really copy
+         //    root name lookup as that may link back to diff version, configuration
+-        _rootNameLookup = src._rootNameLookup;
++        _rootNameLookup = new RootNameLookup(); // Initialize new instance instead of copying
+     }
+\ No newline at end of file

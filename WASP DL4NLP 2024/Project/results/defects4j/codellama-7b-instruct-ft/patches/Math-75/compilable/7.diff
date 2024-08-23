@@ -1,0 +1,20 @@
+diff --git a/tmp/c83871a0-0c67-4977-a538-dd6aa09900b4_buggy.java b/tmp/563b23c4-9c57-4102-b956-2d3b1e6af663_fixed.java
+index 877a1a1..43c9fa1 100644
+--- a/tmp/c83871a0-0c67-4977-a538-dd6aa09900b4_buggy.java
++++ b/tmp/563b23c4-9c57-4102-b956-2d3b1e6af663_fixed.java
+@@ -1,14 +1,14 @@
+     /**
+       * Returns the percentage of values that are equal to v
+      * (as a proportion between 0 and 1).
+      * <p>
+      * Returns <code>Double.NaN</code> if no values have been added.</p>
+      *
+      * @param v the value to lookup
+      * @return the proportion of values equal to v
+-     * @deprecated replaced by {@link #getPct(Comparable)} as of 2.0
++     * @deprecated replaced by {@link #getCumPct(Comparable)} as of 2.0
+      */
+     @Deprecated
+     public double getPct(Object v) {
+         return getCumPct((Comparable<?>) v);
+     }

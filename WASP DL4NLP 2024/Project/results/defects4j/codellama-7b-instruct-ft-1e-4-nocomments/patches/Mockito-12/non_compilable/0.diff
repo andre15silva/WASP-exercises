@@ -1,0 +1,42 @@
+diff --git a/tmp/173d738e-85a7-4faf-beaf-a680745392a8_buggy.java b/tmp/defdafa4-1b44-4829-83cb-d04a11cc05bf_fixed.java
+index bada2b6..eb0ab4b 100644
+--- a/tmp/173d738e-85a7-4faf-beaf-a680745392a8_buggy.java
++++ b/tmp/defdafa4-1b44-4829-83cb-d04a11cc05bf_fixed.java
+@@ -1,16 +1,26 @@
+-    /**
+-     * Finds the generic type (parametrized type) of the field. If the field is not generic it returns Object.class. 
+-     * 
+-     * @param field
+-     * @return
+-     */
+     public Class getGenericType(Field field) {         
+         Type generic = field.getGenericType();
+-        if (generic != null && generic instanceof ParameterizedType) {
++        if (generic != null) {
++            if (generic instanceof ParameterizedType) {               
+                 Type actual = ((ParameterizedType) generic).getActualTypeArguments()[0];
+-                return (Class) actual;
+-                //in case of nested generics we don't go deep
++                return (Class<?>) actual;
++            } else if (generic instanceof TypeVariable) {
++                final TypeVariable var = (TypeVariable) generic;
++                if (var.getTypeName().contains(".")) {
++                    TypeVariable[] vars = (TypeVariable[])var.getGenericDeclaration().getTypeParameters();
++                        int index = -1;
++                        for (int i=0; i<vars.length; i++) {
++                            if (vars[i].getName().equals(var.getName())) {
++                                index=i;
++                                break;
++                            }
++                        }
++                        if (index == -1)
++                            throw new IllegalArgumentException("Type parameter not found");
++                        Type t = ((ParameterizedType) ((ParameterizedType)var.getGenericDeclaration()).getActualTypeArguments()[0]).getActualTypeArguments()[1];
++                        return (Class<?>) t;
++                }
++            }
+         }        
+-        
+         return Object.class;
+     }
+\ No newline at end of file

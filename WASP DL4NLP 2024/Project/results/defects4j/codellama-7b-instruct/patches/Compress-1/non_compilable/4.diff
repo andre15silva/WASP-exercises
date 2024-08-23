@@ -1,0 +1,26 @@
+diff --git a/tmp/ec10f9e1-553a-442e-b143-ae3872aa3b78_buggy.java b/tmp/a77d2c6b-def2-4c18-baa3-3ab53e2bb33c_fixed.java
+index c3986cc..a5a45e8 100644
+--- a/tmp/ec10f9e1-553a-442e-b143-ae3872aa3b78_buggy.java
++++ b/tmp/a77d2c6b-def2-4c18-baa3-3ab53e2bb33c_fixed.java
+@@ -1,13 +1,12 @@
+-    /**
+-     * Closes the CPIO output stream as well as the stream being filtered.
+-     * 
+-     * @throws IOException
+-     *             if an I/O error has occurred or if a CPIO file error has
+-     *             occurred
+-     */
+ public void close() throws IOException {
+-        if (!this.closed) {
++    try {
+         super.close();
+         this.closed = true;
++    } catch (IOException e) {
++        throw new IOException("Failed to close output stream", e);
++    } finally {
++        if (!closed && super.getOutputStream() != null) {
++            super.getOutputStream().close();
++        }
+     }
+ }
+\ No newline at end of file

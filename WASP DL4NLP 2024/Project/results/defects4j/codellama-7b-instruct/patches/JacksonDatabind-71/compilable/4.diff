@@ -1,0 +1,66 @@
+diff --git a/tmp/62bf8d4b-1bf5-4059-8a07-4dff46348032_buggy.java b/tmp/165125fb-f597-47a2-9fa2-6de3a5e35bf4_fixed.java
+index 7f7f1f8..7d5166a 100644
+--- a/tmp/62bf8d4b-1bf5-4059-8a07-4dff46348032_buggy.java
++++ b/tmp/165125fb-f597-47a2-9fa2-6de3a5e35bf4_fixed.java
+@@ -1,47 +1,33 @@
+     public static StdKeyDeserializer forType(Class<?> raw)
+     {
+-        int kind;
+-
+-        // first common types:
+-        if (raw == String.class || raw == Object.class) {
++        if (raw == CharSequence.class) {
+             return StringKD.forType(raw);
+         } else if (raw == UUID.class) {
+-            kind = TYPE_UUID;
+-        } else if (raw == Integer.class) {
+-            kind = TYPE_INT;
+-        } else if (raw == Long.class) {
+-            kind = TYPE_LONG;
+-        } else if (raw == Date.class) {
+-            kind = TYPE_DATE;
+-        } else if (raw == Calendar.class) {
+-            kind = TYPE_CALENDAR;
++            return new StdKeyDeserializer(TYPE_UUID, raw);
+         // then less common ones...
+         } else if (raw == Boolean.class) {
+-            kind = TYPE_BOOLEAN;
++            return new StdKeyDeserializer(TYPE_BOOLEAN, raw);
+         } else if (raw == Byte.class) {
+-            kind = TYPE_BYTE;
++            return new StdKeyDeserializer(TYPE_BYTE, raw);
+         } else if (raw == Character.class) {
+-            kind = TYPE_CHAR;
++            return new StdKeyDeserializer(TYPE_CHAR, raw);
+         } else if (raw == Short.class) {
+-            kind = TYPE_SHORT;
++            return new StdKeyDeserializer(TYPE_SHORT, raw);
+         } else if (raw == Float.class) {
+-            kind = TYPE_FLOAT;
++            return new StdKeyDeserializer(TYPE_FLOAT, raw);
+         } else if (raw == Double.class) {
+-            kind = TYPE_DOUBLE;
++            return new StdKeyDeserializer(TYPE_DOUBLE, raw);
+         } else if (raw == URI.class) {
+-            kind = TYPE_URI;
++            return new StdKeyDeserializer(TYPE_URI, raw);
+         } else if (raw == URL.class) {
+-            kind = TYPE_URL;
++            return new StdKeyDeserializer(TYPE_URL, raw);
+         } else if (raw == Class.class) {
+-            kind = TYPE_CLASS;
++            return new StdKeyDeserializer(TYPE_CLASS, raw);
+         } else if (raw == Locale.class) {
+-            FromStringDeserializer<?> deser = FromStringDeserializer.findDeserializer(Locale.class);
+-            return new StdKeyDeserializer(TYPE_LOCALE, raw, deser);
++            return new StdKeyDeserializer(TYPE_LOCALE, raw);
+         } else if (raw == Currency.class) {
+-            FromStringDeserializer<?> deser = FromStringDeserializer.findDeserializer(Currency.class);
+-            return new StdKeyDeserializer(TYPE_CURRENCY, raw, deser);
++            return new StdKeyDeserializer(TYPE_CURRENCY, raw);
+         } else {
+             return null;
+         }
+-        return new StdKeyDeserializer(kind, raw);
+     }
+\ No newline at end of file

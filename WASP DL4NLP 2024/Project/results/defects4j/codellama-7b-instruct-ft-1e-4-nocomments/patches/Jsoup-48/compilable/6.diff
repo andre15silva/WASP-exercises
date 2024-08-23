@@ -1,0 +1,37 @@
+diff --git a/tmp/cefffc67-e19d-41f6-a494-b2c8c0d63516_buggy.java b/tmp/62b134a5-b2d6-45f0-a927-22183dbc0c12_fixed.java
+index bcd80aa..53254e0 100644
+--- a/tmp/cefffc67-e19d-41f6-a494-b2c8c0d63516_buggy.java
++++ b/tmp/62b134a5-b2d6-45f0-a927-22183dbc0c12_fixed.java
+@@ -1,25 +1,24 @@
+         void processResponseHeaders(Map<String, List<String>> resHeaders) {
+             for (Map.Entry<String, List<String>> entry : resHeaders.entrySet()) {
+                 String name = entry.getKey();
+                 if (name == null)
+-                    continue; // http/1.1 line
+-
++                    continue; 
+                 List<String> values = entry.getValue();
+                 if (name.equalsIgnoreCase("Set-Cookie")) {
+                     for (String value : values) {
+                         if (value == null)
+                             continue;
+                         TokenQueue cd = new TokenQueue(value);
+                         String cookieName = cd.chompTo("=").trim();
+                         String cookieVal = cd.consumeTo(";").trim();
+-                        // ignores path, date, domain, validateTLSCertificates et al. req'd?
+-                        // name not blank, value not null
+                         if (cookieName.length() > 0)
+                             cookie(cookieName, cookieVal);
+                     }
+-                } else { // combine same header names with comma: http://www.w3.org/Protocols/rfc2616/rfc2616-sec4.html#sec4.2
+-                    if (!values.isEmpty())
+-                        header(name, values.get(0));
++                } else { 
++                    StringBuffer headerValue = new StringBuffer();
++                    for (String value : values)
++                        headerValue.append(value);
++                    header(name, headerValue.toString());
+                 }
+             }
+         }
+\ No newline at end of file

@@ -1,0 +1,14 @@
+diff --git a/tmp/e74728d4-1f4a-4512-82d2-4db20f16146d_buggy.java b/tmp/ce583da7-e85d-4bef-b4d2-75423ec885dc_fixed.java
+index 91b7957..276ed8a 100644
+--- a/tmp/e74728d4-1f4a-4512-82d2-4db20f16146d_buggy.java
++++ b/tmp/ce583da7-e85d-4bef-b4d2-75423ec885dc_fixed.java
+@@ -1,6 +1,9 @@
+         private void readTypeVariables() {
++            while(typeVariable != null) {
+                 for (Type type : typeVariable.getBounds()) {
+                     registerTypeVariablesOn(type);
+                 }
+                 registerTypeVariablesOn(getActualTypeArgumentFor(typeVariable));
++                typeVariable = typeVariable.getOwningType().getSuperclass().getTypeParameters().get(0);
++            }
+         }

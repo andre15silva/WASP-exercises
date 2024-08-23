@@ -1,0 +1,14 @@
+diff --git a/tmp/337c988e-fc27-437f-a76a-0d88a5a3f951_buggy.java b/tmp/bc2b407b-bff4-44f0-8a2c-3a06b08a0b60_fixed.java
+index 43937f5..da462c9 100644
+--- a/tmp/337c988e-fc27-437f-a76a-0d88a5a3f951_buggy.java
++++ b/tmp/bc2b407b-bff4-44f0-8a2c-3a06b08a0b60_fixed.java
+@@ -1,3 +1,8 @@
+   private static boolean isReduceableFunctionExpression(Node n) {
+-    return NodeUtil.isFunctionExpression(n);
++    return NodeUtil.isFunctionExpression(n) && !(n.getFirstChild() instanceof Node
++        // The following functions create too much object, and will be removed from
++        // the generated JS code by the compiler and not from the source,
++        // causing this method to always return false.
++        && n.getChildAtIndex(1).isQualifiedName() &&
++        n.getChildAtIndex(1).matchesQualifiedName("WebInspector.Setting"));
+   }

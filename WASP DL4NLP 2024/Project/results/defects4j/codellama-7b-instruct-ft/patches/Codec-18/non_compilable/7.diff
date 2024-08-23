@@ -1,0 +1,70 @@
+diff --git a/tmp/f2b01a49-32d7-4dff-8050-fe1e77a7a103_buggy.java b/tmp/a4214bb2-6746-4bec-b366-84fa7194498f_fixed.java
+index ae1bc64..d57322d 100644
+--- a/tmp/f2b01a49-32d7-4dff-8050-fe1e77a7a103_buggy.java
++++ b/tmp/a4214bb2-6746-4bec-b366-84fa7194498f_fixed.java
+@@ -1,42 +1,63 @@
+     /**
+      * <p>
+      * Compares two CharSequences, returning <code>true</code> if they represent equal sequences of characters.
+      * </p>
+      *
+      * <p>
+      * <code>null</code>s are handled without exceptions. Two <code>null</code> references are considered to be equal.
+      * The comparison is case sensitive.
+      * </p>
+      *
+      * <pre>
+      * StringUtils.equals(null, null)   = true
+      * StringUtils.equals(null, "abc")  = false
+      * StringUtils.equals("abc", null)  = false
+      * StringUtils.equals("abc", "abc") = true
+      * StringUtils.equals("abc", "ABC") = false
+      * </pre>
+      *
+      * <p>
+      * Copied from Apache Commons Lang r1583482 on April 10, 2014 (day of 3.3.2 release).
+      * </p>
+      *
+      * @see Object#equals(Object)
+      * @param cs1
+      *            the first CharSequence, may be <code>null</code>
+      * @param cs2
+      *            the second CharSequence, may be <code>null</code>
+      * @return <code>true</code> if the CharSequences are equal (case-sensitive), or both <code>null</code>
+      * @since 1.10
++     * @throws IllegalArgumentException
++     *             if either CharSequence is <code>null</code>, or if one of the CharSequences has a remaining character
++     *             after this equals operation
+      */
+     public static boolean equals(final CharSequence cs1, final CharSequence cs2) {
+         if (cs1 == cs2) {
+             return true;
+         }
+         if (cs1 == null || cs2 == null) {
+             return false;
+         }
+-        if (cs1 instanceof String && cs2 instanceof String) {
++        if (cs1 instanceof String) {
+             return cs1.equals(cs2);
+         }
+-        return CharSequenceUtils.regionMatches(cs1, false, 0, cs2, 0, Math.max(cs1.length(), cs2.length()));
++        if (cs2 instanceof String) {
++            return cs1.equals(cs2);
++        }
++        int length1 = cs1.length();
++        if (length1 != cs2.length()) {
++            return false;
++        }
++        // IndexOfString is faster; we know they're not null
++        int i = StringUtils.indexOfString(cs1, cs2, 0);
++        // Could check for index limits here (e.g. 2nd loop if too large), but that's an inexpensive check
++        while (i >= 0) {
++            if (i + length1 < cs1.length()) {
++                i++;
++                i += StringUtils.indexOfString(cs1, cs2, i);
++            } else {
++                return false;
++            }
++        }
++        return true;
+     }

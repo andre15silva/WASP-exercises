@@ -1,0 +1,33 @@
+diff --git a/tmp/b7c19e66-3f8a-46f2-b417-ed00bdf3c25b_buggy.java b/tmp/a6a8468e-6f6a-4994-8222-9b628d87cc86_fixed.java
+index dc93be3..6dc3e88 100644
+--- a/tmp/b7c19e66-3f8a-46f2-b417-ed00bdf3c25b_buggy.java
++++ b/tmp/a6a8468e-6f6a-4994-8222-9b628d87cc86_fixed.java
+@@ -1,14 +1,27 @@
+ Element insert(Token.StartTag startTag) {
+     // handle empty unknown tags
+     // when the spec expects an empty tag, will directly hit insertEmpty, so won't generate this fake end tag.
+     if (startTag.isSelfClosing()) {
+         Element el = insertEmpty(startTag);
+         stack.add(el);
++        // Emit end tag only if the tag is known and has to handle self-closing behavior.
++        if (isKnownEmptyTag(startTag.name())) {
+             tokeniser.emit(new Token.EndTag(el.tagName()));  // ensure we get out of whatever state we are in. emitted for yielded processing
++        }
+         return el;
+     }
+     
+     Element el = new Element(Tag.valueOf(startTag.name()), baseUri, startTag.attributes);
+     insert(el);
+     return el;
+ }
++
++private boolean isKnownEmptyTag(String tagName) {
++    return tagName.equals("area") || tagName.equals("base") || tagName.equals("br") || 
++           tagName.equals("col") || tagName.equals("embed") || tagName.equals("hr") || 
++           tagName.equals("img") || tagName.equals("input") || tagName.equals("keygen") || 
++           tagName.equals("link") || tagName.equals("meta") || tagName.equals("param") || 
++           tagName.equals("source") || tagName.equals("track") || tagName.equals("wbr") || 
++           tagName.equals("command") || tagName.equals("picture") || 
++           tagName.equals("source") || tagName.equals("map");
++}
+\ No newline at end of file

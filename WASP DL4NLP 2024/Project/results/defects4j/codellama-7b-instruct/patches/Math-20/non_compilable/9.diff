@@ -1,0 +1,19 @@
+diff --git a/tmp/3ca45572-51e1-43e6-a0af-eecd51eb7d32_buggy.java b/tmp/8c3dc796-d630-40a3-9021-9d4b6200a7fd_fixed.java
+index 46799da..32bd107 100644
+--- a/tmp/3ca45572-51e1-43e6-a0af-eecd51eb7d32_buggy.java
++++ b/tmp/8c3dc796-d630-40a3-9021-9d4b6200a7fd_fixed.java
+@@ -1,8 +1,11 @@
+         /**
+          * @param x Normalized objective variables.
+          * @return the original objective variables, possibly repaired.
+          */
+         public double[] repairAndDecode(final double[] x) {
+-            return
+-                decode(x);
++            if (x[0] <= lower[0] || x[0] >= upper[0]) {
++                return new double[] { Double.NaN };
++            }
++            
++            return decode(x);
+         }
+\ No newline at end of file

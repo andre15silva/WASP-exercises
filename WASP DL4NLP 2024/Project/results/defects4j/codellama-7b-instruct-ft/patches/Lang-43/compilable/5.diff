@@ -1,0 +1,49 @@
+diff --git a/tmp/0ad72821-abb3-4cbf-995a-3b56790f11e0_buggy.java b/tmp/200c611a-4d16-4880-b7e5-3a8a2b969d4c_fixed.java
+index b6b11b6..8ee31c8 100644
+--- a/tmp/0ad72821-abb3-4cbf-995a-3b56790f11e0_buggy.java
++++ b/tmp/200c611a-4d16-4880-b7e5-3a8a2b969d4c_fixed.java
+@@ -1,38 +1,44 @@
+     /**
+      * Consume a quoted string, adding it to <code>appendTo</code> if
+      * specified.
+      * 
+      * @param pattern pattern to parse
+      * @param pos current parse position
+      * @param appendTo optional StringBuffer to append
+      * @param escapingOn whether to process escaped quotes
+      * @return <code>appendTo</code>
+      */
+     private StringBuffer appendQuotedString(String pattern, ParsePosition pos,
+             StringBuffer appendTo, boolean escapingOn) {
++        
++        int cLen = pattern.length();
+         int start = pos.getIndex();
+         char[] c = pattern.toCharArray();
+         if (escapingOn && c[start] == QUOTE) {
+             return appendTo == null ? null : appendTo.append(QUOTE);
+         }
+         int lastHold = start;
+         for (int i = pos.getIndex(); i < pattern.length(); i++) {
+             if (escapingOn && pattern.substring(i).startsWith(ESCAPED_QUOTE)) {
++                // if we're in escaped escaping mode we can get into trouble (e.g.
++                // LANG-477) - use substring instead of startsWith to prevent this
++                String substr = pattern.substring(i);
++                int index = substr.indexOf(ESCAPED_QUOTE);
+                 appendTo.append(c, lastHold, pos.getIndex() - lastHold).append(
+                         QUOTE);
+                 pos.setIndex(i + ESCAPED_QUOTE.length());
+                 lastHold = pos.getIndex();
+                 continue;
+             }
+             switch (c[pos.getIndex()]) {
+             case QUOTE:
+                 next(pos);
+                 return appendTo == null ? null : appendTo.append(c, lastHold,
+                         pos.getIndex() - lastHold);
+             default:
+                 next(pos);
+             }
+         }
+         throw new IllegalArgumentException(
+                 "Unterminated quoted string at position " + start);
+     }

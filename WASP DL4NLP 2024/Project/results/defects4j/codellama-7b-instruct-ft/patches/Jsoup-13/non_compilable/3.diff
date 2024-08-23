@@ -1,0 +1,19 @@
+diff --git a/tmp/6e68727f-feb1-42b0-8366-78ca65ab1120_buggy.java b/tmp/3c88a877-e175-4b31-ad2e-c587a7745213_fixed.java
+index a7cb64f..6590977 100644
+--- a/tmp/6e68727f-feb1-42b0-8366-78ca65ab1120_buggy.java
++++ b/tmp/3c88a877-e175-4b31-ad2e-c587a7745213_fixed.java
+@@ -1,10 +1,14 @@
+     /**
+      * Test if this element has an attribute.
+      * @param attributeKey The attribute key to check.
+      * @return true if the attribute exists, false if not.
+      */
+     public boolean hasAttr(String attributeKey) {
+         Validate.notNull(attributeKey);
+ 
++        // special case for abs:* so we only need to look at the node, not the entire ancestors.
++        if (attributeKey.startsWith("abs:"))
++            return !absUrls.get(attributeKey).equals("");
++
+         return attributes.hasKey(attributeKey);
+     }

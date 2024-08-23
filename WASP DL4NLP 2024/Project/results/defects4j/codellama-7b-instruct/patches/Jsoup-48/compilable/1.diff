@@ -1,0 +1,49 @@
+diff --git a/tmp/d4005893-6a85-413b-a15a-bc6a6981a4b7_buggy.java b/tmp/4801f280-bd49-4695-94f0-e8a2b50afb1a_fixed.java
+index bcd80aa..b3820ee 100644
+--- a/tmp/d4005893-6a85-413b-a15a-bc6a6981a4b7_buggy.java
++++ b/tmp/4801f280-bd49-4695-94f0-e8a2b50afb1a_fixed.java
+@@ -1,25 +1,34 @@
+ void processResponseHeaders(Map<String, List<String>> resHeaders) {
+     for (Map.Entry<String, List<String>> entry : resHeaders.entrySet()) {
+         String name = entry.getKey();
+         if (name == null)
+-                    continue; // http/1.1 line
++            // skip invalid header
++            continue;
+ 
+         List<String> values = entry.getValue();
+         if (name.equalsIgnoreCase("Set-Cookie")) {
++            // parse cookie header
++            // ignores Path, Expires, Domain, and additional parameters req'd?
++            // requires at least a name-value pair
++            if (values.size() >= 2) {
++                String cookie = values.get(0);
++                StringBuffer cookieVal = new StringBuffer();
++                StringBuffer cookieName = new StringBuffer();
++                TokenQueue cd = new TokenQueue(cookie);
++                cookieName.append(cd.chompTo("=").trim());
++                cookieVal.append(cd.consumeTo(";").trim());
++                if (cookieName.length() > 0 && cookieVal.length() > 0)
++                    header(cookieName.toString(), cookieVal.toString());
++            }
++        } else { // combine multiple headers with comma
++            String headerVal = "";
+             for (String value : values) {
+                 if (value == null)
+                     continue;
+-                        TokenQueue cd = new TokenQueue(value);
+-                        String cookieName = cd.chompTo("=").trim();
+-                        String cookieVal = cd.consumeTo(";").trim();
+-                        // ignores path, date, domain, validateTLSCertificates et al. req'd?
+-                        // name not blank, value not null
+-                        if (cookieName.length() > 0)
+-                            cookie(cookieName, cookieVal);
++                headerVal = headerVal + value + ",";
+             }
+-                } else { // combine same header names with comma: http://www.w3.org/Protocols/rfc2616/rfc2616-sec4.html#sec4.2
+             if (!values.isEmpty())
+-                        header(name, values.get(0));
++                header(name, headerVal.substring(0, headerVal.length() - 1));
+         }
+     }
+ }

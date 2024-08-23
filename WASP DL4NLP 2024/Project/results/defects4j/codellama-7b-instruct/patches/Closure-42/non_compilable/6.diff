@@ -1,0 +1,21 @@
+diff --git a/tmp/5c410d9d-f3b5-4e5c-a7e5-db87616ca243_buggy.java b/tmp/7d49762c-5cdd-4225-a2be-436de145e86a_fixed.java
+index 4d0be80..5e236a9 100644
+--- a/tmp/5c410d9d-f3b5-4e5c-a7e5-db87616ca243_buggy.java
++++ b/tmp/7d49762c-5cdd-4225-a2be-436de145e86a_fixed.java
+@@ -1,10 +1,12 @@
+-    @Override
+-    Node processForInLoop(ForInLoop loopNode) {
++import org.mozilla.javascript.ast.Node;
++import org.mozilla.javascript.ast.Token;
+ 
+-        // Return the bare minimum to put the AST in a valid state.
++public class FixJavascript {
++    public static Node processForInLoop(Node loopNode) {
+         return newNode(
+                 Token.FOR,
+                 transform(loopNode.getIterator()),
+                 transform(loopNode.getIteratedObject()),
+                 transformBlock(loopNode.getBody()));
+     }
++}
+\ No newline at end of file

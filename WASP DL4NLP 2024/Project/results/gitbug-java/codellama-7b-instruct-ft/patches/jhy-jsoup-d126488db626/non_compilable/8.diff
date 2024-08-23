@@ -1,0 +1,35 @@
+diff --git a/tmp/f9b3dcf5-6e90-45b1-a3ee-01168ba09050_buggy.java b/tmp/43f064d2-65d4-409d-b50a-ac146e15dede_fixed.java
+index 5bf31b1..df962f0 100644
+--- a/tmp/f9b3dcf5-6e90-45b1-a3ee-01168ba09050_buggy.java
++++ b/tmp/43f064d2-65d4-409d-b50a-ac146e15dede_fixed.java
+@@ -1,17 +1,27 @@
+     private String consumeSubQuery() {
+         StringBuilder sq = StringUtil.borrowBuilder();
++        String tagName = context.tag().nodeName();
++        boolean hasCombinator = false, hasSubSelector = false;
+         while (!tq.isEmpty()) {
+             if (tq.matches("("))
+                 sq.append("(").append(tq.chompBalanced('(', ')')).append(")");
+             else if (tq.matches("["))
+                 sq.append("[").append(tq.chompBalanced('[', ']')).append("]");
+-            else if (tq.matchesAny(Combinators))
+-                if (sq.length() > 0)
++            else if (tq.matchesAny(Combinators)) {
++                hasCombinator = true;
++                if (sq.length() > 0) {
++                    if (hasSubSelector)
+                         break;
+                     else
++                        sq.append(tq.consume());
++                } else
+                     tq.consume();
+-            else
++            } else {
++                hasSubSelector = true;
+                 sq.append(tq.consume());
+             }
++        }
++        if (!hasCombinator && "body".equals(tagName))
++            sq.append(">");
+         return StringUtil.releaseBuilder(sq);
+     }

@@ -1,0 +1,24 @@
+diff --git a/tmp/c2f56b61-16c6-4c4c-b076-1a33872437db_buggy.java b/tmp/33af36c7-2893-4bfd-a158-eb0f469965fe_fixed.java
+index 43937f5..540e8ef 100644
+--- a/tmp/c2f56b61-16c6-4c4c-b076-1a33872437db_buggy.java
++++ b/tmp/33af36c7-2893-4bfd-a158-eb0f469965fe_fixed.java
+@@ -1,3 +1,16 @@
+-  private static boolean isReduceableFunctionExpression(Node n) {
+-    return NodeUtil.isFunctionExpression(n);
++  public void testIssue538() {
++    checkCompilesToSame(      "/** @constructor */\n" +
++        "WebInspector.Setting = function() {}\n" +
++        "WebInspector.Setting.prototype = {\n" +
++        "    get name0(){return this._name;},\n" +
++        "    get name1(){return this._name;},\n" +
++        "    get name2(){return this._name;},\n" +
++        "    get name3(){return this._name;},\n" +
++        "    get name4(){return this._name;},\n" +
++        "    get name5(){return this._name;},\n" +
++        "    get name6(){return this._name;},\n" +
++        "    get name7(){return this._name;},\n" +
++        "    get name8(){return this._name;},\n" +
++        "    get name9(){return this._name;},\n" +
++        "}", 1);
+   }
+\ No newline at end of file

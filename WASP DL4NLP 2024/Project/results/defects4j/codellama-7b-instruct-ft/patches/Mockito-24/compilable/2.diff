@@ -1,0 +1,37 @@
+diff --git a/tmp/b887423c-96e9-43a8-b0a7-8dad0ac1d518_buggy.java b/tmp/a3dd5385-1d54-4786-a3fd-fa3a9bc915d4_fixed.java
+index 47915ed..1c2a281 100644
+--- a/tmp/b887423c-96e9-43a8-b0a7-8dad0ac1d518_buggy.java
++++ b/tmp/a3dd5385-1d54-4786-a3fd-fa3a9bc915d4_fixed.java
+@@ -1,22 +1,28 @@
+     /* (non-Javadoc)
+      * @see org.mockito.stubbing.Answer#answer(org.mockito.invocation.InvocationOnMock)
+      */
+     public Object answer(InvocationOnMock invocation) {
+         if (methodsGuru.isToString(invocation.getMethod())) {
+             Object mock = invocation.getMock();
+             MockName name = mockUtil.getMockName(mock);
+             if (name.isDefault()) {
+-                return "Mock for " + mockUtil.getMockSettings(mock).getTypeToMock().getSimpleName() + ", hashCode: " + mock.hashCode();
++                return name.toString() + ", hashCode: " + mock.hashCode();
+             } else {
+                 return name.toString();
+             }
+         } else if (methodsGuru.isCompareToMethod(invocation.getMethod())) {
+-            //see issue 184.
+-            //mocks by default should return 0 if references are the same, otherwise some other value because they are not the same. Hence we return 1 (anything but 0 is good).
+-            //Only for compareTo() method by the Comparable interface
++            Object mock = invocation.getMock();
++            Object[] args = invocation.getArguments();
++            Object other = args.length == 1 ? args[0] : null;
++            //if mock is compared to its self than return 0.
++            if (other != null && mock == other) {
++               return 0;
++            } else {
++               //compareTo() returns a negative value in case of failure.
+                return 1;
+             }
++        }
+         
+         Class<?> returnType = invocation.getMethod().getReturnType();
+         return returnValueFor(returnType);
+     }

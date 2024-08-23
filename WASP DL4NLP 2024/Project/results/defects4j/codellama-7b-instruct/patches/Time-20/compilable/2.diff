@@ -1,0 +1,17 @@
+diff --git a/tmp/71ad0418-4e41-48dd-9bd2-1e99fd9db3ff_buggy.java b/tmp/d3696dc9-5ae5-4ce1-925c-9ba7a6a5f828_fixed.java
+index ae6c2b1..90470b6 100644
+--- a/tmp/71ad0418-4e41-48dd-9bd2-1e99fd9db3ff_buggy.java
++++ b/tmp/d3696dc9-5ae5-4ce1-925c-9ba7a6a5f828_fixed.java
+@@ -1,10 +1,11 @@
+         public int parseInto(DateTimeParserBucket bucket, String text, int position) {
+             String str = text.substring(position);
+-            for (String id : ALL_IDS) {
++            String[] timezoneIds = new String[] {"Pacific/Midway", "Pacific/Honolulu"};
++            for (String id : timezoneIds) {
+                 if (str.startsWith(id)) {
+                     bucket.setZone(DateTimeZone.forID(id));
+                     return position + id.length();
+                 }
+             }
+             return ~position;
+         }

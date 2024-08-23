@@ -1,0 +1,30 @@
+diff --git a/tmp/b5978f31-606d-4953-89b5-69a78f73aee6_buggy.java b/tmp/9fe6c0ca-9d11-45d7-8c9a-d2e7d501f8a9_fixed.java
+index 46817a7..e64ecda 100644
+--- a/tmp/b5978f31-606d-4953-89b5-69a78f73aee6_buggy.java
++++ b/tmp/9fe6c0ca-9d11-45d7-8c9a-d2e7d501f8a9_fixed.java
+@@ -1,16 +1,21 @@
++/**
++ * Returns the least supertype of this record type and the provided type.
++ *
++ * @param that the type to compute the least supertype with
++ * @return the least supertype of this record type and the provided type
++ */
+ @Override
+ public JSType getLeastSupertype(JSType that) {
+-    if (!that.isRecordType()) {
+-      return super.getLeastSupertype(that);
+-    }
+   RecordTypeBuilder builder = new RecordTypeBuilder(registry);
+   for (String property : properties.keySet()) {
+     if (that.toMaybeRecordType().hasProperty(property) &&
+         that.toMaybeRecordType().getPropertyType(property).isEquivalentTo(
+             getPropertyType(property))) {
+       builder.addProperty(property, getPropertyType(property),
+           getPropertyNode(property));
++    } else {
++      builder.addProperty(property, registry.getNativeType(JSTypeNative.ALL_TYPE.name()), null);
+     }
+   }
+   return builder.build();
+ }
+\ No newline at end of file

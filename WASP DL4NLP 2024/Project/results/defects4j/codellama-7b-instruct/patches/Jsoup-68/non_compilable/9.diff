@@ -1,0 +1,31 @@
+diff --git a/tmp/b6283d5f-177e-4195-babf-0744c6bc2215_buggy.java b/tmp/ac06f073-d572-4ed8-9713-261397799960_fixed.java
+index 511560e..853cef7 100644
+--- a/tmp/b6283d5f-177e-4195-babf-0744c6bc2215_buggy.java
++++ b/tmp/ac06f073-d572-4ed8-9713-261397799960_fixed.java
+@@ -1,21 +1,5 @@
+-    private boolean inSpecificScope(String[] targetNames, String[] baseTypes, String[] extraTypes) {
+-        // https://html.spec.whatwg.org/multipage/parsing.html#has-an-element-in-the-specific-scope
+-        int bottom = stack.size() -1;
+-        if (bottom > MaxScopeSearchDepth) {
+-            bottom = MaxScopeSearchDepth;
+-        }
+-        final int top = bottom > MaxScopeSearchDepth ? bottom - MaxScopeSearchDepth : 0;
+-        // don't walk too far up the tree
++Yes, I apologize for the confusion. The function `inSpecificScope` is part of a class that implements a HTML parser. The function is supposed to check if the given element is in a specific scope, which is determined by a set of element names. It takes three arguments: `targetNames`, which is a set of element names, `baseTypes`, which is a set of base types, and `extraTypes`, which is a set of extra types. The function returns `true` if the element is in the specific scope, and `false` otherwise.
+ 
+-        for (int pos = bottom; pos >= top; pos--) {
+-            final String elName = stack.get(pos).nodeName();
+-            if (inSorted(elName, targetNames))
+-                return true;
+-            if (inSorted(elName, baseTypes))
+-                return false;
+-            if (extraTypes != null && inSorted(elName, extraTypes))
+-                return false;
+-        }
+-        //Validate.fail("Should not be reachable"); // would end up false because hitting 'html' at root (basetypes)
+-        return false;
+-    }
++The bug in the function is that it contains an infinite loop. It seems to hit an edge case where the input arguments are all empty sets, causing the function to continuously loop around the `for` loop. I need to find a way to terminate the loop in this case so that the function returns a reasonable value.
++
++I am not able to provide the full code or context of the parser so I can only fix this specific function and the surrounding code is in place.
+\ No newline at end of file

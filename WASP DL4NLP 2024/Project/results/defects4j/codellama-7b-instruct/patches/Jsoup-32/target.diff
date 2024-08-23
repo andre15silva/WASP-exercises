@@ -1,0 +1,12 @@
+diff --git a/tmp/75741819-85aa-4cec-9f0d-f35d05e9f263_buggy.java b/tmp/3b0460f7-d4cb-4f4c-8b7d-8367f8d09ca9_fixed.java
+index 91469b4..e171ff1 100644
+--- a/tmp/75741819-85aa-4cec-9f0d-f35d05e9f263_buggy.java
++++ b/tmp/3b0460f7-d4cb-4f4c-8b7d-8367f8d09ca9_fixed.java
+@@ -1,6 +1,6 @@
+     @Override
+     public Element clone() {
+         Element clone = (Element) super.clone();
+-        clone.classNames();
++        clone.classNames = null; // derived on first hit, otherwise gets a pointer to source classnames
+         return clone;
+     }

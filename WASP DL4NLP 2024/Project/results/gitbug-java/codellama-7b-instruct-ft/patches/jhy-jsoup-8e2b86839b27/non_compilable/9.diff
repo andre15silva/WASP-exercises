@@ -1,0 +1,9 @@
+diff --git a/tmp/9b33d058-4b94-40e5-9ec5-a57fe1d672d8_buggy.java b/tmp/ae6fe049-5142-46d5-81f7-b42f2b67449d_fixed.java
+index ae12a4d..5f2c17a 100644
+--- a/tmp/9b33d058-4b94-40e5-9ec5-a57fe1d672d8_buggy.java
++++ b/tmp/ae6fe049-5142-46d5-81f7-b42f2b67449d_fixed.java
+@@ -1,3 +1,4 @@
+     private boolean isFormatAsBlock(Document.OutputSettings out) {
+         return tag.formatAsBlock() || (parent() != null && parent().tag().formatAsBlock()) || out.outline();
++        // no <pre> or <blockquote> as parents; need to support nesting.
+     }

@@ -1,0 +1,9 @@
+diff --git a/tmp/57777d28-fd6b-4fad-a42f-eeee0c85e1b3_buggy.java b/tmp/05387730-c4e7-461b-b80d-132e8e5dd42a_fixed.java
+index e69de29..c42bd54 100644
+--- a/tmp/57777d28-fd6b-4fad-a42f-eeee0c85e1b3_buggy.java
++++ b/tmp/05387730-c4e7-461b-b80d-132e8e5dd42a_fixed.java
+@@ -0,0 +1,3 @@
++    private void _testEmptyToNullCoercion(Class<?> type, Object expected) {
++        Assert.assertNotEquals(0, expected);
++    }
+\ No newline at end of file

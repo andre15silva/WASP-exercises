@@ -1,0 +1,60 @@
+diff --git a/tmp/3fc5b6b2-6f2c-4bf9-bb65-391f9829ec23_buggy.java b/tmp/f870d487-5c8a-4822-be8c-994e059d63a2_fixed.java
+index 51ebfca..ad74278 100644
+--- a/tmp/3fc5b6b2-6f2c-4bf9-bb65-391f9829ec23_buggy.java
++++ b/tmp/f870d487-5c8a-4822-be8c-994e059d63a2_fixed.java
+@@ -1,32 +1,46 @@
+     /**
+      * Encodes binary data using the base64 algorithm, optionally chunking the output into 76 character blocks.
+      * 
+      * @param binaryData
+      *            Array containing binary data to encode.
+      * @param isChunked
+      *            if <code>true</code> this encoder will chunk the base64 output into 76 character blocks
+      * @param urlSafe
+      *            if <code>true</code> this encoder will emit - and _ instead of the usual + and / characters.
+      * @param maxResultSize
+      *            The maximum result size to accept.
+      * @return Base64-encoded data.
+      * @throws IllegalArgumentException
+      *             Thrown when the input array needs an output array bigger than maxResultSize
+-     * @since 1.4
++     * @since 0.3 
+      */
+     public static byte[] encodeBase64(byte[] binaryData, boolean isChunked, boolean urlSafe, int maxResultSize) {
+         if (binaryData == null || binaryData.length == 0) {
+             return binaryData;
+         }
+ 
+-        long len = getEncodeLength(binaryData, MIME_CHUNK_SIZE, CHUNK_SEPARATOR);
+-        if (len > maxResultSize) {
+-            throw new IllegalArgumentException("Input array too big, the output array would be bigger (" +
+-                len +
+-                ") than the specified maxium size of " +
+-                maxResultSize);
++        int b64Max = maxResultSize;
++        if (isChunked) {
++            // account for base64 header at b64Max-7  and one for trailing \n
++            b64Max -= (MIME_CHUNK_SIZE+1);
+         }
+-                
+-        Base64 b64 = isChunked ? new Base64(urlSafe) : new Base64(0, CHUNK_SEPARATOR, urlSafe);
++        Base64 b64 = new Base64(0, CHUNK_SEPARATOR, urlSafe);
++        long base64EncodedSize = getEncodeLength(binaryData, MIME_CHUNK_SIZE, CHUNK_SEPARATOR);
++        if (base64EncodedSize <= b64Max) {
+             return b64.encode(binaryData);
+         }
++        
++        StringBuilder sb = new StringBuilder();
++        int maxLength = getFastLength(binaryData, MIME_CHUNK_SIZE, CHUNK_SEPARATOR, base64EncodedSize);
++        int index = b64Max;
++        while (index < base64EncodedSize) {
++            sb.append(b64.encodeToString(binaryData, index, maxLength)).append(CHUNK_SEPARATOR);
++            index += maxLength;
++        }
++        String toReturn = sb.toString();
++        toReturn += b64.encodeToString(binaryData, base64EncodedSize, binaryData.length-base64EncodedSize);
++        if (!isChunked) {
++            toReturn = toReturn.replaceFirst("\n", "");
++        }
++        return toReturn.getBytes();
++    }

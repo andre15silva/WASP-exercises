@@ -1,0 +1,50 @@
+diff --git a/tmp/0c13489f-127d-4a53-bf03-4bc6fa917783_buggy.java b/tmp/26fe364e-d779-421f-894d-30b227880445_fixed.java
+index 01967cc..9e1387b 100644
+--- a/tmp/0c13489f-127d-4a53-bf03-4bc6fa917783_buggy.java
++++ b/tmp/26fe364e-d779-421f-894d-30b227880445_fixed.java
+@@ -1,35 +1,45 @@
+         /**
+          * Method called to check if the default type handler should be
+          * used for given type.
+          * Note: "natural types" (String, Boolean, Integer, Double) will never
+          * use typing; that is both due to them being concrete and final,
+          * and since actual serializers and deserializers will also ignore any
+          * attempts to enforce typing.
+          */
+         public boolean useForType(JavaType t)
+         {
+             switch (_appliesFor) {
+             case NON_CONCRETE_AND_ARRAYS:
+                 while (t.isArrayType()) {
+                     t = t.getContentType();
+                 }
++                // no need to check concrete... but may need to check array types
++                // [databind#793]
++                while (!t.getRawClass().isPrimitive()) {
++                    if (t.hasRawClass(JsonNode.class) && mapper.isEnabled(SerializationFeature.WRITE_NULL_MAP_VALUES)) {
++                        // [databind#793]: use nulls so that [1,2] becomes
++                        // ["1","1"]
++                        return false;
++                    }
++                    t = mapper.getTypeFactory().constructType(t.getRawClass().getSuperclass());
++                }
+                 // fall through
+             case OBJECT_AND_NON_CONCRETE:
+ //                return t.isJavaLangObject() || 
+                 return (t.getRawClass() == Object.class)
+                         || (!t.isConcrete()
+                                 // [databind#88] Should not apply to JSON tree models:
+                         || TreeNode.class.isAssignableFrom(t.getRawClass()));
+ 
+             case NON_FINAL:
+                 while (t.isArrayType()) {
+                     t = t.getContentType();
+                 }
+                 // [Issue#88] Should not apply to JSON tree models:
+                 return !t.isFinal() && !TreeNode.class.isAssignableFrom(t.getRawClass());
+             default:
+             //case JAVA_LANG_OBJECT:
+ //                return t.isJavaLangObject();
+                 return (t.getRawClass() == Object.class);
+             }
+         }

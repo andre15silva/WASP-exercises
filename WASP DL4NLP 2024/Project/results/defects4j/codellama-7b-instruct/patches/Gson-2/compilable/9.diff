@@ -1,0 +1,32 @@
+diff --git a/tmp/3b67762c-006f-4744-823e-f6b8acf10d7d_buggy.java b/tmp/d27fffce-53f6-4779-a709-c75827d4d2a2_fixed.java
+index 6e45f80..51ea331 100644
+--- a/tmp/3b67762c-006f-4744-823e-f6b8acf10d7d_buggy.java
++++ b/tmp/d27fffce-53f6-4779-a709-c75827d4d2a2_fixed.java
+@@ -1,21 +1,12 @@
+-  /**
+-   * Returns a factory for all subtypes of {@code typeAdapter}. We do a runtime check to confirm
+-   * that the deserialized type matches the type requested.
+-   */
+-  public static <T1> TypeAdapterFactory newTypeHierarchyFactory(
+-      final Class<T1> clazz, final TypeAdapter<T1> typeAdapter) {
++  public static <T> TypeAdapterFactory newTypeHierarchyFactory(
++      final Class<T> clazz, final TypeAdapter<T> typeAdapter) {
+     return new TypeAdapterFactory() {
+       @SuppressWarnings("unchecked")
+-      public <T2> TypeAdapter<T2> create(Gson gson, TypeToken<T2> typeToken) {
+-        final Class<? super T2> requestedType = typeToken.getRawType();
+-        if (!clazz.isAssignableFrom(requestedType)) {
++      public <T> TypeAdapter<T> create(Gson gson, TypeToken<T> typeToken) {
++        if (typeToken.getRawType().isAssignableFrom(clazz)) {
++          return (TypeAdapter<T>) typeAdapter;
++        }
+         return null;
+       }
+-        return (TypeAdapter<T2>) typeAdapter;
+-
+-      }
+-      @Override public String toString() {
+-        return "Factory[typeHierarchy=" + clazz.getName() + ",adapter=" + typeAdapter + "]";
+-      }
+     };
+   }

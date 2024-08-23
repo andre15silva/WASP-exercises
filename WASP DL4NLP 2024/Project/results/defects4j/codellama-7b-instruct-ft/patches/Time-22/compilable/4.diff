@@ -1,0 +1,18 @@
+diff --git a/tmp/f0c277b1-2263-4d0b-bf02-3cbc6fcc30bd_buggy.java b/tmp/e6fb15f9-830c-4335-9532-4d7977bdb1fb_fixed.java
+index 5b8a4d2..1bf3156 100644
+--- a/tmp/f0c277b1-2263-4d0b-bf02-3cbc6fcc30bd_buggy.java
++++ b/tmp/e6fb15f9-830c-4335-9532-4d7977bdb1fb_fixed.java
+@@ -1,12 +1,12 @@
+     /**
+      * Creates a period from the given millisecond duration with the standard period type
+      * and ISO rules, ensuring that the calculation is performed with the time-only period type.
+      * <p>
+      * The calculation uses the hour, minute, second and millisecond fields.
+      *
+      * @param duration  the duration, in milliseconds
+      */
+     protected BasePeriod(long duration) {
+         this(duration, null, null);
+-        // bug [3264409]
++        // bug [3264409] (ensure that calculation is performed in UTC)
+     }

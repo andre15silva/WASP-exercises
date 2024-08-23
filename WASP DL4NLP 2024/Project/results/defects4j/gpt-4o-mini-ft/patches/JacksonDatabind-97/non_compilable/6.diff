@@ -1,0 +1,32 @@
+diff --git a/tmp/7b15be41-a156-4058-bdc0-ac9d6f13a8e3_buggy.java b/tmp/f242195a-99f6-4643-b405-534a12f45300_fixed.java
+index dda9103..5df650d 100644
+--- a/tmp/7b15be41-a156-4058-bdc0-ac9d6f13a8e3_buggy.java
++++ b/tmp/f242195a-99f6-4643-b405-534a12f45300_fixed.java
+@@ -1,13 +1,25 @@
+     @Override
+     public final void serialize(JsonGenerator gen, SerializerProvider ctxt) throws IOException
+     {
+         if (_value == null) {
+             ctxt.defaultSerializeNull(gen);
+-        } else if (_value instanceof JsonSerializable) {
+-            ((JsonSerializable) _value).serialize(gen, ctxt);
++        } else { // if (_value instanceof JsonSerializable)
++            if (_value instanceof Map) {
++                gen.writeStartObject();
++                for (Map.Entry e : ((Map) _value).entrySet()) {
++                    gen.writeFieldName(e.getKey().toString());
++                    if (e.getValue() instanceof POJONode) {
++                        final ObjectNode tmp = ((POJONode) e.getValue()).data().getObjectNode();
++                        tmp.putPOJO(e.getKey().toString(), tmp);
++                    } else {
++                        gen.writeString(String.valueOf(e.getValue()));
++                    }
++                }
++                gen.writeEndObject();
+             } else {
+                 // 25-May-2018, tatu: [databind#1991] do not call via generator but through context;
+                 //    this to preserve contextual information
+                 gen.writeObject(_value);
+             }
+         }
++    }

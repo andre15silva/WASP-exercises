@@ -1,0 +1,50 @@
+diff --git a/tmp/0c398e9d-fc38-4233-9a38-f62cc55bcd52_buggy.java b/tmp/b384b793-4da3-4e25-9879-4c7c45f1878c_fixed.java
+index b86c1ea..1d9ecc4 100644
+--- a/tmp/0c398e9d-fc38-4233-9a38-f62cc55bcd52_buggy.java
++++ b/tmp/b384b793-4da3-4e25-9879-4c7c45f1878c_fixed.java
+@@ -1,38 +1,25 @@
+-    /**
+-     * Translate an input onto a Writer. This is intentionally final as its algorithm is 
+-     * tightly coupled with the abstract method of this class. 
+-     *
+-     * @param input CharSequence that is being translated
+-     * @param out Writer to translate the text to
+-     * @throws IOException if and only if the Writer produces an IOException
+-     */
+ public final void translate(CharSequence input, Writer out) throws IOException {
+     if (out == null) {
+         throw new IllegalArgumentException("The Writer must not be null");
+     }
+     if (input == null) {
+         return;
+     }
+     int pos = 0;
+     int len = Character.codePointCount(input, 0, input.length());
+     while (pos < len) {
+         int consumed = translate(input, pos, out);
+         if (consumed == 0) {
+-                char[] c = Character.toChars(Character.codePointAt(input, pos));
++            int codePoint = Character.codePointAt(input, pos);
++            char[] c = Character.toChars(codePoint);
+             out.write(c);
+-            }
+-            else {
+-//          // contract with translators is that they have to understand codepoints 
+-//          // and they just took care of a surrogate pair
++            pos += Character.charCount(codePoint); // Move position correctly
++        } else {
++            // The contract with translators is that they have to understand codepoints 
++            // and they just took care of a surrogate pair
+             for (int pt = 0; pt < consumed; pt++) {
+-                    if (pos < len - 2) {
+                 pos += Character.charCount(Character.codePointAt(input, pos));
+-                    } else {
+-                        pos++;
+             }
+         }
+-                pos--;
+-            }
+-            pos++;
+     }
+ }
+\ No newline at end of file

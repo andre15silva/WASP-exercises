@@ -1,0 +1,23 @@
+diff --git a/tmp/c27092ee-9bba-4d86-b085-9dd75a869948_buggy.java b/tmp/7035d648-ecf3-4bcc-b488-7712fda5ed12_fixed.java
+index 516fad7..e4336ae 100644
+--- a/tmp/c27092ee-9bba-4d86-b085-9dd75a869948_buggy.java
++++ b/tmp/7035d648-ecf3-4bcc-b488-7712fda5ed12_fixed.java
+@@ -1,8 +1,15 @@
+     /**
+      * If the property contains a collection, then the length of that
+-     * collection, otherwise - 1.
++     * collection, otherwise 0 if it's null or -1 if there are no elements.
+      * @return int length
+      */
+     public int getLength() {
+-        return ValueUtils.getLength(getBaseValue());
++        Object baseValue = getBaseValue();
++        if (baseValue == null) {
++            return 0;
++        } else if (baseValue instanceof Collection) {
++            return ((Collection<?>) baseValue).size();
++        } else {
++            return -1; // If it's not a collection
++        }
+     }
+\ No newline at end of file

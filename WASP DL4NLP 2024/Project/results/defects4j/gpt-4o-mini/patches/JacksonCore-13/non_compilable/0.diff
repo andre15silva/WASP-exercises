@@ -1,0 +1,27 @@
+diff --git a/tmp/576563e8-91e1-43e2-9abf-ad1e31f6b0f9_buggy.java b/tmp/e61ce041-1f19-4112-839b-5737c0fc4e8a_fixed.java
+index e69de29..6b5911c 100644
+--- a/tmp/576563e8-91e1-43e2-9abf-ad1e31f6b0f9_buggy.java
++++ b/tmp/e61ce041-1f19-4112-839b-5737c0fc4e8a_fixed.java
+@@ -0,0 +1,21 @@
++public void _testFieldNameQuotingEnabled(JsonFactory factory, boolean writeFieldNames, boolean expectQuoted, String expected) throws IOException {
++    StringWriter writer = new StringWriter();
++    JsonGenerator generator = factory.createGenerator(writer);
++    
++    generator.writeStartObject();
++    if (writeFieldNames) {
++        generator.writeNumberField("foo", 1);
++    } else {
++        generator.writeNumber(1); // writing the value without a field name
++    }
++    generator.writeEndObject();
++    generator.close();
++    
++    String result = writer.toString();
++    
++    if (expectQuoted) {
++        expected = expected.replace("{", "{\"").replace(":", "\":").replace("}", "\"}");
++    }
++    
++    assertEquals(expected, result);
++}
+\ No newline at end of file

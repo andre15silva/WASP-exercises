@@ -1,0 +1,53 @@
+diff --git a/tmp/521831b2-9e39-4f4c-b123-909157ed46ae_buggy.java b/tmp/0fee3b12-f090-4d42-8c1d-9899a58df7b7_fixed.java
+index f47d784..7c28cc1 100644
+--- a/tmp/521831b2-9e39-4f4c-b123-909157ed46ae_buggy.java
++++ b/tmp/0fee3b12-f090-4d42-8c1d-9899a58df7b7_fixed.java
+@@ -1,12 +1,37 @@
++  class MakeDeclaredNamesUnique implements NodeTraversal.Callback {
++    private Set<String> assignedNames = new HashSet<>();
++
+     @Override
+-  public void process(Node externs, Node root) {
+-    NodeTraversal.traverse(compiler, root, this);
+-    if (MAKE_LOCAL_NAMES_UNIQUE) {
+-      MakeDeclaredNamesUnique renamer = new MakeDeclaredNamesUnique();
+-      NodeTraversal t = new NodeTraversal(compiler, renamer);
+-      t.traverseRoots(externs, root);
+-    }
+-    removeDuplicateDeclarations(root);
+-    new PropogateConstantAnnotations(compiler, assertOnChange)
+-        .process(externs, root);
++    public void visit(NodeTraversal t, Node node, Node parent) {
++      if (!shouldRename(node, parent)) {
++        return;
++      }
++
++      String name = getValidName(node);
++      assignedNames.add(name);
++      node.setString(name);
++    }
++
++    private boolean shouldRename(Node node, Node parent) {
++      // Ignore `arguments` variable
++      if (NodeUtil.isName(node, "arguments") && parent.isFunction()) {
++        return false;
++      }
++
++      // Otherwise, check if the name is already assigned
++      String name = node.getString();
++      return !assignedNames.contains(name);
++    }
++
++    private String getValidName(Node node) {
++      String name = "_" + node.getNodeType().toString();
++      if (assignedNames.contains(name)) {
++        int i = 1;
++        while (assignedNames.contains(name + i)) {
++          i++;
++        }
++        name = name + i;
++      }
++      return name;
++    }
+   }
+\ No newline at end of file

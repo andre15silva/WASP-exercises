@@ -1,0 +1,39 @@
+diff --git a/tmp/6786901f-dd6c-4086-aece-053aa208840f_buggy.java b/tmp/95683938-a910-436a-b7e9-4bc8f5940b24_fixed.java
+index 39dd8e7..d701085 100644
+--- a/tmp/6786901f-dd6c-4086-aece-053aa208840f_buggy.java
++++ b/tmp/95683938-a910-436a-b7e9-4bc8f5940b24_fixed.java
+@@ -1,30 +1,26 @@
+     private Attribute parseAttribute() {
+         tq.consumeWhitespace();
+         String key = tq.consumeAttributeKey();
+         String value = "";
+         tq.consumeWhitespace();
+         if (tq.matchChomp("=")) {
+             tq.consumeWhitespace();
+-
+             if (tq.matchChomp(SQ)) {
+-                value = tq.chompTo(SQ);
++                value = tq.chompTo(SQ).trim();
+             } else if (tq.matchChomp(DQ)) {
+-                value = tq.chompTo(DQ);
++                value = tq.chompTo(DQ).trim();
+             } else {
+                 StringBuilder valueAccum = new StringBuilder();
+-                // no ' or " to look for, so scan to end tag or space (or end of stream)
+-                while (!tq.matchesAny("<", "/>", ">") && !tq.matchesWhitespace() && !tq.isEmpty()) {
++                while (!tq.startsWith("= ","/>","<") && !tq.matchesWhitespace() && !tq.isEmpty()) {
+                     valueAccum.append(tq.consume());
+                 }
+                 value = valueAccum.toString();
+             }
+-            tq.consumeWhitespace();
+         }
+         if (key.length() != 0)
+             return Attribute.createFromEncoded(key, value);
+         else {
+             tq.consume();
+-                
+             return null;
+         }
+     }
+\ No newline at end of file

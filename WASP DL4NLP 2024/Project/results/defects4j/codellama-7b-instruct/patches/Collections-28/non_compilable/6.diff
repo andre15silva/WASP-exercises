@@ -1,0 +1,231 @@
+diff --git a/tmp/8ce18d69-1658-4bad-9f2c-9a448973b2d3_buggy.java b/tmp/ba744fca-3f5e-46c2-a899-012bc0142d22_fixed.java
+index e69de29..8deba63 100644
+--- a/tmp/8ce18d69-1658-4bad-9f2c-9a448973b2d3_buggy.java
++++ b/tmp/ba744fca-3f5e-46c2-a899-012bc0142d22_fixed.java
+@@ -0,0 +1,226 @@
++public class PatriciaTrie<V> implements Trie<String, V> {
++    private Node root;
++    private int size;
++
++    public PatriciaTrie() {
++        root = new Node();
++    }
++
++    public void clear() {
++        root = null;
++        size = 0;
++    }
++
++    @Override
++    public V put(String key, V value) {
++        if (key == null) {
++            throw new NullPointerException("Key is null");
++        }
++        if (value == null) {
++            throw new NullPointerException("Value is null");
++        }
++        root = put(root, key, value, 0);
++        size++;
++        return value;
++    }
++
++    private Node put(Node node, String key, V value, int depth) {
++        if (node == null) {
++            node = new Node();
++        }
++        if (depth == key.length()) {
++            node.value = value;
++            return node;
++        }
++        char c = key.charAt(depth);
++        node.children[c] = put(node.children[c], key, value, depth + 1);
++        return node;
++    }
++
++    @Override
++    public V get(String key) {
++        if (key == null) {
++            throw new NullPointerException("Key is null");
++        }
++        Node node = get(root, key, 0);
++        return (node != null) ? node.value : null;
++    }
++
++    private Node get(Node node, String key, int depth) {
++        if (node == null) {
++            return null;
++        }
++        if (depth == key.length()) {
++            return node;
++        }
++        char c = key.charAt(depth);
++        return get(node.children[c], key, depth + 1);
++    }
++
++    @Override
++    public SortedMap<String, V> prefixMap(String prefix) {
++        if (prefix == null) {
++            throw new NullPointerException("Prefix is null");
++        }
++        if (prefix.isEmpty()) {
++            throw new IllegalArgumentException("Prefix is empty");
++        }
++        return new PrefixMap(this, prefix);
++    }
++
++    private static class Node {
++        V value;
++        Node[] children;
++
++        public Node() {
++            children = new Node[256];
++        }
++    }
++
++    private static class PrefixMap implements SortedMap<String, V> {
++        private PatriciaTrie<V> trie;
++        private String prefix;
++
++        public PrefixMap(PatriciaTrie<V> trie, String prefix) {
++            this.trie = trie;
++            this.prefix = prefix;
++        }
++
++        @Override
++        public SortedMap<String, V> subMap(String fromKey, String toKey) {
++            throw new UnsupportedOperationException("Not implemented");
++        }
++
++        @Override
++        public SortedMap<String, V> headMap(String toKey) {
++            throw new UnsupportedOperationException("Not implemented");
++        }
++
++        @Override
++        public SortedMap<String, V> tailMap(String fromKey) {
++            throw new UnsupportedOperationException("Not implemented");
++        }
++
++        @Override
++        public SortedMap<String, V> subSet(String fromKey, String toKey) {
++            throw new UnsupportedOperationException("Not implemented");
++        }
++
++        @Override
++        public Comparator<? super String> comparator() {
++            throw new UnsupportedOperationException("Not implemented");
++        }
++
++        @Override
++        public SortedSet<String> keySet() {
++            throw new UnsupportedOperationException("Not implemented");
++        }
++
++        @Override
++        public Collection<V> values() {
++            throw new UnsupportedOperationException("Not implemented");
++        }
++
++        @Override
++        public Set<Entry<String, V>> entrySet() {
++            throw new UnsupportedOperationException("Not implemented");
++        }
++
++        @Override
++        public V get(Object key) {
++            if (key == null) {
++                throw new NullPointerException("Key is null");
++            }
++            if (!(key instanceof String)) {
++                return null;
++            }
++            String sKey = (String) key;
++            if (sKey.startsWith(prefix)) {
++                return trie.get(sKey);
++            }
++            return null;
++        }
++
++        @Override
++        public V put(String key, V value) {
++            if (key == null) {
++                throw new NullPointerException("Key is null");
++            }
++            if (value == null) {
++                throw new NullPointerException("Value is null");
++            }
++            trie.put(key + prefix, value);
++            return null;
++        }
++
++        @Override
++        public V remove(Object key) {
++            if (key == null) {
++                throw new NullPointerException("Key is null");
++            }
++            if (!(key instanceof String)) {
++                return null;
++            }
++            String sKey = (String) key;
++            if (sKey.startsWith(prefix)) {
++                trie.remove(sKey + prefix);
++            }
++            return null;
++        }
++
++        @Override
++        public void clear() {
++            throw new UnsupportedOperationException("Not implemented");
++        }
++
++        @Override
++        public boolean containsKey(Object key) {
++            if (key == null) {
++                throw new NullPointerException("Key is null");
++            }
++            if (!(key instanceof String)) {
++                return false;
++            }
++            String sKey = (String) key;
++            return sKey.startsWith(prefix) && trie.containsKey(sKey + prefix);
++        }
++
++        @Override
++        public boolean containsValue(Object value) {
++            if (value == null) {
++                throw new NullPointerException("Value is null");
++            }
++            return trie.containsValue(value);
++        }
++
++        @Override
++        public boolean isEmpty() {
++            return false;
++        }
++
++        @Override
++        public int size() {
++            return trie.size();
++        }
++
++        @Override
++        public void putAll(Map<? extends String, ? extends V> m) {
++            throw new UnsupportedOperationException("Not implemented");
++        }
++
++        @Override
++        public Set<String> keySet() {
++            return trie.prefixMap(prefix).keySet();
++        }
++
++        @Override
++        public Collection<V> values() {
++            return trie.prefixMap(prefix).values();
++        }
++
++        @Override
++        public Set<Entry<String, V>> entrySet() {
++            return trie.prefixMap(prefix).entrySet();
++        }
++    }
++}

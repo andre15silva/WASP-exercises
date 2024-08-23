@@ -1,0 +1,23 @@
+diff --git a/tmp/19d98670-f3a8-4f2b-8bfb-3ec5d0373e54_buggy.java b/tmp/fdc7acba-9fe4-40fe-b2c1-fcf797a88b4a_fixed.java
+index 5cedd56..c1139f3 100644
+--- a/tmp/19d98670-f3a8-4f2b-8bfb-3ec5d0373e54_buggy.java
++++ b/tmp/fdc7acba-9fe4-40fe-b2c1-fcf797a88b4a_fixed.java
+@@ -1,15 +1,17 @@
+   /**
+    * Returns true if this transaction is a Soroban transaction.
+    *
++   * @param account The account to use for checking trustlines
++   *
+    * @return true if this transaction is a Soroban transaction.
+    */
+-  public boolean isSorobanTransaction() {
++  public boolean isSorobanTransaction(Account account) {
+     if (mOperations.length != 1) {
+       return false;
+     }
+ 
+     Operation op = mOperations[0];
+     return op instanceof InvokeHostFunctionOperation
+         || op instanceof BumpSequenceOperation
+         || op instanceof RestoreFootprintOperation;
+   }

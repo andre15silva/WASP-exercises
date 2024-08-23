@@ -1,0 +1,43 @@
+diff --git a/tmp/d3783556-f88d-403e-b0a1-ea7f203578b1_buggy.java b/tmp/9a3dbaea-e9b1-4339-b3c1-fd3bddc7e0d2_fixed.java
+index abd3198..fbfceaa 100644
+--- a/tmp/d3783556-f88d-403e-b0a1-ea7f203578b1_buggy.java
++++ b/tmp/9a3dbaea-e9b1-4339-b3c1-fd3bddc7e0d2_fixed.java
+@@ -1,28 +1,12 @@
+-    @Override
+-    protected Object encodeCommand(Command command) {
++    @Test
++    public void testEncodePeriodicPositionRetrievalIntervalSet() throws Exception {
++        var encoder = inject(new GatorProtocolEncoder(null));
++        var device = encoder.getCacheManager().getObject(Device.class, 1);
++        when(device.getUniqueId()).thenReturn("13088005658");
+ 
+-        ByteBuf content = Unpooled.buffer();
+-
+-        switch (command.getType()) {
+-            case Command.TYPE_POSITION_SINGLE:
+-                return encodeContent(command.getDeviceId(), GatorProtocolDecoder.MSG_POSITION_REQUEST, content);
+-            case Command.TYPE_ENGINE_STOP:
+-                return encodeContent(command.getDeviceId(), GatorProtocolDecoder.MSG_CLOSE_THE_OIL_DUCT, content);
+-            case Command.TYPE_ENGINE_RESUME:
+-                return encodeContent(command.getDeviceId(), GatorProtocolDecoder.MSG_RESTORES_THE_OIL_DUCT, content);
+-            case Command.TYPE_SET_SPEED_LIMIT:
+-                content.writeByte(command.getInteger(Command.KEY_DATA));
+-                return encodeContent(command.getDeviceId(), GatorProtocolDecoder.MSG_SET_SPEED_LIMIT, content);
+-            case Command.TYPE_SET_ODOMETER:
+-                content.writeShort(command.getInteger(Command.KEY_DATA));
+-                return encodeContent(command.getDeviceId(), GatorProtocolDecoder.MSG_SET_ODOMETER, content);
+-            case Command.TYPE_POSITION_PERIODIC:
+-                String[] data = command.getString(Command.KEY_FREQUENCY).split(";");
+-                content.writeShort(Integer.valueOf(data[0]));
+-                content.writeShort(Integer.valueOf(data[1]));
+-                content.writeShort(Integer.valueOf(data[2]));
+-                return encodeContent(command.getDeviceId(), GatorProtocolDecoder.MSG_POSITION_PERIODIC, content);
+-            default:
+-                return null;
+-        }
++        Command command = new Command();
++        command.setDeviceId(1);
++        command.set(command.KEY_FREQUENCY, "5;5;120");
++        command.setType(Command.TYPE_POSITION_PERIODIC);
++        verifyCommand(encoder, command, binary("242434000b5800383a00050005781d0d"));
+     }

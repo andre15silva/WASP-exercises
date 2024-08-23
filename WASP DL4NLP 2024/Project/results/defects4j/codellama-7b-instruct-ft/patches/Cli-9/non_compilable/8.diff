@@ -1,0 +1,52 @@
+diff --git a/tmp/112f6283-0f1c-49d6-b92e-55ec5ccc5095_buggy.java b/tmp/a7763606-3846-4609-8ebb-05309f592119_fixed.java
+index 546f262..f072c1d 100644
+--- a/tmp/112f6283-0f1c-49d6-b92e-55ec5ccc5095_buggy.java
++++ b/tmp/a7763606-3846-4609-8ebb-05309f592119_fixed.java
+@@ -1,29 +1,38 @@
+     /**
+      * <p>Throws a {@link MissingOptionException} if all of the
+      * required options are no present.</p>
+      *
+      * @throws MissingOptionException if any of the required Options
+      * are not present.
+      */
+     protected void checkRequiredOptions()
+         throws MissingOptionException
+     {
+         // if there are required options that have not been
+-        // processsed
++        // processed
+         if (getRequiredOptions().size() > 0)
+         {
+             Iterator iter = getRequiredOptions().iterator();
+-            StringBuffer buff = new StringBuffer("Missing required option");
+-            buff.append(getRequiredOptions().size() == 1 ? "" : "s");
+-            buff.append(": ");
+-
+-
+-            // loop through the required options
+-            while (iter.hasNext())
++            StringBuffer buff = new StringBuffer("Missing required options: ");
++            if (iter.hasNext())
+             {
+                 buff.append(iter.next());
+             }
+-
++            boolean needComma = false;
++            iter = getRequiredOptions().iterator();
++            while (iter.hasNext())
++            {
++                StringBuffer item = new StringBuffer(iter.next());
++                if (needComma)
++                {
++                    item.insert(0, ", ");
++                }
++                else
++                {
++                    needComma = true;
++                }
++                buff.append(item.toString());
++            }
+             throw new MissingOptionException(buff.toString());
+         }
+     }

@@ -1,0 +1,24 @@
+diff --git a/tmp/d14d577a-294a-4d65-9f34-74080cd8a78a_buggy.java b/tmp/5c4a3da0-b54f-47cc-8938-b17ff86c0edf_fixed.java
+index 3ecd591..23ab305 100644
+--- a/tmp/d14d577a-294a-4d65-9f34-74080cd8a78a_buggy.java
++++ b/tmp/5c4a3da0-b54f-47cc-8938-b17ff86c0edf_fixed.java
+@@ -1,6 +1,18 @@
+     private boolean isInlineable(Document.OutputSettings out) {
++        int tagLevel = 0;
++        if (tag().isInline())
++            for (Node current = parent(); current != null; current = current.parent()) {
++                if (current instanceof Element && ((Element) current).tagName().equals("a"))
++                    tagLevel += 1;
++                if (current instanceof Document || current instanceof Document.OutputSettings || current instanceof Document.OutputSettings.Syntax ||
++                    current instanceof Document.OutputSettings.Syntax.EscapeMode || current instanceof Document.OutputSettings.Indent ||
++                    current instanceof Document.OutputSettings.Prettyprint)
++                    continue;
++                if (tagLevel &gt; 0)
++                    return false;
++            }
+         return tag().isInline()
+             && (parent() == null || parent().isBlock())
+             && previousSibling() != null
+             && !out.outline();
+     }
+\ No newline at end of file

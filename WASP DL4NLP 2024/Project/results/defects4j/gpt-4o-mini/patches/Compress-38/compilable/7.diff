@@ -1,0 +1,33 @@
+diff --git a/tmp/5147ccfd-67ed-4c23-939d-3d638dba735f_buggy.java b/tmp/395a1f2b-5de4-43ea-bf8a-01207ec107ad_fixed.java
+index 192e83d..f4d8b37 100644
+--- a/tmp/5147ccfd-67ed-4c23-939d-3d638dba735f_buggy.java
++++ b/tmp/395a1f2b-5de4-43ea-bf8a-01207ec107ad_fixed.java
+@@ -1,21 +1,15 @@
+-    /**
+-     * Return whether or not this entry represents a directory.
+-     *
+-     * @return True if this entry is a directory.
+-     */
+ @Override
+ public boolean isDirectory() {
+     if (file != null) {
+-            return file.isDirectory();
++        return file.isDirectory(); // Check if the file object is a directory
+     }
+ 
+     if (linkFlag == LF_DIR) {
+-            return true;
++        return true; // Check if the entry is marked as a directory
+     }
+ 
+-        if (getName().endsWith("/")) {
+-            return true;
+-        }
+-
+-        return false;
++    // Check if the name ends with a '/' for directory indication
++    // Ensure that this check is done even if file is null.
++    String name = getName();
++    return name.endsWith("/") || name.equals(""); // Added check for empty string as a valid directory name
+ }
+\ No newline at end of file

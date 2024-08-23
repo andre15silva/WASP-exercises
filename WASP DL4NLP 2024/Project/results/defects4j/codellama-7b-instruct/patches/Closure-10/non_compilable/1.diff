@@ -1,0 +1,14 @@
+diff --git a/tmp/3c47e39a-fc04-4b3c-920d-35ad29da8320_buggy.java b/tmp/c73dfbc3-1928-4615-99ae-0eb6d14edf12_fixed.java
+index 6fecc90..985dc35 100644
+--- a/tmp/3c47e39a-fc04-4b3c-920d-35ad29da8320_buggy.java
++++ b/tmp/c73dfbc3-1928-4615-99ae-0eb6d14edf12_fixed.java
+@@ -1,7 +1,8 @@
+   static boolean mayBeString(Node n, boolean recurse) {
++    // Use `mayBeStringAndNonString` instead of `allResultsMatch`
+     if (recurse) {
+-      return allResultsMatch(n, MAY_BE_STRING_PREDICATE);
++      return mayBeStringAndNonString(n, MAY_BE_STRING_PREDICATE);
+     } else {
+       return mayBeStringHelper(n);
+     }
+   }

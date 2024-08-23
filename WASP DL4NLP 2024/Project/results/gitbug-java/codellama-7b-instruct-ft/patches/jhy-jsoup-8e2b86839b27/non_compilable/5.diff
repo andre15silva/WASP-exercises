@@ -1,0 +1,9 @@
+diff --git a/tmp/6399b047-d215-4280-b4fa-d9b042a4e10f_buggy.java b/tmp/4c2509f1-0a01-4136-bb2c-0d9f32e77d3a_fixed.java
+index ae12a4d..a364b67 100644
+--- a/tmp/6399b047-d215-4280-b4fa-d9b042a4e10f_buggy.java
++++ b/tmp/4c2509f1-0a01-4136-bb2c-0d9f32e77d3a_fixed.java
+@@ -1,3 +1,3 @@
+     private boolean isFormatAsBlock(Document.OutputSettings out) {
+-        return tag.formatAsBlock() || (parent() != null && parent().tag().formatAsBlock()) || out.outline();
++        return tag.formatAsBlock() || (parent() != null && parent().tag().formatAsBlock()) || out.outline() || tags().tags("pre", "textarea", "script", "title", "style").contains(tag);
+     }

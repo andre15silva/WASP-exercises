@@ -1,0 +1,24 @@
+diff --git a/tmp/8c3109e9-43be-413d-a741-3ce658444659_buggy.java b/tmp/6fcf0ba6-3859-4e77-b43c-2848f1b4f23c_fixed.java
+index ba2718f..6087161 100644
+--- a/tmp/8c3109e9-43be-413d-a741-3ce658444659_buggy.java
++++ b/tmp/6fcf0ba6-3859-4e77-b43c-2848f1b4f23c_fixed.java
+@@ -1,7 +1,19 @@
+   /**
+    * ContextTypeExpression := BasicTypeExpression | '?'
+    * For expressions on the right hand side of a this: or new:
+    */
+   private Node parseContextTypeExpression(JsDocToken token) {
++          if (token.name().equals("?")) {
++            JsDocToken structuralConstructorToken = lexer.peek(1);
++            if (structuralConstructorToken.name().equals("(")) {
++              lexer.consume(structuralConstructorToken);
++              lexer.consume(JsDocToken.make("new"));
++              lexer.consume(JsDocToken.make(":"));
++              lexer.consume(JsDocToken.make("?"));
++              lexer.consume(structuralConstructorToken);
++              return parseTypeName(JsDocToken.make("?"));
++            }
++          }
++          // type not anonymous structural constructor here.
+           return parseTypeName(token);
+   }

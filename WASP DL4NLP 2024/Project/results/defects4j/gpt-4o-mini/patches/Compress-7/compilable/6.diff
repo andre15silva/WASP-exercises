@@ -1,0 +1,31 @@
+diff --git a/tmp/e7895a50-3628-479e-8c1b-6d99903bd933_buggy.java b/tmp/84432fd3-2757-4a33-a247-2fe5e156c836_fixed.java
+index d6662c7..47c4ed7 100644
+--- a/tmp/e7895a50-3628-479e-8c1b-6d99903bd933_buggy.java
++++ b/tmp/84432fd3-2757-4a33-a247-2fe5e156c836_fixed.java
+@@ -1,23 +1,13 @@
+-    /**
+-     * Parse an entry name from a buffer.
+-     * Parsing stops when a NUL is found
+-     * or the buffer length is reached.
+-     *
+-     * @param buffer The buffer from which to parse.
+-     * @param offset The offset into the buffer from which to parse.
+-     * @param length The maximum number of bytes to parse.
+-     * @return The entry name.
+-     */
+ public static String parseName(byte[] buffer, final int offset, final int length) {
+     StringBuffer result = new StringBuffer(length);
+-        int          end = offset + length;
++    int end = Math.min(offset + length, buffer.length);
+ 
+     for (int i = offset; i < end; ++i) {
+         if (buffer[i] == 0) {
+             break;
+         }
+-            result.append((char) buffer[i]);
++        result.append((char) (buffer[i] & 0xFF)); // Convert byte to unsigned int
+     }
+ 
+     return result.toString();
+ }
+\ No newline at end of file

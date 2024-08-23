@@ -1,0 +1,19 @@
+diff --git a/tmp/a5fecdde-7953-42c0-abb3-84230ddd8026_buggy.java b/tmp/20258544-a1e8-4250-ba68-85a9b8c22678_fixed.java
+index d931bce..0571273 100644
+--- a/tmp/a5fecdde-7953-42c0-abb3-84230ddd8026_buggy.java
++++ b/tmp/20258544-a1e8-4250-ba68-85a9b8c22678_fixed.java
+@@ -1,5 +1,13 @@
+     /** {@inheritDoc} */
+     public double solve(final UnivariateRealFunction f, double min, double max, double initial)
+         throws MaxIterationsExceededException, FunctionEvaluationException {
+-        return solve(min, max);
++        if (max == min) {
++            return min;
++        } else if (max== Double.NEGATIVE_INFINITY ||
++            min == Double.POSITIVE_INFINITY) {
++                return new BrentSolver().solve(f, min, max, initial);
++        } else {
++            final double mid = new  Math_369().calculate(min, max);
++            return new MidPointSolver().solve(f, mid, min, initial);
++        }
+     }

@@ -1,0 +1,20 @@
+diff --git a/tmp/262ad3b2-568e-44e0-90ac-383d8f8d429c_buggy.java b/tmp/d5cf9102-5ae0-47e8-9531-1dc829347a97_fixed.java
+index 46799da..15224f1 100644
+--- a/tmp/262ad3b2-568e-44e0-90ac-383d8f8d429c_buggy.java
++++ b/tmp/d5cf9102-5ae0-47e8-9531-1dc829347a97_fixed.java
+@@ -1,8 +1,13 @@
+         /**
+          * @param x Normalized objective variables.
+          * @return the original objective variables, possibly repaired.
++         *         After a successful retrieve and "repair" return the original variables.
+          */
+         public double[] repairAndDecode(final double[] x) {
+-            return
+-                decode(x);
++            final double[] decoded = decode(x);
++            if (decodeFitness(decoded) == Double.POSITIVE_INFINITY) {
++                return decoded;
++            } else {
++                return decodeAndBound(x);
++            }
+         }

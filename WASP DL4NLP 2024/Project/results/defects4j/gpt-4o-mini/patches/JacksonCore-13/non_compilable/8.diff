@@ -1,0 +1,32 @@
+diff --git a/tmp/e311d5a5-74a0-40e4-a0af-d3a211a39d84_buggy.java b/tmp/3e9421a7-14bd-4139-a7c7-9beb6fc4b5c8_fixed.java
+index e69de29..ad8d898 100644
+--- a/tmp/e311d5a5-74a0-40e4-a0af-d3a211a39d84_buggy.java
++++ b/tmp/3e9421a7-14bd-4139-a7c7-9beb6fc4b5c8_fixed.java
+@@ -0,0 +1,26 @@
++private void _testFieldNameQuotingEnabled(JsonFactory factory, boolean quoted, boolean expectedQuoted, String expected) throws IOException {
++    // Create a JSON generator with the provided factory
++    StringWriter writer = new StringWriter();
++    JsonGenerator generator = factory.createGenerator(writer);
++
++    // Configure generator to quote or not quote field names based on the input
++    if (quoted) {
++        generator.writeStartObject();
++        generator.writeNumberField("foo", 1); // Ensure the field name is quoted
++        generator.writeEndObject();
++    } else {
++        // The field name should not be quoted
++        generator.writeStartObject();
++        generator.writeNumberField("foo", 1); // Ensure the field name is not quoted
++        generator.writeEndObject();
++    }
++
++    generator.close();
++    
++    // Validate the output
++    String actual = writer.toString();
++    if (expectedQuoted) {
++        expected = expected.replace("{foo:1}", "{\"foo\":1}");
++    }
++    assertEquals(expected, actual);
++}
+\ No newline at end of file

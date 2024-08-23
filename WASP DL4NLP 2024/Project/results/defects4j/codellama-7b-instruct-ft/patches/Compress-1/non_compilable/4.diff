@@ -1,0 +1,27 @@
+diff --git a/tmp/4004d0eb-b08b-47d4-ad54-00c0634467ce_buggy.java b/tmp/6c0a3593-31e9-4e97-a99c-930049d08f36_fixed.java
+index c3986cc..cfefe12 100644
+--- a/tmp/4004d0eb-b08b-47d4-ad54-00c0634467ce_buggy.java
++++ b/tmp/6c0a3593-31e9-4e97-a99c-930049d08f36_fixed.java
+@@ -1,13 +1,21 @@
+     /**
+      * Closes the CPIO output stream as well as the stream being filtered.
+      * 
+      * @throws IOException
+      *             if an I/O error has occurred or if a CPIO file error has
+      *             occurred
+      */
+     public void close() throws IOException {
+         if (!this.closed) {
++            final OutputStream outputStream = this.archiveOutputStream;
++            final int cpioSize;
++            cpioSize = archiveOutputStream.getBytesWritten();
++            final byte[] cpioData = new byte [cpioSize];
++            outputStream.close();
++            outputStream.flush();
++            outputStream.writeTo(cpioData);
++            archiveOutputStream = null;
+             super.close();
+-            this.closed = true;
++            closed = true;
+         }
+     }

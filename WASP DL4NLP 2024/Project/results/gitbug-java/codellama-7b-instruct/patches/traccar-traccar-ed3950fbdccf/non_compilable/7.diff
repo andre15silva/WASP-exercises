@@ -1,0 +1,79 @@
+diff --git a/tmp/f6c91736-43fd-4d4c-aa54-3d3d47509e9e_buggy.java b/tmp/e63d8b5a-88f5-4e41-986b-676167d9fdca_fixed.java
+index abd3198..c38f8e3 100644
+--- a/tmp/f6c91736-43fd-4d4c-aa54-3d3d47509e9e_buggy.java
++++ b/tmp/e63d8b5a-88f5-4e41-986b-676167d9fdca_fixed.java
+@@ -1,28 +1,47 @@
+-    @Override
+-    protected Object encodeCommand(Command command) {
+-
+-        ByteBuf content = Unpooled.buffer();
+-
+-        switch (command.getType()) {
+-            case Command.TYPE_POSITION_SINGLE:
+-                return encodeContent(command.getDeviceId(), GatorProtocolDecoder.MSG_POSITION_REQUEST, content);
+-            case Command.TYPE_ENGINE_STOP:
+-                return encodeContent(command.getDeviceId(), GatorProtocolDecoder.MSG_CLOSE_THE_OIL_DUCT, content);
+-            case Command.TYPE_ENGINE_RESUME:
+-                return encodeContent(command.getDeviceId(), GatorProtocolDecoder.MSG_RESTORES_THE_OIL_DUCT, content);
+-            case Command.TYPE_SET_SPEED_LIMIT:
+-                content.writeByte(command.getInteger(Command.KEY_DATA));
+-                return encodeContent(command.getDeviceId(), GatorProtocolDecoder.MSG_SET_SPEED_LIMIT, content);
+-            case Command.TYPE_SET_ODOMETER:
+-                content.writeShort(command.getInteger(Command.KEY_DATA));
+-                return encodeContent(command.getDeviceId(), GatorProtocolDecoder.MSG_SET_ODOMETER, content);
+-            case Command.TYPE_POSITION_PERIODIC:
+-                String[] data = command.getString(Command.KEY_FREQUENCY).split(";");
+-                content.writeShort(Integer.valueOf(data[0]));
+-                content.writeShort(Integer.valueOf(data[1]));
+-                content.writeShort(Integer.valueOf(data[2]));
+-                return encodeContent(command.getDeviceId(), GatorProtocolDecoder.MSG_POSITION_PERIODIC, content);
+-            default:
+-                return null;
++   public class Command {
++       private String deviceId;
++       private String type;
++       private String frequency;
++       private String data;
++       private String key;
++
++       public String getDeviceId() {
++           return deviceId;
++       }
++
++       public void setDeviceId(String deviceId) {
++           this.deviceId = deviceId;
++       }
++
++       public String getType() {
++           return type;
++       }
++
++       public void setType(String type) {
++           this.type = type;
++       }
++
++       public String getFrequency() {
++           return frequency;
++       }
++
++       public void setFrequency(String frequency) {
++           this.frequency = frequency;
++       }
++
++       public String getData() {
++           return data;
++       }
++
++       public void setData(String data) {
++           this.data = data;
++       }
++
++       public String getKey() {
++           return key;
++       }
++
++       public void setKey(String key) {
++           this.key = key;
+        }
+    }
+\ No newline at end of file

@@ -1,0 +1,102 @@
+diff --git a/tmp/c0ca7854-b318-41cd-88d2-288e731f80cd_buggy.java b/tmp/f8666356-3a6e-447a-abaa-a6a8abded851_fixed.java
+index a6dab52..e86577e 100644
+--- a/tmp/c0ca7854-b318-41cd-88d2-288e731f80cd_buggy.java
++++ b/tmp/f8666356-3a6e-447a-abaa-a6a8abded851_fixed.java
+@@ -1,80 +1,46 @@
+-    /**
+-     * <p>Worker method for the {@link #escapeJavaScript(String)} method.</p>
+-     * 
+-     * @param out write to receieve the escaped string
+-     * @param str String to escape values in, may be null
+-     * @param escapeSingleQuote escapes single quotes if <code>true</code>
+-     * @throws IOException if an IOException occurs
+-     */
+     private static void escapeJavaStyleString(Writer out, String str, boolean escapeSingleQuote) throws IOException {
+         if (out == null) {
+             throw new IllegalArgumentException("The Writer must not be null");
+         }
+         if (str == null) {
+             return;
+         }
+-        int sz;
+-        sz = str.length();
++        int sz = str.length();
+         for (int i = 0; i < sz; i++) {
+             char ch = str.charAt(i);
+ 
+             // handle unicode
+-            if (ch > 0xfff) {
++            if (ch >= 0xd800 && ch <= 0xdfff) {
++                if (ch >= 0xe000) {
+                     out.write("\\u" + hex(ch));
+-            } else if (ch > 0xff) {
++                } else {
+                     out.write("\\u0" + hex(ch));
+-            } else if (ch > 0x7f) {
+-                out.write("\\u00" + hex(ch));
+-            } else if (ch < 32) {
+-                switch (ch) {
+-                    case '\b':
+-                        out.write('\\');
+-                        out.write('b');
+-                        break;
+-                    case '\n':
+-                        out.write('\\');
+-                        out.write('n');
+-                        break;
+-                    case '\t':
+-                        out.write('\\');
+-                        out.write('t');
+-                        break;
+-                    case '\f':
+-                        out.write('\\');
+-                        out.write('f');
+-                        break;
+-                    case '\r':
+-                        out.write('\\');
+-                        out.write('r');
+-                        break;
+-                    default :
+-                        if (ch > 0xf) {
+-                            out.write("\\u00" + hex(ch));
+-                        } else {
+-                            out.write("\\u000" + hex(ch));
+                 }
+-                        break;
++                continue;
+             }
+-            } else {
++
++            // handle special characters
+             switch (ch) {
+                 case '\'':
+                     if (escapeSingleQuote) {
+-                          out.write('\\');
++                        out.write("\\'");
++                    } else {
++                        out.write("'" );
+                     }
+-                        out.write('\'');
+                     break;
+                 case '"':
+-                        out.write('\\');
+-                        out.write('"');
++                    out.write("\\\"");
+                     break;
+                 case '\\':
+-                        out.write('\\');
+-                        out.write('\\');
++                    out.write("\\\\");
+                     break;
+                 default:
++                    if (ch <= 0x1f || ch >= 0x7f) {
++                        out.write("\\u" + hex(ch));
++                    } else {
+                         out.write(ch);
++                    }
+                     break;
+             }
+         }
+     }
+\ No newline at end of file
+-    }

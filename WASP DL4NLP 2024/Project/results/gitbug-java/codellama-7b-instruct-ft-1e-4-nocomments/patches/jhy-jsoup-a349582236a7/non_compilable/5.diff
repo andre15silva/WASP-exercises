@@ -1,0 +1,19 @@
+diff --git a/tmp/ee13c0a6-a5b0-45d6-a838-f5fbb985da10_buggy.java b/tmp/8b719c64-e049-4e91-bfbf-7c2e38f6abaf_fixed.java
+index 3ecd591..a44e9a3 100644
+--- a/tmp/ee13c0a6-a5b0-45d6-a838-f5fbb985da10_buggy.java
++++ b/tmp/8b719c64-e049-4e91-bfbf-7c2e38f6abaf_fixed.java
+@@ -1,6 +1,9 @@
+     private boolean isInlineable(Document.OutputSettings out) {
+-        return tag().isInline()
+-            && (parent() == null || parent().isBlock())
+-            && previousSibling() != null
+-            && !out.outline();
++        if (!tag().isInline() || !parent() != null || previousSibling() == null || out.outline())
++            return false;
++        Element el = siblingForm(this);
++        Element child = el == this ? this : parent();
++        return el != null &&
++            !isNestedAnchor(el) &&
++            (child.tag().isBlock() || StringUtil.in(child.tagName(), "a", "p", "h1", "h2", "h3", "h4", "h5"));
+     }
+\ No newline at end of file

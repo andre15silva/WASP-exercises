@@ -1,0 +1,16 @@
+diff --git a/tmp/df52aa2b-9586-4b97-b427-c8a6d7809ccc_buggy.java b/tmp/64fc6158-54d1-49b9-bc63-224daf3eb3d3_fixed.java
+index 22640dd..afef1db 100644
+--- a/tmp/df52aa2b-9586-4b97-b427-c8a6d7809ccc_buggy.java
++++ b/tmp/64fc6158-54d1-49b9-bc63-224daf3eb3d3_fixed.java
+@@ -1,3 +1,10 @@
+   private boolean hasExceptionHandler(Node cfgNode) {
+     return false;
+   }
++
++@Override
++  protected void (Node left, Node right) {
++    if (cfgNode != null) {
++      didRewriteTree = true;
++    }
++  }
+\ No newline at end of file

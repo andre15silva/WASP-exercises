@@ -1,0 +1,17 @@
+diff --git a/tmp/c25b1299-5de0-4ce5-af8c-553ff2d98b43_buggy.java b/tmp/e5e0b1cc-8eec-44fa-8520-43ea8e61e2b0_fixed.java
+index 111ba5e..b3f6e37 100644
+--- a/tmp/c25b1299-5de0-4ce5-af8c-553ff2d98b43_buggy.java
++++ b/tmp/e5e0b1cc-8eec-44fa-8520-43ea8e61e2b0_fixed.java
+@@ -1,9 +1,9 @@
+ public static boolean areEqual(Object o1, Object o2) {
+     if (o1 == null || o2 == null) {
+         return o1 == null && o2 == null;
+-        } else if (isArray(o1)) {
+-            return isArray(o2) && areArraysEqual(o1, o2);
++    } else if (isArray(o1) && isArray(o2)) {
++        return areArraysEqual(o1, o2);
+     } else {
+         return o1.equals(o2);
+     }
+ }
+\ No newline at end of file

@@ -1,0 +1,24 @@
+diff --git a/tmp/9cf525ef-63d6-44df-81f4-e3e90f555154_buggy.java b/tmp/f710ecd6-b895-4a09-93fd-7f15e1113955_fixed.java
+index cbfa753..dfd6434 100644
+--- a/tmp/9cf525ef-63d6-44df-81f4-e3e90f555154_buggy.java
++++ b/tmp/f710ecd6-b895-4a09-93fd-7f15e1113955_fixed.java
+@@ -1,15 +1,13 @@
+ void insert(Token.Comment commentToken) {
+     Comment comment = new Comment(commentToken.getData());
+     Node insert = comment;
+-        if (commentToken.bogus) { // xml declarations are emitted as bogus comments (which is right for html, but not xml)
+-            // so we do a bit of a hack and parse the data as an element to pull the attributes out
+-            String data = comment.getData();
+-            if (data.length() > 1 && (data.startsWith("!") || data.startsWith("?"))) {
+-                Document doc = Jsoup.parse("<" + data.substring(1, data.length() -1) + ">", baseUri, Parser.xmlParser());
++    if (commentToken.bogus) {
++        if (comment.getData().startsWith("!") || comment.getData().startsWith("?")) {
++            Document doc = Jsoup.parse("<" + comment.getData().substring(1, comment.getData().length() -1) + ">", baseUri, Parser.xmlParser());
+             Element el = doc.child(0);
+             insert = new XmlDeclaration(settings.normalizeTag(el.tagName()), data.startsWith("!"));
+             insert.attributes().addAll(el.attributes());
+         }
+     }
+     insertNode(insert);
+ }
+\ No newline at end of file

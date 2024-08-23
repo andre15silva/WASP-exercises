@@ -1,0 +1,27 @@
+diff --git a/tmp/1df50ae0-5a5e-4ece-b56a-ae786d2d0337_buggy.java b/tmp/bac2ffe3-5247-438e-a16b-ae0094f0c4bb_fixed.java
+index fd29bad..c3ef3ee 100644
+--- a/tmp/1df50ae0-5a5e-4ece-b56a-ae786d2d0337_buggy.java
++++ b/tmp/bac2ffe3-5247-438e-a16b-ae0094f0c4bb_fixed.java
+@@ -1,10 +1,15 @@
+ /**
+-     * Returns a copy of the header map that iterates in column order.
+-     * <p>
+-     * The map keys are column names. The map values are 0-based indices.
+-     * </p>
+-     * @return a copy of the header map that iterates in column order.
++ * Returns a map from column names to column indices for all the columns in the CSV file.
++ * The map is read-only.
++ *
++ * @return a map from column names to column indices for all the columns in the CSV file
+  */
+ public Map<String, Integer> getHeaderMap() {
+-        return new LinkedHashMap<String, Integer>(this.headerMap);
++    if (this.headerMap == null) {
++        this.headerMap = new LinkedHashMap<>();
++        for (int i = 0; i < this.headers.size(); i++) {
++            this.headerMap.put(this.headers.get(i), i);
++        }
++    }
++    return new LinkedHashMap<>(this.headerMap);
+ }
+\ No newline at end of file

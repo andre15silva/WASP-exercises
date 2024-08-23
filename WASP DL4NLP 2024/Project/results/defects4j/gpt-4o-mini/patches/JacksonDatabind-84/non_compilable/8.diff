@@ -1,0 +1,24 @@
+diff --git a/tmp/094a9251-0507-44cd-a8fb-367f8f62d85f_buggy.java b/tmp/0bb9a70d-bc42-428d-8715-a654b20d8c99_fixed.java
+index e69de29..978fa87 100644
+--- a/tmp/094a9251-0507-44cd-a8fb-367f8f62d85f_buggy.java
++++ b/tmp/0bb9a70d-bc42-428d-8715-a654b20d8c99_fixed.java
+@@ -0,0 +1,18 @@
++public class Base {
++    public int base = 1;
++}
++
++public class Sub extends Base {
++    public int sub = 2;
++}
++
++// Ensure Jackson knows about the properties
++@JsonProperty
++public class Base {
++    public int base = 1;
++}
++
++@JsonProperty
++public class Sub extends Base {
++    public int sub = 2;
++}
+\ No newline at end of file

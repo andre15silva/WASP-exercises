@@ -1,0 +1,31 @@
+diff --git a/tmp/b22749b0-2c84-4e18-b185-7af09de8f50d_buggy.java b/tmp/8f9cb247-d8e1-4ff9-8f5d-135b6fc5b9aa_fixed.java
+index 6cfa79b..078e236 100644
+--- a/tmp/b22749b0-2c84-4e18-b185-7af09de8f50d_buggy.java
++++ b/tmp/8f9cb247-d8e1-4ff9-8f5d-135b6fc5b9aa_fixed.java
+@@ -1,12 +1,22 @@
+     /**
+-     * For this disbution, X, this method returns P(X &lt; <code>x</code>).
++     * For this distribution, X, this method returns P(X &lt; <code>x</code>).
+      * @param x the value at which the CDF is evaluated.
+      * @return CDF evaluted at <code>x</code>. 
+      * @throws MathException if the algorithm fails to converge; unless
+      * x is more than 20 standard deviations from the mean, in which case the
+-     * convergence exception is caught and 0 or 1 is returned.
++     * convergence exception is caught and 0 or 1 is returned. Less than
++     * optimal results will be produced in the vicinity of the lower and
++     * upper tails, but these are sufficiently rare events not to affect
++     * normal computations of the CDF, and using distributions that
++     * guarantee convergence would be inefficient and require  
++     * doubling the number of coefficients stored.
+      */
+     public double cumulativeProbability(double x) throws MathException {
+-            return 0.5 * (1.0 + Erf.erf((x - mean) /
+-                    (standardDeviation * Math.sqrt(2.0))));
++        double z = (x - mean) / standardDeviation;
++        if (z < 0) {
++            return 0.5 + 0.5 * Erf.erf(z / Math.sqrt(2.0));
++        }
++        else {
++            return 0.5 - 0.5 * Erf.erf(z / Math.sqrt(2.0));
++        }
+     }

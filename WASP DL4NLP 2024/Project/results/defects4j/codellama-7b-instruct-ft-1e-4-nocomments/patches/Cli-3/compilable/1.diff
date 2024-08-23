@@ -1,0 +1,27 @@
+diff --git a/tmp/34903868-187b-4c78-9045-be2ab145df37_buggy.java b/tmp/fe8148c7-f4e5-43be-a05f-8243ba2c5151_fixed.java
+index d9b400d..7047b4e 100644
+--- a/tmp/34903868-187b-4c78-9045-be2ab145df37_buggy.java
++++ b/tmp/fe8148c7-f4e5-43be-a05f-8243ba2c5151_fixed.java
+@@ -1,21 +1,19 @@
+     /**
+      * <p>Create a number from a String. If a . is present, it creates a 
+      *    Double, otherwise a Long. </p>
+-     *
+      * @param str the value
+      * @return the number represented by <code>str</code>, if <code>str</code>
+      * is not a number, null is returned.
+      */
+     public static Number createNumber(String str)
+     {
+         try
+         {
+             return org.apache.commons.lang.math.NumberUtils.createNumber(str);
+         }
+         catch (NumberFormatException nfe)
+         {
+             System.err.println(nfe.getMessage());
+         }
+-
+         return null;
+     }
+\ No newline at end of file

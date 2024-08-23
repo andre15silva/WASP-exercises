@@ -1,0 +1,158 @@
+diff --git a/tmp/16c889f7-d3c6-4c0e-9d0d-573eadd178ff_buggy.java b/tmp/8368874c-1550-4779-9ec1-9240be673914_fixed.java
+index 2c4ed06..dc171ae 100644
+--- a/tmp/16c889f7-d3c6-4c0e-9d0d-573eadd178ff_buggy.java
++++ b/tmp/8368874c-1550-4779-9ec1-9240be673914_fixed.java
+@@ -1,111 +1,99 @@
+-    /** Accept a step, triggering events and step handlers.
+-     * @param interpolator step interpolator
+-     * @param y state vector at step end time, must be reset if an event
+-     * asks for resetting or if an events stops integration during the step
+-     * @param yDot placeholder array where to put the time derivative of the state vector
+-     * @param tEnd final integration time
+-     * @return time at end of step
+-     * @exception MathIllegalStateException if the value of one event state cannot be evaluated
+-     * @since 2.2
++    /**
++     * This function handles step events and triggers the necessary actions to handle them.
++     * It checks for any events that may occur during the integration step, and takes the
++     * appropriate action, such as restarting the integration from the beginning or updating
++     * the state of the integration.
++     *
++     * @param interpolator the StepInterpolator to use for event evaluation
++     * @param y the state vector at the end of the integration step
++     * @param yDot the derivative of the state vector at the end of the integration step
++     * @param tEnd the final integration time
++     * @return the time at the end of the integration step
++     * @throws MathIllegalStateException if one or more events violate their
++     * conditions or cannot be evaluated
+      */
+-    protected double acceptStep(final AbstractStepInterpolator interpolator,
+-                                final double[] y, final double[] yDot, final double tEnd)
+-        throws MathIllegalStateException {
++    protected double handleStepEvents(StepInterpolator interpolator, double[] y,
++            double[] yDot, double tEnd) throws MathIllegalStateException {
+ 
+-            double previousT = interpolator.getGlobalPreviousTime();
+-            final double currentT = interpolator.getGlobalCurrentTime();
+-            resetOccurred = false;
+-
+-            // initialize the events states if needed
++        // Initialize the states of all events that occur during the step, if necessary
+         if (!statesInitialized) {
+             for (EventState state : eventsStates) {
+                 state.reinitializeBegin(interpolator);
+             }
+             statesInitialized = true;
+         }
+ 
+-            // search for next events that may occur during the step
+-            final int orderingSign = interpolator.isForward() ? +1 : -1;
+-            SortedSet<EventState> occuringEvents = new TreeSet<EventState>(new Comparator<EventState>() {
+-
+-                /** {@inheritDoc} */
+-                public int compare(EventState es0, EventState es1) {
+-                    return orderingSign * Double.compare(es0.getEventTime(), es1.getEventTime());
+-                }
+-
+-            });
+-
+-            for (final EventState state : eventsStates) {
++        // Check for any events that may occur during the current step
++        SortedSet<EventState> occuringEvents = new TreeSet<EventState>();
++        for (EventState state : eventsStates) {
+             if (state.evaluateStep(interpolator)) {
+-                    // the event occurs during the current step
+                 occuringEvents.add(state);
+             }
+         }
+ 
++        // Handle any events that occur during the step
+         while (!occuringEvents.isEmpty()) {
+ 
+-                // handle the chronologically first event
+-                final Iterator<EventState> iterator = occuringEvents.iterator();
+-                final EventState currentEvent = iterator.next();
+-                iterator.remove();
++            // Take the first event from the set
++            EventState event = occuringEvents.first();
++            occuringEvents.remove(event);
+ 
+-                // restrict the interpolator to the first part of the step, up to the event
+-                final double eventT = currentEvent.getEventTime();
++            // Restrict the interpolator to the first part of the step
++            final double eventT = event.getEventTime();
+             interpolator.setSoftPreviousTime(previousT);
+             interpolator.setSoftCurrentTime(eventT);
+ 
+-                // trigger the event
++            // Trigger the event
+             interpolator.setInterpolatedTime(eventT);
+             final double[] eventY = interpolator.getInterpolatedState();
+-                currentEvent.stepAccepted(eventT, eventY);
+-                isLastStep = currentEvent.stop();
++            event.stepAccepted(eventT, eventY);
++            isLastStep = event.stop();
+ 
+-                // handle the first part of the step, up to the event
+-                for (final StepHandler handler : stepHandlers) {
++            // Handle the first part of the step
++            for (StepHandler handler : stepHandlers) {
+                 handler.handleStep(interpolator, isLastStep);
+             }
+ 
+             if (isLastStep) {
+-                    // the event asked to stop integration
++                // The event asked to stop integration, so return the time at
++                // the end of the current step
+                 System.arraycopy(eventY, 0, y, 0, y.length);
+                 return eventT;
+             }
+ 
+-                if (currentEvent.reset(eventT, eventY)) {
+-                    // some event handler has triggered changes that
+-                    // invalidate the derivatives, we need to recompute them
++            if (event.reset(eventT, eventY)) {
++                // Event handler has triggered changes that invalidate the
++                // derivatives, so recompute them
+                 System.arraycopy(eventY, 0, y, 0, y.length);
+                 computeDerivatives(eventT, y, yDot);
+                 resetOccurred = true;
+                 return eventT;
+             }
+ 
+-                // prepare handling of the remaining part of the step
++            // Prepare handling of the remaining part of the step
+             previousT = eventT;
+             interpolator.setSoftPreviousTime(eventT);
+             interpolator.setSoftCurrentTime(currentT);
+ 
+-                // check if the same event occurs again in the remaining part of the step
+-                if (currentEvent.evaluateStep(interpolator)) {
+-                    // the event occurs during the current step
+-                    occuringEvents.add(currentEvent);
++            // Check if the same event occurs again in the remaining part of the step
++            if (event.evaluateStep(interpolator)) {
++                occuringEvents.add(event);
+             }
+-
+         }
+ 
+         interpolator.setInterpolatedTime(currentT);
+         final double[] currentY = interpolator.getInterpolatedState();
+-            for (final EventState state : eventsStates) {
++        for (EventState state : eventsStates) {
+             state.stepAccepted(currentT, currentY);
+             isLastStep = isLastStep || state.stop();
+         }
+         isLastStep = isLastStep || Precision.equals(currentT, tEnd, 1);
+ 
+-            // handle the remaining part of the step, after all events if any
++        // Handle the remaining part of the step
+         for (StepHandler handler : stepHandlers) {
+             handler.handleStep(interpolator, isLastStep);
+         }
+ 
+         return currentT;
+ 
+     }
+\ No newline at end of file

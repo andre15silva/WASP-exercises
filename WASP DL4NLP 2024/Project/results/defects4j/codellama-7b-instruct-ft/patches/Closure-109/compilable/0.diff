@@ -1,0 +1,21 @@
+diff --git a/tmp/411358c8-2a9e-47fc-8c6e-792725666768_buggy.java b/tmp/ab8a8ec5-a184-4084-b7e1-139315a35e90_fixed.java
+index ba2718f..55f5a62 100644
+--- a/tmp/411358c8-2a9e-47fc-8c6e-792725666768_buggy.java
++++ b/tmp/ab8a8ec5-a184-4084-b7e1-139315a35e90_fixed.java
+@@ -1,7 +1,16 @@
+   /**
+    * ContextTypeExpression := BasicTypeExpression | '?'
+    * For expressions on the right hand side of a this: or new:
+    */
+   private Node parseContextTypeExpression(JsDocToken token) {
+           return parseTypeName(token);
++          // FIXME this case triggers the following warning
++          //   extra warning: Bad type annotation. type not recognized due to syntax error
++          // This was done this way instead of using parseType,
++          // in case this: or new: were found.  Note: the
++          // nominalConstructor method will probably give the wrong answer here!
++          // FIXME - how do we know the type?
++          //return constructObjectType.apply(
++          //    node, toString(node), null, 0/*TODO*////
++          //,null /* object type template */);
+   }

@@ -1,0 +1,37 @@
+diff --git a/tmp/c052b890-31d4-4089-a68a-10d746740afe_buggy.java b/tmp/513f6c48-8d5e-46c4-8b2f-54be2064874c_fixed.java
+index 2573d30..babad0a 100644
+--- a/tmp/c052b890-31d4-4089-a68a-10d746740afe_buggy.java
++++ b/tmp/513f6c48-8d5e-46c4-8b2f-54be2064874c_fixed.java
+@@ -1,20 +1,29 @@
+   /**
+    * Checks name referenced in node to determine if it might have
+    * changed.
+    * @return Whether the replacement can be made.
+    */
+   private boolean isSafeReplacement(Node node, Node replacement) {
+     // No checks are needed for simple names.
+     if (node.isName()) {
+       return true;
+     }
+     Preconditions.checkArgument(node.isGetProp());
+ 
++    // Get the child node that represents the property name.
+     node = node.getFirstChild();
+-    if (node.isName()
+-        && isNameAssignedTo(node.getString(), replacement)) {
++    // Check if the child node is a name and whether it's assigned in the replacement.
++    if (node.isName() && isNameAssignedTo(node.getString(), replacement)) {
+       return false;
+     }
+ 
++    // Ensure we also check if the original node is a property access that could conflict
++    if (node.isGetProp()) {
++      Node parent = node.getParent();
++      if (parent.isGetProp() && isNameAssignedTo(node.getFirstChild().getString(), replacement)) {
++        return false;
++      }
++    }
++
+     return true;
+   }
+\ No newline at end of file

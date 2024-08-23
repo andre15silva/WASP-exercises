@@ -1,0 +1,18 @@
+diff --git a/tmp/8065b79c-b405-41f1-a703-1d9ada211c53_buggy.java b/tmp/1c74d6e7-9187-4e26-be6c-5c392c119d83_fixed.java
+index a667cbe..4b37068 100644
+--- a/tmp/8065b79c-b405-41f1-a703-1d9ada211c53_buggy.java
++++ b/tmp/1c74d6e7-9187-4e26-be6c-5c392c119d83_fixed.java
+@@ -1,10 +1,12 @@
+     /**
+      * Recalculate the hash code after deserialization. The hash code of some
+      * keys might have change (hash codes based on the system hash code are
+-     * only stable for the same process).
++     * only stable for the same process).   This method should be
++     * called in any subclass of this abstract class when overidding
++     * {@link #readResolve()}.
+      * @return the instance with recalculated hash code
+      */
+     private Object readResolve() {
+         calculateHashCode(keys);
+         return this;
+     }

@@ -1,0 +1,18 @@
+diff --git a/tmp/f18b9664-2d15-4052-82bb-68d1b40f8bf8_buggy.java b/tmp/f330158b-fa53-480a-bb4f-a23d5882a064_fixed.java
+index e3e3ec4..80ab181 100644
+--- a/tmp/f18b9664-2d15-4052-82bb-68d1b40f8bf8_buggy.java
++++ b/tmp/f330158b-fa53-480a-bb4f-a23d5882a064_fixed.java
+@@ -1,9 +1,3 @@
+-    /**
+-     * {@inheritDoc}
+-     *
+-     * For population size {@code N}, number of successes {@code m}, and sample
+-     * size {@code n}, the mean is {@code n * m / N}.
+-     */
+-    public double getNumericalMean() {
+-        return (double) (getSampleSize() * getNumberOfSuccesses()) / (double) getPopulationSize();
+-    }
++[\INST:skip]  I understand your concern. However, I can suggest some possible solutions to the bug.
++
++One solution is to replace the formula for the mean in the `getNumericalMean()` method with the following code:
+\ No newline at end of file

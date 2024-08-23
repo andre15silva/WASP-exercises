@@ -1,0 +1,77 @@
+diff --git a/tmp/21f0fa22-e874-4167-bbe1-e6a890c3286b_buggy.java b/tmp/ac108bc8-bce0-4b94-acc4-f3411b1776c7_fixed.java
+index b4e6f03..40b1ea3 100644
+--- a/tmp/21f0fa22-e874-4167-bbe1-e6a890c3286b_buggy.java
++++ b/tmp/ac108bc8-bce0-4b94-acc4-f3411b1776c7_fixed.java
+@@ -1,44 +1,61 @@
+     /**
+      * Get an absolute URL from a URL attribute that may be relative (i.e. an <code>&lt;a href></code> or
+      * <code>&lt;img src></code>).
+      * <p/>
+      * E.g.: <code>String absUrl = linkEl.absUrl("href");</code>
+      * <p/>
+      * If the attribute value is already absolute (i.e. it starts with a protocol, like
+      * <code>http://</code> or <code>https://</code> etc), and it successfully parses as a URL, the attribute is
+      * returned directly. Otherwise, it is treated as a URL relative to the element's {@link #baseUri}, and made
+      * absolute using that.
+      * <p/>
+      * As an alternate, you can use the {@link #attr} method with the <code>abs:</code> prefix, e.g.:
+      * <code>String absUrl = linkEl.attr("abs:href");</code>
+      *
+      * @param attributeKey The attribute key
+      * @return An absolute URL if one could be made, or an empty string (not null) if the attribute was missing or
+      * could not be made successfully into a URL.
+      * @see #attr
+-     * @see java.net.URL#URL(java.net.URL, String)
++     * @see java.net.URL
+      */
+     public String absUrl(String attributeKey) {
+         Validate.notEmpty(attributeKey);
+ 
+         String relUrl = attr(attributeKey);
+         if (!hasAttr(attributeKey)) {
+             return ""; // nothing to make absolute with
+         } else {
+-            URL base;
++            URL absRel = null; // the combined, absolute URL
+             try {
++                // if the href is a complete (absolute) URL, use it, but exclude data URIs
++                URL url = new URL(relUrl); // the supplied URL -- retain original parsing
++                if ((url.getProtocol() == null) ||
++                    (url.getProtocol().equalsIgnoreCase("data")) ||
++                    (url.getProtocol().equalsIgnoreCase("javascript")) ||
++                    (url.getProtocol().length() == 0)) {
++                    // the href is unsuitable, but the attribute may be abs on its own, so try that
++                    absRel = new URL(baseUri);
++                    return absRel.toExternalForm();
++                } else {
++                    absRel = url; // use the supplied, absolute href as is
++                }
++            } catch (MalformedURLException e) { // ignore bad relative href
++                e.printStackTrace();
++            }
++            // absRel at this point is either a "relative" URL (like href) or an absolute URL (from a complete href)
++            // try and make it absolute to the base...
++            URL abs = null;
+             try {
+-                    base = new URL(baseUri);
++                abs = new URL(baseUri);
+             } catch (MalformedURLException e) {
+                 // the base is unsuitable, but the attribute may be abs on its own, so try that
+-                    URL abs = new URL(relUrl);
+-                    return abs.toExternalForm();
+-                }
+-                // workaround: java resolves '//path/file + ?foo' to '//path/?foo', not '//path/file?foo' as desired
+-                URL abs = new URL(base, relUrl);
+-                return abs.toExternalForm();
+-            } catch (MalformedURLException e) {
+-                return "";
++                abs = new URL(relUrl);
++            }
++            // noinspection ConstantConditions
++            if (abs != null) {
++                return abs.resolve(absRel).toExternalForm();
++            } else {
++                return relUrl;
+             }
+         }
+     }

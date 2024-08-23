@@ -1,0 +1,50 @@
+diff --git a/tmp/344d45ae-d358-4189-b287-73cdde4fe502_buggy.java b/tmp/631635bc-28a8-407d-8da8-d73949e77c0b_fixed.java
+index addeb8d..6472e2f 100644
+--- a/tmp/344d45ae-d358-4189-b287-73cdde4fe502_buggy.java
++++ b/tmp/631635bc-28a8-407d-8da8-d73949e77c0b_fixed.java
+@@ -1,38 +1,7 @@
+-    /**
+-     * Searches the string builder to find the first reference to the specified
+-     * string starting searching from the given index.
+-     * <p>
+-     * Note that a null input string will return -1, whereas the JDK throws an exception.
+-     * 
+-     * @param str  the string to find, null returns -1
+-     * @param startIndex  the index to start at, invalid index rounded to edge
+-     * @return the first index of the string, or -1 if not found
+-     */
+-    public int indexOf(String str, int startIndex) {
+-        startIndex = (startIndex < 0 ? 0 : startIndex);
+-        if (str == null || startIndex >= size) {
+-            return -1;
+-        }
+-        int strLen = str.length();
+-        if (strLen == 1) {
+-            return indexOf(str.charAt(0), startIndex);
+-        }
+-        if (strLen == 0) {
+-            return startIndex;
+-        }
+-        if (strLen > size) {
+-            return -1;
+-        }
+-        char[] thisBuf = buffer;
+-        int len = thisBuf.length - strLen;
+-        outer:
+-        for (int i = startIndex; i < len; i++) {
+-            for (int j = 0; j < strLen; j++) {
+-                if (str.charAt(j) != thisBuf[i + j]) {
+-                    continue outer;
+-                }
+-            }
+-            return i;
+-        }
+-        return -1;
+-    }
++
++
++It is not the best solution and it will not work as expected. The reason is that you are not handling the condition where `str` is longer than `thisBuf.length - strLen`. In this case, the loop will iterate over `len` indexes, which will cause an `ArrayIndexOutOfBoundsException` when the loop tries to access `thisBuf[i+j]`.
++
++A better solution would be to use two loops, one for iterating over the characters of the string and one for iterating over the indexes of the string builder. This way you can avoid the use of offsets and the risk of an `ArrayIndexOutOfBoundsException`.
++
++You can see an example of how to implement such a function in the following code:

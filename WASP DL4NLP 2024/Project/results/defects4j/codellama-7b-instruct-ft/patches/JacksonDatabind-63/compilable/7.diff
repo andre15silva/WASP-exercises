@@ -1,0 +1,41 @@
+diff --git a/tmp/093a37b6-fce2-4f2a-bdce-1b0315670bf6_buggy.java b/tmp/2e0a8ef7-4c80-4f5f-b335-681717bee30a_fixed.java
+index f955f47..6cd9ff4 100644
+--- a/tmp/093a37b6-fce2-4f2a-bdce-1b0315670bf6_buggy.java
++++ b/tmp/2e0a8ef7-4c80-4f5f-b335-681717bee30a_fixed.java
+@@ -1,34 +1,36 @@
+         public String getDescription() {
+             if (_desc == null) {
+                 StringBuilder sb = new StringBuilder();
+ 
+                 if (_from == null) { // can this ever occur?
+                     sb.append("UNKNOWN");
+                 } else {
+                     Class<?> cls = (_from instanceof Class<?>) ? (Class<?>)_from : _from.getClass();
+                     // Hmmh. Although Class.getName() is mostly ok, it does look
+                     // butt-ugly for arrays.
+                     // 06-Oct-2016, tatu: as per [databind#1403], `getSimpleName()` not so good
+                     //   as it drops enclosing class. So let's try bit different approach
+                     String pkgName = com.fasterxml.jackson.databind.util.ClassUtil.getPackageName(cls);
+                     if (pkgName != null) {
+                         sb.append(pkgName);
+                         sb.append('.');
+                     }
+                     sb.append(cls.getSimpleName());
++                    // For inner classes, get name will include package; remove package part
++                    sb.setLength(pkgName == null ? sb.length() : pkgName.length()+2);
+                 }
+                 sb.append('[');
+                 if (_fieldName != null) {
+                     sb.append('"');
+                     sb.append(_fieldName);
+                     sb.append('"');
+                 } else if (_index >= 0) {
+                     sb.append(_index);
+                 } else {
+                     sb.append('?');
+                 }
+                 sb.append(']');
+                 _desc = sb.toString();
+             }
+             return _desc;
+         }

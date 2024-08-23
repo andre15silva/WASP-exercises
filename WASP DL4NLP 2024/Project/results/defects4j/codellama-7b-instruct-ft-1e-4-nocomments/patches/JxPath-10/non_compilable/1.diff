@@ -1,0 +1,13 @@
+diff --git a/tmp/be9d3a5e-1b86-49cf-b330-c68183bf9ece_buggy.java b/tmp/1cecf1d4-4861-4ae5-b158-0455e91f52b0_fixed.java
+index b86b44d..d035f76 100644
+--- a/tmp/be9d3a5e-1b86-49cf-b330-c68183bf9ece_buggy.java
++++ b/tmp/1cecf1d4-4861-4ae5-b158-0455e91f52b0_fixed.java
+@@ -1,4 +1,5 @@
+     public final Object computeValue(EvalContext context) {
+-        return compute(args[0].computeValue(context), args[1].computeValue(context))
+-                ? Boolean.TRUE : Boolean.FALSE;
++        return compute(args[0].computeValue(context),
++                PositionHelper.emptyIsFalse(args[1].computeValue(context)),
++                context) ? Boolean.TRUE : Boolean.FALSE;
+     }
+\ No newline at end of file

@@ -1,0 +1,26 @@
+diff --git a/tmp/bdf27d6a-57e2-4a3e-9744-7bfb00d2e0cd_buggy.java b/tmp/ab608742-0c4c-42c3-ac0e-36ef3e94a577_fixed.java
+index 7030ef0..653b79b 100644
+--- a/tmp/bdf27d6a-57e2-4a3e-9744-7bfb00d2e0cd_buggy.java
++++ b/tmp/ab608742-0c4c-42c3-ac0e-36ef3e94a577_fixed.java
+@@ -1,15 +1,11 @@
+-    /**
+-     Add a list of allowed elements to a safelist. (If a tag is not allowed, it will be removed from the HTML.)
+-
+-     @param tags tag names to allow
+-     @return this (for chaining)
+-     */
+     public Safelist addTags(String... tags) {
+-        Validate.notNull(tags);
+-
++        if (Validate.notNull(tags) && Validate.notNull(tagNames)) {
+             for (String tagName : tags) {
+-            Validate.notEmpty(tagName);
++                if (Validate.notEmpty(tagName)) {
+                     tagNames.add(TagName.valueOf(tagName));
+                 }
++            }
+             return this;
+         }
++        return null;
++    }
+\ No newline at end of file

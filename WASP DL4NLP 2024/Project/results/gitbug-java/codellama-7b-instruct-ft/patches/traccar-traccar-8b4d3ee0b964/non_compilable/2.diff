@@ -1,0 +1,121 @@
+diff --git a/tmp/5e4052e0-14c4-413f-a241-8fb80d6d06c0_buggy.java b/tmp/d96ecfe4-32d3-4ef4-a94e-4dfbd691c7f8_fixed.java
+index 27f2719..50a9b42 100644
+--- a/tmp/5e4052e0-14c4-413f-a241-8fb80d6d06c0_buggy.java
++++ b/tmp/d96ecfe4-32d3-4ef4-a94e-4dfbd691c7f8_fixed.java
+@@ -1,90 +1,109 @@
+     @Override
+     protected Object decode(
+             Channel channel, SocketAddress remoteAddress, Object msg) throws Exception {
+ 
+         String sentence = (String) msg;
+ 
+         if (sentence.startsWith("!1,")) {
+-            int index = sentence.indexOf(',', 3);
+-            if (index < 0) {
+-                index = sentence.length();
++            DeviceSession deviceSession = getDeviceSession(channel, remoteAddress);
++            if (deviceSession == null) {
++                return null;
+             }
+-            getDeviceSession(channel, remoteAddress, sentence.substring(3, index));
++            int index = sentence.indexOf(',', 4);
++            String imei = sentence.substring(4, index).trim();
++            int type = sentence.charAt(2) - '0';
++            getLastLocation(deviceSession.getDevice(), type, imei);
+             return null;
+         }
+ 
+         DeviceSession deviceSession = getDeviceSession(channel, remoteAddress);
+-        if (deviceSession == null || !sentence.matches("![35A-D],.*")) {
++        if (deviceSession == null || !sentence.matches("![35AB],.*")) {
+             return null;
+         }
+ 
+         Position position = new Position(getProtocolName());
+         position.setDeviceId(deviceSession.getDeviceId());
+ 
+         String type = sentence.substring(1, 2);
+         position.set(Position.KEY_TYPE, type);
+ 
+         if (type.equals("3")) {
+ 
+             getLastLocation(position, null);
+ 
+             position.set(Position.KEY_RESULT, sentence.substring(3));
+ 
+             return position;
+ 
+         } else if (type.equals("5")) {
+ 
+             String[] values = sentence.split(",");
+ 
+             getLastLocation(position, null);
+ 
+             position.set(Position.KEY_RSSI, Integer.parseInt(values[1]));
+             if (values.length >= 4) {
+                 position.set(Position.KEY_BATTERY_LEVEL, Integer.parseInt(values[3]));
+             }
+ 
+             return position;
+ 
+-        } else if (type.equals("B") || type.equals("D")) {
++        } else if (type.equals("A") || type.equals("B") || type.equals("D")) {
+ 
+             Parser parser = new Parser(PATTERN_BD, sentence);
+             if (!parser.matches()) {
+                 return null;
+             }
+ 
+             decodeFix(position, parser);
+             decodeState(position, parser);
+ 
+             position.set(Position.KEY_SATELLITES, parser.nextInt(0));
+             position.set(Position.KEY_SATELLITES_VISIBLE, parser.nextInt(0));
+             position.set(Position.KEY_HDOP, parser.nextDouble(0));
+ 
+             return position;
+ 
+         } else if (type.equals("C")) {
+ 
+             Parser parser = new Parser(PATTERN_C, sentence);
+             if (!parser.matches()) {
+                 return null;
+             }
+ 
+             decodeFix(position, parser);
+             decodeState(position, parser);
+ 
+             return position;
+ 
+-        } else if (type.equals("A")) {
++        } else if (type.equals("4") || type.equals("9")) {
+ 
+             Parser parser = new Parser(PATTERN_A, sentence);
+             if (!parser.matches()) {
+                 return null;
+             }
+ 
+             decodeFix(position, parser);
+ 
++            position.setNetwork(new Network(getNetworkProtocol(parser.nextInt(1))));
++            position.set(Position.KEY_PHONE, parser.next());
++            position.set(Position.KEY_RSSI, Integer.parseInt(parser.next()));
++            if (parser.hasNext()) {
++                position.set(Position.KEY_BATTERY_LEVEL, parser.next());
++            }
++            if (parser.hasNext()) {
++                position.set(Position.KEY_SATELLITES, parser.nextInt(0));
++            }
++            if (parser.hasNext()) {
++                position.set(Position.KEY_SATELLITES_VISIBLE, parser.nextInt(0));
++            }
++            if (parser.hasNext()) {
++                position.set(Position.KEY_HDOP, parser.nextDouble(0));
++            }
++
+             return position;
+ 
+         }
+ 
+         return null;
+     }

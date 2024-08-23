@@ -1,0 +1,20 @@
+diff --git a/tmp/92b5807c-6305-4181-961a-161fea336141_buggy.java b/tmp/31f3eca8-4123-445f-9278-9271b13a8a1c_fixed.java
+index fa6828a..bb3f64a 100644
+--- a/tmp/92b5807c-6305-4181-961a-161fea336141_buggy.java
++++ b/tmp/31f3eca8-4123-445f-9278-9271b13a8a1c_fixed.java
+@@ -1,5 +1,13 @@
+ private void injectMockCandidate(Class<?> awaitingInjectionClazz, Set<Object> mocks, Object fieldInstance) {
+     for (Field field : orderedInstanceFieldsFrom(awaitingInjectionClazz)) {
+-            mockCandidateFilter.filterCandidate(mocks, field, fieldInstance).thenInject();
++        Object candidateMock = mockCandidateFilter.filterCandidate(mocks, field, fieldInstance);
++        if (candidateMock != null) { // Check if a valid mock candidate is found
++            try {
++                field.setAccessible(true); // Make the field accessible if it's private
++                field.set(fieldInstance, candidateMock); // Inject the mock candidate
++            } catch (IllegalAccessException e) {
++                throw new RuntimeException("Failed to inject mock candidate", e);
++            }
++        }
+     }
+ }
+\ No newline at end of file

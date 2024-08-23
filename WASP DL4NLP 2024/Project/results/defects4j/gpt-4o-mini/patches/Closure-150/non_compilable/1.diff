@@ -1,0 +1,43 @@
+diff --git a/tmp/efaa0869-46e4-4c1b-8c58-33acaed82621_buggy.java b/tmp/58f00c23-32b3-40e9-be5f-ed3e9e3ceae4_fixed.java
+index 800e6e1..114c03d 100644
+--- a/tmp/efaa0869-46e4-4c1b-8c58-33acaed82621_buggy.java
++++ b/tmp/58f00c23-32b3-40e9-be5f-ed3e9e3ceae4_fixed.java
+@@ -1,32 +1,29 @@
+-    /**
+-     * Visit a node in a local scope, and add any local variables or catch
+-     * parameters into the local symbol table.
+-     *
+-     * @param t The node traversal.
+-     * @param n The node being visited.
+-     * @param parent The parent of n
+-     */
+ @Override public void visit(NodeTraversal t, Node n, Node parent) {
+   if (n == scope.getRootNode()) return;
+ 
+   if (n.getType() == Token.LP && parent == scope.getRootNode()) {
+     handleFunctionInputs(parent);
+     return;
+   }
+ 
+   attachLiteralTypes(n);
+   switch (n.getType()) {
+     case Token.FUNCTION:
+       if (parent.getType() == Token.NAME) {
+         return;
+       }
+       defineDeclaredFunction(n, parent);
+       break;
+     case Token.CATCH:
+       defineCatch(n, parent);
+       break;
+     case Token.VAR:
+       defineVar(n, parent);
+       break;
++    case Token.NAME:
++      if (parent.getType() == Token.FUNCTION || parent.getType() == Token.VAR) {
++        defineVariable(n, parent); // Fix: Added handling for NAME type declarations
++      }
++      break;
+   }
+ }
+\ No newline at end of file

@@ -1,0 +1,58 @@
+diff --git a/tmp/d9688ad4-4a65-42d1-8c07-c8372f3b1e70_buggy.java b/tmp/3e489b27-ebe6-4c38-8f77-b427d56eeab6_fixed.java
+index 5abdeb5..06cf807 100644
+--- a/tmp/d9688ad4-4a65-42d1-8c07-c8372f3b1e70_buggy.java
++++ b/tmp/3e489b27-ebe6-4c38-8f77-b427d56eeab6_fixed.java
+@@ -1,29 +1,51 @@
+     /**
+      * Computes the number of uses of the variable varName and store it in
+      * numUseWithinUseCfgNode.
+      */
+     private void getNumUseInUseCfgNode(final Node cfgNode) {
+ 
+       numUsesWithinCfgNode = 0;
+       AbstractCfgNodeTraversalCallback gatherCb =
+           new AbstractCfgNodeTraversalCallback() {
+ 
+         @Override
+         public void visit(NodeTraversal t, Node n, Node parent) {
+           if (n.isName() && n.getString().equals(varName) &&
+             // We make a special exception when the entire cfgNode is a chain
+             // of assignments, since in that case the assignment statements
+             // will happen after the inlining of the right hand side.
++            //
++            // This is necessary because of Issue 965: JSCompiler breaks in the
++            // case of something like:
++            //
++            // var i = 0;
++            // return 1 ? (i = 5) : 0, i;
++            //
++            // where i is used twice.  This check only works if the
++            // cfg node is the root
++            //
++            // Also a similar issue is when the cfgNode is something like
++            // (x ? (i = 5) : 0) ? i : 0
++            //
++            // or (1 ? (i = 5) : 0) || i
++            //
++            // or (i = 5) * i)
++            //
++            // For now only ignore the fact that this issue is a real problem
++            // since a very large number of people only use GWT for debugging
++            // without generating output JS for production.
++            //
+             // TODO(blickly): Make the SIDE_EFFECT_PREDICATE check more exact
+             //   and remove this special case.
+-              !(parent.isAssign() &&
+-               (parent.getFirstChild() == n))) {
++              !(n.isHook() &&
++                isCfgNode(n.getFirstChild()) &&
++                !(n.isTry() && isNameDeclaredInTryCatch(cfgNode, n)))) {
+               // Don't count lhs of top-level assignment chain
+               numUsesWithinCfgNode++;
+           }
+         }
+ 
+       };
+ 
+       NodeTraversal.traverse(compiler, cfgNode, gatherCb);
+     }

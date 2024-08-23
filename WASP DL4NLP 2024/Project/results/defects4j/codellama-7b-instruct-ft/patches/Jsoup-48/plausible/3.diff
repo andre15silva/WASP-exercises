@@ -1,0 +1,36 @@
+diff --git a/tmp/aae4f8e2-4691-4673-912c-5ff0ad383d0c_buggy.java b/tmp/b18d3590-740d-48ed-95b6-56f2ab33dd94_fixed.java
+index bcd80aa..1184d54 100644
+--- a/tmp/aae4f8e2-4691-4673-912c-5ff0ad383d0c_buggy.java
++++ b/tmp/b18d3590-740d-48ed-95b6-56f2ab33dd94_fixed.java
+@@ -1,25 +1,28 @@
+         void processResponseHeaders(Map<String, List<String>> resHeaders) {
+             for (Map.Entry<String, List<String>> entry : resHeaders.entrySet()) {
+                 String name = entry.getKey();
+                 if (name == null)
+                     continue; // http/1.1 line
+ 
+                 List<String> values = entry.getValue();
+                 if (name.equalsIgnoreCase("Set-Cookie")) {
+                     for (String value : values) {
+                         if (value == null)
+                             continue;
+                         TokenQueue cd = new TokenQueue(value);
+                         String cookieName = cd.chompTo("=").trim();
+                         String cookieVal = cd.consumeTo(";").trim();
+                         // ignores path, date, domain, validateTLSCertificates et al. req'd?
+                         // name not blank, value not null
+                         if (cookieName.length() > 0)
+                             cookie(cookieName, cookieVal);
+                     }
+-                } else { // combine same header names with comma: http://www.w3.org/Protocols/rfc2616/rfc2616-sec4.html#sec4.2
+-                    if (!values.isEmpty())
+-                        header(name, values.get(0));
++                }
++                if (!values.isEmpty()) { // combine same header names with comma: http://www.w3.org/Protocols/rfc2616/rfc2616-sec4.html#sec4.2
++                    String all = "";
++                    for (String value: values)
++                        all += (all.length() > 0 ? ", " : "") + value;
++                    header(name, all);
+                 }
+             }
+         }

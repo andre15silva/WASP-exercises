@@ -1,0 +1,75 @@
+diff --git a/tmp/1e9d03f5-3620-4232-8c5b-2640183042e5_buggy.java b/tmp/f9609d7f-f3f0-408f-98d1-cf8a0c0867a8_fixed.java
+index 730ab7d..f859008 100644
+--- a/tmp/1e9d03f5-3620-4232-8c5b-2640183042e5_buggy.java
++++ b/tmp/f9609d7f-f3f0-408f-98d1-cf8a0c0867a8_fixed.java
+@@ -1,48 +1,65 @@
+     /**
+      * Parses the raw bytes read from the central directory extra
+      * field with knowledge which fields are expected to be there.
+      *
+      * <p>All four fields inside the zip64 extended information extra
+      * field are optional and must only be present if their corresponding
+      * entry inside the central directory contains the correct magic
+      * value.</p>
+      */
+     public void reparseCentralDirectoryData(boolean hasUncompressedSize,
+                                             boolean hasCompressedSize,
+                                             boolean hasRelativeHeaderOffset,
+                                             boolean hasDiskStart)
+         throws ZipException {
+         if (rawCentralDirectoryData != null) {
+             int expectedLength = (hasUncompressedSize ? DWORD : 0)
+                 + (hasCompressedSize ? DWORD : 0)
+                 + (hasRelativeHeaderOffset ? DWORD : 0)
+                 + (hasDiskStart ? WORD : 0);
+             if (rawCentralDirectoryData.length != expectedLength) {
+-                throw new ZipException("central directory zip64 extended"
++                if (rawCentralDirectoryData.length < expectedLength) {
++                    throw new ZipException("Central directory zip64 extended"
+                                            + " information extra field's length"
+-                                       + " doesn't match central directory"
+-                                       + " data.  Expected length "
+-                                       + expectedLength + " but is "
+-                                       + rawCentralDirectoryData.length);
++                                           + " (offset: " + offset
++                                           + ") is less than expected "
++                                           + expectedLength);
++                }
++                else {
++                    int extraFieldLength = rawCentralDirectoryData.length - offset;
++                    System.err.println("Warning: extra field length differs from"
++                                       + " documentation in LocalFileHeader.xml: "
++                                       + extraFieldLength + " != " + expectedLength
++                                       + " (" + this + ")");
++                    expectedLength = extraFieldLength;
++                }
+             }
+             int offset = 0;
+             if (hasUncompressedSize) {
+                 size = new ZipEightByteInteger(rawCentralDirectoryData, offset);
+                 offset += DWORD;
+             }
+             if (hasCompressedSize) {
+                 compressedSize = new ZipEightByteInteger(rawCentralDirectoryData,
+                                                          offset);
+                 offset += DWORD;
+             }
+             if (hasRelativeHeaderOffset) {
+                 relativeHeaderOffset =
+                     new ZipEightByteInteger(rawCentralDirectoryData, offset);
+                 offset += DWORD;
+             }
+             if (hasDiskStart) {
+                 diskStart = new ZipLong(rawCentralDirectoryData, offset);
+                 offset += WORD;
+             }
++            if (offset != expectedLength) {
++                throw new ZipException("central directory zip64 extended"
++                                       + " information extra field's length"
++                                       + " doesn't match central directory"
++                                       + " data.  Expected length "
++                                       + expectedLength + " but is "
++                                       + offset);
++            }
+         }
+     }

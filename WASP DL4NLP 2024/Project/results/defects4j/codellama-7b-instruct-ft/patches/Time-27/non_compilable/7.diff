@@ -1,0 +1,36 @@
+diff --git a/tmp/c01e1eb9-c628-444e-ae06-4c5b8d9f0df6_buggy.java b/tmp/53324310-4916-4b7b-ac3d-5e83cf62b807_fixed.java
+index ec6c9ee..d635b95 100644
+--- a/tmp/c01e1eb9-c628-444e-ae06-4c5b8d9f0df6_buggy.java
++++ b/tmp/53324310-4916-4b7b-ac3d-5e83cf62b807_fixed.java
+@@ -1,21 +1,31 @@
+     //-----------------------------------------------------------------------
+     private static PeriodFormatter toFormatter(List<Object> elementPairs, boolean notPrinter, boolean notParser) {
+         if (notPrinter && notParser) {
+             throw new IllegalStateException("Builder has created neither a printer nor a parser");
+         }
+         int size = elementPairs.size();
+         if (size >= 2 && elementPairs.get(0) instanceof Separator) {
+             Separator sep = (Separator) elementPairs.get(0);
++            if (size > 2) {
++                // if the separators include periods and we don't build the printer ourselves, we have to make sure it
++                // is able to recognize a period after the separator. As a separator does not have an alphabetical parser
++                // to recognize a period, we create a parser for these elements
++                SepAndComps comp = createSepAndComps(elementPairs);
++                if (sep.getSeparator(0) != null && !sep.getSeparator(0).contains(".")) {
++                    comp.sep.setPrinter(comp.printer.getFirstItem());
++                    comp.sep.setParser(comp.parser.getFirstItem());
++                }
++            }
+             PeriodFormatter f = toFormatter(elementPairs.subList(2, size), notPrinter, notParser);
+             sep = sep.finish(f.getPrinter(), f.getParser());
+             return new PeriodFormatter(sep, sep);
+         }
+         Object[] comp = createComposite(elementPairs);
+         if (notPrinter) {
+             return new PeriodFormatter(null, (PeriodParser) comp[1]);
+         } else if (notParser) {
+             return new PeriodFormatter((PeriodPrinter) comp[0], null);
+         } else {
+             return new PeriodFormatter((PeriodPrinter) comp[0], (PeriodParser) comp[1]);
+         }
+     }

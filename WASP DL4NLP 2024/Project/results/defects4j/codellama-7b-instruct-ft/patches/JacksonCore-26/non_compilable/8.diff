@@ -1,0 +1,35 @@
+diff --git a/tmp/ba27704d-84a3-42e7-8565-de0e8424b3e9_buggy.java b/tmp/a2a2117a-48a7-4d1c-9dca-01d0765a009d_fixed.java
+index 0722547..688757b 100644
+--- a/tmp/ba27704d-84a3-42e7-8565-de0e8424b3e9_buggy.java
++++ b/tmp/a2a2117a-48a7-4d1c-9dca-01d0765a009d_fixed.java
+@@ -1,26 +1,30 @@
+     @Override
+     public void feedInput(byte[] buf, int start, int end) throws IOException
+     {
+         // Must not have remaining input
+         if (_inputPtr < _inputEnd) {
+             _reportError("Still have %d undecoded bytes, should not call 'feedInput'", _inputEnd - _inputPtr);
+         }
+         if (end < start) {
+             _reportError("Input end (%d) may not be before start (%d)", end, start);
+         }
+         // and shouldn't have been marked as end-of-input
+         if (_endOfInput) {
+             _reportError("Already closed, can not feed more input");
+         }
+         // Time to update pointers first
+         _currInputProcessed += _origBufferLen;
+ 
+         // Also need to adjust row start, to work as if it extended into the past wrt new buffer
+         _currInputRowStart = start - (_inputEnd - _currInputRowStart);
+ 
+         // And then update buffer settings
+         _inputBuffer = buf;
+         _inputPtr = start;
+         _inputEnd = end;
+         _origBufferLen = end - start;
++        // Finally, need the offsets...
++        long deltaOfs = _currInputProcessed - _reader.getInputDeclaredSize();
++        _reader.setCurrentInputFeederOffset(deltaOfs);
++        _currInputRowStart += - (int)deltaOfs;
+     }

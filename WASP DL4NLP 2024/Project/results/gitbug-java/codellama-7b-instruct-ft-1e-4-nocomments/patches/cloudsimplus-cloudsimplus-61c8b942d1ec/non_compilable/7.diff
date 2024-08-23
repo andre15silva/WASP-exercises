@@ -1,0 +1,10 @@
+diff --git a/tmp/1149446c-08a5-4594-8fdc-97447966ebec_buggy.java b/tmp/6c289408-361c-40c9-9db0-d1db8d6f3e55_fixed.java
+index a2af134..323e69a 100644
+--- a/tmp/1149446c-08a5-4594-8fdc-97447966ebec_buggy.java
++++ b/tmp/6c289408-361c-40c9-9db0-d1db8d6f3e55_fixed.java
+@@ -1,3 +1,3 @@
+     public HostAbstract(final List<Pe> peList, final boolean activate) {
+-        this(defaultBwCapacity, defaultStorageCapacity, new HarddriveStorage(defaultRamCapacity), peList, activate);
++        this(defaultBwCapacity, defaultStorageCapacity, new HarddriveStorage(defaultRamCapacity, peList), peList, activate);
+     }
+\ No newline at end of file

@@ -1,0 +1,31 @@
+diff --git a/tmp/3f678ee6-5927-4528-abb4-dff88eb4935b_buggy.java b/tmp/38b9d1ae-bf0e-4a76-aff4-46f9455ad261_fixed.java
+index dc93be3..a9a9bc6 100644
+--- a/tmp/3f678ee6-5927-4528-abb4-dff88eb4935b_buggy.java
++++ b/tmp/38b9d1ae-bf0e-4a76-aff4-46f9455ad261_fixed.java
+@@ -1,14 +1,24 @@
+     Element insert(Token.StartTag startTag) {
+-        // handle empty unknown tags
++        // handle empty self-closing tags
++        // when the spec expects content, will generate an end tag, so wont generate a fake end tag.
+         // when the spec expects an empty tag, will directly hit insertEmpty, so won't generate this fake end tag.
+         if (startTag.isSelfClosing()) {
+             Element el = insertEmpty(startTag);
++            // force an end tag. known empty blocks can self close, but may not be recognised as such.
++            // unknown tags are assumed to be inline, unless they are known to be block
++            // allow <hr /> / <li /> but not <br><input></p></form>
++            // to get _that_ going, need to refactor how we differentiate between known & unknown
++            Token endTag = new Token.EndTag(el.tagName());
++            if (startTag.dataAttributes().isKnownTag() && startTag.dataAttributes().validSelfClosing()) {
++                endTag.selfClosed = true;
++            }
++            tokeniser.acknowledgeSelfClosingFlag();
++            tokeniser.emit(endTag);
+             stack.add(el);
+-            tokeniser.emit(new Token.EndTag(el.tagName()));  // ensure we get out of whatever state we are in. emitted for yielded processing
+             return el;
+         }
+         
+         Element el = new Element(Tag.valueOf(startTag.name()), baseUri, startTag.attributes);
+         insert(el);
+         return el;
+     }

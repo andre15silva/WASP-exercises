@@ -1,0 +1,25 @@
+diff --git a/tmp/06261c24-738b-4328-beb2-274a24295147_buggy.java b/tmp/42b939df-1f6f-4c18-9de9-1fdadebaf5d8_fixed.java
+index e69de29..c98e207 100644
+--- a/tmp/06261c24-738b-4328-beb2-274a24295147_buggy.java
++++ b/tmp/42b939df-1f6f-4c18-9de9-1fdadebaf5d8_fixed.java
+@@ -0,0 +1,19 @@
++import com.fasterxml.jackson.databind.JavaType;
++import com.fasterxml.jackson.databind.ObjectMapper;
++import com.fasterxml.jackson.databind.type.TypeFactory;
++
++public class TestTypeFactory {
++
++    static class Base {}
++    static class Sub extends Base {}
++    static class Extra extends Sub {}
++
++    public static void main(String[] args) throws Exception {
++        TypeFactory tf = new ObjectMapper().getTypeFactory();
++        tf.constructType(Base.class); // must be constructed before sub to set the cache correctly
++        JavaType subType = tf.constructType(Sub.class);
++        // baseTypeFromSub should be a ResolvedRecursiveType in this test
++        JavaType baseTypeFromSub = subType.getSuperClass();
++        System.out.println(baseTypeFromSub.getSuperClass());
++    }
++}
+\ No newline at end of file

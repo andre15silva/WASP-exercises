@@ -1,0 +1,12 @@
+diff --git a/tmp/97718494-27f4-4195-9d07-a9a1440a8f6c_buggy.java b/tmp/b0496fc7-0211-499b-9efc-7767310aa579_fixed.java
+index 8bae155..047ee16 100644
+--- a/tmp/97718494-27f4-4195-9d07-a9a1440a8f6c_buggy.java
++++ b/tmp/b0496fc7-0211-499b-9efc-7767310aa579_fixed.java
+@@ -1,5 +1,5 @@
+     @Override
+     public String asStringLiteral()
+     {
+-        return '"' + this.value + '"';
++        return '"' + StringUtil.escapeQuotes(this.value) + '"';
+     }
+\ No newline at end of file

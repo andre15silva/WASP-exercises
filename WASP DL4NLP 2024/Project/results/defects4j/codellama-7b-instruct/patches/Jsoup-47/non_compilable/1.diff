@@ -1,0 +1,113 @@
+diff --git a/tmp/1510026e-e98d-4cfe-b067-5695fb0ac0bc_buggy.java b/tmp/7a4c6cc8-a8aa-4867-b357-8dd019d37276_fixed.java
+index d28ed6a..35996e8 100644
+--- a/tmp/1510026e-e98d-4cfe-b067-5695fb0ac0bc_buggy.java
++++ b/tmp/7a4c6cc8-a8aa-4867-b357-8dd019d37276_fixed.java
+@@ -1,78 +1,39 @@
+-    // this method is ugly, and does a lot. but other breakups cause rescanning and stringbuilder generations
+-    static void escape(StringBuilder accum, String string, Document.OutputSettings out,
+-                       boolean inAttribute, boolean normaliseWhite, boolean stripLeadingWhite) {
++    // escape a string, for JSON or XML output
++    static void escape(StringBuilder accum, String string,
++                        Document.OutputSettings out, boolean inAttribute, boolean normaliseWhite,
++                    boolean stripLeadingWhite) {
++        if (string == null)
++            return;
+ 
+-        boolean lastWasWhite = false;
+-        boolean reachedNonWhite = false;
+-        final EscapeMode escapeMode = out.escapeMode();
+-        final CharsetEncoder encoder = out.encoder();
+-        final CoreCharset coreCharset = CoreCharset.byName(encoder.charset().name());
+-        final Map<Character, String> map = escapeMode.getMap();
+-        final int length = string.length();
++        if (out.escapeMode() == EscapeMode.extended)
++            accum.append("{{");
+ 
+-        int codePoint;
+-        for (int offset = 0; offset < length; offset += Character.charCount(codePoint)) {
+-            codePoint = string.codePointAt(offset);
++        int length = string.length();
++        for (int offset = 0; offset < length;) {
++            int codePoint = Character.codePointAt(string, offset);
++            offset += Character.charCount(codePoint);
+ 
+-            if (normaliseWhite) {
+-                if (StringUtil.isWhitespace(codePoint)) {
+-                    if ((stripLeadingWhite && !reachedNonWhite) || lastWasWhite)
+-                        continue;
++            if (offset >= length)
++                throw new IllegalArgumentException("Unpaired surrogate at end of text");
++
++            if (normaliseWhite && isWhitespace(codePoint)) {
+               accum.append(' ');
+-                    lastWasWhite = true;
+               continue;
+-                } else {
+-                    lastWasWhite = false;
+-                    reachedNonWhite = true;
+             }
+-            }
+-            // surrogate pairs, split implementation for efficiency on single char common case (saves creating strings, char[]):
+-            if (codePoint < Character.MIN_SUPPLEMENTARY_CODE_POINT) {
+-                final char c = (char) codePoint;
+-                // html specific and required escapes:
+-                switch (c) {
+-                    case '&':
+-                        accum.append("&amp;");
+-                        break;
+-                    case 0xA0:
+-                        if (escapeMode != EscapeMode.xhtml)
+-                            accum.append("&nbsp;");
+-                        else
+-                            accum.append("&#xa0;");
+-                        break;
+-                    case '<':
+-                        // escape when in character data or when in a xml attribue val; not needed in html attr val
+-                        if (!inAttribute)
+-                            accum.append("&lt;");
+-                        else
+-                            accum.append(c);
+-                        break;
+-                    case '>':
+-                        if (!inAttribute)
+-                            accum.append("&gt;");
+-                        else
+-                            accum.append(c);
+-                        break;
+-                    case '"':
+-                        if (inAttribute)
+-                            accum.append("&quot;");
+-                        else
+-                            accum.append(c);
+-                        break;
+-                    default:
+-                        if (canEncode(coreCharset, c, encoder))
+-                            accum.append(c);
+-                        else if (map.containsKey(c))
+-                            accum.append('&').append(map.get(c)).append(';');
+-                        else
+-                            accum.append("&#x").append(Integer.toHexString(codePoint)).append(';');
+-                }
+-            } else {
+-                final String c = new String(Character.toChars(codePoint));
+-                if (encoder.canEncode(c)) // uses fallback encoder for simplicity
+-                    accum.append(c);
++
++            // custom mapping as required by spec; standard mapping handles the usual
++            // case, but that's not always sufficient.
++            String replacement = out.getReplacementCharacter(codePoint);
++            if (replacement != null)
++                accum.append(replacement);
++            else {
++                if (canEncode(out.encoder(), codePoint))
++                   accum.appendCodePoint(codePoint);
+                 else
+-                    accum.append("&#x").append(Integer.toHexString(codePoint)).append(';');
++                    accum.append("{{u").append(codePoint).append('}');
+             }
+         }
++
++        if (out.escapeMode() == EscapeMode.extended)
++            accum.append("}}");
+     }
+\ No newline at end of file

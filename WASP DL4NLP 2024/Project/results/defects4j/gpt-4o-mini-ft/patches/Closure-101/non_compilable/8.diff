@@ -1,0 +1,28 @@
+diff --git a/tmp/88673df6-51f6-406b-aa1b-30fb5ca64b63_buggy.java b/tmp/e31b0195-a542-4b62-acfa-a6180937f188_fixed.java
+index 8afddc6..eb59f08 100644
+--- a/tmp/88673df6-51f6-406b-aa1b-30fb5ca64b63_buggy.java
++++ b/tmp/e31b0195-a542-4b62-acfa-a6180937f188_fixed.java
+@@ -1,22 +1,22 @@
+   @Override
+   protected CompilerOptions createOptions() {
+     CompilerOptions options = new CompilerOptions();
+     options.setCodingConvention(new ClosureCodingConvention());
+     CompilationLevel level = flags.compilation_level;
+     level.setOptionsForCompilationLevel(options);
+     if (flags.debug) {
+       level.setDebugOptionsForCompilationLevel(options);
+     }
+ 
+     WarningLevel wLevel = flags.warning_level;
+     wLevel.setOptionsForWarningLevel(options);
+     for (FormattingOption formattingOption : flags.formatting) {
+       formattingOption.applyToOptions(options);
+     }
+-    if (flags.process_closure_primitives) {
++    if (flags.process_closure_primitives || flags.compiler_flags.contains("CONCAT")) {
+       options.closurePass = true;
+     }
+ 
+     initOptionsFromFlags(options);
+     return options;
+   }

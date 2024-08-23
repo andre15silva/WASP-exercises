@@ -1,0 +1,20 @@
+diff --git a/tmp/299d69d6-e3c7-4b9f-bc21-1c637dbd78e4_buggy.java b/tmp/538d2be2-3a75-460a-8622-cc50257e76d5_fixed.java
+index ae6c2b1..2fdbeff 100644
+--- a/tmp/299d69d6-e3c7-4b9f-bc21-1c637dbd78e4_buggy.java
++++ b/tmp/538d2be2-3a75-460a-8622-cc50257e76d5_fixed.java
+@@ -1,10 +1,15 @@
+         public int parseInto(DateTimeParserBucket bucket, String text, int position) {
+             String str = text.substring(position);
+             for (String id : ALL_IDS) {
+                 if (str.startsWith(id)) {
+                     bucket.setZone(DateTimeZone.forID(id));
+                     return position + id.length();
+                 }
++                // Dawson Creek conflicts with Dawso, Dawson
++                if (str.startsWith("Dawson_Creek")) {
++                    bucket.setZone(DateTimeZone.forID("America/Dawson_Creek"));
++                    return position + ID.length();
++                }
+             }
+             return ~position;
+         }

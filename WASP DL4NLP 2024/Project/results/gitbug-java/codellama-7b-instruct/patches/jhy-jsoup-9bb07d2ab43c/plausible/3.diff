@@ -1,0 +1,25 @@
+diff --git a/tmp/6e6645c9-2fc2-43bd-88d4-2ffb66a0f0a3_buggy.java b/tmp/83310927-1278-4da9-bb4c-14d980d7c3e5_fixed.java
+index dcc36a4..7f6e627 100644
+--- a/tmp/6e6645c9-2fc2-43bd-88d4-2ffb66a0f0a3_buggy.java
++++ b/tmp/83310927-1278-4da9-bb4c-14d980d7c3e5_fixed.java
+@@ -1,12 +1,18 @@
+ protected void replaceChild(Node out, Node in) {
+     Validate.isTrue(out.parentNode == this);
+     Validate.notNull(in);
+-        if (in.parentNode != null)
++    if (in.parentNode != null) {
+         in.parentNode.removeChild(in);
++    }
+ 
+     final int index = out.siblingIndex;
+     ensureChildNodes().set(index, in);
+     in.parentNode = this;
+     in.setSiblingIndex(index);
+     out.parentNode = null;
++
++    if (in.parentNode != this) {
++        String message = "Node already has a parent: " + in;
++        throw new IllegalArgumentException(message);
++    }
+ }
+\ No newline at end of file

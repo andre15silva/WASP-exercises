@@ -1,0 +1,15 @@
+diff --git a/tmp/1b71d503-babe-475e-8d6f-59456bfacb93_buggy.java b/tmp/cabdfe4e-a152-4986-a02e-252b13f32dc8_fixed.java
+index e69de29..1612c4f 100644
+--- a/tmp/1b71d503-babe-475e-8d6f-59456bfacb93_buggy.java
++++ b/tmp/cabdfe4e-a152-4986-a02e-252b13f32dc8_fixed.java
+@@ -0,0 +1,10 @@
++    private static void _testEmptyToNullCoercion(Class<?> type, Object value) {
++        if (value == null) {
++            return;
++        }
++    
++        if (type.isInstance(value)) {
++            return type.cast(value);
++        }
++        fail("Failed: " + type + " is not a valid instance of " + value.getClass());
++    }

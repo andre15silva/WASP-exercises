@@ -1,0 +1,32 @@
+diff --git a/tmp/eb4d9be8-1a43-45f0-8f5c-7f6c9a8f2809_buggy.java b/tmp/d0f88430-0b6d-43e8-bdac-2e488dc102bf_fixed.java
+index 0e18f59..91d20fb 100644
+--- a/tmp/eb4d9be8-1a43-45f0-8f5c-7f6c9a8f2809_buggy.java
++++ b/tmp/d0f88430-0b6d-43e8-bdac-2e488dc102bf_fixed.java
+@@ -1,13 +1,16 @@
+-        @Override
+-        InputStream decode(final InputStream in, final Coder coder,
+-                byte[] password) throws IOException {
+-            byte propsByte = coder.properties[0];
+-            long dictSize = coder.properties[1];
+-            for (int i = 1; i < 4; i++) {
+-                dictSize |= (coder.properties[i + 1] << (8 * i));
++import java.util.Arrays;
++
++public class MyClass {
++    private static final int LZMA_DICT_SIZE_MAX = 4 * 1024 * 1024 * 1024;
++
++    public static void decode(byte[] properties, byte[] password) {
++        int dictSize = Arrays.stream(properties)
++                              .limit(4)
++                              .mapToInt(b -> b & 0xFF)
++                              .sum();
++
++        if (dictSize > LZMA_DICT_SIZE_MAX) {
++            throw new UnsupportedOptionsException("LZMA dictionary too big");
+         }
+-            if (dictSize > LZMAInputStream.DICT_SIZE_MAX) {
+-                throw new IOException("Dictionary larger than 4GiB maximum size");
+     }
+-            return new LZMAInputStream(in, -1, propsByte, (int) dictSize);
+ }
+\ No newline at end of file

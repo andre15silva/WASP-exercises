@@ -1,0 +1,58 @@
+diff --git a/tmp/235b7c66-2f72-4c10-832e-a11e3e9010fd_buggy.java b/tmp/749b65bc-3dc3-4e4d-a2e0-213ebab18fe4_fixed.java
+index fecb896..a5b75f7 100644
+--- a/tmp/235b7c66-2f72-4c10-832e-a11e3e9010fd_buggy.java
++++ b/tmp/749b65bc-3dc3-4e4d-a2e0-213ebab18fe4_fixed.java
+@@ -1,34 +1,37 @@
+-    /**
+-     * Pulls a balanced string off the queue. E.g. if queue is "(one (two) three) four", (,) will return "one (two) three",
+-     * and leave " four" on the queue. Unbalanced openers and closers can quoted (with ' or ") or escaped (with \). Those escapes will be left
+-     * in the returned string, which is suitable for regexes (where we need to preserve the escape), but unsuitable for
+-     * contains text strings; use unescape for that.
+-     * @param open opener
+-     * @param close closer
+-     * @return data matched from the queue
+-     */
+     public String chompBalanced(char open, char close) {
+         int start = -1;
+         int end = -1;
+         int depth = 0;
+-        char last = 0;
+-
++        char closeQuote=0, openQuote=0;
+         do {
+             if (isEmpty()) break;
+             Character c = consume();
+             if (last == 0 || last != ESC) {
+-                if (c.equals(open)) {
++                switch(c) {
++                    case '\'':
++                        openQuote = (openQuote > 0) ? 0 : '\'';
++                        closeQuote = (closeQuote==openQuote) ? 0 : closeQuote;
++                        break;
++                    case '"':
++                        openQuote = (openQuote > 0) ? 0 : '"';
++                        closeQuote = (closeQuote==openQuote) ? 0 : closeQuote;
++                        break;
++                    case '\\':
++                        break;
++                    default:
++                        break;
++                }
++                if (c.equals(open) && openQuote==0) {
+                     depth++;
+                     if (start == -1)
+                         start = pos;
+                 }
+-                else if (c.equals(close))
++                else if (c.equals(close) && closeQuote==0)
+                     depth--;
+             }
+-
+             if (depth > 0 && last != 0)
+-                end = pos; // don't include the outer match pair in the return
++                end = pos; 
+             last = c;
+         } while (depth > 0);
+         return (end >= 0) ? queue.substring(start, end) : "";
+     }
+\ No newline at end of file

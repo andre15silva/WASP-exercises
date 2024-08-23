@@ -1,0 +1,40 @@
+diff --git a/tmp/08d55253-9661-4147-89b2-b78798df4c1d_buggy.java b/tmp/22721e8d-9c47-47cf-a8a6-d8f09fa6cfef_fixed.java
+index 03b03d7..9db791e 100644
+--- a/tmp/08d55253-9661-4147-89b2-b78798df4c1d_buggy.java
++++ b/tmp/22721e8d-9c47-47cf-a8a6-d8f09fa6cfef_fixed.java
+@@ -1,25 +1,30 @@
+     /**
+      * Adjusts the offset to be the earlier or later one during an overlap.
+      *
+      * @param instant  the instant to adjust
+      * @param earlierOrLater  false for earlier, true for later
+      * @return the adjusted instant millis
+      */
+     public long adjustOffset(long instant, boolean earlierOrLater) {
+         // a bit messy, but will work in all non-pathological cases
+ 
+         // evaluate 3 hours before and after to work out if anything is happening
+         long instantBefore = convertUTCToLocal(instant - 3 * DateTimeConstants.MILLIS_PER_HOUR);
+         long instantAfter = convertUTCToLocal(instant + 3 * DateTimeConstants.MILLIS_PER_HOUR);
+         if (instantBefore == instantAfter) {
+             return instant; // not an overlap (less than is a gap, equal is normal case)
+         }
+ 
+         // work out range of instants that have duplicate local times
+         long local = convertUTCToLocal(instant);
+-        return convertLocalToUTC(local, false, earlierOrLater ? instantAfter : instantBefore);
++        int offsetBefore = Integer.parseInt(Integer.toString(local / DateTimeConstants.MILLIS_PER_HOUR) - instantBefore / DateTimeConstants.MILLIS_PER_HOUR);
++        int offsetAfter = Integer.parseInt(Integer.toString(local / DateTimeConstants.MILLIS_PER_HOUR) - instantAfter / DateTimeConstants.MILLIS_PER_HOUR);
+ 
+-        // calculate result
+-          // currently in later offset
+-          // currently in earlier offset
++        if (offsetBefore > offsetAfter) {
++            return instant - DateTimeConstants.MILLIS_PER_HOUR;
++        } else if (offsetBefore < offsetAfter) {
++            return instant + DateTimeConstants.MILLIS_PER_HOUR;
++        } else {
++            return instant;
++        }
+     }
+\ No newline at end of file

@@ -1,0 +1,36 @@
+diff --git a/tmp/46b98d46-9154-43c4-96a2-9cc335d4221f_buggy.java b/tmp/90f82f76-8a48-4dc2-844b-4dc8904b3c7e_fixed.java
+index 1478ee1..dc2816a 100644
+--- a/tmp/46b98d46-9154-43c4-96a2-9cc335d4221f_buggy.java
++++ b/tmp/90f82f76-8a48-4dc2-844b-4dc8904b3c7e_fixed.java
+@@ -1,24 +1,13 @@
+   /** Compute the cross-product of two vectors.
+    * @param v1 first vector
+    * @param v2 second vector
+    * @return the cross product v1 ^ v2 as a new Vector
+    */
+   public static Vector3D crossProduct(final Vector3D v1, final Vector3D v2) {
+-
+-
+-      // rescale both vectors without losing precision,
+-      // to ensure their norm are the same order of magnitude
+-
+-      // we reduce cancellation errors by preconditioning,
+-      // we replace v1 by v3 = v1 - rho v2 with rho chosen in order to compute
+-      // v3 without loss of precision. See Kahan lecture
+-      // "Computing Cross-Products and Rotations in 2- and 3-Dimensional Euclidean Spaces"
+-      // available at http://www.cs.berkeley.edu/~wkahan/MathH110/Cross.pdf
+-
+-      // compute rho as an 8 bits approximation of v1.v2 / v2.v2
+-
+-
+-      // compute cross product from v3 and v2 instead of v1 and v2
+-      return new Vector3D(v1.y * v2.z - v1.z * v2.y, v1.z * v2.x - v1.x * v2.z, v1.x * v2.y - v1.y * v2.x);
+-
++      double scale    = FastMath.scalb(1.0, 100);
++      Vector3D big1   = new Vector3D(scale, v1);
++      Vector3D small2 = new Vector3D(1 / scale, v2);
++      big1 = big1.subtract(scale * v2);
++      return new Vector3D(big1.y * small2.z + small2.y * scale, big1.z * small2.x + small2.z * scale,
++                      big1.x * small2.y + small2.x * scale);
+   }
+\ No newline at end of file

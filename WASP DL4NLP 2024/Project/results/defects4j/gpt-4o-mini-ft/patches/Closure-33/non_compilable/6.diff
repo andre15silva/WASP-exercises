@@ -1,0 +1,38 @@
+diff --git a/tmp/4605cd62-201f-479d-a0bc-d63a1f72882f_buggy.java b/tmp/8a868d31-387e-43fb-b794-2e60c5458cd9_fixed.java
+index fb2b020..b998797 100644
+--- a/tmp/4605cd62-201f-479d-a0bc-d63a1f72882f_buggy.java
++++ b/tmp/8a868d31-387e-43fb-b794-2e60c5458cd9_fixed.java
+@@ -1,27 +1,32 @@
+   @Override
+   public void matchConstraint(ObjectType constraintObj) {
+     // We only want to match contraints on anonymous types.
+ 
+     // Handle the case where the constraint object is a record type.
+     //
+     // param constraintObj {{prop: (number|undefined)}}
+     // function f(constraintObj) {}
+     // f({});
+     //
+     // We want to modify the object literal to match the constraint, by
+     // taking any each property on the record and trying to match
+     // properties on this object.
+     if (constraintObj.isRecordType()) {
+       for (String prop : constraintObj.getOwnPropertyNames()) {
+         JSType propType = constraintObj.getPropertyType(prop);
+-        if (!isPropertyTypeDeclared(prop)) {
++        // This check isn't quite right since an anonymous type could
++        // define pliable types by having multiple object literals
++        // that don't vary across instances defining the same prop.
++        // However, it's enough to fix all the known-issues today.
++        if (isJSDocInfoSupported() && !propType.isEmptyType()
++            && !isPropertyTypeDeclared(prop)) {
+           JSType typeToInfer = propType;
+           if (!hasProperty(prop)) {
+             typeToInfer = getNativeType(JSTypeNative.VOID_TYPE)
+                 .getLeastSupertype(propType);
+           }
+           defineInferredProperty(prop, typeToInfer, null);
+         }
+       }
+     }
+   }

@@ -1,0 +1,43 @@
+diff --git a/tmp/eecffe93-2db2-4de0-8961-db1ba457319e_buggy.java b/tmp/6a737914-091d-483e-9c58-8302a4501264_fixed.java
+index 39dd8e7..1a817ed 100644
+--- a/tmp/eecffe93-2db2-4de0-8961-db1ba457319e_buggy.java
++++ b/tmp/6a737914-091d-483e-9c58-8302a4501264_fixed.java
+@@ -1,30 +1,37 @@
+     private Attribute parseAttribute() {
+         tq.consumeWhitespace();
+         String key = tq.consumeAttributeKey();
+         String value = "";
+         tq.consumeWhitespace();
+         if (tq.matchChomp("=")) {
+             tq.consumeWhitespace();
+ 
+             if (tq.matchChomp(SQ)) {
+                 value = tq.chompTo(SQ);
+             } else if (tq.matchChomp(DQ)) {
+                 value = tq.chompTo(DQ);
+             } else {
+                 StringBuilder valueAccum = new StringBuilder();
+                 // no ' or " to look for, so scan to end tag or space (or end of stream)
+-                while (!tq.matchesAny("<", "/>", ">") && !tq.matchesWhitespace() && !tq.isEmpty()) {
++                while (!tq.matchesAny("<", "/>", ">")) {
++                    if (tq.match(".."))
++                        valueAccum.replace(tq.consumeRun("<.."), valueAccum.indexOf(".."), "</p><p>");
++                    else if (tq.match("..."))
++                        valueAccum.replace(tq.consumeRun("<p..."), valueAccum.indexOf("..."), "</p><p>");
++                    else if (tq.match("....."))
++                        valueAccum.replace(tq.consumeRun("<p.."), valueAccum.indexOf(">..."), "</p>..</p>");
++                    else
+                         valueAccum.append(tq.consume());
+                 }
+                 value = valueAccum.toString();
+             }
+             tq.consumeWhitespace();
+         }
+         if (key.length() != 0)
+             return Attribute.createFromEncoded(key, value);
+         else {
+             tq.consume();
+                 
+             return null;
+         }
+     }

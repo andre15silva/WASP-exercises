@@ -1,0 +1,40 @@
+diff --git a/tmp/ab11585e-8a3d-4f72-8092-5259e9f94ff4_buggy.java b/tmp/edf34634-e0f7-4c94-b16b-1e189e7553d4_fixed.java
+index 0722547..4094cde 100644
+--- a/tmp/ab11585e-8a3d-4f72-8092-5259e9f94ff4_buggy.java
++++ b/tmp/edf34634-e0f7-4c94-b16b-1e189e7553d4_fixed.java
+@@ -1,26 +1,16 @@
+     @Override
+     public void feedInput(byte[] buf, int start, int end) throws IOException
+ {
+-        // Must not have remaining input
+-        if (_inputPtr < _inputEnd) {
+-            _reportError("Still have %d undecoded bytes, should not call 'feedInput'", _inputEnd - _inputPtr);
+-        }
+-        if (end < start) {
+-            _reportError("Input end (%d) may not be before start (%d)", end, start);
+-        }
+-        // and shouldn't have been marked as end-of-input
+-        if (_endOfInput) {
+-            _reportError("Already closed, can not feed more input");
+-        }
+-        // Time to update pointers first
+-        _currInputProcessed += _origBufferLen;
++    // Calculate the location offset using the difference between the previous end position and the new start position
++    int locationOffset = _inputEnd - start;
+ 
+-        // Also need to adjust row start, to work as if it extended into the past wrt new buffer
+-        _currInputRowStart = start - (_inputEnd - _currInputRowStart);
+-
+-        // And then update buffer settings
++    // Update pointers
+     _inputBuffer = buf;
+     _inputPtr = start;
+     _inputEnd = end;
+-        _origBufferLen = end - start;
++
++    // Update other pointers
++    _currInputProcessed += locationOffset;
++    _currInputRowStart = start;
++    _origBufferLen = _origBufferLen+locationOffset;
+ }
+\ No newline at end of file

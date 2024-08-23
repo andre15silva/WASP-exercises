@@ -1,0 +1,29 @@
+diff --git a/tmp/acb8e160-283b-447f-b36d-289040a98f30_buggy.java b/tmp/10e13946-e7fd-4eea-8e33-5919fd0fa893_fixed.java
+index 5b8a4d2..f3557f3 100644
+--- a/tmp/acb8e160-283b-447f-b36d-289040a98f30_buggy.java
++++ b/tmp/10e13946-e7fd-4eea-8e33-5919fd0fa893_fixed.java
+@@ -1,12 +1,22 @@
+     /**
+      * Creates a period from the given millisecond duration with the standard period type
+      * and ISO rules, ensuring that the calculation is performed with the time-only period type.
+      * <p>
+      * The calculation uses the hour, minute, second and millisecond fields.
+      *
+      * @param duration  the duration, in milliseconds
+      */
+     protected BasePeriod(long duration) {
+         this(duration, null, null);
+-        // bug [3264409]
++        long millis = duration / DateTimeConstants.MILLIS_PER_SECOND;
++        int seconds = (int) millis;
++        millis = millis - seconds * DateTimeConstants.MILLIS_PER_SECOND;
++        int minutes = seconds / 60;
++        seconds = seconds % 60;
++        int hours = minutes / 60;
++        minutes = minutes % 60;
++        setMillis(millis);
++        setSeconds(seconds);
++        setMinutes(minutes);
++        setHours(hours);
+     }
+\ No newline at end of file

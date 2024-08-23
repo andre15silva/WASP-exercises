@@ -1,0 +1,52 @@
+diff --git a/tmp/d3f2a439-fce5-47da-9cb1-e00df39a85da_buggy.java b/tmp/7afbf5b9-dff5-4838-aa6e-35d478f6c7ee_fixed.java
+index e4d90e7..02c3a0c 100644
+--- a/tmp/d3f2a439-fce5-47da-9cb1-e00df39a85da_buggy.java
++++ b/tmp/7afbf5b9-dff5-4838-aa6e-35d478f6c7ee_fixed.java
+@@ -1,45 +1,2 @@
+-  @Override
+-  String toStringHelper(boolean forAnnotations) {
+-    if (hasReferenceName()) {
+-      return getReferenceName();
+-    } else if (prettyPrint) {
+-      // Don't pretty print recursively.
+-      prettyPrint = false;
+ 
+-      // Use a tree set so that the properties are sorted.
+-      Set<String> propertyNames = Sets.newTreeSet();
+-      for (ObjectType current = this;
+-           current != null && !current.isNativeObjectType() &&
+-               propertyNames.size() <= MAX_PRETTY_PRINTED_PROPERTIES;
+-           current = current.getImplicitPrototype()) {
+-        propertyNames.addAll(current.getOwnPropertyNames());
+-      }
+-
+-      StringBuilder sb = new StringBuilder();
+-      sb.append("{");
+-
+-      int i = 0;
+-      for (String property : propertyNames) {
+-        if (i > 0) {
+-          sb.append(", ");
+-        }
+-
+-        sb.append(property);
+-        sb.append(": ");
+-        sb.append(getPropertyType(property).toString());
+-
+-        ++i;
+-        if (i == MAX_PRETTY_PRINTED_PROPERTIES) {
+-          sb.append(", ...");
+-          break;
+-        }
+-      }
+-
+-      sb.append("}");
+-
+-      prettyPrint = true;
+-      return sb.toString();
+-    } else {
+-      return "{...}";
+-    }
+-  }
++The fixed version would be:
+\ No newline at end of file

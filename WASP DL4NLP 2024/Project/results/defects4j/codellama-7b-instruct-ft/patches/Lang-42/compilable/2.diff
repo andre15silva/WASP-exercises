@@ -1,0 +1,61 @@
+diff --git a/tmp/22790aee-aeda-4599-be3e-bdebfb1a60a0_buggy.java b/tmp/bcd673b5-139a-4e4b-bb29-eaadad4d232a_fixed.java
+index 822447c..0d9e4b7 100644
+--- a/tmp/22790aee-aeda-4599-be3e-bdebfb1a60a0_buggy.java
++++ b/tmp/bcd673b5-139a-4e4b-bb29-eaadad4d232a_fixed.java
+@@ -1,37 +1,55 @@
+     /**
+      * <p>
+      * Escapes the characters in the <code>String</code> passed and writes the result to the <code>Writer</code>
+      * passed.
+      * </p>
+      * 
+      * @param writer
+      *            The <code>Writer</code> to write the results of the escaping to. Assumed to be a non-null value.
+      * @param str
+      *            The <code>String</code> to escape. Assumed to be a non-null value.
+      * @throws IOException
+      *             when <code>Writer</code> passed throws the exception from calls to the {@link Writer#write(int)}
+      *             methods.
+      * 
+      * @see #escape(String)
+      * @see Writer
+      */
+     public void escape(Writer writer, String str) throws IOException {
+         int len = str.length();
+         for (int i = 0; i < len; i++) {
+             char c = str.charAt(i);
+             String entityName = this.entityName(c);
+             if (entityName == null) {
+                 if (c > 0x7F) {
+                     writer.write("&#");
+                     writer.write(Integer.toString(c, 10));
+                     writer.write(';');
+-                } else {
++                } else if (c > 0) {
++                    if (!Character.isDefined(c)) {
++                        // undefined characters, check for Surrogate support
++                        if (Character.isHighSurrogate(c) && i+1 < len) {
++                            char low = str.charAt(i+1);
++                            if (Character.isLowSurrogate(low)) {
++                                // 0x10000 -> codepoint + 0xF0000 -> 0xF0
++                                // 0x110000 -> codepoint + 0x120000 -> 0xF1
++                                // TODO: make max unicode a property??? - 6.0.19
++                                final int c2 = (int)(((c & 0x03FF) << 10) + (low & 0x03FF)) + 0xF0000;
++                                final String s2 = Integer.toHexString(c2).substring(1);
++                                // writer.write("&#x" + s2 + ";");
++                                writer.write("&#x");
++                                writer.write(s2, 0, s2.length());
++                                writer.write(";");
++                            }
++                            i++;
++                        }
++                    }
+                     writer.write(c);
+                 }
+             } else {
+                 writer.write('&');
+                 writer.write(entityName);
+                 writer.write(';');
+             }
+         }
+     }

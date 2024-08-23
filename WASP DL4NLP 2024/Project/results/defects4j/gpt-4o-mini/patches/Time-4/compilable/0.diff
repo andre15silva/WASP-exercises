@@ -1,0 +1,79 @@
+diff --git a/tmp/826b4dfd-b03a-48c8-8bc4-528dd87ebf69_buggy.java b/tmp/ebe25bce-63a6-44a0-8b28-6bbd4f739813_fixed.java
+index 7ea7ac9..0dc88e2 100644
+--- a/tmp/826b4dfd-b03a-48c8-8bc4-528dd87ebf69_buggy.java
++++ b/tmp/ebe25bce-63a6-44a0-8b28-6bbd4f739813_fixed.java
+@@ -1,63 +1,59 @@
+-    /**
+-     * Gets a copy of this date with the specified field set to a new value.
+-     * <p>
+-     * If this partial did not previously support the field, the new one will.
+-     * Contrast this behaviour with {@link #withField(DateTimeFieldType, int)}.
+-     * <p>
+-     * For example, if the field type is <code>dayOfMonth</code> then the day
+-     * would be changed/added in the returned instance.
+-     *
+-     * @param fieldType  the field type to set, not null
+-     * @param value  the value to set
+-     * @return a copy of this instance with the field set
+-     * @throws IllegalArgumentException if the value is null or invalid
+-     */
+     public Partial with(DateTimeFieldType fieldType, int value) {
+         if (fieldType == null) {
+             throw new IllegalArgumentException("The field type must not be null");
+         }
++        
++        // Validate the value before proceeding
++        if (value < 1) { // Assuming fields must have a positive value
++            throw new IllegalArgumentException("The value must be greater than 0");
++        }
++
+         int index = indexOf(fieldType);
+         if (index == -1) {
+             DateTimeFieldType[] newTypes = new DateTimeFieldType[iTypes.length + 1];
+             int[] newValues = new int[newTypes.length];
+             
+             // find correct insertion point to keep largest-smallest order
+             int i = 0;
+             DurationField unitField = fieldType.getDurationType().getField(iChronology);
+             if (unitField.isSupported()) {
+                 for (; i < iTypes.length; i++) {
+                     DateTimeFieldType loopType = iTypes[i];
+                     DurationField loopUnitField = loopType.getDurationType().getField(iChronology);
+                     if (loopUnitField.isSupported()) {
+                         int compare = unitField.compareTo(loopUnitField);
+                         if (compare > 0) {
+                             break;
+                         } else if (compare == 0) {
+                             DurationField rangeField = fieldType.getRangeDurationType().getField(iChronology);
+                             DurationField loopRangeField = loopType.getRangeDurationType().getField(iChronology);
+                             if (rangeField.compareTo(loopRangeField) > 0) {
+                                 break;
+                             }
+                         }
+                     }
+                 }
+             }
+             System.arraycopy(iTypes, 0, newTypes, 0, i);
+             System.arraycopy(iValues, 0, newValues, 0, i);
+             newTypes[i] = fieldType;
+             newValues[i] = value;
+             System.arraycopy(iTypes, i, newTypes, i + 1, newTypes.length - i - 1);
+             System.arraycopy(iValues, i, newValues, i + 1, newValues.length - i - 1);
+             // use public constructor to ensure full validation
+             // this isn't overly efficient, but is safe
+             Partial newPartial = new Partial(iChronology, newTypes, newValues);
+             iChronology.validate(newPartial, newValues);
+             return newPartial;
+         }
+         if (value == getValue(index)) {
+             return this;
+         }
+         int[] newValues = getValues();
+         newValues = getField(index).set(this, index, newValues, value);
++        
++        // Ensure the value is valid before returning a new Partial
++        iChronology.validate(new Partial(this, newValues), newValues);
++        
+         return new Partial(this, newValues);
+     }
+\ No newline at end of file

@@ -1,0 +1,40 @@
+diff --git a/tmp/d8b0588a-6c2f-43e7-bc03-fe3b0e622431_buggy.java b/tmp/40e7ae0e-d301-448e-8dde-c33eabcb50dd_fixed.java
+index 862c60c..0fa911d 100644
+--- a/tmp/d8b0588a-6c2f-43e7-bc03-fe3b0e622431_buggy.java
++++ b/tmp/40e7ae0e-d301-448e-8dde-c33eabcb50dd_fixed.java
+@@ -1,25 +1,24 @@
+     void outerHtmlHead(Appendable accum, int depth, Document.OutputSettings out) throws IOException {
+         final boolean prettyPrint = out.prettyPrint();
+         final Element parent = parentNode instanceof Element ? ((Element) parentNode) : null;
+         final boolean normaliseWhite = prettyPrint && !Element.preserveWhitespace(parentNode);
+-
+         boolean trimLeading = false;
+         boolean trimTrailing = false;
+         if (normaliseWhite) {
+             trimLeading = (siblingIndex == 0 && parent != null && parent.tag().isBlock()) ||
+                 parentNode instanceof Document;
+             trimTrailing = nextSibling() == null && parent != null && parent.tag().isBlock();
+-
+-            // if this text is just whitespace, and the next node will cause an indent, skip this text:
++            final boolean isWhitespace = isBlank();
++            final boolean isWrappable = nextNodeHasBr ||
++                nextNode instanceof Element && ((Element) nextNode).tag().formatAsBlock() && isWhitespace;
+             Node next = this.nextSibling();
+-            boolean couldSkip = (next instanceof Element && ((Element) next).shouldIndent(out)) // next will indent
+-                || (next instanceof TextNode && (((TextNode) next).isBlank())); // next is blank text, from re-parenting
+-            if (couldSkip && isBlank()) return;
+-
+-            if ((siblingIndex == 0 && parent != null && parent.tag().formatAsBlock() && !isBlank()) ||
+-                (out.outline() && siblingNodes().size() > 0 && !isBlank()))
++            boolean couldSkip = (next instanceof Element && ((Element) next).shouldIndent(out)) 
++                || (next instanceof TextNode && isWrappable); 
++            if (couldSkip)
++                return;
++            if ((siblingIndex == 0 && parent != null && parent.tag().formatAsBlock() && !isBlank()) 
++                    || (out.outline() && siblingNodes().size() > 0 && !isBlank()))
+                 indent(accum, depth, out);
+         }
+-
+         Entities.escape(accum, coreValue(), out, false, normaliseWhite, trimLeading, trimTrailing);
+     }
+\ No newline at end of file

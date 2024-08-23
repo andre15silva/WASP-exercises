@@ -1,0 +1,21 @@
+diff --git a/tmp/7f17d4d8-f01e-49e9-9777-418593f9139d_buggy.java b/tmp/0ea76cc2-b014-4fe8-b351-f5fd3b48dde8_fixed.java
+index 0e18f59..70357f7 100644
+--- a/tmp/7f17d4d8-f01e-49e9-9777-418593f9139d_buggy.java
++++ b/tmp/0ea76cc2-b014-4fe8-b351-f5fd3b48dde8_fixed.java
+@@ -1,13 +1,14 @@
+         @Override
+         InputStream decode(final InputStream in, final Coder coder,
+                 byte[] password) throws IOException {
+             byte propsByte = coder.properties[0];
+             long dictSize = coder.properties[1];
+             for (int i = 1; i < 4; i++) {
+                 dictSize |= (coder.properties[i + 1] << (8 * i));
+             }
+-            if (dictSize > LZMAInputStream.DICT_SIZE_MAX) {
+-                throw new IOException("Dictionary larger than 4GiB maximum size");
++            int uncompressedSize = coder.getUncompressedSize();
++            if (uncompressedSize > 0 && dictSize > uncompressedSize) {
++                throw new IOException("LZMA dictionary is too large");
+             }
+             return new LZMAInputStream(in, -1, propsByte, (int) dictSize);
+         }

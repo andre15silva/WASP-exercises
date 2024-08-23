@@ -1,0 +1,21 @@
+diff --git a/tmp/06e65cef-8552-4d8c-b3b3-7ced1cf55924_buggy.java b/tmp/90bd7f4d-c379-46f4-8520-4e73bad85516_fixed.java
+index 22640dd..622646e 100644
+--- a/tmp/06e65cef-8552-4d8c-b3b3-7ced1cf55924_buggy.java
++++ b/tmp/90bd7f4d-c379-46f4-8520-4e73bad85516_fixed.java
+@@ -1,3 +1,15 @@
+ private boolean hasExceptionHandler(Node cfgNode) {
++    // Check if the given node is part of a try-catch block
++    if (cfgNode == null) {
++        return false;
++    }
++    // Traverse the control flow graph to find try/catch blocks
++    while (cfgNode != null) {
++        // Add logic here to determine if cfgNode has an exception handler
++        if (cfgNode.isTryNode() || cfgNode.isCatchNode()) {
++            return true;
++        }
++        cfgNode = cfgNode.getNext(); // Move to the next node in the graph
++    }
+     return false;
+ }
+\ No newline at end of file

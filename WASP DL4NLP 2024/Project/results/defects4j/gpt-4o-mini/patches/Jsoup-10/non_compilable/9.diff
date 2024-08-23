@@ -1,0 +1,67 @@
+diff --git a/tmp/ddd921a1-7048-480e-9ff7-9851cacbac58_buggy.java b/tmp/751c3c75-ebea-4d40-9424-6f6e82989041_fixed.java
+index b4e6f03..dfda74d 100644
+--- a/tmp/ddd921a1-7048-480e-9ff7-9851cacbac58_buggy.java
++++ b/tmp/751c3c75-ebea-4d40-9424-6f6e82989041_fixed.java
+@@ -1,44 +1,37 @@
+-    /**
+-     * Get an absolute URL from a URL attribute that may be relative (i.e. an <code>&lt;a href></code> or
+-     * <code>&lt;img src></code>).
+-     * <p/>
+-     * E.g.: <code>String absUrl = linkEl.absUrl("href");</code>
+-     * <p/>
+-     * If the attribute value is already absolute (i.e. it starts with a protocol, like
+-     * <code>http://</code> or <code>https://</code> etc), and it successfully parses as a URL, the attribute is
+-     * returned directly. Otherwise, it is treated as a URL relative to the element's {@link #baseUri}, and made
+-     * absolute using that.
+-     * <p/>
+-     * As an alternate, you can use the {@link #attr} method with the <code>abs:</code> prefix, e.g.:
+-     * <code>String absUrl = linkEl.attr("abs:href");</code>
+-     *
+-     * @param attributeKey The attribute key
+-     * @return An absolute URL if one could be made, or an empty string (not null) if the attribute was missing or
+-     * could not be made successfully into a URL.
+-     * @see #attr
+-     * @see java.net.URL#URL(java.net.URL, String)
+-     */
+ public String absUrl(String attributeKey) {
+     Validate.notEmpty(attributeKey);
+ 
+     String relUrl = attr(attributeKey);
+     if (!hasAttr(attributeKey)) {
+         return ""; // nothing to make absolute with
+     } else {
+         URL base;
+         try {
+-                try {
++            // Attempt to create a URL from baseUri. If it fails, treat relUrl as an absolute URL.
+             base = new URL(baseUri);
+         } catch (MalformedURLException e) {
+-                    // the base is unsuitable, but the attribute may be abs on its own, so try that
++            // If baseUri is malformed, we check if relUrl can be treated as absolute.
++            try {
+                 URL abs = new URL(relUrl);
+                 return abs.toExternalForm();
++            } catch (MalformedURLException ex) {
++                return ""; // both baseUri and relUrl are unsuitable, return empty
+             }
+-                // workaround: java resolves '//path/file + ?foo' to '//path/?foo', not '//path/file?foo' as desired
++        }
++
++        // Here, base is valid; now we must handle the relative URL correctly.
++        if (relUrl.startsWith("?")) {
++            // If relUrl is a query string, concatenate it with the base's path
++            String basePath = base.getPath();
++            return new URL(base.getProtocol(), base.getHost(), base.getPort(), basePath + relUrl).toExternalForm();
++        }
++
++        try {
++            // If relUrl is not a simple query, create a new URL based on the base
+             URL abs = new URL(base, relUrl);
+             return abs.toExternalForm();
+         } catch (MalformedURLException e) {
+-                return "";
++            return ""; // could not construct a valid URL
+         }
+     }
+ }
+\ No newline at end of file

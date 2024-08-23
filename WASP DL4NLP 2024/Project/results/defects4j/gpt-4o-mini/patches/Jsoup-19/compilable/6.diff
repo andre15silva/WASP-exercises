@@ -1,0 +1,23 @@
+diff --git a/tmp/e5422d75-5063-49fc-aa88-ee9ff0cd0922_buggy.java b/tmp/5ab0a28f-216b-4e23-9562-f0774c648e60_fixed.java
+index 4aff4e4..108550e 100644
+--- a/tmp/e5422d75-5063-49fc-aa88-ee9ff0cd0922_buggy.java
++++ b/tmp/5ab0a28f-216b-4e23-9562-f0774c648e60_fixed.java
+@@ -1,15 +1,16 @@
+ private boolean testValidProtocol(Element el, Attribute attr, Set<Protocol> protocols) {
+     // try to resolve relative urls to abs, and optionally update the attribute so output html has abs.
+     // rels without a baseuri get removed
+     String value = el.absUrl(attr.getKey());
+     if (!preserveRelativeLinks)
+         attr.setValue(value);
+     
++    // Add check for the raw attribute value to account for custom protocols
+     for (Protocol protocol : protocols) {
+         String prot = protocol.toString() + ":";
+-            if (value.toLowerCase().startsWith(prot)) {
++        if (value.toLowerCase().startsWith(prot) || attr.getValue().toLowerCase().startsWith(prot)) {
+             return true;
+         }
+     }
+     return false;
+ }
+\ No newline at end of file

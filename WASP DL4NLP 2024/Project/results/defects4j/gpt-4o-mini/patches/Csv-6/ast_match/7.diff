@@ -1,0 +1,21 @@
+diff --git a/tmp/6fb1d5cb-92b3-4330-866d-37816edcfde3_buggy.java b/tmp/37045dc7-c842-4d0f-b7ad-e23df0aa498e_fixed.java
+index 163b2e1..d6a0d0b 100644
+--- a/tmp/6fb1d5cb-92b3-4330-866d-37816edcfde3_buggy.java
++++ b/tmp/37045dc7-c842-4d0f-b7ad-e23df0aa498e_fixed.java
+@@ -1,13 +1,9 @@
+-    /**
+-     * Puts all values of this record into the given Map.
+-     *
+-     * @param map The Map to populate.
+-     * @return the given map.
+-     */
+     <M extends Map<String, String>> M putIn(final M map) {
+         for (final Entry<String, Integer> entry : mapping.entrySet()) {
+             final int col = entry.getValue().intValue();
++            if (col < values.length) { // Check if col is within the bounds of the values array
+                 map.put(entry.getKey(), values[col]);
+             }
++        }
+         return map;
+     }
+\ No newline at end of file

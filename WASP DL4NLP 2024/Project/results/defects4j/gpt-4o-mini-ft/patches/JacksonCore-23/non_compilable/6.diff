@@ -1,0 +1,11 @@
+diff --git a/tmp/789b48ba-7e30-484d-84d4-0d846f4b6b1c_buggy.java b/tmp/fe89acc2-cec4-412a-8128-1640d7506be8_fixed.java
+index fc49bcd..484519d 100644
+--- a/tmp/789b48ba-7e30-484d-84d4-0d846f4b6b1c_buggy.java
++++ b/tmp/fe89acc2-cec4-412a-8128-1640d7506be8_fixed.java
+@@ -1,4 +1,5 @@
+     @Override
+     public DefaultPrettyPrinter createInstance() {
+-        return new DefaultPrettyPrinter(this);
++        return new DefaultPrettyPrinter(this)
++                .withRootValueSeparator(rootValueSeparatorAsString);
+     }

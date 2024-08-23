@@ -1,0 +1,54 @@
+diff --git a/tmp/4578f128-e7e7-4fc9-9019-e1898a1b5a42_buggy.java b/tmp/098b66e6-26a4-4489-bde0-37ccbcff7205_fixed.java
+index 1bbc082..765adb4 100644
+--- a/tmp/4578f128-e7e7-4fc9-9019-e1898a1b5a42_buggy.java
++++ b/tmp/098b66e6-26a4-4489-bde0-37ccbcff7205_fixed.java
+@@ -1,36 +1,41 @@
+     /**
+      * Write an long integer into a buffer as an octal string if this
+      * will fit, or as a binary number otherwise.
+      * 
+      * Uses {@link #formatUnsignedOctalString} to format
+      * the value as an octal string with leading zeros.
+      * The converted number is followed by a space.
+      * 
+      * @param value The value to write into the buffer.
+      * @param buf The destination buffer.
+      * @param offset The starting offset into the buffer.
+      * @param length The length of the buffer.
++     * @param roundTrip If set, we will first try the
++     * maximum number of octal characters that we can represent
++     * (rounded up to the nearest 8 bits) in the buffer.
++     * This is useful if we wrote an octal string and
++     * now we need to write it back to disk or in human
++     * readable format.
+      * @return The updated offset.
+      * @throws IllegalArgumentException if the value (and trailer)
+      * will not fit in the buffer.
+      * @since 1.4
+      */
+     public static int formatLongOctalOrBinaryBytes(
+-        final long value, final byte[] buf, final int offset, final int length) {
+-
+-        // Check whether we are dealing with UID/GID or SIZE field
++        final long value, final byte[] buf, final int offset,
++        final int length, final boolean roundTrip) {
+         final long maxAsOctalChar = length == TarConstants.UIDLEN ? TarConstants.MAXID : TarConstants.MAXSIZE;
+-
+         final boolean negative = value < 0;
+-        if (!negative && value <= maxAsOctalChar) { // OK to store as octal chars
++        if (roundTrip) {
++            final long maxOctalChar = (((maxAsOctalChar - 1) >> 3) + 1) << 3;
++            if (!negative && value < maxOctalChar) { 
+                 return formatLongOctalBytes(value, buf, offset, length);
+             }
+-
++        }
+         if (length < 9) {
+             formatLongBinary(value, buf, offset, length, negative);
+         }
+         formatBigIntegerBinary(value, buf, offset, length, negative);
+-
+         buf[offset] = (byte) (negative ? 0xff : 0x80);
+         return offset + length;
+     }
+\ No newline at end of file

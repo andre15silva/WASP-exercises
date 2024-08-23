@@ -1,0 +1,37 @@
+diff --git a/tmp/a23be8c6-3043-4727-9c7f-0a30a42f7518_buggy.java b/tmp/219c1e26-188a-4006-956d-6ea89be2ea51_fixed.java
+index 1a63a66..afe84d7 100644
+--- a/tmp/a23be8c6-3043-4727-9c7f-0a30a42f7518_buggy.java
++++ b/tmp/219c1e26-188a-4006-956d-6ea89be2ea51_fixed.java
+@@ -1,21 +1,15 @@
+ @Override
+ @Deprecated
+-    protected JavaType _narrow(Class<?> subclass)
++protected JavaType _narrow(subclass)
+ {
+-        if (_class == subclass) {
+-            return this;
++    if (subclass == _class) {
++        return this
+     }
+-        // Should we check that there is a sub-class relationship?
+-        // 15-Jan-2016, tatu: Almost yes, but there are some complications with
+-        //    placeholder values (`Void`, `NoClass`), so can not quite do yet.
+-        // TODO: fix in 2.8
+-            /*
+-            throw new IllegalArgumentException("Class "+subclass.getName()+" not sub-type of "
+-                    +_class.getName());
+-                    */
+-            return new SimpleType(subclass, _bindings, this, _superInterfaces,
+-                    _valueHandler, _typeHandler, _asStatic);
+-        // Otherwise, stitch together the hierarchy. First, super-class
+-        // if not found, try a super-interface
+-        // should not get here but...
++    if (subclass.isSubclass(_class)) {
++        return new SimpleType(subclass, _bindings, this, _superInterfaces, _valueHandler, _typeHandler, _asStatic)
++    }
++    if (subclass.isInterface() && subclass.isAssignableFrom(_class)) {
++        return new SimpleType(subclass, _bindings, this, _superInterfaces, _valueHandler, _typeHandler, _asStatic)
++    }
++    return this
+ }
+\ No newline at end of file

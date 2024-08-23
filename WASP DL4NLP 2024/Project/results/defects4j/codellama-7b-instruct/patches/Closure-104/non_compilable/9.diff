@@ -1,0 +1,33 @@
+diff --git a/tmp/030ce84b-df42-41a7-81ce-f7eab9f363f6_buggy.java b/tmp/ddef8a84-0da6-471a-8222-b12780fdacb9_fixed.java
+index b36b2a9..90460ef 100644
+--- a/tmp/030ce84b-df42-41a7-81ce-f7eab9f363f6_buggy.java
++++ b/tmp/ddef8a84-0da6-471a-8222-b12780fdacb9_fixed.java
+@@ -1,26 +1 @@
+-  JSType meet(JSType that) {
+-    UnionTypeBuilder builder = new UnionTypeBuilder(registry);
+-    for (JSType alternate : alternates) {
+-      if (alternate.isSubtype(that)) {
+-        builder.addAlternate(alternate);
+-      }
+-    }
+-
+-    if (that instanceof UnionType) {
+-      for (JSType otherAlternate : ((UnionType) that).alternates) {
+-        if (otherAlternate.isSubtype(this)) {
+-          builder.addAlternate(otherAlternate);
+-        }
+-      }
+-    } else if (that.isSubtype(this)) {
+-      builder.addAlternate(that);
+-    }
+-    JSType result = builder.build();
+-    if (result != null) {
+-      return result;
+-    } else if (this.isObject() && that.isObject()) {
+-      return getNativeType(JSTypeNative.NO_OBJECT_TYPE);
+-    } else {
+-      return getNativeType(JSTypeNative.NO_TYPE);
+-    }
+-  }
++Yes, those steps are acceptable.
+\ No newline at end of file

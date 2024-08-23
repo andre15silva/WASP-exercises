@@ -1,0 +1,17 @@
+diff --git a/tmp/6f292762-3151-4ff9-b172-fcde3db93f6a_buggy.java b/tmp/ac37c3cd-cf16-4a99-a5bd-9988a06be265_fixed.java
+index ba2718f..a07fb3e 100644
+--- a/tmp/6f292762-3151-4ff9-b172-fcde3db93f6a_buggy.java
++++ b/tmp/ac37c3cd-cf16-4a99-a5bd-9988a06be265_fixed.java
+@@ -1,7 +1,11 @@
+   /**
+    * ContextTypeExpression := BasicTypeExpression | '?'
+    * For expressions on the right hand side of a this: or new:
+    */
+   private Node parseContextTypeExpression(JsDocToken token) {
+-          return parseTypeName(token);
++    if (token == JsDocToken.QMARK) {
++      return newNode(Token.QMARK);
++    } else {
++      return parseBasicTypeExpression(token);
++    }
+   }

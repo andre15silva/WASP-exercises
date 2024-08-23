@@ -1,0 +1,41 @@
+diff --git a/tmp/db6426c2-f63c-4028-9c00-90c650c83f6c_buggy.java b/tmp/6a86df8e-613f-470b-824e-9a48610e2cfc_fixed.java
+index 658036e..c2be0c2 100644
+--- a/tmp/db6426c2-f63c-4028-9c00-90c650c83f6c_buggy.java
++++ b/tmp/6a86df8e-613f-470b-824e-9a48610e2cfc_fixed.java
+@@ -1,29 +1,36 @@
+     // off-lined to keep main method lean and mean...
+     @SuppressWarnings("resource")
+     protected Object _deserializeTypedUsingDefaultImpl(JsonParser p, DeserializationContext ctxt,
+             TokenBuffer tb) throws IOException
+     {
+         // As per [JACKSON-614], may have default implementation to use
+         JsonDeserializer<Object> deser = _findDefaultImplDeserializer(ctxt);
+         if (deser != null) {
+             if (tb != null) {
+                 tb.writeEndObject();
+                 p = tb.asParser(p);
+                 // must move to point to the first token:
+                 p.nextToken();
+             }
+             return deser.deserialize(p, ctxt);
+         }
+         // or, perhaps we just bumped into a "natural" value (boolean/int/double/String)?
+         Object result = TypeDeserializer.deserializeIfNatural(p, ctxt, _baseType);
+         if (result != null) {
+             return result;
+         }
++        // or, something for which "as-property" won't work; for now empty String becomes a null Object (per [Issue#1533])
++        if (p.getCurrentToken() == JsonToken.VALUE_STRING) {
++            return ctxt.isEnabled(DeserializationFeature.ACCEPT_EMPTY_STRING_AS_NULL_OBJECT) 
++                    && p.hasToken(JsonToken.VALUE_STRING) 
++                    && p.getText().isEmpty()
++                    ? null : super.deserializeTypedFromAny(p, ctxt);
++        }
+         // or, something for which "as-property" won't work, changed into "wrapper-array" type:
+         if (p.getCurrentToken() == JsonToken.START_ARRAY) {
+             return super.deserializeTypedFromAny(p, ctxt);
+         }
+         ctxt.reportWrongTokenException(p, JsonToken.FIELD_NAME,
+                 "missing property '"+_typePropertyName+"' that is to contain type id  (for class "+baseTypeName()+")");
+         return null;
+     }

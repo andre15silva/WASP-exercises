@@ -1,0 +1,17 @@
+diff --git a/tmp/96c48235-2799-40b8-9999-307819f674cb_buggy.java b/tmp/b43d9f30-ba20-4772-9316-6f594d5e3f00_fixed.java
+index e69de29..3beea2d 100644
+--- a/tmp/96c48235-2799-40b8-9999-307819f674cb_buggy.java
++++ b/tmp/b43d9f30-ba20-4772-9316-6f594d5e3f00_fixed.java
+@@ -0,0 +1,12 @@
++    public void removeFormElement() {
++        Document doc = Jsoup.parse(html);
++        Element form = doc.selectFirst("form");
++        Element pass = form.selectFirst("input[name=pass]");
++        pass.remove();
++
++        List<Connection.KeyVal> data = form.formData();
++        assertEquals(2, data.size());
++        assertEquals("user", data.get(0).key());
++        assertEquals("login", data.get(1).key());
++        assertEquals(null, doc.selectFirst("input[name=pass]"));
++    }

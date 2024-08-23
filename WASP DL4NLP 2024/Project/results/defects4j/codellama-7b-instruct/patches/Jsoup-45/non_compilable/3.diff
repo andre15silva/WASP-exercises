@@ -1,0 +1,58 @@
+diff --git a/tmp/7e7fd689-f616-4a23-be10-9ca8192fbe47_buggy.java b/tmp/94faa653-585d-43ab-8bb5-cce85a592500_fixed.java
+index 135fc63..6145fad 100644
+--- a/tmp/7e7fd689-f616-4a23-be10-9ca8192fbe47_buggy.java
++++ b/tmp/94faa653-585d-43ab-8bb5-cce85a592500_fixed.java
+@@ -1,48 +1,4 @@
+-    void resetInsertionMode() {
+-        boolean last = false;
+-        for (int pos = stack.size() -1; pos >= 0; pos--) {
+-            Element node = stack.get(pos);
+-            if (pos == 0) {
+-                last = true;
+-                node = contextElement;
+-            }
+-            String name = node.nodeName();
+-            if ("select".equals(name)) {
+-                transition(HtmlTreeBuilderState.InSelect);
+-                break; // frag
+-            } else if (("td".equals(name) || "td".equals(name) && !last)) {
+-                transition(HtmlTreeBuilderState.InCell);
+-                break;
+-            } else if ("tr".equals(name)) {
+-                transition(HtmlTreeBuilderState.InRow);
+-                break;
+-            } else if ("tbody".equals(name) || "thead".equals(name) || "tfoot".equals(name)) {
+-                transition(HtmlTreeBuilderState.InTableBody);
+-                break;
+-            } else if ("caption".equals(name)) {
+-                transition(HtmlTreeBuilderState.InCaption);
+-                break;
+-            } else if ("colgroup".equals(name)) {
+-                transition(HtmlTreeBuilderState.InColumnGroup);
+-                break; // frag
+-            } else if ("table".equals(name)) {
+-                transition(HtmlTreeBuilderState.InTable);
+-                break;
+-            } else if ("head".equals(name)) {
+-                transition(HtmlTreeBuilderState.InBody);
+-                break; // frag
+-            } else if ("body".equals(name)) {
+-                transition(HtmlTreeBuilderState.InBody);
+-                break;
+-            } else if ("frameset".equals(name)) {
+-                transition(HtmlTreeBuilderState.InFrameset);
+-                break; // frag
+-            } else if ("html".equals(name)) {
+-                transition(HtmlTreeBuilderState.BeforeHead);
+-                break; // frag
+-            } else if (last) {
+-                transition(HtmlTreeBuilderState.InBody);
+-                break; // frag
+-            }
+-        }
+-    }
++
++Thank you for the additional context. It seems that the function is intended to insert a table under the body tag, but it's not properly handling the cases where the body already contains tables. The current implementation is adding multiple tables because it's entering the `else if ("table".equals(name))` clause multiple times.
++
++Here's a modified version of the function that should fix the issue:
+\ No newline at end of file

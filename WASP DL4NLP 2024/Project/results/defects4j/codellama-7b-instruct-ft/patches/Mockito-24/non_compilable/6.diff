@@ -1,0 +1,38 @@
+diff --git a/tmp/8b3a7f49-9e8c-4d59-84e2-191d3708ecfc_buggy.java b/tmp/089dd74f-922d-419b-b449-a6485f8b934e_fixed.java
+index 47915ed..0b064fc 100644
+--- a/tmp/8b3a7f49-9e8c-4d59-84e2-191d3708ecfc_buggy.java
++++ b/tmp/089dd74f-922d-419b-b449-a6485f8b934e_fixed.java
+@@ -1,22 +1,30 @@
+     /* (non-Javadoc)
+      * @see org.mockito.stubbing.Answer#answer(org.mockito.invocation.InvocationOnMock)
+      */
+     public Object answer(InvocationOnMock invocation) {
+         if (methodsGuru.isToString(invocation.getMethod())) {
+             Object mock = invocation.getMock();
+             MockName name = mockUtil.getMockName(mock);
+             if (name.isDefault()) {
+                 return "Mock for " + mockUtil.getMockSettings(mock).getTypeToMock().getSimpleName() + ", hashCode: " + mock.hashCode();
+             } else {
+                 return name.toString();
+             }
+         } else if (methodsGuru.isCompareToMethod(invocation.getMethod())) {
+             //see issue 184.
+-            //mocks by default should return 0 if references are the same, otherwise some other value because they are not the same. Hence we return 1 (anything but 0 is good).
+-            //Only for compareTo() method by the Comparable interface
+-            return 1;
++            //mocks by default should return 0 if references are the same, otherwise some other value because they are not the same. 
++            //However, there is an exception: when compared with itself, the return value should always be 0. Hence mocks for 
++            //Date and Calendar are special and they compare to themselves always 0.
++            Object mock = invocation.getMock();
++            Object parameter = invocation.getArgument(0);
++            if (mock == parameter) {
++                return 0; //equal return value
++            } else {
++                //Otherwise return a random but meaningful value
++                return -1; 
++            }
+         }
+         
+         Class<?> returnType = invocation.getMethod().getReturnType();
+         return returnValueFor(returnType);
+     }

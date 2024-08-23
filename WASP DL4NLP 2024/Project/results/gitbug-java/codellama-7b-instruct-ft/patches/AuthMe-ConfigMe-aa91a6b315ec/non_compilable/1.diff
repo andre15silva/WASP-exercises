@@ -1,0 +1,16 @@
+diff --git a/tmp/5d0f4146-04d3-4020-90cf-2275ba5bfeba_buggy.java b/tmp/878fa970-a28c-40d4-9875-c561cac3a2ea_fixed.java
+index b775870..dedeff6 100644
+--- a/tmp/5d0f4146-04d3-4020-90cf-2275ba5bfeba_buggy.java
++++ b/tmp/878fa970-a28c-40d4-9875-c561cac3a2ea_fixed.java
+@@ -1,10 +1,10 @@
+     /**
+      * Sets the given lines for the provided path, overriding any previously existing comments for the path.
+      * An entry that is a sole new-line (i.e. "\n") will result in an empty line without any comment marker.
+      *
+      * @param path the path to register the comment lines for
+      * @param commentLines the comment lines to set for the path
+      */
+     public void setComment(@NotNull String path, @NotNull String... commentLines) {
+-        comments.put(path, Collections.unmodifiableList(Arrays.asList(commentLines)));
++        comments.put(path, com.google.common.collect.ImmutableList.copyOf(commentLines));
+     }

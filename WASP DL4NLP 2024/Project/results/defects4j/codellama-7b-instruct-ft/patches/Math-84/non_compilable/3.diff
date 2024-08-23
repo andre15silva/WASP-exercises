@@ -1,0 +1,83 @@
+diff --git a/tmp/01902da3-6ec2-4812-8c84-97dbde8a58f9_buggy.java b/tmp/56b7323c-6ea4-4bef-82db-4cf8c92aa3e4_fixed.java
+index 5f1dcf2..1a37286 100644
+--- a/tmp/01902da3-6ec2-4812-8c84-97dbde8a58f9_buggy.java
++++ b/tmp/56b7323c-6ea4-4bef-82db-4cf8c92aa3e4_fixed.java
+@@ -1,41 +1,65 @@
+     /** {@inheritDoc} */
+     @Override
+     protected void iterateSimplex(final Comparator<RealPointValuePair> comparator)
+         throws FunctionEvaluationException, OptimizationException, IllegalArgumentException {
+ 
+         while (true) {
+ 
+             incrementIterationsCounter();
+ 
+-            // save the original vertex
++            // save the original simplex
+             final RealPointValuePair[] original = simplex;
+-            final RealPointValuePair best = original[0];
+ 
+             // perform a reflection step
+             final RealPointValuePair reflected = evaluateNewSimplex(original, 1.0, comparator);
+-            if (comparator.compare(reflected, best) < 0) {
++            final RealPointValuePair best = reflected;
++            final int reflectIndex = Arrays.binarySearch(original, best, comparator);
++            // the reflected simplex is the "current" simplex now
++            simplex = reflected;
+ 
+             // compute the expanded simplex
+-                final RealPointValuePair[] reflectedSimplex = simplex;
+             final RealPointValuePair expanded = evaluateNewSimplex(original, khi, comparator);
+-                if (comparator.compare(reflected, expanded) <= 0) {
+-                    // accept the reflected simplex
+-                    simplex = reflectedSimplex;
+-                }
+ 
+-                return;
++            // see if we need to stop now or go on
++            if (comparator.compare(best, reflected) <= 0) {
++                // the reflection point is better than or equal to the "current" best
++
++                // see if the result is the best we got so far
++                if (comparator.compare(reflected, best) < 0) {
++                    // the reflected simplex is strictly better, the current simplex is the "final" one
++                    simplex = reflected;
+ 
++                    // check convergence
++                    return;
++                } else {
++                    // the reflected simplex is not strictly better; use the expanded simplex
++                    simplex = expanded;
+                 }
++            } else {
++                // the reflection point is worse than the "current" best
+ 
+-            // compute the contracted simplex
+-            final RealPointValuePair contracted = evaluateNewSimplex(original, gamma, comparator);
+-            if (comparator.compare(contracted, best) < 0) {
+-                // accept the contracted simplex
++                // see if the expansion improved things
++                if (comparator.compare(best, expanded) < 0) {
++                    // the expansion improved the result
++                    simplex = expanded;
+ 
+                     // check convergence
+                     return;
++                } else {
++                    // the expansion did not improve the result; contract the simplex
++                    simplex = evaluateNewSimplex(original, gamma, comparator);
++                }
++            }
++
++            final RealPointValuePair finalBest = simplex[reflectIndex];
++            if (finalBest.getValue() <= best.getValue()) {
++                // the reflected simplex is strictly better
++
++                // save the original simplex and exit
++                simplex = original;
++                return;
+             }
+ 
+         }
+ 
+     }

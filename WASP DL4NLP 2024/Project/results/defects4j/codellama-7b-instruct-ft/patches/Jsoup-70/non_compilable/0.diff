@@ -1,0 +1,21 @@
+diff --git a/tmp/8f3bdabf-8594-41ad-9a66-db50c189c2cd_buggy.java b/tmp/0939498e-d502-4eda-9a02-c48ab6458731_fixed.java
+index 6c87721..5871b3a 100644
+--- a/tmp/8f3bdabf-8594-41ad-9a66-db50c189c2cd_buggy.java
++++ b/tmp/0939498e-d502-4eda-9a02-c48ab6458731_fixed.java
+@@ -1,11 +1,15 @@
+     static boolean preserveWhitespace(Node node) {
+         // looks only at this element and five levels up, to prevent recursion & needless stack searches
+-        if (node != null && node instanceof Element) {
++        if (node != null && node.type() == Node.Tag && node.preserveWhitespace())
++            return true;
++        else if (node != null && node.preserveWhitespace())
++            return true;
++	else if (node != null && node instanceof Element) {
+             Element el = (Element) node;
+                 if (el.tag.preserveWhitespace())
+                     return true;
+                 else
+                     return el.parent() != null && el.parent().tag.preserveWhitespace();
+         }
+         return false;
+     }

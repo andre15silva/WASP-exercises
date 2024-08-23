@@ -1,0 +1,17 @@
+diff --git a/tmp/71486821-9002-4a4e-9d22-cdf2ade54247_buggy.java b/tmp/a614ee34-b44d-4336-a8c1-98666c2fe306_fixed.java
+index 308b324..4350370 100644
+--- a/tmp/71486821-9002-4a4e-9d22-cdf2ade54247_buggy.java
++++ b/tmp/a614ee34-b44d-4336-a8c1-98666c2fe306_fixed.java
+@@ -1,11 +1,11 @@
+   /**
+    * Check to see if the given block comment looks like it should be JSDoc.
+    */
+   private void handleBlockComment(Comment comment) {
+-    if (comment.getValue().indexOf("/* @") != -1 || comment.getValue().indexOf("\n * @") != -1) {
++    if (comment.getValue().indexOf("/* @") != -1 || comment.getValue().indexOf("\n * @") != -1 || comment.getValue().indexOf("\n *@") != -1) {
+       errorReporter.warning(
+           SUSPICIOUS_COMMENT_WARNING,
+           sourceName,
+           comment.getLineno(), "", 0);
+     }
+   }

@@ -1,0 +1,21 @@
+diff --git a/tmp/9f9f5e37-7bd9-4593-a3ec-8b14680db6ac_buggy.java b/tmp/6eaf0267-b14b-4fdc-b479-21cf9e5fe9a4_fixed.java
+index d2a3c80..b7b4003 100644
+--- a/tmp/9f9f5e37-7bd9-4593-a3ec-8b14680db6ac_buggy.java
++++ b/tmp/6eaf0267-b14b-4fdc-b479-21cf9e5fe9a4_fixed.java
+@@ -1,11 +1,16 @@
+     /**
+      * Outputs the record separator.
+      *
+      * @throws IOException
+      *             If an I/O error occurs
+      */
+     public void println() throws IOException {
+         final String recordSeparator = format.getRecordSeparator();
++            if ("null".equals(recordSeparator)) {
++                // handle csv 1.06 and csv2.1 compatibility for null value that used to be formatted as empty strings
++                newRecord = false;
++            } else {
+                 out.append(recordSeparator);
++            }
+         newRecord = true;
+     }

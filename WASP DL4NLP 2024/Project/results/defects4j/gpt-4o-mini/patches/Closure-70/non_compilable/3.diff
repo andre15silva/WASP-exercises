@@ -1,0 +1,66 @@
+diff --git a/tmp/104dfa38-0c95-48ce-8109-950f4913f7aa_buggy.java b/tmp/940f22a1-29bf-4f43-a616-133e61dfd232_fixed.java
+index 1530b34..fdc2f9d 100644
+--- a/tmp/104dfa38-0c95-48ce-8109-950f4913f7aa_buggy.java
++++ b/tmp/940f22a1-29bf-4f43-a616-133e61dfd232_fixed.java
+@@ -1,23 +1,54 @@
+-    /**
+-     * Declares all of a function's arguments.
+-     */
+ private void declareArguments(Node functionNode) {
+     Node astParameters = functionNode.getFirstChild().getNext();
+     Node body = astParameters.getNext();
+     FunctionType functionType = (FunctionType) functionNode.getJSType();
+     if (functionType != null) {
+         Node jsDocParameters = functionType.getParametersNode();
+         if (jsDocParameters != null) {
+             Node jsDocParameter = jsDocParameters.getFirstChild();
+             for (Node astParameter : astParameters.children()) {
+                 if (jsDocParameter != null) {
+-              defineSlot(astParameter, functionNode,
+-                  jsDocParameter.getJSType(), true);
++                    // Check for duplicate variable declarations
++                    if (isVariableRedefined(astParameter, functionNode)) {
++                        reportDuplicateVariable(astParameter, functionNode, jsDocParameter.getJSType());
++                    } else {
++                        defineSlot(astParameter, functionNode, jsDocParameter.getJSType(), true);
++                    }
+                     jsDocParameter = jsDocParameter.getNext();
+                 } else {
+                     defineSlot(astParameter, functionNode, null, true);
+                 }
+             }
+         }
+     }
+-    } // end declareArguments
++}
++
++private boolean isVariableRedefined(Node astParameter, Node functionNode) {
++    // Check if the variable is redefined in the function body
++    for (Node child : functionNode.getSecondChild().children()) {
++        if (child.isVar() || child.isLet() || child.isConst()) {
++            for (Node var : child.children()) {
++                if (var.getString().equals(astParameter.getString())) {
++                    return true;
++                }
++            }
++        }
++    }
++    return false;
++}
++
++private void reportDuplicateVariable(Node astParameter, Node functionNode, JSType jsType) {
++    // Report the duplicate variable declaration with appropriate messages
++    String message = "variable " + astParameter.getString() +
++             " redefined with type " + jsType.toString() +
++             ", original definition at " + functionNode + 
++             " with type " + getOriginalType(functionNode, astParameter);
++    // Logic to report the message, e.g., logging it or adding to a warning list
++    System.out.println(message); // Here we simply print for demonstration
++}
++
++// Dummy method for illustration purposes
++private String getOriginalType(Node functionNode, Node astParameter) {
++    // Logic to retrieve the original type of the variable from the functionNode context
++    return "originalType"; // Placeholder return value
++}
+\ No newline at end of file

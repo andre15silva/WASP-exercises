@@ -1,0 +1,9 @@
+diff --git a/tmp/f1b6c391-475a-4a01-acc4-df09dedc8f38_buggy.java b/tmp/0e05cc1a-b272-42ad-b2f7-a20827c2fcee_fixed.java
+index ae12a4d..7cf30cf 100644
+--- a/tmp/f1b6c391-475a-4a01-acc4-df09dedc8f38_buggy.java
++++ b/tmp/0e05cc1a-b272-42ad-b2f7-a20827c2fcee_fixed.java
+@@ -1,3 +1,3 @@
+     private boolean isFormatAsBlock(Document.OutputSettings out) {
+-        return tag.formatAsBlock() || (parent() != null && parent().tag().formatAsBlock()) || out.outline();
++        return tag.formatAsBlock() || (parent() != null && parent().tag().formatAsBlock()) || out.prettyPrint() && tag.style().display().equals("inline");
+     }

@@ -1,0 +1,42 @@
+diff --git a/tmp/348383b1-6608-4243-8938-fcd22463c548_buggy.java b/tmp/0f8a2d4c-222b-4cd2-8179-52327c64afb9_fixed.java
+index 1ea204a..6496a09 100644
+--- a/tmp/348383b1-6608-4243-8938-fcd22463c548_buggy.java
++++ b/tmp/0f8a2d4c-222b-4cd2-8179-52327c64afb9_fixed.java
+@@ -1,17 +1,24 @@
+-  private static String extractClassNameIfGoog(Node node, Node parent,
+-      String functionName){
+-    String className = null;
+-    if (NodeUtil.isExprCall(parent)) {
+-      Node callee = node.getFirstChild();
+-      if (callee != null && callee.getType() == Token.GETPROP) {
+-        String qualifiedName = callee.getQualifiedName();
+-        if (functionName.equals(qualifiedName)) {
+-          Node target = callee.getNext();
+-          if (target != null) {
+-            className = target.getString();
++function extractClassNameIfGoog(node, parent) {
++  // Check if the current node is a function call to goog.require
++  if (node.getType() != Token.GETPROP) {
++    return null;
+   }
++
++  // Get the name of the function being called
++  var functionName = node.getQualifiedName();
++
++  // Check if the function being called is goog.require
++  if (functionName !== "goog.require") {
++    return null;
+   }
++
++  // Get the target of the function call
++  var target = node.getNext();
++
++  // Check if the target is a valid string
++  if (target.getType() !== NodeUtil.STRING) {
++    return null;
+   }
+-    }
+-    return className;
++
++  return target.getString();
+ }

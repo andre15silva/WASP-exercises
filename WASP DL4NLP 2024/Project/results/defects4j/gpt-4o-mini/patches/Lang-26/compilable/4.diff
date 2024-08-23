@@ -1,0 +1,22 @@
+diff --git a/tmp/e722415a-282e-4715-9b81-f98adbc64191_buggy.java b/tmp/7b170499-1350-4d0b-997f-3bc8b8d30ee3_fixed.java
+index d56e399..4f348c1 100644
+--- a/tmp/e722415a-282e-4715-9b81-f98adbc64191_buggy.java
++++ b/tmp/7b170499-1350-4d0b-997f-3bc8b8d30ee3_fixed.java
+@@ -1,11 +1,10 @@
+-    /**
+-     * <p>Formats a <code>Date</code> object.</p>
+-     * 
+-     * @param date  the date to format
+-     * @return the formatted string
+-     */
+ public String format(Date date) {
+     Calendar c = new GregorianCalendar(mTimeZone);
+     c.setTime(date);
++    
++    // Set the first day of the week and the minimal days in the first week
++    c.setFirstDayOfWeek(Calendar.MONDAY);
++    c.setMinimalDaysInFirstWeek(1);
++    
+     return applyRules(c, new StringBuffer(mMaxLengthEstimate)).toString();
+ }
+\ No newline at end of file

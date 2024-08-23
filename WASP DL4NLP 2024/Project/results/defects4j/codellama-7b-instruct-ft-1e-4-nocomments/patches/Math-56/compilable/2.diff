@@ -1,0 +1,46 @@
+diff --git a/tmp/2c62d819-9512-463e-a114-0f89e51ea8cf_buggy.java b/tmp/3655aed8-c846-4e7a-87bb-3514ee62c21c_fixed.java
+index 2608424..301f55d 100644
+--- a/tmp/2c62d819-9512-463e-a114-0f89e51ea8cf_buggy.java
++++ b/tmp/3655aed8-c846-4e7a-87bb-3514ee62c21c_fixed.java
+@@ -1,39 +1,27 @@
+-    /**
+-     * Convert to multidimensional counter.
+-     *
+-     * @param index Index in unidimensional counter.
+-     * @return the multidimensional counts.
+-     * @throws OutOfRangeException if {@code index} is not between
+-     * {@code 0} and the value returned by {@link #getSize()} (excluded).
+-     */
+     public int[] getCounts(int index) {
+         if (index < 0 ||
+             index >= totalSize) {
+             throw new OutOfRangeException(index, 0, totalSize);
+         }
+-
+         final int[] indices = new int[dimension];
+-
+         int count = 0;
+         for (int i = 0; i < last; i++) {
+             int idx = 0;
+             final int offset = uniCounterOffset[i];
+-            while (count <= index) {
++            while (count < index) {
+                 count += offset;
+                 ++idx;
+             }
+             --idx;
+             count -= offset;
+             indices[i] = idx;
+         }
+-
+         int idx = 1;
+         while (count < index) {
+             count += idx;
+             ++idx;
+         }
+         --idx;
+         indices[last] = idx;
+-
+         return indices;
+     }
+\ No newline at end of file

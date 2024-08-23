@@ -1,0 +1,13 @@
+diff --git a/tmp/0888b44a-74bc-4330-9e2f-89f8572e956c_buggy.java b/tmp/52f755b3-e29d-4de9-90cc-36997c0070f0_fixed.java
+index e69de29..0b3c9a1 100644
+--- a/tmp/0888b44a-74bc-4330-9e2f-89f8572e956c_buggy.java
++++ b/tmp/52f755b3-e29d-4de9-90cc-36997c0070f0_fixed.java
+@@ -0,0 +1,7 @@
++public static Object deserialize(byte[] bytes, Class<?> clazz) {
++    if (!MultiValueMap.isSupportedClass(clazz)) {
++        throw new UnsupportedOperationException("unsupported clazz");
++    }
++
++    return (MultiValueMap<Object, Object>) deserializer.deserialize(bytes, clazz);
++}
+\ No newline at end of file

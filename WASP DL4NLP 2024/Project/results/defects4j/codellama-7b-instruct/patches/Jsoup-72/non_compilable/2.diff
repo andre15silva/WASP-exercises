@@ -1,0 +1,49 @@
+diff --git a/tmp/85edd969-8b6b-4ecd-a2cc-94bf8b6b7287_buggy.java b/tmp/539d8d3b-2f68-464a-8a94-3150de150a28_fixed.java
+index d666a67..50bc6e7 100644
+--- a/tmp/85edd969-8b6b-4ecd-a2cc-94bf8b6b7287_buggy.java
++++ b/tmp/539d8d3b-2f68-464a-8a94-3150de150a28_fixed.java
+@@ -1,36 +1,10 @@
+-    /**
+-     * Caches short strings, as a flywheel pattern, to reduce GC load. Just for this doc, to prevent leaks.
+-     * <p />
+-     * Simplistic, and on hash collisions just falls back to creating a new string, vs a full HashMap with Entry list.
+-     * That saves both having to create objects as hash keys, and running through the entry list, at the expense of
+-     * some more duplicates.
+-     */
+-    private static String cacheString(final char[] charBuf, final String[] stringCache, final int start, final int count) {
+-        // limit (no cache):
+-        if (count > maxStringCacheLen)
+-            return new String(charBuf, start, count);
+ 
+-        // calculate hash:
+-        int hash = 0;
+-        int offset = start;
+-        for (int i = 0; i < count; i++) {
+-            hash = 31 * hash + charBuf[offset++];
+-        }
++You're correct, the code is trying to create a string of length -1, which is not a valid length. The bug is in the calculation of the string length.
+ 
+-        // get from cache
+-        final int index = hash & stringCache.length - 1;
+-        String cached = stringCache[index];
++The function `rangeEquals` checks if the specified range of characters in the input array equals the specified string. The function calls `rangeEquals` multiple times in the course of its execution. Each time it calls `rangeEquals`, it passes in a start offset and a length. The length is calculated by subtracting the start offset from the end offset.
+ 
+-        if (cached == null) { // miss, add
+-            cached = new String(charBuf, start, count);
+-            stringCache[index] = cached;
+-        } else { // hashcode hit, check equality
+-            if (rangeEquals(charBuf, start, count, cached)) { // hit
+-                return cached;
+-            } else { // hashcode conflict
+-                cached = new String(charBuf, start, count);
+-                stringCache[index] = cached; // update the cache, as recently used strings are more likely to show up again
+-            }
+-        }
+-        return cached;
+-    }
++The bug is that the function calls `rangeEquals` with a length of -1, which is not a valid length. The function should not call `rangeEquals` with a length of -1, because it will cause an `ArrayIndexOutOfBoundsException` when it tries to access the characters in the input array.
++
++I would recommend modifying the function to check the validity of the length before calling `rangeEquals`. If the length is negative or exceeds the number of characters in the input array, the function should return false immediately.
++
++Here is an example of how the function could be modified:
+\ No newline at end of file

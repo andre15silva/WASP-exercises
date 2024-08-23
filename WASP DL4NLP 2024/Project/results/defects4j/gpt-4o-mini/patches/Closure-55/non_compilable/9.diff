@@ -1,0 +1,10 @@
+diff --git a/tmp/74a3fc7c-4b41-4beb-93e2-ca4d5312d22e_buggy.java b/tmp/3d25a106-15d0-4c75-9928-c4adf750f43a_fixed.java
+index 43937f5..c57a24e 100644
+--- a/tmp/74a3fc7c-4b41-4beb-93e2-ca4d5312d22e_buggy.java
++++ b/tmp/3d25a106-15d0-4c75-9928-c4adf750f43a_fixed.java
+@@ -1,3 +1,3 @@
+ private static boolean isReduceableFunctionExpression(Node n) {
+-    return NodeUtil.isFunctionExpression(n);
++    return NodeUtil.isFunctionExpression(n) || NodeUtil.isGetterMethod(n) || NodeUtil.isSetterMethod(n);
+ }
+\ No newline at end of file

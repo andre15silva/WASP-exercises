@@ -1,0 +1,54 @@
+diff --git a/tmp/a9d68e17-5678-453a-9599-dfcff2676df9_buggy.java b/tmp/3e307b6b-ec6b-40f6-be05-e5162a970c4f_fixed.java
+index f674e52..503dc8f 100644
+--- a/tmp/a9d68e17-5678-453a-9599-dfcff2676df9_buggy.java
++++ b/tmp/3e307b6b-ec6b-40f6-be05-e5162a970c4f_fixed.java
+@@ -1,41 +1,15 @@
+-    /**
+-     * Test for the equality of two Complex objects.
+-     * <p>
+-     * If both the real and imaginary parts of two Complex numbers
+-     * are exactly the same, and neither is <code>Double.NaN</code>, the two
+-     * Complex objects are considered to be equal.</p>
+-     * <p>
+-     * All <code>NaN</code> values are considered to be equal - i.e, if either
+-     * (or both) real and imaginary parts of the complex number are equal
+-     * to <code>Double.NaN</code>, the complex number is equal to 
+-     * <code>Complex.NaN</code>.</p>
+-     *
+-     * @param other Object to test for equality to this
+-     * @return true if two Complex objects are equal, false if
+-     *         object is null, not an instance of Complex, or
+-     *         not equal to this Complex instance
+-     * 
+-     */
+ public boolean equals(Object other) {
+-        boolean ret;
+-        
+     if (this == other) {
+-            ret = true;
+-        } else if (other == null) {
+-            ret = false;
++        return true;
++    } else if (other == null || !(other instanceof Complex)) {
++        return false;
+     } else {
+-            try {
+         Complex rhs = (Complex)other;
+-                if (rhs.isNaN()) {
+-                    ret = this.isNaN();
++        if (this.isNaN() || rhs.isNaN()) {
++            return this.isNaN() && rhs.isNaN();
+         } else {
+-                    ret = (Double.doubleToRawLongBits(real) == Double.doubleToRawLongBits(rhs.getReal())) && (Double.doubleToRawLongBits(imaginary) == Double.doubleToRawLongBits(rhs.getImaginary()));
++            return (Double.doubleToRawLongBits(real) == Double.doubleToRawLongBits(rhs.getReal())) &&
++                   (Double.doubleToRawLongBits(imaginary) == Double.doubleToRawLongBits(rhs.getImaginary()));
+         }
+-            } catch (ClassCastException ex) {
+-                // ignore exception
+-                ret = false;
+     }
+ }
+\ No newline at end of file
+-      
+-        return ret;
+-    }

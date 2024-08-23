@@ -1,0 +1,18 @@
+diff --git a/tmp/88508250-05fe-4f05-8061-fcc54a08b09f_buggy.java b/tmp/439ea9aa-da3d-4b76-8ee6-631377db2c63_fixed.java
+index e69de29..87538cf 100644
+--- a/tmp/88508250-05fe-4f05-8061-fcc54a08b09f_buggy.java
++++ b/tmp/439ea9aa-da3d-4b76-8ee6-631377db2c63_fixed.java
+@@ -0,0 +1,12 @@
++public class Test1647 extends BaseMapTest
++{
++    public void testSuperClassWithReferencedJavaType() throws Exception
++    {
++        TypeFactory tf = objectMapper().getTypeFactory();
++        tf.constructType(Base.class); // must be constructed before sub to set the cache correctly
++        JavaType subType = tf.constructType(Sub.class);
++        // baseTypeFromSub should be a ResolvedRecursiveType in this test
++        JavaType baseTypeFromSub = subType.getSuperClass();
++        assertNotNull(baseTypeFromSub.getSuperClass());
++    }
++}
+\ No newline at end of file

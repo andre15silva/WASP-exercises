@@ -1,0 +1,45 @@
+diff --git a/tmp/1893cfa9-baeb-4455-a84a-75524c24658c_buggy.java b/tmp/cc1136ac-4213-4b3b-98a9-c9fb7210269a_fixed.java
+index d6a560a..e98dc1e 100644
+--- a/tmp/1893cfa9-baeb-4455-a84a-75524c24658c_buggy.java
++++ b/tmp/cc1136ac-4213-4b3b-98a9-c9fb7210269a_fixed.java
+@@ -1,33 +1,39 @@
+   /**
+    * Resolve the referenced type within the enclosing scope.
+    */
+   @Override
+   JSType resolveInternal(ErrorReporter t, StaticScope<JSType> enclosing) {
+     // TODO(user): Investigate whether it is really necessary to keep two
+     // different mechanisms for resolving named types, and if so, which order
+     // makes more sense. Now, resolution via registry is first in order to
+     // avoid triggering the warnings built into the resolution via properties.
+     boolean resolved = resolveViaRegistry(t, enclosing);
+     if (detectImplicitPrototypeCycle()) {
+       handleTypeCycle(t);
+     }
+ 
+     if (resolved) {
+       super.resolveInternal(t, enclosing);
+       finishPropertyContinuations();
+       return registry.isLastGeneration() ?
+           getReferencedType() : this;
+     }
+ 
+     resolveViaProperties(t, enclosing);
+     if (detectImplicitPrototypeCycle()) {
+       handleTypeCycle(t);
+     }
+ 
++    JSType i = registry.getNativeType(JSType.I_IMPLEMENTS_TYPE);
++    if (isResolved() && getReferencedType().isSubtypeOf(i)) {
++      // We allow the type to implement "implements", which makes the
++      // type implement the subtype of "implements".
++      finishPropertyContinuations();
++    }
+     super.resolveInternal(t, enclosing);
+-    if (isResolved()) {
++    if (registry.isLastGeneration()) {
+       finishPropertyContinuations();
+     }
+     return registry.isLastGeneration() ?
+         getReferencedType() : this;
+   }

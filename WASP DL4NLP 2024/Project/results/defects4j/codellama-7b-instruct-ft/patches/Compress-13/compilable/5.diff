@@ -1,0 +1,17 @@
+diff --git a/tmp/07038781-cb07-407a-a950-551e43e84326_buggy.java b/tmp/2b03a848-78ff-4a06-a32d-37fba8905e91_fixed.java
+index 1c92640..fe8488a 100644
+--- a/tmp/07038781-cb07-407a-a950-551e43e84326_buggy.java
++++ b/tmp/2b03a848-78ff-4a06-a32d-37fba8905e91_fixed.java
+@@ -1,7 +1,12 @@
+     /**
+      * Set the name of the entry.
+      * @param name the name to use
+      */
+     protected void setName(String name) {
++        // workaround for WinZip, which uses a slash instead of a backslash
++        int pos;
++        while ((pos = name.indexOf(0x005c)) >= 0) {
++            name = name.substring(0, pos) + "\\" + name.substring(pos + 1);
++        }
+         this.name = name;
+     }

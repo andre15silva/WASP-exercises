@@ -1,0 +1,27 @@
+diff --git a/tmp/ad0e29c3-4d43-468d-882c-21c2bf85f4c2_buggy.java b/tmp/3ef9a6ab-5ef2-46d4-b064-22613b746387_fixed.java
+index b278cd0..3cecabc 100644
+--- a/tmp/ad0e29c3-4d43-468d-882c-21c2bf85f4c2_buggy.java
++++ b/tmp/3ef9a6ab-5ef2-46d4-b064-22613b746387_fixed.java
+@@ -1,9 +1,22 @@
+     /**
+      * <p>Checks if the locale specified is in the list of available locales.</p>
+      *
+      * @param locale the Locale object to check if it is available
+      * @return true if the locale is a known locale
+      */
+     public static boolean isAvailableLocale(Locale locale) {
+         return cAvailableLocaleSet.contains(locale);
+     }
++
++    /**
++     * Returns the set of Locales available on this system as available in the JDK. The set returned is a copy so it is
++     * immutable and this function should be called "sparingly". It is better to store the result in a static final
++     * local variable within your own application rather than calling this method repeatedly.
++     *
++     * @return an unmodifiable collection of availiable locales
++     */
++    public static Set<?> availableLocaleSet() {
++        Locale[] jdkLocaleArray = Locale.getAvailableLocales();
++        List jdkLocaleList = Arrays.asList(jdkLocaleArray);
++        return Collections.unmodifiableCollection(new HashSet(jdkLocaleList));
++    }

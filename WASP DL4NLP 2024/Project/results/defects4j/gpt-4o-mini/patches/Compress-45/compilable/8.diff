@@ -1,0 +1,47 @@
+diff --git a/tmp/53c36542-3577-4f6b-b6e7-dcef24277ad1_buggy.java b/tmp/98296606-d50d-4edb-990c-2b349a909572_fixed.java
+index 1bbc082..91b18e6 100644
+--- a/tmp/53c36542-3577-4f6b-b6e7-dcef24277ad1_buggy.java
++++ b/tmp/98296606-d50d-4edb-990c-2b349a909572_fixed.java
+@@ -1,36 +1,21 @@
+-    /**
+-     * Write an long integer into a buffer as an octal string if this
+-     * will fit, or as a binary number otherwise.
+-     * 
+-     * Uses {@link #formatUnsignedOctalString} to format
+-     * the value as an octal string with leading zeros.
+-     * The converted number is followed by a space.
+-     * 
+-     * @param value The value to write into the buffer.
+-     * @param buf The destination buffer.
+-     * @param offset The starting offset into the buffer.
+-     * @param length The length of the buffer.
+-     * @return The updated offset.
+-     * @throws IllegalArgumentException if the value (and trailer)
+-     * will not fit in the buffer.
+-     * @since 1.4
+-     */
+ public static int formatLongOctalOrBinaryBytes(
+     final long value, final byte[] buf, final int offset, final int length) {
+ 
+     // Check whether we are dealing with UID/GID or SIZE field
+     final long maxAsOctalChar = length == TarConstants.UIDLEN ? TarConstants.MAXID : TarConstants.MAXSIZE;
+ 
+     final boolean negative = value < 0;
+-        if (!negative && value <= maxAsOctalChar) { // OK to store as octal chars
++    if (!negative && value <= maxAsOctalChar && length >= 11) { // Ensure enough space for octal string (including space)
+         return formatLongOctalBytes(value, buf, offset, length);
+     }
+ 
++    // Ensure the buffer can fit the binary representation and the trailer
+     if (length < 9) {
+         formatLongBinary(value, buf, offset, length, negative);
+-        }
++    } else {
+         formatBigIntegerBinary(value, buf, offset, length, negative);
++    }
+ 
+-        buf[offset] = (byte) (negative ? 0xff : 0x80);
++    buf[offset + length - 1] = (byte) (negative ? 0xff : 0x80); // Place the sign at the end of the data
+     return offset + length;
+ }
+\ No newline at end of file

@@ -1,0 +1,27 @@
+diff --git a/tmp/43c38753-548d-45aa-b803-de804a22fd5b_buggy.java b/tmp/83c50ace-3fe8-4703-ad15-1860ef0df51f_fixed.java
+index a5ff4fc..cceb2ec 100644
+--- a/tmp/43c38753-548d-45aa-b803-de804a22fd5b_buggy.java
++++ b/tmp/83c50ace-3fe8-4703-ad15-1860ef0df51f_fixed.java
+@@ -1,17 +1,13 @@
+ /**
+  * Helper method used to prevent both caching and cache lookups for structured
+  * types that have custom value handlers
+  *
+  * @since 2.8.11
+  */
+-    private boolean _hasCustomHandlers(JavaType t) {
+-        if (t.isContainerType()) {
+-            // First: value types may have both value and type handlers
+-            JavaType ct = t.getContentType();
+-            if (ct != null) {
+-                return (ct.getValueHandler() != null) || (ct.getTypeHandler() != null);
+-            // Second: map(-like) types may have value handler for key (but not type; keys are untyped)
+-            }
++public boolean _hasCustomHandlers(JsonUnmarshallerContext ctxt) {
++    if (ctxt.valueType().getContentType().getValueHandler() != null
++            || ctxt.valueType().getContentType().getTypeHandler() != null) {
++        return true;
+     }
+     return false;
+ }
+\ No newline at end of file

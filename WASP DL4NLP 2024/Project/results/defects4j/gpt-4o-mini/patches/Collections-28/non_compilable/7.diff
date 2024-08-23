@@ -1,0 +1,35 @@
+diff --git a/tmp/15f970bd-86c0-46ae-aef3-658f24b25af9_buggy.java b/tmp/f9d7521b-bc7e-40a5-a221-e355d374123c_fixed.java
+index e69de29..f6ea735 100644
+--- a/tmp/15f970bd-86c0-46ae-aef3-658f24b25af9_buggy.java
++++ b/tmp/f9d7521b-bc7e-40a5-a221-e355d374123c_fixed.java
+@@ -0,0 +1,29 @@
++public SortedMap<String, Integer> prefixMap(String prefix) {
++    // Create a temporary map to store the prefix entries
++    SortedMap<String, Integer> resultMap = new TreeMap<>();
++    
++    // Search the trie for the prefix
++    TrieNode node = findNode(prefix);
++    
++    // If the node is null, return an empty map
++    if (node == null) {
++        return resultMap;
++    }
++    
++    // Add all entries with the given prefix to the resultMap
++    collectEntries(node, prefix, resultMap);
++    
++    return resultMap;
++}
++
++private void collectEntries(TrieNode node, String prefix, SortedMap<String, Integer> resultMap) {
++    // If the current node has an entry, add it to the result map
++    if (node.value != null) {
++        resultMap.put(prefix, node.value);
++    }
++    
++    // Recur for each child node
++    for (Map.Entry<Character, TrieNode> entry : node.children.entrySet()) {
++        collectEntries(entry.getValue(), prefix + entry.getKey(), resultMap);
++    }
++}
+\ No newline at end of file

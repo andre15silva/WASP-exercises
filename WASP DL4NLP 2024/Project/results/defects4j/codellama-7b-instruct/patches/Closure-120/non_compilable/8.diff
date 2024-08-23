@@ -1,0 +1,44 @@
+diff --git a/tmp/5c2bd442-9e75-44f7-b063-e4b3a42e75bb_buggy.java b/tmp/e38fd14b-661d-4766-9eca-a9ebf5dac6a9_fixed.java
+index 07b0792..cd8924d 100644
+--- a/tmp/5c2bd442-9e75-44f7-b063-e4b3a42e75bb_buggy.java
++++ b/tmp/e38fd14b-661d-4766-9eca-a9ebf5dac6a9_fixed.java
+@@ -1,22 +1,29 @@
+-    /**
+-     * @return Whether the variable is only assigned a value once for its
+-     *     lifetime.
+-     */
+-    boolean isAssignedOnceInLifetime() {
+-      Reference ref = getOneAndOnlyAssignment();
++    private void isAssignedOnceInLifetimeHelper(Reference ref,
++            BasicBlock block) {
+         if (ref == null) {
+             return false;
+         }
+ 
+         // Make sure this assignment is not in a loop.
+-      for (BasicBlock block = ref.getBasicBlock();
+-           block != null; block = block.getParent()) {
+-        if (block.isFunction) {
++        for (BasicBlock b = ref.getBasicBlock();
++                b != null; b = b.getParent()) {
++            if (b.isFunction) {
+                 break;
+-        } else if (block.isLoop) {
++            } else if (b.isLoop) {
+                 return false;
+             }
+         }
+ 
+         return true;
+     }
++
++    boolean isAssignedOnceInLifetime() {
++        // Get the reference to the variable.
++        Reference ref = getOneAndOnlyAssignment();
++
++        // Get the basic block that contains the reference.
++        BasicBlock block = ref.getBasicBlock();
++
++        // Check if the variable is assigned once in its lifetime.
++        return isAssignedOnceInLifetimeHelper(ref, block);
++    }

@@ -1,0 +1,47 @@
+diff --git a/tmp/ff01499e-93cf-4b29-9931-d7a78dc9128b_buggy.java b/tmp/9af7e5b6-2e71-4f57-b659-6d481fcc8ba1_fixed.java
+index b86c1ea..ba78333 100644
+--- a/tmp/ff01499e-93cf-4b29-9931-d7a78dc9128b_buggy.java
++++ b/tmp/9af7e5b6-2e71-4f57-b659-6d481fcc8ba1_fixed.java
+@@ -1,38 +1,31 @@
+     /**
+      * Translate an input onto a Writer. This is intentionally final as its algorithm is 
+      * tightly coupled with the abstract method of this class. 
+      *
+      * @param input CharSequence that is being translated
+      * @param out Writer to translate the text to
+      * @throws IOException if and only if the Writer produces an IOException
+      */
+     public final void translate(CharSequence input, Writer out) throws IOException {
+         if (out == null) {
+             throw new IllegalArgumentException("The Writer must not be null");
+         }
+         if (input == null) {
+             return;
+         }
+         int pos = 0;
+         int len = Character.codePointCount(input, 0, input.length());
+         while (pos < len) {
+             int consumed = translate(input, pos, out);
+             if (consumed == 0) {
++                // handle surrogate pairs
++                if (pos < len - 2) {
+                     char[] c = Character.toChars(Character.codePointAt(input, pos));
+                     out.write(c);
+-            }
+-            else {
+-//          // contract with translators is that they have to understand codepoints 
+-//          // and they just took care of a surrogate pair
+-            for (int pt = 0; pt < consumed; pt++) {
+-                    if (pos < len - 2) {
+-                pos += Character.charCount(Character.codePointAt(input, pos));
+                 } else {
+-                        pos++;
++                    out.write(character.toChars(Character.codePointAt(input, pos));
+                 }
+             }
+-                pos--;
+-            }
+-            pos++;
++            pos += consumed;
+         }
+     }

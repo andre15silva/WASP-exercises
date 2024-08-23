@@ -1,0 +1,45 @@
+diff --git a/tmp/a244b101-da7d-43ed-9627-1eff678a8832_buggy.java b/tmp/f6e2dcf1-555f-4dee-8567-c33b585925cf_fixed.java
+index 1530b34..44da91a 100644
+--- a/tmp/a244b101-da7d-43ed-9627-1eff678a8832_buggy.java
++++ b/tmp/f6e2dcf1-555f-4dee-8567-c33b585925cf_fixed.java
+@@ -1,23 +1,35 @@
+-    /**
+-     * Declares all of a function's arguments.
+-     */
+ private void declareArguments(Node functionNode) {
+     Node astParameters = functionNode.getFirstChild().getNext();
+     Node body = astParameters.getNext();
+     FunctionType functionType = (FunctionType) functionNode.getJSType();
+     if (functionType != null) {
+         Node jsDocParameters = functionType.getParametersNode();
+         if (jsDocParameters != null) {
+             Node jsDocParameter = jsDocParameters.getFirstChild();
++            Set<String> declaredParameters = new HashSet<>();
+             for (Node astParameter : astParameters.children()) {
++                String paramName = astParameter.getString();
++                if (declaredParameters.contains(paramName)) {
++                    // Report warning for duplicate local variable declarations
++                    reportDuplicateVariableWarning(paramName, functionNode);
++                }
++                declaredParameters.add(paramName);
++                
+                 if (jsDocParameter != null) {
+                     defineSlot(astParameter, functionNode,
+                         jsDocParameter.getJSType(), true);
+                     jsDocParameter = jsDocParameter.getNext();
+                 } else {
+                     defineSlot(astParameter, functionNode, null, true);
+                 }
+             }
+         }
+     }
+-    } // end declareArguments
++}
++
++private void reportDuplicateVariableWarning(String varName, Node functionNode) {
++    // Implement the logic to report a warning for duplicate variables.
++    // This might involve logging or using a particular warning handling mechanism
++    // of your implementation.
++    System.out.println("Warning: variable " + varName + " redefined in function " + functionNode.toString());
++}
+\ No newline at end of file

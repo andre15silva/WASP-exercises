@@ -1,0 +1,47 @@
+diff --git a/tmp/cc643983-351d-4784-972c-323648a949d8_buggy.java b/tmp/7924808c-bfdf-4532-bfd2-7d6b965778f3_fixed.java
+index 9033e1c..b193b07 100644
+--- a/tmp/cc643983-351d-4784-972c-323648a949d8_buggy.java
++++ b/tmp/7924808c-bfdf-4532-bfd2-7d6b965778f3_fixed.java
+@@ -1,11 +1,41 @@
+     /**
+      * Returns true iff they are equal as defined by
+      * {@link #equals(double,double,int) equals(x, y, 1)}.
+      *
+      * @param x first value
+      * @param y second value
+      * @return {@code true} if the values are equal.
+      */
+     public static boolean equals(double x, double y) {
+         return (Double.isNaN(x) && Double.isNaN(y)) || x == y;
+     }
++    /**
++     * Compare the first and second arrays for equality.
++     * The arrays <code>a1</code> and <code>a2</code> are equal iff
++     * both <code>a1==null && a2==null</code> or <code>a1!=null &&
++     * a2!=null && a1.length == a2.length &&
++     * MathUtils.equals(a1[i], a2[i], 1)</code> for all valid
++     * <code>i</code>.
++     *
++     * @param a1 first array (or first element)
++     * @param a2 second array (or second element)
++     * @return {@code true} if both arrays are the same.
++     * @since 2.1
++     */
++    public static boolean equals(final double[] a1, final double[] a2) {
++        if (a1 == null) {
++            return a2 == null;
++        } else if (a2 == null) {
++            return false;
++        } else {
++            if (a1.length != a2.length) { 
++                return false;
++            }
++            for(int i = 0; i < a1.length; i++) {
++                if (!MathUtils.equals(a1[i], a2[i], 1)) {
++                    return false;
++                }
++            }
++            return true;
++        }
++    }
+\ No newline at end of file

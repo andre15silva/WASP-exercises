@@ -1,0 +1,57 @@
+diff --git a/tmp/967ba426-c9c5-48b4-b446-10df721b9d78_buggy.java b/tmp/4803a204-f01e-47d0-a6c9-152b322171de_fixed.java
+index e4d90e7..6986a29 100644
+--- a/tmp/967ba426-c9c5-48b4-b446-10df721b9d78_buggy.java
++++ b/tmp/4803a204-f01e-47d0-a6c9-152b322171de_fixed.java
+@@ -1,45 +1,51 @@
+   @Override
+   String toStringHelper(boolean forAnnotations) {
+     if (hasReferenceName()) {
+       return getReferenceName();
+     } else if (prettyPrint) {
+       // Don't pretty print recursively.
+       prettyPrint = false;
+ 
+       // Use a tree set so that the properties are sorted.
+       Set<String> propertyNames = Sets.newTreeSet();
+       for (ObjectType current = this;
+            current != null && !current.isNativeObjectType() &&
+                propertyNames.size() <= MAX_PRETTY_PRINTED_PROPERTIES;
+            current = current.getImplicitPrototype()) {
+         propertyNames.addAll(current.getOwnPropertyNames());
+       }
+ 
+       StringBuilder sb = new StringBuilder();
+       sb.append("{");
+ 
+       int i = 0;
+       for (String property : propertyNames) {
+         if (i > 0) {
+           sb.append(", ");
+         }
+ 
+         sb.append(property);
+         sb.append(": ");
+-        sb.append(getPropertyType(property).toString());
++        JSType propertyType = getPropertyType(property);
++        if (propertyType instanceof ProxyObjectType &&
++            propertyType.getReferencedType().isEquivalent(getInstanceType())) {
++          // Keep the pretty-printer from going recursive.
++          propertyType = propertyType.getReferencedTypeInternal();
++        }
++        sb.append(propertyType.toString());
+ 
+         ++i;
+         if (i == MAX_PRETTY_PRINTED_PROPERTIES) {
+           sb.append(", ...");
+           break;
+         }
+       }
+ 
+       sb.append("}");
+ 
+       prettyPrint = true;
+       return sb.toString();
+     } else {
+       return "{...}";
+     }
+   }

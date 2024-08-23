@@ -1,0 +1,14 @@
+diff --git a/tmp/49b2b315-b597-4b67-bd89-ef84548db049_buggy.java b/tmp/37d42e24-70ae-469a-9c11-109c2da47e00_fixed.java
+index 50f3e2e..0a0a8a9 100644
+--- a/tmp/49b2b315-b597-4b67-bd89-ef84548db049_buggy.java
++++ b/tmp/37d42e24-70ae-469a-9c11-109c2da47e00_fixed.java
+@@ -1,7 +1,8 @@
+     /** Get a line with reversed direction.
+      * @return a new instance, with reversed direction
+      */
+     public Line revert() {
+-        final Line reverted = new Line(zero, zero.subtract(direction));
++        final Line reverted = new Line(this);
++        reverted.direction = reverted.direction.negate();
+         return reverted;
+     }

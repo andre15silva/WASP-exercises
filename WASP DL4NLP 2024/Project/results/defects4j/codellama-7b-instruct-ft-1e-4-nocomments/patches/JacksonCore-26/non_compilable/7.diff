@@ -1,0 +1,44 @@
+diff --git a/tmp/454c068f-7d35-4728-95e5-7e884b2b757e_buggy.java b/tmp/82a95bb0-c554-4bd7-8d42-01e7efa87c1e_fixed.java
+index 0722547..83a6e6d 100644
+--- a/tmp/454c068f-7d35-4728-95e5-7e884b2b757e_buggy.java
++++ b/tmp/82a95bb0-c554-4bd7-8d42-01e7efa87c1e_fixed.java
+@@ -1,26 +1,31 @@
+     @Override
+     public void feedInput(byte[] buf, int start, int end) throws IOException
+     {
+-        // Must not have remaining input
+         if (_inputPtr < _inputEnd) {
+             _reportError("Still have %d undecoded bytes, should not call 'feedInput'", _inputEnd - _inputPtr);
+         }
+         if (end < start) {
+             _reportError("Input end (%d) may not be before start (%d)", end, start);
+         }
+-        // and shouldn't have been marked as end-of-input
+         if (_endOfInput) {
+             _reportError("Already closed, can not feed more input");
+         }
+-        // Time to update pointers first
++        int currOfs = _currInputProcessed;
+         _currInputProcessed += _origBufferLen;
+-
+-        // Also need to adjust row start, to work as if it extended into the past wrt new buffer
+         _currInputRowStart = start - (_inputEnd - _currInputRowStart);
+-
+-        // And then update buffer settings
+         _inputBuffer = buf;
+         _inputPtr = start;
+         _inputEnd = end;
+         _origBufferLen = end - start;
++        int byteOff = currOfs;
++        for (int row = getCurrentRowNumber(); row > 0; row--) {
++            byteOff += _currInputRowStart;
++        }
++        for (int col = getCurrentLocation().getColumnNr(); col > 0; col--) {
++            byteOff--;
++        }
++        JsonLocation loc = getCurrentLocation();
++        loc.setOffset(byteOff);
++        JsonLocation tokLoc = getTokenLocation();
++        tokLoc.setOffset(byteOff);
+     }
+\ No newline at end of file

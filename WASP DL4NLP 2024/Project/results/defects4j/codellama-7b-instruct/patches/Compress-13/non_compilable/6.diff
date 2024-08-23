@@ -1,0 +1,14 @@
+diff --git a/tmp/fea3f83e-e71e-4a07-88e2-28933e9a5956_buggy.java b/tmp/e2d80b98-cd04-4d6f-9af5-165d42e93031_fixed.java
+index 1c92640..9f8f47a 100644
+--- a/tmp/fea3f83e-e71e-4a07-88e2-28933e9a5956_buggy.java
++++ b/tmp/e2d80b98-cd04-4d6f-9af5-165d42e93031_fixed.java
+@@ -1,7 +1,7 @@
+     /**
+      * Set the name of the entry.
+      * @param name the name to use
+      */
+     protected void setName(String name) {
+-        this.name = name;
++        this.name = new String(name.getBytes("UTF-8"), "Windows-1252");
+     }
+\ No newline at end of file

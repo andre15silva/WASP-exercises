@@ -1,0 +1,54 @@
+diff --git a/tmp/38736576-1cd0-46b1-a220-a13c37620855_buggy.java b/tmp/f4d2c44d-10ee-4f5b-9ef9-0f6a9b88f489_fixed.java
+index 71189c3..9ce0419 100644
+--- a/tmp/38736576-1cd0-46b1-a220-a13c37620855_buggy.java
++++ b/tmp/f4d2c44d-10ee-4f5b-9ef9-0f6a9b88f489_fixed.java
+@@ -1,46 +1,46 @@
+     public void validate(final WriteableCommandLine commandLine)
+         throws OptionException {
+         // number of options found
+         int present = 0;
+ 
+         // reference to first unexpected option
+-        Option unexpected = null;
++        Option<String> unexpected = null;
+ 
+         for (final Iterator i = options.iterator(); i.hasNext();) {
+-            final Option option = (Option) i.next();
++            final Option<String> option = (Option<String>) i.next();
+ 
+             // needs validation?
+             boolean validate = option.isRequired() || option instanceof Group;
+             if (validate) {
+                 option.validate(commandLine);
+             }
+ 
+             // if the child option is present then validate it
+             if (commandLine.hasOption(option)) {
+                 if (++present > maximum) {
+-                    unexpected = option;
++                    unexpected = (Option<String>) option;
+ 
+                     break;
+                 }
+ 
+                 option.validate(commandLine);
+             }
+         }
+ 
+         // too many options
+         if (unexpected != null) {
+             throw new OptionException(this, ResourceConstants.UNEXPECTED_TOKEN,
+                                       unexpected.getPreferredName());
+         }
+ 
+         // too few option
+         if (present < minimum) {
+             throw new OptionException(this, ResourceConstants.MISSING_OPTION);
+         }
+ 
+         // validate each anonymous argument
+         for (final Iterator i = anonymous.iterator(); i.hasNext();) {
+             final Option option = (Option) i.next();
+             option.validate(commandLine);
+         }
+     }

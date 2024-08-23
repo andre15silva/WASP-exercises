@@ -1,0 +1,59 @@
+diff --git a/tmp/58ae6b3a-1cd7-4930-93d3-8106e8b49f12_buggy.java b/tmp/b771d911-a9e3-475d-a5a6-d6ea1cab3fd6_fixed.java
+index e4d90e7..0202825 100644
+--- a/tmp/58ae6b3a-1cd7-4930-93d3-8106e8b49f12_buggy.java
++++ b/tmp/b771d911-a9e3-475d-a5a6-d6ea1cab3fd6_fixed.java
+@@ -1,45 +1,52 @@
+ @Override
+ String toStringHelper(boolean forAnnotations) {
+     if (hasReferenceName()) {
+         return getReferenceName();
+     } else if (prettyPrint) {
+         // Don't pretty print recursively.
+         prettyPrint = false;
+ 
+         // Use a tree set so that the properties are sorted.
+         Set<String> propertyNames = Sets.newTreeSet();
+         for (ObjectType current = this;
+              current != null && !current.isNativeObjectType() &&
+                  propertyNames.size() <= MAX_PRETTY_PRINTED_PROPERTIES;
+              current = current.getImplicitPrototype()) {
+             propertyNames.addAll(current.getOwnPropertyNames());
+         }
+ 
+         StringBuilder sb = new StringBuilder();
+         sb.append("{");
+ 
+         int i = 0;
+         for (String property : propertyNames) {
+             if (i > 0) {
+                 sb.append(", ");
+             }
+ 
+             sb.append(property);
+             sb.append(": ");
+-        sb.append(getPropertyType(property).toString());
++
++            JSType propertyType = getPropertyType(property);
++            // Check if the property type refers to the current type to prevent recursion
++            if (propertyType.equals(this)) {
++                sb.append("{...}"); // represent recursive structure
++            } else {
++                sb.append(propertyType.toString());
++            }
+ 
+             ++i;
+             if (i == MAX_PRETTY_PRINTED_PROPERTIES) {
+                 sb.append(", ...");
+                 break;
+             }
+         }
+ 
+         sb.append("}");
+ 
+         prettyPrint = true;
+         return sb.toString();
+     } else {
+         return "{...}";
+     }
+ }
+\ No newline at end of file

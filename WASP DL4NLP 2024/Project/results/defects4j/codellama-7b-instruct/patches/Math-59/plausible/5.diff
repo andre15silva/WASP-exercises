@@ -1,0 +1,18 @@
+diff --git a/tmp/fe671408-f2e3-46c0-bc2f-60334dbcdd59_buggy.java b/tmp/ade272a3-05b8-4527-bb8b-41c901889bbb_fixed.java
+index 2b35d23..9caa757 100644
+--- a/tmp/fe671408-f2e3-46c0-bc2f-60334dbcdd59_buggy.java
++++ b/tmp/ade272a3-05b8-4527-bb8b-41c901889bbb_fixed.java
+@@ -1,8 +1,6 @@
+-    /** Compute the maximum of two values
+-     * @param a first value
+-     * @param b second value
+-     * @return b if a is lesser or equal to b, a otherwise
+-     */
+ public static float max(final float a, final float b) {
+-        return (a <= b) ? b : (Float.isNaN(a + b) ? Float.NaN : b);
++    if (Float.isNaN(a + b)) {
++        return Float.NaN;
++    }
++    return a > b ? a : b;
+ }
+\ No newline at end of file

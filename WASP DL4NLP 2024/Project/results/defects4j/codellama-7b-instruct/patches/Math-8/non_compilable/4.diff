@@ -1,0 +1,41 @@
+diff --git a/tmp/b536599b-ca96-40be-85df-bb558727c14a_buggy.java b/tmp/26ede40d-5f5f-455d-9b55-501e2c8d29d0_fixed.java
+index bfa2423..8e4e7cf 100644
+--- a/tmp/b536599b-ca96-40be-85df-bb558727c14a_buggy.java
++++ b/tmp/26ede40d-5f5f-455d-9b55-501e2c8d29d0_fixed.java
+@@ -1,23 +1,18 @@
+     /**
+-     * Generate a random sample from the distribution.
++     * Generate a random number from the distribution.
+      *
+-     * @param sampleSize the number of random values to generate.
+-     * @return an array representing the random sample.
+-     * @throws NotStrictlyPositiveException if {@code sampleSize} is not
+-     * positive.
++     * @return a random number.
++     * @throws NotStrictlyPositiveException if the size of the distribution
++     * is not strictly positive (i.e. the size is negative or equal to
++     * zero).
++     * @throws NullPointerException if there are no elements in the
++     * distribution.
+      */
+-    public T[] sample(int sampleSize) throws NotStrictlyPositiveException {
+-        if (sampleSize <= 0) {
+-            throw new NotStrictlyPositiveException(LocalizedFormats.NUMBER_OF_SAMPLES,
+-                    sampleSize);
++    public T sample() throws NotStrictlyPositiveException, NullPointerException {
++        if (singletons.size() == 0) {
++            throw new NullPointerException(LocalizedFormats.EMPTY_COLLECTION);
+         }
+ 
+-        final T[]out = (T[]) java.lang.reflect.Array.newInstance(singletons.get(0).getClass(), sampleSize);
+-
+-        for (int i = 0; i < sampleSize; i++) {
+-            out[i] = sample();
+-        }
+-
+-        return out;
+-
++        final int index = RANDOM.nextInt(singletons.size());
++        return singletons.get(index);
+     }
+\ No newline at end of file

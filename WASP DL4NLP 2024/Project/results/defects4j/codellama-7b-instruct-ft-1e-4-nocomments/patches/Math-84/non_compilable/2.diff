@@ -1,0 +1,83 @@
+diff --git a/tmp/a536e36b-3681-40f2-8b74-de0332378169_buggy.java b/tmp/5d33aab3-d8f0-46a6-ab46-e373a2dfb141_fixed.java
+index 5f1dcf2..8889d1f 100644
+--- a/tmp/a536e36b-3681-40f2-8b74-de0332378169_buggy.java
++++ b/tmp/5d33aab3-d8f0-46a6-ab46-e373a2dfb141_fixed.java
+@@ -1,41 +1,51 @@
+     /** {@inheritDoc} */
+     @Override
+     protected void iterateSimplex(final Comparator<RealPointValuePair> comparator)
+         throws FunctionEvaluationException, OptimizationException, IllegalArgumentException {
+-
++        int sign = 1;
++        boolean maximize = optimizationData.getGoalType().equals(GoalType.MAXIMIZE);
++        if (maximize) {
++            sign = -1;
++        }
+         while (true) {
+-
+             incrementIterationsCounter();
+-
+-            // save the original vertex
+             final RealPointValuePair[] original = simplex;
+             final RealPointValuePair best = original[0];
+-
+-            // perform a reflection step
+-            final RealPointValuePair reflected = evaluateNewSimplex(original, 1.0, comparator);
+-            if (comparator.compare(reflected, best) < 0) {
+-
+-                // compute the expanded simplex
+-                final RealPointValuePair[] reflectedSimplex = simplex;
+-                final RealPointValuePair expanded = evaluateNewSimplex(original, khi, comparator);
++            final double bestValue = best.getValue();
++            if (bestValue * sign <= 0) {
++                final RealPointValuePair reflected = evaluateNewSimplex(original, 1.0, sign, comparator);
++                if (comparator.compare(reflected, best) <= 0) {
++                    final RealPointValuePair expanded = evaluateNewSimplex(original, khi, sign, comparator);
+                     if (comparator.compare(reflected, expanded) <= 0) {
+-                    // accept the reflected simplex
+-                    simplex = reflectedSimplex;
++                        if (maximize) {
++                            if (bestValue <= expanded.getValue() || bestValue <= reflected.getValue()) {
++                                simplex = original;
++                                break;
+                             }
+-
++                        } else {
++                            if (-bestValue <= expanded.getValue() || -bestValue <= reflected.getValue()) {
++                                simplex = original;
++                                break;
++                            }
++                        }
++                        if (maximize) {
+                             return;
+-
+-            }
+-
+-            // compute the contracted simplex
+-            final RealPointValuePair contracted = evaluateNewSimplex(original, gamma, comparator);
+-            if (comparator.compare(contracted, best) < 0) {
+-                // accept the contracted simplex
+-
+-            // check convergence
++                        } else {
++                            break;
++                        }
++                    }
++                }
++                final RealPointValuePair contracted = evaluateNewSimplex(original, gamma, sign, comparator);
++                if (comparator.compare(contracted, best) <= 0) {
++                    if (maximize) {
+                         return;
++                    } else {
++                        break;
++                    }
++                }
++                simplex = original;
++                continue;
+             }
+-
++            break;
+         }
+-
+     }
+\ No newline at end of file

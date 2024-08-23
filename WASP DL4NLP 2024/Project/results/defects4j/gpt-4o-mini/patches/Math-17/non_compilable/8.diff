@@ -1,0 +1,17 @@
+diff --git a/tmp/9eece095-3e26-48ee-97f3-b484a8343832_buggy.java b/tmp/bfa6168c-79e1-4826-886f-1f987c9b4813_fixed.java
+index 10da689..38b4ca9 100644
+--- a/tmp/9eece095-3e26-48ee-97f3-b484a8343832_buggy.java
++++ b/tmp/bfa6168c-79e1-4826-886f-1f987c9b4813_fixed.java
+@@ -1,7 +1,7 @@
+-    /** Multiply this by a single digit x.
+-     * @param x multiplicand
+-     * @return product of this and x
+-     */
+ public Dfp multiply(final int x) {
++    // Handle special cases for NaN and zero to avoid incorrect results
++    if (isNaN() || x == 0) {
++        return newDfp(NaN);
++    }
+     return multiplyFast(x);
+ }
+\ No newline at end of file

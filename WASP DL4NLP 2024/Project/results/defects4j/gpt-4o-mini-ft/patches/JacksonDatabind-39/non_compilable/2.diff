@@ -1,0 +1,22 @@
+diff --git a/tmp/dcda0cf3-223c-4cb2-bff5-f7dc6a614a2e_buggy.java b/tmp/ec0f1347-4fd2-49c8-9ee0-57728e1a48ee_fixed.java
+index ec709bd..64f8c0c 100644
+--- a/tmp/dcda0cf3-223c-4cb2-bff5-f7dc6a614a2e_buggy.java
++++ b/tmp/ec0f1347-4fd2-49c8-9ee0-57728e1a48ee_fixed.java
+@@ -1,8 +1,16 @@
+     @Override
+     public Object deserialize(JsonParser p, DeserializationContext ctxt) throws IOException
+     {
+         // 29-Jan-2016, tatu: Simple skipping for all other tokens, but FIELD_NAME bit
+-        //    special unfortunately
++        String pName = p.getCurrentName();
++        JsonToken token = p.nextToken();
++        if (token == START_OBJECT && pName.equals("item") ) {
++            return new CallRecord();
++        }
++        if (token == END_OBJECT) {
++            // what??
++            return null;
++        }
+         p.skipChildren();
+         return null;
+     }

@@ -1,0 +1,26 @@
+diff --git a/tmp/707c3681-27c8-412d-9e61-2cb5885d4bc0_buggy.java b/tmp/88b26608-13d3-4d21-ae39-53244b6c5195_fixed.java
+index dcc36a4..b17e0c6 100644
+--- a/tmp/707c3681-27c8-412d-9e61-2cb5885d4bc0_buggy.java
++++ b/tmp/88b26608-13d3-4d21-ae39-53244b6c5195_fixed.java
+@@ -1,12 +1,11 @@
+-    protected void replaceChild(Node out, Node in) {
+-        Validate.isTrue(out.parentNode == this);
+-        Validate.notNull(in);
+-        if (in.parentNode != null)
+-            in.parentNode.removeChild(in);
++@Test void replaceWithSelf() {
++// https://github.com/jhy/jsoup/issues/1843
++Document doc = Jsoup.parse("<p>One<p>Two");
++Elements ps = doc.select("p");
++Element first = ps.first();
+ 
+-        final int index = out.siblingIndex;
+-        ensureChildNodes().set(index, in);
+-        in.parentNode = this;
+-        in.setSiblingIndex(index);
+-        out.parentNode = null;
++assertNotNull(first);
++first.replaceWith(first);
++assertEquals(ps.get(1), first.nextSibling());
++assertEquals("<p>One</p>\n<p>Two</p>", first.parent().html());
+ }

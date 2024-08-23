@@ -1,0 +1,12 @@
+diff --git a/tmp/bf3d8186-d968-401f-8f1c-5155dea9fb11_buggy.java b/tmp/395529db-eb91-44d4-a01c-7bbce8a60c80_fixed.java
+index 7f06a9c..1568618 100644
+--- a/tmp/bf3d8186-d968-401f-8f1c-5155dea9fb11_buggy.java
++++ b/tmp/395529db-eb91-44d4-a01c-7bbce8a60c80_fixed.java
+@@ -1,7 +1,6 @@
+     public void acceptedBy(MemberId memberId) {
+-        requireNotCompleted();
+         requireNotCanceled();
+         requireHasSpace();
+         membersWhoAccepted.add(memberId);
+         membersWhoDeclined.remove(memberId);
+     }

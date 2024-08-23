@@ -1,0 +1,51 @@
+diff --git a/tmp/ca08a443-03ea-4ffb-a9cf-888366d7dca2_buggy.java b/tmp/f344d143-f5a0-4847-a2d4-b83c3eb0845d_fixed.java
+index 3d8e775..6b58a15 100644
+--- a/tmp/ca08a443-03ea-4ffb-a9cf-888366d7dca2_buggy.java
++++ b/tmp/f344d143-f5a0-4847-a2d4-b83c3eb0845d_fixed.java
+@@ -1,44 +1,42 @@
+-    /* (non-Javadoc)
+-     * @see java.lang.Object#equals(java.lang.Object)
+-     */
+   @Override
+     public boolean equals(Object obj) {
+         if (this == obj) {
+             return true;
+         }
+         if (obj == null || getClass() != obj.getClass()) {
+             return false;
+         }
+         ZipArchiveEntry other = (ZipArchiveEntry) obj;
+         String myName = getName();
+         String otherName = other.getName();
+         if (myName == null) {
+             if (otherName != null) {
+                 return false;
+             }
+         } else if (!myName.equals(otherName)) {
+             return false;
+         }
+         String myComment = getComment();
+         String otherComment = other.getComment();
+         if (myComment == null) {
+             if (otherComment != null) {
+                 return false;
+             }
+         } else if (!myComment.equals(otherComment)) {
+             return false;
+         }
+         return getTime() == other.getTime()
+             && getInternalAttributes() == other.getInternalAttributes()
+             && getPlatform() == other.getPlatform()
+             && getExternalAttributes() == other.getExternalAttributes()
+             && getMethod() == other.getMethod()
+             && getSize() == other.getSize()
+             && getCrc() == other.getCrc()
+             && getCompressedSize() == other.getCompressedSize()
+             && Arrays.equals(getCentralDirectoryExtra(),
+                              other.getCentralDirectoryExtra())
+             && Arrays.equals(getLocalFileDataExtra(),
+                              other.getLocalFileDataExtra())
+-            && gpb.equals(other.gpb);
++            && Arrays.equals(getFileDataExtra(),
++                             other.getFileDataExtra());
+     }

@@ -1,0 +1,39 @@
+diff --git a/tmp/985a62bf-8b5c-4b78-a2fb-7c3a75614ae1_buggy.java b/tmp/1ed28838-08cc-4cf3-ad19-e6496d332c92_fixed.java
+index 1530b34..38da6ac 100644
+--- a/tmp/985a62bf-8b5c-4b78-a2fb-7c3a75614ae1_buggy.java
++++ b/tmp/1ed28838-08cc-4cf3-ad19-e6496d332c92_fixed.java
+@@ -1,23 +1,34 @@
+     /**
+      * Declares all of a function's arguments.
+      */
+     private void declareArguments(Node functionNode) {
+       Node astParameters = functionNode.getFirstChild().getNext();
+       Node body = astParameters.getNext();
+       FunctionType functionType = (FunctionType) functionNode.getJSType();
+       if (functionType != null) {
+         Node jsDocParameters = functionType.getParametersNode();
+         if (jsDocParameters != null) {
+           Node jsDocParameter = jsDocParameters.getFirstChild();
+           for (Node astParameter : astParameters.children()) {
+             if (jsDocParameter != null) {
+               defineSlot(astParameter, functionNode,
+                   jsDocParameter.getJSType(), true);
+               jsDocParameter = jsDocParameter.getNext();
+             } else {
+               defineSlot(astParameter, functionNode, null, true);
+             }
+           }
+         }
+       }
++      scope.declareVars(functionNode);
++      if (functionNode.getType() == Token.LAMBDA) {
++        scope.declareVariableInFunctionScope(functionNode);
++      } else if (functionNode.getType() != Token.FUNCTION) {
++        // declare all vars in a function. Do not warn about shadowed
++        // variables because that would get old.
++        scope.declareVariables(body, true);
++        scope.declareArguments(astParameters, true);
++        scope.declareLocalVars(body);
++        scope.declareCatchVars(body);
++      }
+     } // end declareArguments

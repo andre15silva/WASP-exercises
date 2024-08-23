@@ -1,0 +1,24 @@
+diff --git a/tmp/e857e2dc-e2fb-4965-8803-7dbbde1af307_buggy.java b/tmp/81e1e6b5-1aa1-4dda-aec7-49ffd81f2a69_fixed.java
+index 46799da..0371f6b 100644
+--- a/tmp/e857e2dc-e2fb-4965-8803-7dbbde1af307_buggy.java
++++ b/tmp/81e1e6b5-1aa1-4dda-aec7-49ffd81f2a69_fixed.java
+@@ -1,8 +1,16 @@
+         /**
+          * @param x Normalized objective variables.
+          * @return the original objective variables, possibly repaired.
+          */
+         public double[] repairAndDecode(final double[] x) {
+-            return
+-                decode(x);
++        final double[] y = decode(x);
++        final int n = y.length;
++        for (int i = 0; i < n; ++i) {
++            if (y[i] > upper[i]) {
++                y[i] = upper[i];
++            } else if (y[i] < lower[i]) {
++                y[i] = lower[i];
++            }
++        }
++        return y;
+         }
+\ No newline at end of file

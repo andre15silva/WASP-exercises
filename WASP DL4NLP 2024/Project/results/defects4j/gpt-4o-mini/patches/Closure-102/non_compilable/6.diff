@@ -1,0 +1,23 @@
+diff --git a/tmp/ca53b612-a29d-43f7-938a-4d414ce6e830_buggy.java b/tmp/ba377df2-9040-4317-891b-f4dce89610cd_fixed.java
+index f47d784..0267bd4 100644
+--- a/tmp/ca53b612-a29d-43f7-938a-4d414ce6e830_buggy.java
++++ b/tmp/ba377df2-9040-4317-891b-f4dce89610cd_fixed.java
+@@ -1,12 +1,17 @@
+ @Override
+ public void process(Node externs, Node root) {
+     NodeTraversal.traverse(compiler, root, this);
+     if (MAKE_LOCAL_NAMES_UNIQUE) {
+         MakeDeclaredNamesUnique renamer = new MakeDeclaredNamesUnique();
+         NodeTraversal t = new NodeTraversal(compiler, renamer);
+         t.traverseRoots(externs, root);
+     }
+     removeDuplicateDeclarations(root);
++    
++    // Ensure that the scope is correctly updated before propagating annotations
+     new PropogateConstantAnnotations(compiler, assertOnChange)
+         .process(externs, root);
++    
++    // Revisit the local variable declarations to handle 'arguments' correctly 
++    NodeTraversal.traverse(compiler, root, new LocalVariableRenamer());
+ }
+\ No newline at end of file

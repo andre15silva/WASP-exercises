@@ -1,0 +1,84 @@
+diff --git a/tmp/908c7bb5-4afd-402a-b4a4-0fe1cfad8132_buggy.java b/tmp/6e112f78-3671-46d4-a7b3-fc5381b58ed5_fixed.java
+index e087f95..97b457f 100644
+--- a/tmp/908c7bb5-4afd-402a-b4a4-0fe1cfad8132_buggy.java
++++ b/tmp/6e112f78-3671-46d4-a7b3-fc5381b58ed5_fixed.java
+@@ -1,53 +1,41 @@
+-    /**
+-     * Parse an octal string from a buffer.
+-     * Leading spaces are ignored.
+-     * The buffer must contain a trailing space or NUL,
+-     * and may contain an additional trailing space or NUL.
+-     *
+-     * The input buffer is allowed to contain all NULs,
+-     * in which case the method returns 0L
+-     * (this allows for missing fields).
+-     *
+-     * @param buffer The buffer from which to parse.
+-     * @param offset The offset into the buffer from which to parse.
+-     * @param length The maximum number of bytes to parse - must be at least 2 bytes.
+-     * @return The long value of the octal string.
+-     * @throws IllegalArgumentException if the trailing space/NUL is missing or if a invalid byte is detected.
+-     */
+-    public static long parseOctal(final byte[] buffer, final int offset, final int length) {
++public static long parseOctal(final byte[] buffer, final int offset, final int length) throws IllegalArgumentException {
++    // Check that the input buffer is not too short
++    if (length < 2) {
++        throw new IllegalArgumentException("the input buffer must contain at least 2 bytes");
++    }
++    
++    // Check that the last byte is a space or NUL
++    char lastByte = (char) buffer[offset + length - 1];
++    if (lastByte != ' ' && lastByte != '\0') {
++        throw new IllegalArgumentException("the last byte of the input buffer must be a space or NUL");
++    }
++    
++    // Parse the octal string
++    int end = offset + length - 1;
++    int start = offset;
+     long result = 0;
+     boolean stillPadding = true;
+-        int     end = offset + length;
+-        int     start = offset;
+-
+     for (int i = start; i < end; i++) {
+-            final byte currentByte = buffer[i];
++        char currentByte = (char) buffer[i];
+         if (currentByte == 0) {
+             break;
+         }
+-
+-        // Skip leading spaces
+-            if (currentByte == (byte) ' ' || currentByte == '0') {
++        if (currentByte == ' ') {
++            if (!stillPadding) {
++                throw new IllegalArgumentException("embedded space");
++            }
++            break;
++        } else if (currentByte == '\0') {
+             if (stillPadding) {
+-                   continue;
++                throw new IllegalArgumentException("not all NULs");
+             }
+-                if (currentByte == (byte) ' ') {
+             break;
+         }
+-            }
+-
+-        // Must have trailing NUL or space
+-        // May have additional NUL or space
+-
+         stillPadding = false;
+-            // CheckStyle:MagicNumber OFF
+         if (currentByte < '0' || currentByte > '7') {
+-                throw new IllegalArgumentException(
+-                        exceptionMessage(buffer, offset, length, start, currentByte));
++            throw new IllegalArgumentException("invalid byte");
+         }
+-            result = (result << 3) + (currentByte - '0'); // convert from ASCII
+-            // CheckStyle:MagicNumber ON
++        result = (result << 3) + (currentByte - '0');
+     }
+-
+     return result;
+ }
+\ No newline at end of file

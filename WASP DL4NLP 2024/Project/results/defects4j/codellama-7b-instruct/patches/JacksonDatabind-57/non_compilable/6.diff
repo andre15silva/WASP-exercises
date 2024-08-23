@@ -1,0 +1,19 @@
+diff --git a/tmp/823805df-f62c-4fc2-85cd-ca8743bf1659_buggy.java b/tmp/87716e74-ccc6-4ead-9cb2-8a33138c7b69_fixed.java
+index 08a41cf..f010737 100644
+--- a/tmp/823805df-f62c-4fc2-85cd-ca8743bf1659_buggy.java
++++ b/tmp/87716e74-ccc6-4ead-9cb2-8a33138c7b69_fixed.java
+@@ -1,12 +1,2 @@
+-    /**
+-     * Overloaded version of {@link #readValue(InputStream)}.
+-     */
+-    public <T> MappingIterator<T> readValues(byte[] src, int offset, int length)
+-        throws IOException, JsonProcessingException
+-    {
+-        if (_dataFormatReaders != null) {
+-            return _detectBindAndReadValues(_dataFormatReaders.findFormat(src, offset, length), false);
+-        }
+-        return _bindAndReadValues(_considerFilter(_parserFactory.createParser(src),
+-                true));
+-    }
++
++Here is the fixed version of the buggy function:

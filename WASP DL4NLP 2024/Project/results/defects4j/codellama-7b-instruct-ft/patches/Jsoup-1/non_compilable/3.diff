@@ -1,0 +1,28 @@
+diff --git a/tmp/081b709f-11fc-4bb7-8258-f911abb7dde3_buggy.java b/tmp/1df39ed3-2c9b-4d03-9b4b-703c9207b177_fixed.java
+index 00914da..7df7702 100644
+--- a/tmp/081b709f-11fc-4bb7-8258-f911abb7dde3_buggy.java
++++ b/tmp/1df39ed3-2c9b-4d03-9b4b-703c9207b177_fixed.java
+@@ -1,17 +1,21 @@
+     // does not recurse.
+     private void normalise(Element element) {
+         List<Node> toMove = new ArrayList<Node>();
+         for (Node node: element.childNodes) {
+             if (node instanceof TextNode) {
+                 TextNode tn = (TextNode) node;
+                 if (!tn.isBlank())
+                     toMove.add(tn);
+             }
+         }
+ 
+         for (Node node: toMove) {
+             element.removeChild(node);
+-            body().appendChild(new TextNode(" ", ""));
+-            body().appendChild(node);
++            try {
++                root.insertBefore(new TextNode(" ", ""), body); // TODO: This shouldn't be hardcoded? "body" isn't always the first element and doesn't always exist, but usually the first.
++                root.insertBefore(node, body);
++            } catch (DOMException e) {
++                // todo: rethrow?
++            }
+         }
+     }

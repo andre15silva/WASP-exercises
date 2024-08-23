@@ -1,0 +1,25 @@
+diff --git a/tmp/4746f7c5-ee48-4ab8-b391-d4a7b33acb43_buggy.java b/tmp/a01eaad8-ed70-4223-8757-85580ae49ba2_fixed.java
+index a6f008f..93cbcf8 100644
+--- a/tmp/4746f7c5-ee48-4ab8-b391-d4a7b33acb43_buggy.java
++++ b/tmp/a01eaad8-ed70-4223-8757-85580ae49ba2_fixed.java
+@@ -1,11 +1,18 @@
+     /**
+-     * Method that can be called on backends that support passing opaque datatypes of
+-     * non-JSON formats
++     * Method that can be called when passing opaque base64 encoded strings as datatypes.
+      *
+      * @since 2.8
+      */
+     public void writeEmbeddedObject(Object object) throws IOException {
+         // 01-Sep-2016, tatu: As per [core#318], handle small number of cases
++        //   where we may get base64-encoded data from JSON that would otherwise be in
++        //   binary
++        if (object instanceof byte[]) {
++            byte[] data = (byte[])object;
++            String base64 = WIKIPEDIA_BASE64_ENCODED;
++            writeRaw(base64);
++        } else {
+             throw new JsonGenerationException("No native support for writing embedded objects",
+                     this);
+         }
++    }

@@ -1,0 +1,12 @@
+diff --git a/tmp/5241792d-5359-4118-88d0-264840179226_buggy.java b/tmp/d6b07da1-9652-4670-85b1-6922fcb17fc7_fixed.java
+index 91469b4..f997b9a 100644
+--- a/tmp/5241792d-5359-4118-88d0-264840179226_buggy.java
++++ b/tmp/d6b07da1-9652-4670-85b1-6922fcb17fc7_fixed.java
+@@ -1,6 +1,4 @@
+     @Override
+     public Element clone() {
+-        Element clone = (Element) super.clone();
+-        clone.classNames();
+-        return clone;
++        return (Element) super.clone();
+     }

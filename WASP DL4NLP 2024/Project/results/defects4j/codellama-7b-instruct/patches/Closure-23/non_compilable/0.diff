@@ -1,0 +1,68 @@
+diff --git a/tmp/60dd2369-7813-40b6-bef9-da8611f11670_buggy.java b/tmp/922af47d-06b7-49d8-9fb0-b0b3d4f54c4d_fixed.java
+index cfdcd9c..6fc39ae 100644
+--- a/tmp/60dd2369-7813-40b6-bef9-da8611f11670_buggy.java
++++ b/tmp/922af47d-06b7-49d8-9fb0-b0b3d4f54c4d_fixed.java
+@@ -1,51 +1,28 @@
+ private Node tryFoldArrayAccess(Node n, Node left, Node right) {
+-    Node parent = n.getParent();
+-    // If GETPROP/GETELEM is used as assignment target the array literal is
+-    // acting as a temporary we can't fold it here:
+-    //    "[][0] += 1"
+-    if (isAssignmentTarget(n)) {
+-      return n;
+-    }
+-
++    // If the right node is not a number, return the method
+     if (!right.isNumber()) {
+-      // Sometimes people like to use complex expressions to index into
+-      // arrays, or strings to index into array methods.
+         return n;
+     }
+ 
+-    double index = right.getDouble();
+-    int intIndex = (int) index;
+-    if (intIndex != index) {
+-      error(INVALID_GETELEM_INDEX_ERROR, right);
+-      return n;
+-    }
++    // Get the integer value of the right node
++    int index = right.getInt();
+ 
+-    if (intIndex < 0) {
+-      error(INDEX_OUT_OF_BOUNDS_ERROR, right);
++    // If the index is negative or greater than the length of the array, return the method
++    if (index < 0 || index >= left.getChildCount()) {
+         return n;
+     }
+ 
+-    Node current = left.getFirstChild();
+-    Node elem = null;
+-    for (int i = 0; current != null && i < intIndex; i++) {
+-        elem = current;
+-
+-      current = current.getNext();
+-    }
++    // Get the element at the specified index
++    Node elem = left.getChild(index);
+ 
+-    if (elem == null) {
+-      error(INDEX_OUT_OF_BOUNDS_ERROR, right);
++    // If the element is not a number, return the method
++    if (!elem.isNumber()) {
+         return n;
+     }
+ 
+-    if (elem.isEmpty()) {
+-      elem = NodeUtil.newUndefinedNode(elem);
+-    } else {
+-      left.removeChild(elem);
+-    }
+-
+-    // Replace the entire GETELEM with the value
+-    n.getParent().replaceChild(n, elem);
++    // Replace the GETELEM node with a new number node with the same value as the element
++    n.getParent().replaceChild(n, NodeUtil.newNumberNode(elem.getNumberParts()));
+     reportCodeChange();
++
+     return elem;
+ }

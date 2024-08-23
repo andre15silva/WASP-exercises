@@ -1,0 +1,40 @@
+diff --git a/tmp/b3acc3fb-13cd-4546-8319-2ef34bfff510_buggy.java b/tmp/1d2056a8-2646-4c79-8d39-fc4d1e784d6e_fixed.java
+index b529d33..2e71175 100644
+--- a/tmp/b3acc3fb-13cd-4546-8319-2ef34bfff510_buggy.java
++++ b/tmp/1d2056a8-2646-4c79-8d39-fc4d1e784d6e_fixed.java
+@@ -1,29 +1,5 @@
+-    /**
+-     * Used internally by the Soundex algorithm.
+-     *
+-     * Consonants from the same code group separated by W or H are treated as one.
+-     *
+-     * @param str
+-     *                  the cleaned working string to encode (in upper case).
+-     * @param index
+-     *                  the character position to encode
+-     * @return Mapping code for a particular character
+-     * @throws IllegalArgumentException
+-     *                  if the character is not mapped
+-     */
+-    private char getMappingCode(final String str, final int index) {
+-        // map() throws IllegalArgumentException
+-        final char mappedChar = this.map(str.charAt(index));
+-        // HW rule check
+-        if (index > 1 && mappedChar != '0') {
+-            final char hwChar = str.charAt(index - 1);
+-            if ('H' == hwChar || 'W' == hwChar) {
+-                final char preHWChar = str.charAt(index - 2);
+-                final char firstCode = this.map(preHWChar);
+-                if (firstCode == mappedChar || 'H' == preHWChar || 'W' == preHWChar) {
+-                    return 0;
+-                }
+-            }
+-        }
+-        return mappedChar;
+-    }
++The fix is to add a conditional statement to return the correct mapping code based on the character at the current index in the string.
++
++The first condition is to check if the character at the current index is a consonant, and if so, return the mapping code for that consonant. The second condition is to check if the character at the current index is a vowel, and if so, return 0.
++
++Here is the fixed code:
+\ No newline at end of file

@@ -1,0 +1,32 @@
+diff --git a/tmp/618d883e-3605-43ce-b26f-03edf834180d_buggy.java b/tmp/0e16323a-905d-484e-90c7-7a256cff4299_fixed.java
+index 29d025a..f02b3d4 100644
+--- a/tmp/618d883e-3605-43ce-b26f-03edf834180d_buggy.java
++++ b/tmp/0e16323a-905d-484e-90c7-7a256cff4299_fixed.java
+@@ -1,13 +1,22 @@
+-    private void _verifySharing()
+-    {
++private void _verifySharing() {
+     if (_hashShared) {
+         _hashArea = Arrays.copyOf(_hashArea, _hashArea.length);
+         _names = Arrays.copyOf(_names, _names.length);
+         _hashShared = false;
+-            // 09-Sep-2015, tatu: As per [jackson-core#216], also need to ensure
+-            //    we rehash as needed, as need-rehash flag is not copied from parent
+     }
+     if (_needRehash) {
++        // Ensure that we increase the size of _hashArea appropriately before rehashing if it needs to expand
++        int newSize = calculateNewSize(_hashArea.length);
++        if (newSize > _hashArea.length) {
++            _hashArea = Arrays.copyOf(_hashArea, newSize);
++            _names = Arrays.copyOf(_names, newSize);
++        }
+         rehash();
+     }
+ }
++
++// Helper method to calculate a new size for the hash area
++private int calculateNewSize(int currentSize) {
++    // Implement logic to calculate the new size, for example, double the current size
++    return currentSize * 2;
++}
+\ No newline at end of file

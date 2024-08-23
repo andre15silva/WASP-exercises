@@ -1,0 +1,77 @@
+diff --git a/tmp/b7f19ef0-db9f-4b5e-9080-b8dd2b6e553b_buggy.java b/tmp/b81d5e3c-eb54-4cf5-be04-d52f2445b2a0_fixed.java
+index f674e52..322d196 100644
+--- a/tmp/b7f19ef0-db9f-4b5e-9080-b8dd2b6e553b_buggy.java
++++ b/tmp/b81d5e3c-eb54-4cf5-be04-d52f2445b2a0_fixed.java
+@@ -1,41 +1,72 @@
+     /**
+      * Test for the equality of two Complex objects.
+      * <p>
+      * If both the real and imaginary parts of two Complex numbers
+      * are exactly the same, and neither is <code>Double.NaN</code>, the two
+      * Complex objects are considered to be equal.</p>
+      * <p>
+      * All <code>NaN</code> values are considered to be equal - i.e, if either
+      * (or both) real and imaginary parts of the complex number are equal
+      * to <code>Double.NaN</code>, the complex number is equal to 
+      * <code>Complex.NaN</code>.</p>
+      *
+      * @param other Object to test for equality to this
+      * @return true if two Complex objects are equal, false if
+      *         object is null, not an instance of Complex, or
+      *         not equal to this Complex instance
+      * 
+      */
+     public boolean equals(Object other) {
+         boolean ret;
+         
+         if (this == other) { 
+             ret = true;
+         } else if (other == null) {
+             ret = false;
+         } else  {
+             try {
+                 Complex rhs = (Complex)other;
+                 if (rhs.isNaN()) {
+                     ret = this.isNaN();
+                 } else {
+                     ret = (Double.doubleToRawLongBits(real) == Double.doubleToRawLongBits(rhs.getReal())) && (Double.doubleToRawLongBits(imaginary) == Double.doubleToRawLongBits(rhs.getImaginary()));
+                 }
+             } catch (ClassCastException ex) {
+                 // ignore exception
+                 ret = false;
+             }
+         }
+       
+         return ret;
+     }
++
++    /** Add Exception case: MATH-221.
++     *
++     * The current implementation leads to an equality of (0, -1) and (0, 1).
++     * The reason is the default JDK implementation of multplication of doubles
++     * on some platforms such as Windows XP that fails the test.
++     * @since 1.2
++     */
++    public boolean equals(Object other) {
++        boolean ret;
++        
++        if (this == other) { 
++            ret = true;
++        } else if (other == null) {
++            ret = false;
++        } else  {
++            try {
++                Complex rhs = (Complex)other;
++                if (rhs.isNaN()) {
++                    ret = this.isNaN();
++                } else {
++                    ret = (Double.doubleToRawLongBits(real) == Double.doubleToRawLongBits(rhs.getReal())) && (Double.doubleToRawLongBits(imaginary) == Double.doubleToRawLongBits(rhs.getImaginary()));
++                }
++            } catch (ClassCastException ex) {
++                // ignore exception
++                ret = false;
++            }
++        }
++      
++        return ret;
++    }

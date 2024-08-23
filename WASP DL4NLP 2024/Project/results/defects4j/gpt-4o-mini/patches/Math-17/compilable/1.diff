@@ -1,0 +1,21 @@
+diff --git a/tmp/1a476905-a15b-44ff-863b-4732c9db8de4_buggy.java b/tmp/6d8767e3-7696-4bc4-96ba-ef2d7b173d0c_fixed.java
+index 10da689..5ab0053 100644
+--- a/tmp/1a476905-a15b-44ff-863b-4732c9db8de4_buggy.java
++++ b/tmp/6d8767e3-7696-4bc4-96ba-ef2d7b173d0c_fixed.java
+@@ -1,7 +1,14 @@
+ /** Multiply this by a single digit x.
+  * @param x multiplicand
+  * @return product of this and x
+  */
+ public Dfp multiply(final int x) {
+-            return multiplyFast(x);
++    if (x == 0) {
++        return field.newDfp("0"); // Handle multiplication by zero
++    } else if (x == 1) {
++        return this; // Handle multiplication by one
++    } else if (x == -1) {
++        return this.negate(); // Handle multiplication by negative one
++    }
++    return multiplyFast(x); // Default case
+ }
+\ No newline at end of file

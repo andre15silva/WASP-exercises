@@ -1,0 +1,52 @@
+diff --git a/tmp/f791db3d-4089-4a31-ac99-7b6f6afe01ef_buggy.java b/tmp/3b081846-6b78-4bf3-b28e-ac77130e6950_fixed.java
+index 711e87d..4e48071 100644
+--- a/tmp/f791db3d-4089-4a31-ac99-7b6f6afe01ef_buggy.java
++++ b/tmp/3b081846-6b78-4bf3-b28e-ac77130e6950_fixed.java
+@@ -1,38 +1,35 @@
+     private void applyPaxHeadersToCurrentEntry(Map<String, String> headers) {
+-        /*
+-         * The following headers are defined for Pax.
+-         * atime, ctime, charset: cannot use these without changing TarArchiveEntry fields
+-         * mtime
+-         * comment
+-         * gid, gname
+-         * linkpath
+-         * size
+-         * uid,uname
+-         * SCHILY.devminor, SCHILY.devmajor: don't have setters/getters for those
+-         */
+         for (Entry<String, String> ent : headers.entrySet()){
+             String key = ent.getKey();
+             String val = ent.getValue();
+             if ("path".equals(key)){
+                 currEntry.setName(val);
+             } else if ("linkpath".equals(key)){
+                 currEntry.setLinkName(val);
+             } else if ("gid".equals(key)){
+                 currEntry.setGroupId(Integer.parseInt(val));
+             } else if ("gname".equals(key)){
+                 currEntry.setGroupName(val);
+             } else if ("uid".equals(key)){
+                 currEntry.setUserId(Integer.parseInt(val));
+             } else if ("uname".equals(key)){
+                 currEntry.setUserName(val);
+             } else if ("size".equals(key)){
+                 currEntry.setSize(Long.parseLong(val));
+             } else if ("mtime".equals(key)){
+                 currEntry.setModTime((long) (Double.parseDouble(val) * 1000));
+             } else if ("SCHILY.devminor".equals(key)){
+                 currEntry.setDevMinor(Integer.parseInt(val));
+             } else if ("SCHILY.devmajor".equals(key)){
+                 currEntry.setDevMajor(Integer.parseInt(val));
++            } else if ("gnomon.gid".equals(key)){
++                currEntry.setGroupId(new Long(val).longValue());
++            } else if ("gnomon.uid".equals(key)){
++                currEntry.setUserId(new Long(val).longValue());
++            } else if ("gnomon.gname".equals(key)){
++                currEntry.setGroupName(val);
++            } else if ("gnomon.uname".equals(key)){
++                currEntry.setUserName(val);
+             }
+         }
+     }
+\ No newline at end of file

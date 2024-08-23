@@ -1,0 +1,15 @@
+diff --git a/tmp/982da9bf-f5d2-4147-bb71-9411a5308f9b_buggy.java b/tmp/c509c6bb-5199-48d4-8a3d-588b3841244a_fixed.java
+index e69de29..6597945 100644
+--- a/tmp/982da9bf-f5d2-4147-bb71-9411a5308f9b_buggy.java
++++ b/tmp/c509c6bb-5199-48d4-8a3d-588b3841244a_fixed.java
+@@ -0,0 +1,9 @@
++public List<Connection.KeyVal> collectFormData(Document doc, Element element) {
++    List<Connection.KeyVal> data = new ArrayList<>();
++    for (Element input : doc.select("input")) {
++        if (input.attr("name").equals(element.attr("name"))) {
++            data.add(new Connection.KeyVal(input.attr("name"), input.attr("value")));
++        }
++    }
++    return data;
++}
+\ No newline at end of file

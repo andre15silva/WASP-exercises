@@ -1,0 +1,218 @@
+diff --git a/tmp/05f5d172-5c73-45e6-8d3b-5023b85cd9a6_buggy.java b/tmp/dcbf4c4d-f804-47c1-abb9-cbf87fb83b42_fixed.java
+index ef65dd9..73f8699 100644
+--- a/tmp/05f5d172-5c73-45e6-8d3b-5023b85cd9a6_buggy.java
++++ b/tmp/dcbf4c4d-f804-47c1-abb9-cbf87fb83b42_fixed.java
+@@ -1,92 +1,194 @@
+   /**
+    * Try to fold an array join: ['a', 'b', 'c'].join('') -> 'abc';
+    */
+   void tryFoldStringJoin(NodeTraversal t, Node n, Node left, Node right,
+                          Node parent) {
+     if (!NodeUtil.isGetProp(left) || !NodeUtil.isImmutableValue(right)) {
+       return;
+     }
+ 
+     Node arrayNode = left.getFirstChild();
+     Node functionName = arrayNode.getNext();
+ 
+     if ((arrayNode.getType() != Token.ARRAYLIT) ||
+         !functionName.getString().equals("join")) {
+       return;
+     }
+ 
+     String joinString = NodeUtil.getStringValue(right);
++    Node elem = arrayNode.getFirstChild();
+     List<Node> arrayFoldedChildren = Lists.newLinkedList();
+-    StringBuilder sb = new StringBuilder();
++    List<Node> arrayNodes = Lists.newLinkedList();
++    // Merge adjacent literals.
++    while (elem != null) {
++      if (NodeUtil.isImmutableValue(elem)) {
++        arrayNodes.add(Node.newString(NodeUtil.getStringValue(elem)));
++      } else {
++        arrayNodes.add(elem);
++      }
++      elem = elem.getNext();
++    }
++
++    int kMaxSize = 40;
++    String newJoinedString = null;
++    int savedCost = Integer.MAX_VALUE;
++    String foldedJoinedString = null;
++    for (Node node : arrayNodes) {
++      String value = NodeUtil.getStringValue(node);
++      size_t oldCost = InlineCostEstimator.getCost(node);
++      if (node.getType() == Token.STRING) {
++        Node newNode = node;
++        Node parentNode = parent.getFirstChild();
++        while (parentNode != null && parentNode.getType() == Token.ADD
++               && InlineCostEstimator.getCost(parentNode, false) + 2 + value.length() < savedCost) {
++          newNode = parentNode;
++          parentNode = parentNode.getFirstChild();
++        }
++        Node newString = newNode.isFirstChild() ? newNode.getNext() : newNode.getPrevious();
++        if (InlineCostEstimator.getCost(newString) < oldCost + 2 + value.length()) {
++          savedCost = InlineCostEstimator.getCost(newString);
++          newJoinedString = newNode.isFirstChild() ? value + newString.getString() :
++                               newString.getString() + value;
++          foldedJoinedString = newNode.isFirstChild() ? value + ", " + newString.getString() :
++                               newString.getString() + ", " + value;
++        }
++      } else {
++        if (value.length() + kMaxSize < savedCost) {
++          return;
++        }
++        StringBuilder sb = new StringBuilder("[\"").append(value);
++        boolean found = false;
++        for (Node node : arrayNodes) {
++          if (!NodeUtil.isImmutableValue(node)) {
++            sb.append("\",");
++            found = true;
++            Node child = node.getFirstChild();
++            sb.append(NodeUtil.getStringValue(child));
++          }
++        }
++        if (found) {
++          foldedJoinedString = sb.append("\"]").toString();
++          sb = new StringBuilder("[");
++          savedCost = value.length() + 2 + value.length() + (arrayNodes.size() - 1) * 2;
++          savedCost -= InlineCostEstimator.getCost(arrayNodes.get(0));
++          for (int i = 1; i < arrayNodes.size(); ++i) {
++            Node node = arrayNodes.get(i);
++            sb.append(NodeUtil.getStringValue(node));
++            if (NodeUtil.isImmutableValue(node)) {
++              sb.append(",");
++            }
++          }
++          foldedJoinedString = sb.append("]").toString();
++        }
++      }
++      if (newJoinedString != null && savedCost + joinString.length() < InlineCostEstimator.getCost(n, false)) {
++        Node emptyStringNode = Node.newString("");
++        parent.replaceChild(n, emptyStringNode);
++        return;
++      }
++    }
++    if (newJoinedString != null) {
++      Node foldedString = NodeUtil.newString(n, foldedJoinedString);
++      Node replacement = new Node(n.getType(),
++          Node.newString(""),
++          Node.newString("")).copyInformationFrom(n);
++      parent.replaceChild(n, replacement);
++      replacement.getFirstChild().replaceChild(NodeUtil.newString(n, "\"" + newJoinedString + '"'),
++          NodeUtil.newString(n, ""));
++      replacement.getLastChild().replaceChild(NodeUtil.newString(n, ""),
++          NodeUtil.newString(n, ""));
++      return;
++    }
++
++    String joinedString = null;
+     int foldedSize = 0;
++    List<Node> flattened = Lists.newArrayList();
+     Node elem = arrayNode.getFirstChild();
+     // Merges adjacent String nodes.
+     while (elem != null) {
+       if (NodeUtil.isImmutableValue(elem)) {
+-        if (sb.length() > 0) {
+-          sb.append(joinString);
+-        }
+-        sb.append(NodeUtil.getStringValue(elem));
++        if (joinedString == null) {
++          // + 2 for the quotes.
++          foldedSize += 2;
++          joinedString = NodeUtil.getStringValue(elem);
+         } else {
+-        if (sb.length() > 0) {
+           // + 2 for the quotes.
+-          foldedSize += sb.length() + 2;
+-          arrayFoldedChildren.add(Node.newString(sb.toString()));
+-          sb = new StringBuilder();
++          foldedSize += 2 + joinString.length();
++          joinedString += joinString + node.getString();
+         }
+-        foldedSize += InlineCostEstimator.getCost(elem);
+-        arrayFoldedChildren.add(elem);
++      } else {
++        flattened.add(elem);
+       }
+       elem = elem.getNext();
+     }
+ 
+-    if (sb.length() > 0) {
++    if (joinedString != null) {
+       // + 2 for the quotes.
+-      foldedSize += sb.length() + 2;
+-      arrayFoldedChildren.add(Node.newString(sb.toString()));
++      foldedSize += 2 + joinedString.length();
++      Node newString = NodeUtil.newString(n, joinedString);
++      List<Node> newFlattened = Lists.newArrayList();
++      int kJoinOverhead = "[].join()".length();
++      int kCoeff = 2;
++      for (Node node : flattened) {
++        foldedSize += kJoinOverhead + InlineCostEstimator.getCost(node) * kCoeff;
++        newFlattened.add(new Node(Token.ADD,
++            new StringNode(node.getSourceFileName(),
++                           node.getLineno(),
++                           node.getCharno(),
++                           node.getToken()),
++            StringNode(node.getSourceFileName(),
++                       node.getLineno(),
++                       node.getCharno(),
++                       node.getToken()),
++            new StringNode(node.getSourceFileName(),
++                           node.getLineno(),
++                           node.getCharno(),
++                           node.getToken())));
++      }
++      flattened = newFlattened;
+     }
+     // one for each comma.
+-    foldedSize += arrayFoldedChildren.size() - 1;
++    foldedSize += flattened.size() - 1;
+ 
+     int originalSize = InlineCostEstimator.getCost(n);
+-    switch (arrayFoldedChildren.size()) {
++    switch (flattened.size()) {
+       case 0:
+         Node emptyStringNode = Node.newString("");
+         parent.replaceChild(n, emptyStringNode);
+         break;
+ 
+       case 1:
+-        Node foldedStringNode = arrayFoldedChildren.remove(0);
++        Node foldedStringNode = flattened.remove(0);
+         if (foldedSize > originalSize) {
+           return;
+         }
+         arrayNode.detachChildren();
+         if (foldedStringNode.getType() != Token.STRING) {
+           // If the Node is not a string literal, ensure that
+           // it is coerced to a string.
+           Node replacement = new Node(Token.ADD,
+               Node.newString(""), foldedStringNode);
+           foldedStringNode = replacement;
+         }
+         parent.replaceChild(n, foldedStringNode);
+         break;
+ 
+       default:
+         // No folding could actually be performed.
+-        if (arrayFoldedChildren.size() == arrayNode.getChildCount()) {
++        if (flattened.size() == arrayNode.getChildCount()) {
+           return;
+         }
+         int kJoinOverhead = "[].join()".length();
+         foldedSize += kJoinOverhead;
+         foldedSize += InlineCostEstimator.getCost(right);
+         if (foldedSize > originalSize) {
+           return;
+         }
+         arrayNode.detachChildren();
+-        for (Node node : arrayFoldedChildren) {
++        for (Node node : flattened) {
+           arrayNode.addChildToBack(node);
+         }
+         break;
+     }
+     t.getCompiler().reportCodeChange();
+   }

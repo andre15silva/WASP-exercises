@@ -1,0 +1,17 @@
+diff --git a/tmp/10190e2d-c491-4e20-9e56-5148f81e40ab_buggy.java b/tmp/3afd9c4d-b8b3-4805-b3fb-1b8bb82f27b3_fixed.java
+index a7cb64f..1bb31d4 100644
+--- a/tmp/10190e2d-c491-4e20-9e56-5148f81e40ab_buggy.java
++++ b/tmp/3afd9c4d-b8b3-4805-b3fb-1b8bb82f27b3_fixed.java
+@@ -1,10 +1,10 @@
+     /**
+-     * Test if this element has an attribute.
++     * Test if this element has an attribute. Attributes with non-empty values are preserved through parsing HTML.
+      * @param attributeKey The attribute key to check.
+      * @return true if the attribute exists, false if not.
+      */
+     public boolean hasAttr(String attributeKey) {
+         Validate.notNull(attributeKey);
+ 
+-        return attributes.hasKey(attributeKey);
++        return attributes.hasKeyIgnoreAsserts(attributeKey);
+     }

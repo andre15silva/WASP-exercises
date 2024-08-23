@@ -1,0 +1,20 @@
+diff --git a/tmp/b69d7687-170d-4c7e-b855-a3054ef5bad7_buggy.java b/tmp/5dde3703-e31f-4b31-b4df-38c9da9d13ec_fixed.java
+index fa6828a..8f20551 100644
+--- a/tmp/b69d7687-170d-4c7e-b855-a3054ef5bad7_buggy.java
++++ b/tmp/5dde3703-e31f-4b31-b4df-38c9da9d13ec_fixed.java
+@@ -1,5 +1,13 @@
+ private void injectMockCandidate(Class<?> awaitingInjectionClazz, Set<Object> mocks, Object fieldInstance) {
+     for(Field field : orderedInstanceFieldsFrom(awaitingInjectionClazz)) {
+-            mockCandidateFilter.filterCandidate(mocks, field, fieldInstance).thenInject();
++        Optional<Object> mock = mockCandidateFilter.filterCandidate(mocks, field, fieldInstance);
++        if (mock.isPresent()) {
++            try {
++                field.setAccessible(true);
++                field.set(fieldInstance, mock.get());
++            } catch (IllegalAccessException e) {
++                throw new RuntimeException("Failed to inject mock", e);
++            }
++        }
+     }
+ }
+\ No newline at end of file

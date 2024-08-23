@@ -1,0 +1,36 @@
+diff --git a/tmp/8cae80b7-6bbd-445c-be86-d4bb4a4cabfd_buggy.java b/tmp/df079f3d-c183-4ccc-83f8-ab1a934908b7_fixed.java
+index d6662c7..2fee83a 100644
+--- a/tmp/8cae80b7-6bbd-445c-be86-d4bb4a4cabfd_buggy.java
++++ b/tmp/df079f3d-c183-4ccc-83f8-ab1a934908b7_fixed.java
+@@ -1,23 +1,29 @@
+     /**
+      * Parse an entry name from a buffer.
+      * Parsing stops when a NUL is found
+      * or the buffer length is reached.
+      *
+      * @param buffer The buffer from which to parse.
+      * @param offset The offset into the buffer from which to parse.
+      * @param length The maximum number of bytes to parse.
+      * @return The entry name.
+      */
+     public static String parseName(byte[] buffer, final int offset, final int length) {
+         StringBuffer result = new StringBuffer(length);
+         int          end = offset + length;
+ 
+         for (int i = offset; i < end; ++i) {
+-            if (buffer[i] == 0) {
++            byte b = buffer[i];
++            if (b == 0) {
+                 break;
++            } else if (0x1E <= b && b <= 0x1F) {
++                result.append(b - 0x1E + 'a');
++            } else if (b == 0x3F) {
++                result.append('?');
++            } else {
++                result.append((char) b);
+             }
+-            result.append((char) buffer[i]);
+         }
+ 
+         return result.toString();
+     }

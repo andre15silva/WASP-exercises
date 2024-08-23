@@ -1,0 +1,14 @@
+diff --git a/tmp/91b975a1-5843-4897-8487-7ff27602ec36_buggy.java b/tmp/641de9c4-686c-4fe4-aafc-719eb797614d_fixed.java
+index 5a7ae71..78ed941 100644
+--- a/tmp/91b975a1-5843-4897-8487-7ff27602ec36_buggy.java
++++ b/tmp/641de9c4-686c-4fe4-aafc-719eb797614d_fixed.java
+@@ -1,8 +1,8 @@
+     public String getString(String key, String defaultValue) {
+         if (attributes.containsKey(key)) {
+-            Object value = attributes.containsKey(key);
++            String value = attributes.get(key);
+             return value != null ? value.toString() : null;
+         } else {
+             return defaultValue;
+         }
+     }

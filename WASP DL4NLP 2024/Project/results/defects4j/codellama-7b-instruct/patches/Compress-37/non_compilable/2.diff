@@ -1,0 +1,70 @@
+diff --git a/tmp/07590879-71db-45d5-8d67-89736570fcd2_buggy.java b/tmp/88cf176f-ddc9-4591-aa94-d31d38c91333_fixed.java
+index 4b7e1e4..c105cf5 100644
+--- a/tmp/07590879-71db-45d5-8d67-89736570fcd2_buggy.java
++++ b/tmp/88cf176f-ddc9-4591-aa94-d31d38c91333_fixed.java
+@@ -1,52 +1,49 @@
+-    // https://www.gnu.org/software/tar/manual/html_section/tar_92.html#SEC188
++    // This is the original buggy function
+     Map<String, String> parsePaxHeaders(final InputStream i)
+         throws IOException {
+         final Map<String, String> headers = new HashMap<String, String>(globalPaxHeaders);
+         // Format is "length keyword=value\n";
+-        while(true){ // get length
++        while(true) {
+             int ch;
+             int len = 0;
+             int read = 0;
+             while((ch = i.read()) != -1) {
+                 read++;
+                 if (ch == ' ') {
+                     // Get keyword
+                     final ByteArrayOutputStream coll = new ByteArrayOutputStream();
+                     while((ch = i.read()) != -1) {
+                         read++;
+                         if (ch == '=') { // end of keyword
+                             final String keyword = coll.toString(CharsetNames.UTF_8);
+                             // Get rest of entry
+                             final int restLen = len - read;
+                             if (restLen == 1) { // only NL
+                                 headers.remove(keyword);
+                             } else {
+                                 final byte[] rest = new byte[restLen];
+                                 final int got = IOUtils.readFully(i, rest);
+                                 if (got != restLen) {
+-                                    throw new IOException("Failed to read "
+-                                                          + "Paxheader. Expected "
+-                                                          + restLen
+-                                                          + " bytes, read "
+-                                                          + got);
++                                    throw new IOException("Failed to read " +
++                                                          "Paxheader. Expected " +
++                                                          restLen
++                                                          + " bytes, read " + got);
+                                 }
+                                 // Drop trailing NL
+-                                final String value = new String(rest, 0,
+-                                                          restLen - 1, CharsetNames.UTF_8);
++                                final String value = new String(
++                                                        rest, 0,
++                                                        restLen - 1,
++                                                        CharsetNames.UTF_8);
+                                 headers.put(keyword, value);
+                             }
+                             break;
+                         }
+                         coll.write((byte) ch);
+                     }
+-                    break; // Processed single header
+                 }
+-                len *= 10;
+-                len += ch - '0';
+-            }
+-            if (ch == -1){ // EOF
+-                break;
+             }
++            // Add the header
++            headers.put(keyword, value);
+         }
+         return headers;
+     }
+\ No newline at end of file

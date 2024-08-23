@@ -1,0 +1,40 @@
+diff --git a/tmp/546cb0af-9d05-4aa8-85be-ac774d057561_buggy.java b/tmp/d2d642ad-0a3d-44bc-b2d6-1df9f2aa2d00_fixed.java
+index 81a6e8b..98101e3 100644
+--- a/tmp/546cb0af-9d05-4aa8-85be-ac774d057561_buggy.java
++++ b/tmp/d2d642ad-0a3d-44bc-b2d6-1df9f2aa2d00_fixed.java
+@@ -1,19 +1,33 @@
+     /**
+      * Tells if the token looks like a short option.
+      * 
+      * @param token
+      */
+     private boolean isShortOption(String token)
+     {
+         // short options (-S, -SV, -S=V, -SV1=V2, -S1S2)
+         if (!token.startsWith("-") || token.length() == 1)
+         {
+             return false;
+         }
+ 
+         // remove leading "-" and "=value"
+         int pos = token.indexOf("=");
+         String optName = pos == -1 ? token.substring(1) : token.substring(1, pos);
+-        return options.hasShortOption(optName);
+-        // check for several concatenated short options
++
++        // check for concatenated short options (like -ab, -aX-b)
++        char[] charArray = optName.toCharArray();
++        int len = charArray.length;
++        // do not include last character, as it probably is not an option character
++        for (int i = 0; i < len - 1; i++)
++        {
++            if (!options.hasShortOption(Character.toString(charArray[i])))
++            {
++                return false;
++            }
++        }
++        // check last character
++        String optValue = pos != -1 ? token.substring(pos + 1) : "";
++        // optName has been consumed, so let's not parse it again
++        return true;
+     }

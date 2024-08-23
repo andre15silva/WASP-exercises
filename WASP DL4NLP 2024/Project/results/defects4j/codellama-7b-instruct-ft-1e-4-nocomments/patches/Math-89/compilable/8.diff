@@ -1,0 +1,23 @@
+diff --git a/tmp/7d44eb6c-0f96-4568-9076-14d3802135e0_buggy.java b/tmp/fab7f9a9-2043-4a73-ba17-c7c89621d776_fixed.java
+index 42b7b48..ccddadb 100644
+--- a/tmp/7d44eb6c-0f96-4568-9076-14d3802135e0_buggy.java
++++ b/tmp/fab7f9a9-2043-4a73-ba17-c7c89621d776_fixed.java
+@@ -1,16 +1,16 @@
+     /**
+      * Adds 1 to the frequency count for v.
+      * <p>
+      * If other objects have already been added to this Frequency, v must
+      * be comparable to those that have already been added.
+      * </p>
+-     * 
+      * @param v the value to add.
+      * @throws IllegalArgumentException if <code>v</code> is not Comparable, 
+      *         or is not comparable with previous entries
+      * @deprecated use {@link #addValue(Comparable)} instead
++     * @since Commons Collections 1.1
+      */
+     @Deprecated
+     public void addValue(Object v) {
+         addValue((Comparable<?>) v);            
+     }
+\ No newline at end of file

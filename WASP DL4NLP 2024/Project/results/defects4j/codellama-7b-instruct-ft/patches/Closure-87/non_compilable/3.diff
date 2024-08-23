@@ -1,0 +1,37 @@
+diff --git a/tmp/188ae8ac-8f38-4618-9445-ce29fe54a31c_buggy.java b/tmp/30a9f71a-6515-4f72-8bee-dba5409e00d5_fixed.java
+index 19fd63e..6fad6e7 100644
+--- a/tmp/188ae8ac-8f38-4618-9445-ce29fe54a31c_buggy.java
++++ b/tmp/30a9f71a-6515-4f72-8bee-dba5409e00d5_fixed.java
+@@ -1,24 +1,32 @@
+   /**
+    * @return Whether the node is a block with a single statement that is
+    *     an expression.
+    */
+   private boolean isFoldableExpressBlock(Node n) {
+     if (n.getType() == Token.BLOCK) {
+       if (n.hasOneChild()) {
+         Node maybeExpr = n.getFirstChild();
+           // IE has a bug where event handlers behave differently when
+           // their return value is used vs. when their return value is in
+           // an EXPR_RESULT. It's pretty freaking weird. See:
+           // http://code.google.com/p/closure-compiler/issues/detail?id=291
+           // We try to detect this case, and not fold EXPR_RESULTs
+           // into other expressions.
+ 
+             // We only have to worry about methods with an implicit 'this'
+             // param, or this doesn't happen.
+ 
+           return NodeUtil.isExpressionNode(maybeExpr);
+       }
++    } else if (n.getType() == Token.IF && NodeUtil.isFoldableCall(n.getFirstChild()) && NodeUtil.isFoldableCall(n.getLastChild())) {
++      // This is a hack to prevent folding an event handler setup in an
++      // if. IE will call both the onchange and onblur event handlers
++      // when an if-case is true. See:
++      // http://code.google.com/p/closure-compiler/issues/detail?id=291
++      // The code is also pretty aggressive about folding function calls,
++      // this is just one extra special-case.
++      return false;
+     }
+ 
+     return false;
+   }

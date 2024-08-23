@@ -1,0 +1,15 @@
+diff --git a/tmp/d4639675-25af-4d75-ab61-2de9ec4418c9_buggy.java b/tmp/efadcc88-b5cc-48bd-9620-5473b7145f41_fixed.java
+index d5b3da9..3a2d5f3 100644
+--- a/tmp/d4639675-25af-4d75-ab61-2de9ec4418c9_buggy.java
++++ b/tmp/efadcc88-b5cc-48bd-9620-5473b7145f41_fixed.java
+@@ -1,7 +1,9 @@
+         private void copyAttributes(org.jsoup.nodes.Node source, Element el) {
+             for (Attribute attribute : source.attributes()) {
+                 // valid xml attribute names are: ^[a-zA-Z_:][-a-zA-Z0-9_:.]
+-                String key = attribute.getKey().replaceAll("[^-a-zA-Z0-9_:.]", "");
++                String key = attribute.getKey();
++                // could use this to work with any C14N attribute:
++                // key = key.replaceAll("[^-A-Za-z0-9_.:]", "");
+                 el.setAttribute(key, attribute.getValue());
+             }
+         }

@@ -1,0 +1,33 @@
+diff --git a/tmp/0e2d5cf5-fd7e-44be-b91b-aaa0e61e2345_buggy.java b/tmp/1832a40a-230b-41b7-afec-01e569876d3d_fixed.java
+index dd6dcb5..d5c170e 100644
+--- a/tmp/0e2d5cf5-fd7e-44be-b91b-aaa0e61e2345_buggy.java
++++ b/tmp/1832a40a-230b-41b7-afec-01e569876d3d_fixed.java
+@@ -1,22 +1,22 @@
+     /**
+-     * <p>Converts an array of <code>Object</code> in to an array of <code>Class</code> objects.
+-     * If any of these objects is null, a null element will be inserted into the array.</p>
++     * <p>Converts an array of {@link Object} instances to an array of {@link Class} instances.</p>
+      *
+      * <p>This method returns <code>null</code> for a <code>null</code> input array.</p>
+      *
+      * @param array an <code>Object</code> array
+-     * @return a <code>Class</code> array, <code>null</code> if null array input
+-     * @since 2.4
++     * @return an array of {@link Class} instances, <code>null</code> if null array input
++     *
++     * @since 3.1
+      */
+     public static Class<?>[] toClass(Object[] array) {
+         if (array == null) {
+             return null;
+         } else if (array.length == 0) {
+             return ArrayUtils.EMPTY_CLASS_ARRAY;
+         }
+-        Class<?>[] classes = new Class[array.length];
++        final Class<?>[] classes = new Class[array.length];
+         for (int i = 0; i < array.length; i++) {
+-            classes[i] = array[i].getClass();
++            classes[i] = array[i] == null ? null : array[i].getClass();
+         }
+         return classes;
+     }

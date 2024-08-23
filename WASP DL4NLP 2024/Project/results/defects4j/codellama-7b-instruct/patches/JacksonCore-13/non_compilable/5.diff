@@ -1,0 +1,12 @@
+diff --git a/tmp/aac1c740-f7f8-4070-a2b3-b26f1b791b73_buggy.java b/tmp/dd1866b3-c6a4-444d-9fef-b3bacb4a64fa_fixed.java
+index e69de29..57c6827 100644
+--- a/tmp/aac1c740-f7f8-4070-a2b3-b26f1b791b73_buggy.java
++++ b/tmp/dd1866b3-c6a4-444d-9fef-b3bacb4a64fa_fixed.java
+@@ -0,0 +1,6 @@
++    protected void _testFieldNameQuotingEnabled(JsonFactory factory, boolean includeFieldPrefix, boolean quotingEnabled, String expected) throws IOException {
++        JsonStreamContext createParser = factory.createParser(expected);
++        createParser.nextToken();
++        JsonNode node = createParser.readValueAsTree();
++        assertEquals(node.get("foo").asText(), 1);
++    }
+\ No newline at end of file

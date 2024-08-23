@@ -1,0 +1,96 @@
+diff --git a/tmp/29683f2c-5ddc-49f5-8806-014233c3a3d9_buggy.java b/tmp/e83ae9c6-8622-4adf-8d7d-2d555f60d407_fixed.java
+index f650982..1b4e266 100644
+--- a/tmp/29683f2c-5ddc-49f5-8806-014233c3a3d9_buggy.java
++++ b/tmp/e83ae9c6-8622-4adf-8d7d-2d555f60d407_fixed.java
+@@ -1,42 +1,82 @@
+     /**
+      * Compares two values
+      */
+     protected boolean equal(
+         EvalContext context,
+         Expression left,
+         Expression right) 
+     {
+         Object l = left.compute(context);
+         Object r = right.compute(context);
+ 
+ //        System.err.println("COMPARING: " +
+ //            (l == null ? "null" : l.getClass().getName()) + " " +
+ //            (r == null ? "null" : r.getClass().getName()));
+ 
+         if (l instanceof InitialContext || l instanceof SelfContext) {
+             l = ((EvalContext) l).getSingleNodePointer();
+         }
+ 
+         if (r instanceof InitialContext || r instanceof SelfContext) {
+             r = ((EvalContext) r).getSingleNodePointer();
+         }
+ 
++        Iterator li = null;
+         if (l instanceof Collection) {
+-            l = ((Collection) l).iterator();
++            Collection coll = (Collection) l;
++            li = coll.size() > 0 ? coll.iterator() : EmptyIterator.getInstance();
++        } else if (l instanceof Object[]) {
++            Object[] array = (Object[]) l;
++            li = array.length > 0 ? Arrays.asList(array).iterator() : EmptyIterator.getInstance();
++        } else if (l instanceof Iterator) {
++            li = (Iterator) l;
+         }
+ 
++        Iterator ri = null;
+         if (r instanceof Collection) {
+-            r = ((Collection) r).iterator();
++            Collection coll = (Collection) r;
++            ri = coll.size() > 0 ? coll.iterator() : EmptyIterator.getInstance();
++        } else if (r instanceof Object[]) {
++            Object[] array = (Object[]) r;
++            ri = array.length > 0 ? Arrays.asList(array).iterator() : EmptyIterator.getInstance();
++        } else if (r instanceof Iterator) {
++            ri = (Iterator) r;
+         }
+ 
+-        if ((l instanceof Iterator) && !(r instanceof Iterator)) {
+-            return contains((Iterator) l, r);
++        if (li != null && ri != null) {
++            if (!li.hasNext() && !ri.hasNext()) {
++                return true;
+             }
+-        if (!(l instanceof Iterator) && (r instanceof Iterator)) {
+-            return contains((Iterator) r, l);
++            if (!ri.hasNext()) {
++                return false;
+             }
+-        if (l instanceof Iterator && r instanceof Iterator) {
+-            return findMatch((Iterator) l, (Iterator) r);
++            if (!li.hasNext()) {
++                return false;
+             }
+-        return equal(l, r);
++
++            if (li.next() instanceof NodePointer) {
++                Object n = ((NodePointer) li.next()).getNode();
++                li = getIterator(n, c);
++            } else if (li.next() instanceof Iterable) {
++                Object n = ((Iterable<?>) li.next()).iterator();
++                li = n;
++            }
++
++            if (ri.next() instanceof NodePointer) {
++                Object n = ((NodePointer) ri.next()).getNode();
++                ri = getIterator(n, c);
++            } else if (ri.next() instanceof Iterable) {
++                Object n = ((Iterable<?>) ri.next()).iterator();
++                ri = n;
++            }
++
++            if (li.hasNext() && ri.hasNext()) {
++                return (li.next().equals(ri.next()));
++            }
++        } else if (li != null) {
++            return li.hasNext();
++        } else if (ri != null) {
++            return ri.hasNext();
++        }
++        return false;
+     }

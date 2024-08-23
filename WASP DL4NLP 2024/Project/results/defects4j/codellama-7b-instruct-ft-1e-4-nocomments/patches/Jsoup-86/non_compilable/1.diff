@@ -1,0 +1,29 @@
+diff --git a/tmp/cec1ed26-f6fd-4656-9c36-1a732ae9133a_buggy.java b/tmp/b98facf2-edf8-4625-8dff-abc1d567e763_fixed.java
+index b8e7fdb..4e377e1 100644
+--- a/tmp/cec1ed26-f6fd-4656-9c36-1a732ae9133a_buggy.java
++++ b/tmp/b98facf2-edf8-4625-8dff-abc1d567e763_fixed.java
+@@ -1,15 +1,22 @@
+     /**
+      * Attempt to cast this comment to an XML Declaration note.
+      * @return an XML declaration if it could be parsed as one, null otherwise.
+      */
+     public XmlDeclaration asXmlDeclaration() {
+         String data = getData();
+-        Document doc = Jsoup.parse("<" + data.substring(1, data.length() -1) + ">", baseUri(), Parser.xmlParser());
++        String trimmed = data.trim();
++        if (trimmed.contains("\n") && (data.startsWith("\n") || data.endsWith("\n")))
++            return null;
++        int pos = trimmed.indexOf("<?");
++        Document doc = Jsoup.parse("<" + (data.startsWith("!") ? data.substring(0, 2) : "") + (pos == -1 ? data.substring(1, data.length() - 1) : trimmed.substring(1, pos + 1)),
++           baseUri(),
++           Parser.xmlParser().settings(new Document.OutputSettings().prettyPrint(false))
++           );
+         XmlDeclaration decl = null;
+         if (doc.childNodeSize() > 0) {
+             Element el = doc.child(0);
+             decl = new XmlDeclaration(NodeUtils.parser(doc).settings().normalizeTag(el.tagName()), data.startsWith("!"));
+             decl.attributes().addAll(el.attributes());
+         }
+         return decl;
+     }
+\ No newline at end of file

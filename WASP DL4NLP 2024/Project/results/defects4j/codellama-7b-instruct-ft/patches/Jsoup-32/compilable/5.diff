@@ -1,0 +1,12 @@
+diff --git a/tmp/36633df4-baef-4265-8a91-f0f9dfdfb4ca_buggy.java b/tmp/9af3e27c-c34b-41c9-89c2-34772317b02d_fixed.java
+index 91469b4..0b86796 100644
+--- a/tmp/36633df4-baef-4265-8a91-f0f9dfdfb4ca_buggy.java
++++ b/tmp/9af3e27c-c34b-41c9-89c2-34772317b02d_fixed.java
+@@ -1,6 +1,6 @@
+     @Override
+     public Element clone() {
+         Element clone = (Element) super.clone();
+-        clone.classNames();
++        clone.classNames(new HashSet<String>(classNames()));
+         return clone;
+     }

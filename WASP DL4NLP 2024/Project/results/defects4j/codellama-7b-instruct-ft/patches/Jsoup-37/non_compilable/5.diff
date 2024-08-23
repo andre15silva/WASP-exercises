@@ -1,0 +1,18 @@
+diff --git a/tmp/4a0d3121-9c76-436e-8db0-5016f03d379d_buggy.java b/tmp/1d098e0c-b5ef-4ddf-bfec-04475b5e5cd8_fixed.java
+index 7498011..ae13f2c 100644
+--- a/tmp/4a0d3121-9c76-436e-8db0-5016f03d379d_buggy.java
++++ b/tmp/1d098e0c-b5ef-4ddf-bfec-04475b5e5cd8_fixed.java
+@@ -1,12 +1,12 @@
+     /**
+      * Retrieves the element's inner HTML. E.g. on a {@code <div>} with one empty {@code <p>}, would return
+      * {@code <p></p>}. (Whereas {@link #outerHtml()} would return {@code <div><p></p></div>}.)
+      * 
+      * @return String of HTML.
+      * @see #outerHtml()
+      */
+     public String html() {
+         StringBuilder accum = new StringBuilder();
+-        html(accum);
++        html(accum, new Document.OutputSettings().prettyPrint(false));
+         return accum.toString().trim();
+     }

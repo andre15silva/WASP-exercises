@@ -1,0 +1,25 @@
+diff --git a/tmp/c7215720-278b-41be-bf52-f9605156813c_buggy.java b/tmp/bd57592f-7430-4048-a9de-ff5ac50d41cd_fixed.java
+index a5ff4fc..f2ed2e9 100644
+--- a/tmp/c7215720-278b-41be-bf52-f9605156813c_buggy.java
++++ b/tmp/bd57592f-7430-4048-a9de-ff5ac50d41cd_fixed.java
+@@ -1,17 +1,3 @@
+-    /**
+-     * Helper method used to prevent both caching and cache lookups for structured
+-     * types that have custom value handlers
+-     *
+-     * @since 2.8.11
+-     */
+-    private boolean _hasCustomHandlers(JavaType t) {
+-        if (t.isContainerType()) {
+-            // First: value types may have both value and type handlers
+-            JavaType ct = t.getContentType();
+-            if (ct != null) {
+-                return (ct.getValueHandler() != null) || (ct.getTypeHandler() != null);
+-            // Second: map(-like) types may have value handler for key (but not type; keys are untyped)
+-            }
+-        }
+-        return false;
++    public static String aposToQuotes(String input) {
++        return input.replaceAll("'", "\"");
+     }
+\ No newline at end of file

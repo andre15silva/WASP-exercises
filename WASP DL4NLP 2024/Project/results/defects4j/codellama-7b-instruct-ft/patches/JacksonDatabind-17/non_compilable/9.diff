@@ -1,0 +1,51 @@
+diff --git a/tmp/ddd278b0-daf6-437e-b48a-2745ebd8e651_buggy.java b/tmp/24cffd36-4950-4b87-a0c1-c42798da2b13_fixed.java
+index 01967cc..ad169b8 100644
+--- a/tmp/ddd278b0-daf6-437e-b48a-2745ebd8e651_buggy.java
++++ b/tmp/24cffd36-4950-4b87-a0c1-c42798da2b13_fixed.java
+@@ -1,35 +1,32 @@
+         /**
+          * Method called to check if the default type handler should be
+          * used for given type.
+          * Note: "natural types" (String, Boolean, Integer, Double) will never
+          * use typing; that is both due to them being concrete and final,
+          * and since actual serializers and deserializers will also ignore any
+          * attempts to enforce typing.
+          */
+         public boolean useForType(JavaType t)
+         {
+             switch (_appliesFor) {
+             case NON_CONCRETE_AND_ARRAYS:
+                 while (t.isArrayType()) {
+                     t = t.getContentType();
+                 }
+                 // fall through
+             case OBJECT_AND_NON_CONCRETE:
+-//                return t.isJavaLangObject() || 
+-                return (t.getRawClass() == Object.class)
+-                        || (!t.isConcrete()
+-                                // [databind#88] Should not apply to JSON tree models:
+-                        || TreeNode.class.isAssignableFrom(t.getRawClass()));
+-
+-            case NON_FINAL:
+-                while (t.isArrayType()) {
+-                    t = t.getContentType();
+-                }
+-                // [Issue#88] Should not apply to JSON tree models:
+-                return !t.isFinal() && !TreeNode.class.isAssignableFrom(t.getRawClass());
+-            default:
++                return (_objectTyping == ObjectMapper.Typing.DEFAULT_DYNAMIC)
++                        // let's not try to type anything that requires subtyping
++                        || (t.isContainerType() && !t.hasHandlers())
++//   [Issue-10] : This leads to issues where
++//   DefaultTyping.SIMPLE_TYPE will fail to read
++//   java.util TreeNodes that were generated
++//                       || TreeNode.class.isAssignableFrom(t.getRawClass()));
++                        ;
+             //case JAVA_LANG_OBJECT:
+ //                return t.isJavaLangObject();
+-                return (t.getRawClass() == Object.class);
++            default:
++                return false;
++//            return (t.getRawClass() == Object.class);
+             }
+         }

@@ -1,0 +1,30 @@
+diff --git a/tmp/fe785fb1-34c4-4bfc-a45a-740233d493da_buggy.java b/tmp/8428b32b-0a28-4ce9-a9fa-146e2e9c5791_fixed.java
+index 1bec4d6..6576a7d 100644
+--- a/tmp/fe785fb1-34c4-4bfc-a45a-740233d493da_buggy.java
++++ b/tmp/8428b32b-0a28-4ce9-a9fa-146e2e9c5791_fixed.java
+@@ -1,14 +1,13 @@
+-    private JavaType _mapType(Class<?> rawClass)
++     public static void testMapToProperties()
+      {
+-        // 28-May-2015, tatu: Properties are special, as per [databind#810]
+-        JavaType[] typeParams = findTypeParameters(rawClass, Map.class);
+-        // ok to have no types ("raw")
+-        if (typeParams == null) {
+-            return MapType.construct(rawClass, _unknownType(), _unknownType());
+-        }
+-        // but exactly 2 types if any found
+-        if (typeParams.length != 2) {
+-            throw new IllegalArgumentException("Strange Map type "+rawClass.getName()+": can not determine type parameters");
+-        }
+-        return MapType.construct(rawClass, typeParams[0], typeParams[1]);
++         Bean bean = new Bean();
++         bean.A = 129;
++         bean.B = "13";
++         Properties props = MAPPER.convertValue(bean, Properties.class);
++
++         assertEquals(2, props.size());
++
++         assertEquals("13", props.getProperty("B"));
++         // should coercce non-Strings to Strings
++         assertEquals("129", props.getProperty("A"));
+      }

@@ -1,0 +1,115 @@
+diff --git a/tmp/5631f041-9fc3-4900-b244-e4e770269fb6_buggy.java b/tmp/bdc3fa38-57a1-4ea7-9b1c-83bf3e6da56e_fixed.java
+index 27e0871..8aaa9a3 100644
+--- a/tmp/5631f041-9fc3-4900-b244-e4e770269fb6_buggy.java
++++ b/tmp/bdc3fa38-57a1-4ea7-9b1c-83bf3e6da56e_fixed.java
+@@ -1,86 +1,89 @@
+   /**
+    * Try to fold arithmetic binary operators
+    */
+   private Node performArithmeticOp(int opType, Node left, Node right) {
+     // Unlike other operations, ADD operands are not always converted
+     // to Number.
+     if (opType == Token.ADD
+         && (NodeUtil.mayBeString(left, false)
+             || NodeUtil.mayBeString(right, false))) {
+       return null;
+     }
+ 
+     double result;
+ 
+     // TODO(johnlenz): Handle NaN with unknown value. BIT ops convert NaN
+     // to zero so this is a little akward here.
+ 
+     Double lValObj = NodeUtil.getNumberValue(left);
+     if (lValObj == null) {
+       return null;
+     }
+     Double rValObj = NodeUtil.getNumberValue(right);
+     if (rValObj == null) {
+       return null;
+     }
+ 
+     double lval = lValObj;
+     double rval = rValObj;
+ 
++    int opTypeValue = 0;
+     switch (opType) {
+       case Token.BITAND:
+-        result = ScriptRuntime.toInt32(lval) & ScriptRuntime.toInt32(rval);
++        opTypeValue = 0x1;
+         break;
+       case Token.BITOR:
+-        result = ScriptRuntime.toInt32(lval) | ScriptRuntime.toInt32(rval);
++        opTypeValue = 0x2;
+         break;
+       case Token.BITXOR:
+-        result = ScriptRuntime.toInt32(lval) ^ ScriptRuntime.toInt32(rval);
++        opTypeValue = 0x3;
+         break;
+       case Token.ADD:
+-        result = lval + rval;
++        opTypeValue = 0x14;
+         break;
+       case Token.SUB:
+-        result = lval - rval;
++        opTypeValue = 0x18;
+         break;
+       case Token.MUL:
+-        result = lval * rval;
++        opTypeValue = 0x10;
+         break;
+       case Token.MOD:
+-        if (rval == 0) {
+-          error(DiagnosticType.error("JSC_DIVIDE_BY_0_ERROR", "Divide by 0"), right);
+-          return null;
+-        }
+-        result = lval % rval;
++        opTypeValue = 0x20;
+         break;
+       case Token.DIV:
+-        if (rval == 0) {
+-          error(DiagnosticType.error("JSC_DIVIDE_BY_0_ERROR", "Divide by 0"), right);
+-          return null;
+-        }
+-        result = lval / rval;
++        opTypeValue = 0x28;
+         break;
+       default:
+         throw new Error("Unexpected arithmetic operator");
+     }
+ 
+-    // TODO(johnlenz): consider removing the result length check.
+-    // length of the left and right value plus 1 byte for the operator.
+-    if (String.valueOf(result).length() <=
+-        String.valueOf(lval).length() + String.valueOf(rval).length() + 1 &&
++    double rvalFold = getConstFoldNumber(opType, lval, rval);
++    if (rvalFold == 0) {
++      error(DiagnosticType.error("JSC_CANNOT_DIVIDE", "cannot divide {0} by {1}",
++          "", Math.abs(lval), Math.abs(rval)), right);
++      return null;
++    }
++
++    double x = lval / rval * rval + opTypeValue;
++    if (x > MAX_FOLD_NUMBER || x < -MAX_FOLD_NUMBER) {
++      return null;
++    }
++    result = x;
+ 
+     // Do not try to fold arithmetic for numbers > 2^53. After that
+     // point, fixed-point math starts to break down and become inaccurate.
+-        Math.abs(result) <= MAX_FOLD_NUMBER) {
++    int m = (int) Math.abs(result);
++    if (m <= MAX_FOLD_NUMBER &&
++        (m == Math.abs(lval) || m == Math.abs(rval))) {
+       Node newNumber = Node.newNumber(result);
+       return newNumber;
+     } else if (Double.isNaN(result)) {
+       return Node.newString(Token.NAME, "NaN");
+     } else if (result == Double.POSITIVE_INFINITY) {
+       return Node.newString(Token.NAME, "Infinity");
+     } else if (result == Double.NEGATIVE_INFINITY) {
+       return new Node(Token.NEG, Node.newString(Token.NAME, "Infinity"));
+     }
+ 
+     return null;
+   }

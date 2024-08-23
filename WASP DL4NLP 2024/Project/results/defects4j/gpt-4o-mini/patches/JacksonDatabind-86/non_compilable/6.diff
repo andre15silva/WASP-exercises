@@ -1,0 +1,20 @@
+diff --git a/tmp/f2ccb30b-442c-498c-937b-98574d636c0d_buggy.java b/tmp/6ac69a47-6b68-4429-bcb1-a64d8687e937_fixed.java
+index e69de29..40fed4e 100644
+--- a/tmp/f2ccb30b-442c-498c-937b-98574d636c0d_buggy.java
++++ b/tmp/6ac69a47-6b68-4429-bcb1-a64d8687e937_fixed.java
+@@ -0,0 +1,14 @@
++public JavaType getSuperClass() {
++    if (_superClass == null) {
++        // Ensure that we resolve the super class type correctly
++        if (_class == null) { // Should not happen, but just in case
++            return null;
++        }
++        _superClass = _typeFactory.constructType(_class.getSuperclass());
++        // Register the super class in the cache if it's resolved
++        if (_superClass != null) {
++            _typeFactory.addCacheEntry(_superClass);
++        }
++    }
++    return _superClass;
++}
+\ No newline at end of file

@@ -1,0 +1,20 @@
+diff --git a/tmp/be204971-2e6f-4389-938c-e22541b24a96_buggy.java b/tmp/335bb028-9efd-4af1-89f5-910e7b3e9224_fixed.java
+index fa6828a..368665f 100644
+--- a/tmp/be204971-2e6f-4389-938c-e22541b24a96_buggy.java
++++ b/tmp/335bb028-9efd-4af1-89f5-910e7b3e9224_fixed.java
+@@ -1,5 +1,13 @@
+     private void injectMockCandidate(Class<?> awaitingInjectionClazz, Set<Object> mocks, Object fieldInstance) {
++        Set<InjectableField> injectableFields = new HashSet<InjectableField>();
+         for (Field field : orderedInstanceFieldsFrom(awaitingInjectionClazz)) {
+-            mockCandidateFilter.filterCandidate(mocks, field, fieldInstance).thenInject();
++            mockCandidateFilter.filterCandidate(mocks, field, fieldInstance).thenInject(injectableFields);
++        }
++        for (InjectableField injectableField : injectableFields) {
++            try {
++                injectableField.inject(fieldInstance);
++            } catch (IllegalAccessException e) {
++                e.printStackTrace();
++            }
+         }
+     }
+\ No newline at end of file

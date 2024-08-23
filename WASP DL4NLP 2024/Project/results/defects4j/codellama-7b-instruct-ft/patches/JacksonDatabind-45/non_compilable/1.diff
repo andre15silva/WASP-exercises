@@ -1,0 +1,43 @@
+diff --git a/tmp/f493a1b2-0a88-4d5c-af61-8e8abc6719c1_buggy.java b/tmp/152bc31f-c616-4649-bc09-38bc91a296fc_fixed.java
+index 0dbce00..532df07 100644
+--- a/tmp/f493a1b2-0a88-4d5c-af61-8e8abc6719c1_buggy.java
++++ b/tmp/152bc31f-c616-4649-bc09-38bc91a296fc_fixed.java
+@@ -1,33 +1,30 @@
+     @Override
+     public JsonSerializer<?> createContextual(SerializerProvider serializers,
+             BeanProperty property) throws JsonMappingException
+     {
+         if (property != null) {
+             JsonFormat.Value format = serializers.getAnnotationIntrospector().findFormat((Annotated)property.getMember());
+             if (format != null) {
+ 
+             	// Simple case first: serialize as numeric timestamp?
+                 JsonFormat.Shape shape = format.getShape();
+-                if (shape.isNumeric()) {
++                if (shape.isNumeric() || (format.equals(JsonFormat.Value.empty())
++                        && (serializers.isEnabled(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS) || serializers.getTimeZone() != null))) {
+                     return withFormat(Boolean.TRUE, null);
+                 }
+ 
+-                if (format.getShape() == JsonFormat.Shape.STRING) {
++                if (format.equal(JsonFormat.Value.empty())) {
+                     TimeZone tz = format.getTimeZone();
+-                    final String pattern = format.hasPattern()
+-                                    ? format.getPattern()
+-                                    : StdDateFormat.DATE_FORMAT_STR_ISO8601;
+-                    final Locale loc = format.hasLocale()
+-                                    ? format.getLocale()
+-                                    : serializers.getLocale();
++                    final String pattern = format.hasPattern() ? format.getPattern() : StdDateFormat.DATE_FORMAT_STR_ISO8601;
++                    final Locale loc = format.hasLocale() ? format.getLocale() : serializers.getLocale();
+                     SimpleDateFormat df = new SimpleDateFormat(pattern, loc);
+                     if (tz == null) {
+                         tz = serializers.getTimeZone();
+                     }
+                     df.setTimeZone(tz);
+                     return withFormat(Boolean.FALSE, df);
+                 }
+             }
+         }
+         return this;
+     }

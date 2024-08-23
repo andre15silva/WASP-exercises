@@ -1,0 +1,15 @@
+diff --git a/tmp/03a7dab0-755c-4b88-96dd-73a2831e2982_buggy.java b/tmp/96e563ca-bb2d-4039-950e-66fb5507e78d_fixed.java
+index ba2718f..925c892 100644
+--- a/tmp/03a7dab0-755c-4b88-96dd-73a2831e2982_buggy.java
++++ b/tmp/96e563ca-bb2d-4039-950e-66fb5507e78d_fixed.java
+@@ -1,7 +1,9 @@
+   /**
++   * The return type of structural constructors
+    * ContextTypeExpression := BasicTypeExpression | '?'
+-   * For expressions on the right hand side of a this: or new:
++   * For expressions on the right hand side of a constructor call:
++   * StructuralConstructor := "new" ':' ContextTypeExpression
+    */
+   private Node parseContextTypeExpression(JsDocToken token) {
+           return parseTypeName(token);
+   }

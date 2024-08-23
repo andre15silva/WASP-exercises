@@ -1,0 +1,23 @@
+diff --git a/tmp/4cbc7e52-d5dd-45ca-91a9-fef36524618a_buggy.java b/tmp/2a82ae50-7243-40ee-9305-a674bc8071a0_fixed.java
+index a38ec6d..5d37391 100644
+--- a/tmp/4cbc7e52-d5dd-45ca-91a9-fef36524618a_buggy.java
++++ b/tmp/2a82ae50-7243-40ee-9305-a674bc8071a0_fixed.java
+@@ -1,10 +1,18 @@
+     @Override
+     public JSType caseObjectType(ObjectType type) {
+       if (value.equals("function")) {
+         JSType ctorType = getNativeType(U2U_CONSTRUCTOR_TYPE);
+         return resultEqualsValue && ctorType.isSubtype(type) ? ctorType : null;
+           // Objects are restricted to "Function", subtypes are left
+           // Only filter out subtypes of "function"
++      } else if (value.equals(googIsFunctionJsDoc)) {
++        return resultEqualsValue ? objOrBooleanOrStringType : null;
++          // We should only look for this annotation for goog.isFunction,
++          // even though goog.isFunction is already restricted to Function
++          // and Objects. The only way to pass in a restricted type to
++          // goog.isFunction is to use a qualified name in the jsdoc;
++          // this is the only case where the user has specified a
++          // restricted type manually.
+       }
+       return matchesExpectation("object") ? type : null;
+     }

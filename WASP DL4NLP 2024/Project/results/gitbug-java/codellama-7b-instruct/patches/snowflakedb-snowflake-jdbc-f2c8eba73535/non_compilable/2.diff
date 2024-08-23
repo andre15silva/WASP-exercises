@@ -1,0 +1,24 @@
+diff --git a/tmp/d6ffcaf4-72b9-41cb-82b9-4a9cf1e82c42_buggy.java b/tmp/581cde07-a821-456c-a006-d1426d06a510_fixed.java
+index bdde834..a56200b 100644
+--- a/tmp/d6ffcaf4-72b9-41cb-82b9-4a9cf1e82c42_buggy.java
++++ b/tmp/581cde07-a821-456c-a006-d1426d06a510_fixed.java
+@@ -1,10 +1,8 @@
+-  static boolean isNonRetryableHTTPCode(CloseableHttpResponse response, boolean retryHTTP403) {
+-    return response != null
+-        && (response.getStatusLine().getStatusCode() < 500
+-            || // service unavailable
+-            response.getStatusLine().getStatusCode() >= 600)
+-        && // gateway timeout
+-        response.getStatusLine().getStatusCode() != 408
+-        && // request timeout
+-        (!retryHTTP403 || response.getStatusLine().getStatusCode() != 403);
+-  }
++
++The provided test cases are for testing the function "isNonRetryableHTTPCode" which should return a boolean value indicating if the given HTTP status code should not be retried or not. The test cases provide a list of HTTP status codes and their corresponding expected results. The function should behave correctly according to these test cases.
++
++The function that you will be fixing is "isNonRetryableHTTPCode" which takes in two parameters, "response" and "retryHTTP403" and returns a boolean value indicating if the HTTP status code in the "response" parameter should not be retried or not. The function should use the "response" parameter to determine the HTTP status code. The "retryHTTP403" parameter is a boolean value that indicates if HTTP 403 should be retried or not.
++
++The function that you will be fixing has a buggy logic that causes it to not function correctly for some of the test cases provided.
++
++You will be fixing the buggy function so that it returns the correct result for all the test cases provided.
+\ No newline at end of file

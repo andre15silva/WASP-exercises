@@ -1,0 +1,18 @@
+diff --git a/tmp/478a649d-bc54-46a1-bdef-c4766d3b06d0_buggy.java b/tmp/f241488d-5787-40d5-809b-13202ac362f3_fixed.java
+index 9033e1c..ecffc91 100644
+--- a/tmp/478a649d-bc54-46a1-bdef-c4766d3b06d0_buggy.java
++++ b/tmp/f241488d-5787-40d5-809b-13202ac362f3_fixed.java
+@@ -1,11 +1,10 @@
+     /**
+      * Returns true iff they are equal as defined by
+      * {@link #equals(double,double,int) equals(x, y, 1)}.
+      *
+-     * @param x first value
+-     * @param y second value
+-     * @return {@code true} if the values are equal.
++     * @deprecated To be removed in release 3.0 (replaced by {@link
++     * #testArrayEqualsIncludingNaN()}.
+      */
+     public static boolean equals(double x, double y) {
+         return (Double.isNaN(x) && Double.isNaN(y)) || x == y;
+     }

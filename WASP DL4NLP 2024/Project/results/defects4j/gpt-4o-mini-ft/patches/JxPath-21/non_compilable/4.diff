@@ -1,0 +1,24 @@
+diff --git a/tmp/ada4b2f5-b378-41a3-963b-0319b2a604c0_buggy.java b/tmp/63139969-f21d-40f4-b824-99b8ecd6261e_fixed.java
+index 516fad7..c24b565 100644
+--- a/tmp/ada4b2f5-b378-41a3-963b-0319b2a604c0_buggy.java
++++ b/tmp/63139969-f21d-40f4-b824-99b8ecd6261e_fixed.java
+@@ -1,8 +1,19 @@
+     /**
+      * If the property contains a collection, then the length of that
+      * collection, otherwise - 1.
+      * @return int length
+      */
+     public int getLength() {
+         return ValueUtils.getLength(getBaseValue());
+     }
++
++    @Override
++    public boolean instanceofValue(Object context) {
++        if(null == context) {
++            return false;
++        }
++        if(node == null) {
++            return true;
++        }
++        return super.instanceofValue(context);
++    }

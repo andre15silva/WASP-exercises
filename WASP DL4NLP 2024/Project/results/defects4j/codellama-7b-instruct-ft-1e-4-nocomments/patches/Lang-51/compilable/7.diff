@@ -1,0 +1,188 @@
+diff --git a/tmp/3932af85-d867-4079-b6f8-69d59137b29f_buggy.java b/tmp/d92e1098-63d0-4c18-bfd2-348d5ac96151_fixed.java
+index 55b319a..8f65c7f 100644
+--- a/tmp/3932af85-d867-4079-b6f8-69d59137b29f_buggy.java
++++ b/tmp/d92e1098-63d0-4c18-bfd2-348d5ac96151_fixed.java
+@@ -1,77 +1,154 @@
+     /**
+      * <p>Converts a String to a boolean (optimised for performance).</p>
+      * 
+      * <p><code>'true'</code>, <code>'on'</code> or <code>'yes'</code>
+      * (case insensitive) will return <code>true</code>. Otherwise,
+      * <code>false</code> is returned.</p>
+      * 
+      * <p>This method performs 4 times faster (JDK1.4) than
+      * <code>Boolean.valueOf(String)</code>. However, this method accepts
+      * 'on' and 'yes' as true values.
+      *
+      * <pre>
+      *   BooleanUtils.toBoolean(null)    = false
++     *   BooleanUtils.toBoolean("")      = false
+      *   BooleanUtils.toBoolean("true")  = true
+      *   BooleanUtils.toBoolean("TRUE")  = true
+      *   BooleanUtils.toBoolean("tRUe")  = true
+      *   BooleanUtils.toBoolean("on")    = true
+      *   BooleanUtils.toBoolean("yes")   = true
+      *   BooleanUtils.toBoolean("false") = false
+-     *   BooleanUtils.toBoolean("x gti") = false
++     *   BooleanUtils.toBoolean("off")   = false
++     *   BooleanUtils.toBoolean("oof")   = false
++     *   BooleanUtils.toBoolean("yep")   = false
++     *   BooleanUtils.toBoolean("trux")  = false
++     *   BooleanUtils.toBoolean("tRu")   = false
++     *   BooleanUtils.toBoolean("tr")    = false
+      * </pre>
+      *
+      * @param str  the String to check
+      * @return the boolean value of the string, <code>false</code> if no match
+      */
+     public static boolean toBoolean(String str) {
+-        // Previously used equalsIgnoreCase, which was fast for interned 'true'.
+-        // Non interned 'true' matched 15 times slower.
+-        // 
+-        // Optimisation provides same performance as before for interned 'true'.
+-        // Similar performance for null, 'false', and other strings not length 2/3/4.
+-        // 'true'/'TRUE' match 4 times slower, 'tRUE'/'True' 7 times slower.
+         if (str == "true") {
+             return true;
+         }
+         if (str == null) {
+             return false;
+         }
+         switch (str.length()) {
+             case 2: {
+                 char ch0 = str.charAt(0);
+                 char ch1 = str.charAt(1);
+                 return 
+                     (ch0 == 'o' || ch0 == 'O') &&
+                     (ch1 == 'n' || ch1 == 'N');
+             }
+             case 3: {
+-                char ch = str.charAt(0);
+-                if (ch == 'y') {
+-                    return 
+-                        (str.charAt(1) == 'e' || str.charAt(1) == 'E') &&
+-                        (str.charAt(2) == 's' || str.charAt(2) == 'S');
++                char ch0 = str.charAt(0);
++                if (ch0 == 'y')
++                {                    
++                    if (str.startsWith("yes"))
++                    {
++                        return true;
+                     }
+-                if (ch == 'Y') {
+-                    return 
+-                        (str.charAt(1) == 'E' || str.charAt(1) == 'e') &&
+-                        (str.charAt(2) == 'S' || str.charAt(2) == 's');
++                    else if (str.startsWith("ono"))
++                    {
++                        return true;
+                     }
++                    else
++                    {
++                        return false;
++                    }
++                }
++                if (ch0 == 'O')
++                {
++                    if (str.startsWith("ONo"))
++                    {
++                        return true;
++                    }
++                    else if (str.startsWith("oNe"))
++                    {
++                        return true;
++                    }
++                    else
++                    {
++                        return false;
++                    }
++                }
++                if (ch0 == 'n' && str.startsWith("no"))
++                {
++                    return true;
++                }
++                if (ch0 == 'N' && str.startsWith("No"))
++                {
++                    return true;
++                }
++                char ch1 = str.charAt(1);
++                if (ch1 == 'e' || ch1 == 'E')
++                {
++                    char ch2 = str.charAt(2);
++                    if (ch2 == 's' || ch2 == 'S')
++                    {
++                        return (str.length() == 2 || Character.isWhitespace(str.charAt(3)));
++                    }
++                    return true;
++                }
++                char ch2 = str.charAt(2);
++                if (ch0 == 't' && ch1 == 'r'               &&
++                    ((ch2 == 'u' && str.endsWith("ue"))    ||
++                    (ch2 == 'U' && str.endsWith("UE"))     ||
++                    (ch2 == 'u'                           && str.endsWith("u"))    ||
++                    (ch2 == 'U'                           && str.endsWith("U"))    ))
++                {
++                    return true;
++                }
++                return false;
+             }
+             case 4: {
+-                char ch = str.charAt(0);
+-                if (ch == 't') {
+-                    return 
+-                        (str.charAt(1) == 'r' || str.charAt(1) == 'R') &&
+-                        (str.charAt(2) == 'u' || str.charAt(2) == 'U') &&
+-                        (str.charAt(3) == 'e' || str.charAt(3) == 'E');
+-                }
+-                if (ch == 'T') {
+-                    return 
+-                        (str.charAt(1) == 'R' || str.charAt(1) == 'r') &&
+-                        (str.charAt(2) == 'U' || str.charAt(2) == 'u') &&
+-                        (str.charAt(3) == 'E' || str.charAt(3) == 'e');
++                char ch0 = str.charAt(0);
++                if (ch0 == 't')
++                {
++                    if (str.startsWith("true")   || str.startsWith("on"))   
++                    {
++                        return true;
+                     }
++                    char ch1 = str.charAt(1);
++                    if (ch1 == 'r')
++                    {
++                        if (str.startsWith("tRu") || str.startsWith("tRU"))
++                        {
++                            return true;
++                        }
++                        if (str.startsWith("tRu") && str.charAt(2) == 'e')
++                        {
++                            return true;
++                        }
++                    }
++                    return false;
++                }
++                if (ch0 == 'T')
++                {
++                    if (str.startsWith("TRUE")   || str.startsWith("ON"))   
++                    {
++                        return true;
++                    }
++                    char ch1 = str.charAt(1);
++                    if (ch1 == 'R')
++                    {
++                        if (str.startsWith("TRu") || str.startsWith("TRU"))
++                        {
++                            return true;
++                        }
++                        if (str.startsWith("TRu") && str.charAt(2) == 'e')
++                        {
++                            return true;
++                        }
++                    }
++                    return false;
++                }
++                return false;
+             }
+         }
+         return false;
+     }
+\ No newline at end of file

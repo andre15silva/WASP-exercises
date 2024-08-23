@@ -1,0 +1,35 @@
+diff --git a/tmp/e6ca0188-5dae-444e-bd4f-e164aa7d4d07_buggy.java b/tmp/279f3897-8e59-45c5-a3f6-f60ba622798d_fixed.java
+index 9a3a9db..cf5e48b 100644
+--- a/tmp/e6ca0188-5dae-444e-bd4f-e164aa7d4d07_buggy.java
++++ b/tmp/279f3897-8e59-45c5-a3f6-f60ba622798d_fixed.java
+@@ -1,27 +1,30 @@
+     /**
+      * If the stack contains an element with this tag's name, pop up the stack to remove the first occurrence. If not
+      * found, skips.
+      *
+      * @param endTag tag to close
+      */
+     private void popStackToClose(Token.EndTag endTag) {
+         String elName = endTag.name();
+         Element firstFound = null;
+ 
+         for (int pos = stack.size() -1; pos >= 0; pos--) {
+             Element next = stack.get(pos);
+             if (next.nodeName().equals(elName)) {
+                 firstFound = next;
+                 break;
+             }
+         }
+         if (firstFound == null)
+             return; // not found, skip
+ 
+         for (int pos = stack.size() -1; pos >= 0; pos--) {
+             Element next = stack.get(pos);
+             stack.remove(pos);
+             if (next == firstFound)
+                 break;
++            // discard discordant tags:
++            // stack: <div></p><div></span>text with \n<p>
++            // popStackToClose: </p>, now pop an element that is a <span> but is not at stack top
+         }
+     }

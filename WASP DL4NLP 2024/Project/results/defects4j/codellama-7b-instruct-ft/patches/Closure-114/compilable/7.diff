@@ -1,0 +1,46 @@
+diff --git a/tmp/0bdb1132-d387-4397-b268-221981dbc045_buggy.java b/tmp/8fc6e04d-982f-419b-a698-9de57272aa87_fixed.java
+index c51c8b1..656717c 100644
+--- a/tmp/0bdb1132-d387-4397-b268-221981dbc045_buggy.java
++++ b/tmp/8fc6e04d-982f-419b-a698-9de57272aa87_fixed.java
+@@ -1,31 +1,37 @@
+     private void recordAssignment(NodeTraversal t, Node n, Node recordNode) {
+       Node nameNode = n.getFirstChild();
+       Node parent = n.getParent();
+       NameInformation ns = createNameInformation(t, nameNode);
+       if (ns != null) {
+         if (parent.isFor() && !NodeUtil.isForIn(parent)) {
+           // Patch for assignments that appear in the init,
+           // condition or iteration part of a FOR loop.  Without
+           // this change, all 3 of those parts try to claim the for
+           // loop as their dependency scope.  The last assignment in
+           // those three fields wins, which can result in incorrect
+           // reference edges between referenced and assigned variables.
+           //
+           // TODO(user) revisit the dependency scope calculation
+           // logic.
+           if (parent.getFirstChild().getNext() != n) {
+             recordDepScope(recordNode, ns);
+           } else {
+             recordDepScope(nameNode, ns);
+           }
+         } else {
+           // The rhs of the assignment is the caller, so it's used by the
+           // context. Don't associate it w/ the lhs.
+-          // FYI: this fixes only the specific case where the assignment is the
+-          // caller expression, but it could be nested deeper in the caller and
+-          // we would still get a bug.
++          // FYI: this fixes the specific cases where the assignment is
++          // assigned in any part of the caller and is in the variable
++          // part of the LHS of the assignment, the caller is a direct
++          // ancestor of the assignment.  The assignment could be
++          // nested deeper in the caller and cause the above
++          // logic to break.  We would have to scan all uses of x
++          // in the for loop to find any lhs, and even then there
++          // might be multiple lhs.  We can't do that so just comment
++          // out the below code.
+           // See testAssignWithCall2 for an example of this.
+-          recordDepScope(recordNode, ns);
++          //recordDepScope(recordNode, ns);
+         }
+       }
+     }

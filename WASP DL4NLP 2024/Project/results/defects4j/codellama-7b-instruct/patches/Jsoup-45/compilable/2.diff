@@ -1,0 +1,73 @@
+diff --git a/tmp/9c8a5327-a08a-44b1-b93e-efe9a429c104_buggy.java b/tmp/3e0f26d2-5140-4c66-8977-cbcdcdfc88fe_fixed.java
+index 135fc63..2b7adbd 100644
+--- a/tmp/9c8a5327-a08a-44b1-b93e-efe9a429c104_buggy.java
++++ b/tmp/3e0f26d2-5140-4c66-8977-cbcdcdfc88fe_fixed.java
+@@ -1,48 +1,51 @@
+     void resetInsertionMode() {
++        if (stack == null) {
++            throw new NullPointerException("Stack should not be null");
++        }
+         boolean last = false;
+         for (int pos = stack.size() -1; pos >= 0; pos--) {
+             Element node = stack.get(pos);
+             if (pos == 0) {
+                 last = true;
+                 node = contextElement;
+             }
+             String name = node.nodeName();
+-            if ("select".equals(name)) {
++            if ("SELECT".equals(name)) {
+                 transition(HtmlTreeBuilderState.InSelect);
+                 break; // frag
+-            } else if (("td".equals(name) || "td".equals(name) && !last)) {
++            } else if (("TD".equals(name) || "TH".equals(name) & !last)) {
+                 transition(HtmlTreeBuilderState.InCell);
+                 break;
+-            } else if ("tr".equals(name)) {
++            } else if ("TR".equals(name)) {
+                 transition(HtmlTreeBuilderState.InRow);
+                 break;
+-            } else if ("tbody".equals(name) || "thead".equals(name) || "tfoot".equals(name)) {
++            } else if ("TBODY".equals(name) || "THEAD".equals(name) || "TFOOT".equals(name)) {
+                 transition(HtmlTreeBuilderState.InTableBody);
+                 break;
+-            } else if ("caption".equals(name)) {
++            } else if ("CAPTION".equals(name)) {
+                 transition(HtmlTreeBuilderState.InCaption);
+                 break;
+-            } else if ("colgroup".equals(name)) {
++            } else if ("COLGROUP".equals(name)) {
+                 transition(HtmlTreeBuilderState.InColumnGroup);
+-                break; // frag
+-            } else if ("table".equals(name)) {
++                break;
++            } else if ("TABLE".equals(name)) {
+                 transition(HtmlTreeBuilderState.InTable);
+                 break;
+-            } else if ("head".equals(name)) {
++            } else if ("HEAD".equals(name)) {
+                 transition(HtmlTreeBuilderState.InBody);
+-                break; // frag
+-            } else if ("body".equals(name)) {
++                break;
++            } else if ("BODY".equals(name)) {
+                 transition(HtmlTreeBuilderState.InBody);
+                 break;
+-            } else if ("frameset".equals(name)) {
++            } else if ("FRAMESET".equals(name)) {
+                 transition(HtmlTreeBuilderState.InFrameset);
+-                break; // frag
+-            } else if ("html".equals(name)) {
++                break;
++            } else if ("HTML".equals(name)) {
+                 transition(HtmlTreeBuilderState.BeforeHead);
+-                break; // frag
++                break;
+             } else if (last) {
+                 transition(HtmlTreeBuilderState.InBody);
+-                break; // frag
++                break;
+             }
+         }
+     }
+\ No newline at end of file

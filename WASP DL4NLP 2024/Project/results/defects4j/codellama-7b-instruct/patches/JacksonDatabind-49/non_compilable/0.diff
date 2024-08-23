@@ -1,0 +1,35 @@
+diff --git a/tmp/342a0cd0-0128-4782-a9e8-56b30e1cdc43_buggy.java b/tmp/809a4928-6238-47f7-bf86-4b14b7d14cf5_fixed.java
+index c222270..70a8ea6 100644
+--- a/tmp/342a0cd0-0128-4782-a9e8-56b30e1cdc43_buggy.java
++++ b/tmp/809a4928-6238-47f7-bf86-4b14b7d14cf5_fixed.java
+@@ -1,7 +1,24 @@
+-    public Object generateId(Object forPojo) {
+-        // 04-Jun-2016, tatu: As per [databind#1255], need to consider possibility of
+-        //    id being generated for "alwaysAsId", but not being written as POJO; regardless,
+-        //    need to use existing id if there is one:
+-            id = generator.generateId(forPojo);
+-        return id;
++package com.fasterxml.jackson.databind;
++
++import org.junit.Test;
++
++import static org.junit.Assert.assertNotNull;
++
++public class ObjectIdTest
++{
++    @Test
++    public void testIssue1255() throws Exception
++    {
++        ObjectMapper mapper = new ObjectMapper();
++        Foo mo = new Foo();
++        mo.bar1 = new Bar();
++        mo.bar2 = mo.bar1;
++
++        String json = mapper.writeValueAsString(mo);
++
++        Foo result = mapper.readValue(json, Foo.class);
++        assertNotNull(result);
+     }
++
++}
++

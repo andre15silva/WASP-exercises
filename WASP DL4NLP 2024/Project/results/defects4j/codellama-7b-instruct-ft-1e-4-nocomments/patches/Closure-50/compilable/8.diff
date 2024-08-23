@@ -1,0 +1,145 @@
+diff --git a/tmp/17a762c7-bea9-429a-83da-59945b7c8677_buggy.java b/tmp/c619556f-ee66-4fe4-9ea2-e87639c8e17f_fixed.java
+index d8b0158..494f5c7 100644
+--- a/tmp/17a762c7-bea9-429a-83da-59945b7c8677_buggy.java
++++ b/tmp/c619556f-ee66-4fe4-9ea2-e87639c8e17f_fixed.java
+@@ -1,113 +1,103 @@
+-  /**
+-   * Try to fold an array join: ['a', 'b', 'c'].join('') -> 'abc';
+-   */
+   private Node tryFoldArrayJoin(Node n) {
+     Node callTarget = n.getFirstChild();
+-
+     if (callTarget == null || !NodeUtil.isGetProp(callTarget)) {
+       return n;
+     }
+-
+     Node right = callTarget.getNext();
+     if (right != null) {
+       if (!NodeUtil.isImmutableValue(right)) {
+         return n;
+       }
+     }
+-
+     Node arrayNode = callTarget.getFirstChild();
+     Node functionName = arrayNode.getNext();
+-
+     if ((arrayNode.getType() != Token.ARRAYLIT) ||
+         !functionName.getString().equals("join")) {
+       return n;
+     }
+-
+-      // "," is the default, it doesn't need to be explicit
+-
+     String joinString = (right == null) ? "," : NodeUtil.getStringValue(right);
+     List<Node> arrayFoldedChildren = Lists.newLinkedList();
+     StringBuilder sb = null;
+     int foldedSize = 0;
+     Node prev = null;
+     Node elem = arrayNode.getFirstChild();
+-    // Merges adjacent String nodes.
++    int kJoinOverhead = "[].join()".length();
++    StringBuffer buf = new StringBuffer();
++    int elemSeparatorCost = InlineCostEstimator.getCost(Node.newString(joinString));
+     while (elem != null) {
++      foldedSize++; 
+       if (NodeUtil.isImmutableValue(elem) || elem.getType() == Token.EMPTY) {
+         if (sb == null) {
+           sb = new StringBuilder();
+         } else {
+           sb.append(joinString);
+         }
+-        sb.append(NodeUtil.getArrayElementStringValue(elem));
++        if (elem.getType() == Token.STRING) {
++          buf.append(elem);
+         } else {
+-        if (sb != null) {
+-          Preconditions.checkNotNull(prev);
+-          // + 2 for the quotes.
+-          foldedSize += sb.length() + 2;
+-          arrayFoldedChildren.add(
+-              Node.newString(sb.toString()).copyInformationFrom(prev));
++          buf.append(NodeUtil.getArrayElementStringValue(elem));
++        }
++      } else {
++        if (sb == null) {
++          foldedSize++;
++        } else {
++          foldedSize += sb.length() + kJoinOverhead;
++          arrayFoldedChildren.add(Node.newString(sb.toString()).copyInformationFrom(prev));
+           sb = null;
+         }
+         foldedSize += InlineCostEstimator.getCost(elem);
+         arrayFoldedChildren.add(elem);
++        buf.append(joinString);
+       }
+       prev = elem;
+       elem = elem.getNext();
+     }
+-
+     if (sb != null) {
+-      Preconditions.checkNotNull(prev);
+-      // + 2 for the quotes.
+-      foldedSize += sb.length() + 2;
+-      arrayFoldedChildren.add(
+-          Node.newString(sb.toString()).copyInformationFrom(prev));
++      foldedSize++;
++      buf.append(sb);
+     }
+-    // one for each comma.
+     foldedSize += arrayFoldedChildren.size() - 1;
+-
++    int bufCost = InlineCostEstimator.getCost(Node.newString(buf.toString()));
+     int originalSize = InlineCostEstimator.getCost(n);
+     switch (arrayFoldedChildren.size()) {
+       case 0:
+         Node emptyStringNode = Node.newString("");
+         n.getParent().replaceChild(n, emptyStringNode);
+         reportCodeChange();
+         return emptyStringNode;
+       case 1:
+         Node foldedStringNode = arrayFoldedChildren.remove(0);
+         if (foldedSize > originalSize) {
+           return n;
+         }
+         arrayNode.detachChildren();
+-        if (foldedStringNode.getType() != Token.STRING) {
+-          // If the Node is not a string literal, ensure that
+-          // it is coerced to a string.
++        if (foldedSize + bufCost <= originalSize) {
++          Node replacement = Node.newString(buf.toString()).copyInformationFrom(n);
++          n.getParent().replaceChild(n, replacement);
++          reportCodeChange();
++          return replacement;
++        }
+         Node replacement = new Node(Token.ADD,
+             Node.newString("").copyInformationFrom(n),
+             foldedStringNode);
+-          foldedStringNode = replacement;
+-        }
+-        n.getParent().replaceChild(n, foldedStringNode);
++        n.getParent().replaceChild(n, replacement);
+         reportCodeChange();
+-        return foldedStringNode;
++        return replacement;
+       default:
+-        // No folding could actually be performed.
+         if (arrayFoldedChildren.size() == arrayNode.getChildCount()) {
+           return n;
+         }
+-        int kJoinOverhead = "[].join()".length();
+         foldedSize += kJoinOverhead;
+         foldedSize += (right != null) ? InlineCostEstimator.getCost(right) : 0;
+         if (foldedSize > originalSize) {
+           return n;
+         }
+         arrayNode.detachChildren();
+         for (Node node : arrayFoldedChildren) {
+           arrayNode.addChildToBack(node);
+         }
+         reportCodeChange();
+         break;
+     }
+-
+     return n;
+   }
+\ No newline at end of file

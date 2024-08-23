@@ -1,0 +1,13 @@
+diff --git a/tmp/8051a3eb-8194-405a-b50d-87691bc563d2_buggy.java b/tmp/336070a4-bd88-455f-a479-03a725182244_fixed.java
+index 593602f..fffb230 100644
+--- a/tmp/8051a3eb-8194-405a-b50d-87691bc563d2_buggy.java
++++ b/tmp/336070a4-bd88-455f-a479-03a725182244_fixed.java
+@@ -1,6 +1,6 @@
+     @Override
+     public String toString() {
+         return rangesList.stream()
+-            .map(RangesList::formatRanges)
++            .map(Range::formatRanges)
+             .collect(joining(OR_JOINER));
+     }
+\ No newline at end of file

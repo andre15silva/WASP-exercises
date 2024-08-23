@@ -1,0 +1,25 @@
+diff --git a/tmp/8a668f1e-ee00-4467-a5c7-a213eee02002_buggy.java b/tmp/73b58df9-3a7c-4038-9490-b7deeb2d19d6_fixed.java
+index de9af32..4018630 100644
+--- a/tmp/8a668f1e-ee00-4467-a5c7-a213eee02002_buggy.java
++++ b/tmp/73b58df9-3a7c-4038-9490-b7deeb2d19d6_fixed.java
+@@ -1,18 +1,2 @@
+-  /**
+-   * @see #findCalledFunctions(Node)
+-   */
+-  private void findCalledFunctions(
+-      Node node, Set<String> changed) {
+-    Preconditions.checkArgument(changed != null);
+-    // For each referenced function, add a new reference
+-    if (node.getType() == Token.CALL) {
+-      Node child = node.getFirstChild();
+-      if (child.getType() == Token.NAME) {
+-        changed.add(child.getString());
+-      }
+-    }
+ 
+-    for (Node c = node.getFirstChild(); c != null; c = c.getNext()) {
+-      findCalledFunctions(c, changed);
+-    }
+-  }
++The corrected version of the fixed function is:
+\ No newline at end of file

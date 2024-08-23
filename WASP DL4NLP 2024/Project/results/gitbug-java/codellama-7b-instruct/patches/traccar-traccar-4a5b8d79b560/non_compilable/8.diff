@@ -1,0 +1,138 @@
+diff --git a/tmp/124f473e-8c4c-4f3a-9cb3-161d23ac1c2c_buggy.java b/tmp/03fb84da-f187-44c5-8eaf-c60db249f54c_fixed.java
+index 1c732f4..3cf21e3 100644
+--- a/tmp/124f473e-8c4c-4f3a-9cb3-161d23ac1c2c_buggy.java
++++ b/tmp/03fb84da-f187-44c5-8eaf-c60db249f54c_fixed.java
+@@ -1,88 +1,120 @@
+-    @Override
+-    protected Object decode(
+-            Channel channel, SocketAddress remoteAddress, Object msg) throws Exception {
+ 
+-        String sentence = (String) msg;
+-        sentence = sentence.substring(sentence.indexOf('|') + 1, sentence.lastIndexOf('|'));
++protected Object decode(Channel channel, SocketAddress remoteAddress, Object msg) throws Exception {
+ 
++\```
++\end{code}
++
++  public static final String PROTOCOL_NAME = "starcom";
++
++\begin{code}
++// Create new position
+ Position position = new Position();
+ position.setProtocol(getProtocolName());
+ 
+-        for (String entry : sentence.split(",")) {
+-            int delimiter = entry.indexOf('=');
+-            String key = entry.substring(0, delimiter);
+-            String value = entry.substring(delimiter + 1);
++// Decode message
++String sentence = (String) msg.toString();
++sentence = sentence.substring(sentence.indexOf('|') + 1, sentence.lastIndexOf('|'));
++
++// Parse message
++int delimiter = sentence.indexOf(',');
++int i;
++
++// Get device identifier
++String deviceStr = sentence.substring(0, delimiter);
++delimiter = deviceStr.indexOf('=');
++String device = deviceStr.substring(delimiter + 1);
++
++// Get device's unique identifier
++long uniqueId = Long.parseLong(device);
++
++// Validate device
++DeviceSession deviceSession = getDeviceSession(channel, remoteAddress, uniqueId);
++if (deviceSession == null) {
++    return null;
++}
++
++// Update device in position
++position.setDeviceId(deviceSession.getDeviceId());
++
++// Decode attributes
++while (i < sentence.length()) {
++    delimiter = sentence.indexOf('=', i);
++    String key = sentence.substring(i, delimiter);
++    String value = sentence.substring(delimiter + 1);
++
+     switch (key) {
+         case "unit":
+-                    DeviceSession deviceSession = getDeviceSession(channel, remoteAddress, value);
+-                    if (deviceSession != null) {
+-                        position.setDeviceId(deviceSession.getDeviceId());
+-                    }
+             break;
+         case "gps_valid":
+             position.setValid(Integer.parseInt(value) != 0);
+             break;
+         case "datetime_actual":
+             position.setTime(new SimpleDateFormat("yyyy/MM/dd HH:mm:ss").parse(value));
+             break;
+         case "latitude":
+             position.setLatitude(Double.parseDouble(value));
+             break;
+         case "longitude":
+             position.setLongitude(Double.parseDouble(value));
+             break;
+         case "altitude":
+             position.setAltitude(Double.parseDouble(value));
+             break;
+         case "velocity":
+             position.setSpeed(UnitsConverter.knotsFromKph(Integer.parseInt(value)));
+             break;
+         case "heading":
+             position.setCourse(Integer.parseInt(value));
+             break;
+         case "eventid":
+             position.set(Position.KEY_EVENT, Integer.parseInt(value));
+             break;
+         case "mileage":
+             position.set(Position.KEY_ODOMETER, (long) (Double.parseDouble(value) * 1000));
+             break;
+         case "satellites":
+             position.set(Position.KEY_SATELLITES, Integer.parseInt(value));
+             break;
+         case "ignition":
+             position.set(Position.KEY_IGNITION, Integer.parseInt(value) != 0);
+             break;
+         case "door":
+             position.set(Position.KEY_DOOR, Integer.parseInt(value) != 0);
+             break;
+         case "arm":
+             position.set(Position.KEY_ARMED, Integer.parseInt(value) != 0);
+             break;
+         case "fuel":
+             position.set(Position.KEY_FUEL_LEVEL, Integer.parseInt(value));
+             break;
+         case "rpm":
+             position.set(Position.KEY_RPM, Integer.parseInt(value));
+             break;
+         case "main_voltage":
+             position.set(Position.KEY_POWER, Double.parseDouble(value));
+             break;
+         case "backup_voltage":
+             position.set(Position.KEY_BATTERY, Double.parseDouble(value));
+             break;
+         case "analog1":
+         case "analog2":
+         case "analog3":
+             position.set(Position.PREFIX_ADC + (key.charAt(key.length() - 1) - '0'), Double.parseDouble(value));
+             break;
+         case "extra1":
+         case "extra2":
+         case "extra3":
+         default:
+             position.set(key, value);
+             break;
+     }
++
++    i = delimiter + 1;
+ }
+ 
+ return position;
++\end{code}
++
+ }
++
++\```

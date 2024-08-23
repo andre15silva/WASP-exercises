@@ -1,0 +1,32 @@
+diff --git a/tmp/530ccf26-9084-439c-b5f8-101e30951df9_buggy.java b/tmp/7a9e48c2-193d-4247-b349-b068410ff6c4_fixed.java
+index 220820e..0c42b07 100644
+--- a/tmp/530ccf26-9084-439c-b5f8-101e30951df9_buggy.java
++++ b/tmp/7a9e48c2-193d-4247-b349-b068410ff6c4_fixed.java
+@@ -1,22 +1,25 @@
+     /**
+      * Returns the row with the minimum ratio as given by the minimum ratio test (MRT).
+      * @param tableau simple tableau for the problem
+      * @param col the column to test the ratio of.  See {@link #getPivotColumn(SimplexTableau)}
+      * @return row with the minimum ratio
+      */
+     private Integer getPivotRow(final int col, final SimplexTableau tableau) {
+         double minRatio = Double.MAX_VALUE;
+         Integer minRatioPos = null;
+         for (int i = tableau.getNumObjectiveFunctions(); i < tableau.getHeight(); i++) {
+             final double rhs = tableau.getEntry(i, tableau.getWidth() - 1);
+             final double entry = tableau.getEntry(i, col);
+-            if (MathUtils.compareTo(entry, 0, epsilon) >= 0) {
++            if (Math.abs(entry - rhs) == 0.0) {
++                minRatio = Double.POSITIVE_INFINITY;
++            }
++            else {
+                 final double ratio = rhs / entry; 
+-                if (ratio < minRatio) {
++                if (Math.abs(ratio) < Math.abs(minRatio)) {
+                     minRatio = ratio;
+                     minRatioPos = i; 
+                 }
+             }
+         }
+         return minRatioPos;
+     }

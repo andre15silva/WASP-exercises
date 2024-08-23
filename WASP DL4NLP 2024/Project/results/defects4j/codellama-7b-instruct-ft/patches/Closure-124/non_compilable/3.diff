@@ -1,0 +1,34 @@
+diff --git a/tmp/caf04845-bb1d-49b0-a044-8547d115abc4_buggy.java b/tmp/a5b3fa73-9da7-43b9-8fa9-20f1817c0b12_fixed.java
+index 2573d30..d4a3313 100644
+--- a/tmp/caf04845-bb1d-49b0-a044-8547d115abc4_buggy.java
++++ b/tmp/a5b3fa73-9da7-43b9-8fa9-20f1817c0b12_fixed.java
+@@ -1,20 +1,29 @@
+   /**
+    * Checks name referenced in node to determine if it might have
+    * changed.
+    * @return Whether the replacement can be made.
+    */
+   private boolean isSafeReplacement(Node node, Node replacement) {
+     // No checks are needed for simple names.
+     if (node.isName()) {
+       return true;
+     }
+     Preconditions.checkArgument(node.isGetProp());
+ 
+       node = node.getFirstChild();
+     if (node.isName()
+         && isNameAssignedTo(node.getString(), replacement)) {
+       return false;
+     }
+ 
++    while (node.isGetProp()) {
++      node = node.getFirstChild();
++      if (node.isName() && node.getJSDocInfo() != null && node.getJSDocInfo().isDefineOverrides()) {
++        // Assume a replacement of 'x' like 'define.x' can never be safe as it may
++        // refer to the define.
++        return false;
++      }
++    }
++
+     return true;
+   }

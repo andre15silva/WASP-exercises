@@ -1,0 +1,49 @@
+diff --git a/tmp/d81c45d9-fe78-413f-996f-6875a01f96c8_buggy.java b/tmp/ccd825e6-4a4b-4d42-bd93-2829ce23587e_fixed.java
+index 939f49b..4a37edc 100644
+--- a/tmp/d81c45d9-fe78-413f-996f-6875a01f96c8_buggy.java
++++ b/tmp/ccd825e6-4a4b-4d42-bd93-2829ce23587e_fixed.java
+@@ -1,21 +1,43 @@
+     private boolean isPrototypePropertyAssign(Node assign) {
+       Node n = assign.getFirstChild();
+       if (n != null && NodeUtil.isVarOrSimpleAssignLhs(n, assign)
+           && n.getType() == Token.GETPROP
+           ) {
+         // We want to exclude the assignment itself from the usage list
+         boolean isChainedProperty =
+             n.getFirstChild().getType() == Token.GETPROP;
+ 
+         if (isChainedProperty) {
+           Node child = n.getFirstChild().getFirstChild().getNext();
+ 
+           if (child.getType() == Token.STRING &&
+               child.getString().equals("prototype")) {
+             return true;
+           }
+         }
+       }
+ 
+-      return false;
++      // TODO(johnlenz): This is a fix for Aliasing #7.
++      // This should be done in a more general analysis, but this is
++      // sufficient for the time being.
++      boolean parentIsExport = false;
++      for (Node child : n.getAncestorTree().getChildren()) {
++        if (child.getType() == Token.EXPORT) {
++          for (Node c : NodeUtil.findLhsNodesInNode(child)) {
++            // If any LHS references in that exported variable were in the
++            // assigned value, then we have to do a full aliasing analysis.
++            boolean assignedValueHasReferenced = false;
++            for (Node assignmentValue : NodeUtil.findLhsNodesInNode(assign)) {
++              assignedValueHasReferenced =
++                  assignmentValue.checkIfReferenced();
++            }
++            if (assignedValueHasReferenced) {
++              return true;
++            }
++          }
++          parentIsExport = true;
++        }
++      }
++
++      return parentIsExport;
+     }

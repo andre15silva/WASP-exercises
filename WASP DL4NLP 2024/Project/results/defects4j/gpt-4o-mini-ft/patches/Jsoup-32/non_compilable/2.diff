@@ -1,0 +1,12 @@
+diff --git a/tmp/b7b163e5-8f6e-461c-9312-cb138cc663af_buggy.java b/tmp/fd8b4d1a-53e1-4f90-a9a6-642e0cb1a120_fixed.java
+index 91469b4..6c5b75d 100644
+--- a/tmp/b7b163e5-8f6e-461c-9312-cb138cc663af_buggy.java
++++ b/tmp/fd8b4d1a-53e1-4f90-a9a6-642e0cb1a120_fixed.java
+@@ -1,6 +1,7 @@
+     @Override
+     public Element clone() {
+         Element clone = (Element) super.clone();
+         clone.classNames();
++        clone.id = null; // Clone affects the id, so we need to make sure we remove any pointer to the id in this clone operation.
+         return clone;
+     }

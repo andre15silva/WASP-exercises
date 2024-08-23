@@ -1,0 +1,23 @@
+diff --git a/tmp/80d8c752-552e-4056-80db-8eecea8e3b6a_buggy.java b/tmp/299b9388-2b26-4334-b170-cd74f1e947f7_fixed.java
+index 51430e1..1f831bf 100644
+--- a/tmp/80d8c752-552e-4056-80db-8eecea8e3b6a_buggy.java
++++ b/tmp/299b9388-2b26-4334-b170-cd74f1e947f7_fixed.java
+@@ -1,12 +1,18 @@
+     @Override
+     public void serialize(Object value, JsonGenerator jgen, SerializerProvider provider) throws IOException {
+         String str;
+         
+         if (value instanceof Date) {
+             provider.defaultSerializeDateKey((Date) value, jgen);
+             return;
+         } else {
+             str = value.toString();
+         }
++        Class<?> clz = value.getClass();
++        if (!provider.isEnabled(SerializationConfig.Feature.USE_BIG_INTEGER_FOR_INTS) && clz == Class.class) {
++            // don't change key for Integer -> class; would result in incorrect JSON (should have been Integer -> int)
++            jgen.writeFieldName(aposToQuotes("Int"));
++        } else {
+             jgen.writeFieldName(str);
+         }
++    }

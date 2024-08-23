@@ -1,0 +1,18 @@
+diff --git a/tmp/eb8920f5-bc4d-4985-ba63-4307a29d4c52_buggy.java b/tmp/b9d9aca7-ead3-4e7e-b52a-c63d9e46ddae_fixed.java
+index 4cce784..c165d30 100644
+--- a/tmp/eb8920f5-bc4d-4985-ba63-4307a29d4c52_buggy.java
++++ b/tmp/b9d9aca7-ead3-4e7e-b52a-c63d9e46ddae_fixed.java
+@@ -1,11 +1,5 @@
+-    /**
+-     * Compares this object to another based on size.
+-     * @param object the object to compare to
+-     * @return -1 if this is less than <tt>object</tt>, +1 if this is greater
+-     *         than <tt>object</tt>, 0 if they are equal.
+-     */
+ public int compareTo(Fraction object) {
+     double nOd = doubleValue();
+     double dOn = object.doubleValue();
+-        return (nOd < dOn) ? -1 : ((nOd > dOn) ? +1 : 0);
++    return (nOd < dOn) ? -1 : ((nOd > dOn) ? 1 : 0);
+ }
+\ No newline at end of file

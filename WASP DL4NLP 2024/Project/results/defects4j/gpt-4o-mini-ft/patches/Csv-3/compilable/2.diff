@@ -1,0 +1,49 @@
+diff --git a/tmp/84c57ed9-709b-4dc2-877d-d4395b9da9a1_buggy.java b/tmp/914f3b43-bb02-4336-b103-19c412a490c6_fixed.java
+index 1ad070d..f39524d 100644
+--- a/tmp/84c57ed9-709b-4dc2-877d-d4395b9da9a1_buggy.java
++++ b/tmp/914f3b43-bb02-4336-b103-19c412a490c6_fixed.java
+@@ -1,38 +1,40 @@
+     /**
+      * Handle an escape sequence.
+      * The current character must be the escape character.
+      * On return, the next character is available by calling {@link ExtendedBufferedReader#getLastChar()}
+      * on the input stream.
+      * 
+      * @return the unescaped character (as an int) or {@link END_OF_STREAM} if char following the escape is invalid. 
+      * @throws IOException if there is a problem reading the stream or the end of stream is detected: 
+      * the escape character is not allowed at end of strem
+      */
+     int readEscape() throws IOException {
+         // the escape char has just been read (normally a backslash)
+         final int c = in.read();
+         switch (c) {
+         case 'r':
+             return CR;
+         case 'n':
+             return LF;
+         case 't':
+             return TAB;
+         case 'b':
+             return BACKSPACE;
+         case 'f':
+             return FF;
+         case CR:
+         case LF:
+-        case FF: // TODO is this correct?
+-        case TAB: // TODO is this correct? Do tabs need to be escaped?
+-        case BACKSPACE: // TODO is this correct?
+-            return c;
++        case FF: // TODO Is this correct?
++        case TAB: // TODO Is this correct? Do tabs need to be escaped?
++        case BACKSPACE: // TODO Is this correct?
++        case 'N':
++            // MySQL uses 'N' to symbolize null values.
++            return 'N';
+         case END_OF_STREAM:
+             throw new IOException("EOF whilst processing escape sequence");
+         default:
+             // Now check for meta-characters
+                 return c;
+             // indicate unexpected char - available from in.getLastChar()
+         }
+     }

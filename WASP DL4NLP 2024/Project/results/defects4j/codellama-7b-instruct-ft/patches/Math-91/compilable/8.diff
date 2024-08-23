@@ -1,0 +1,23 @@
+diff --git a/tmp/d8258150-1fa4-4cd6-a4e3-045a96b5363e_buggy.java b/tmp/0c272995-a37b-48bd-a74e-ad0d1cf791fb_fixed.java
+index 4cce784..c8b9a32 100644
+--- a/tmp/d8258150-1fa4-4cd6-a4e3-045a96b5363e_buggy.java
++++ b/tmp/0c272995-a37b-48bd-a74e-ad0d1cf791fb_fixed.java
+@@ -1,11 +1,15 @@
+     /**
+-     * Compares this object to another based on size.
++     * Compares this object to another based on size and numerator and
++     * denominator. A more complete comparison would be to compare with error
++     * tolerance in <i>ulp</i> (an Unit in the last place).
+      * @param object the object to compare to
+      * @return -1 if this is less than <tt>object</tt>, +1 if this is greater
+      *         than <tt>object</tt>, 0 if they are equal.
+      */
+     public int compareTo(Fraction object) {
+-        double nOd = doubleValue();
++        final double epsilon = 1.0e-20;
++        double dOd = doubleValue();
+         double dOn = object.doubleValue();
+-        return (nOd < dOn) ? -1 : ((nOd > dOn) ? +1 : 0);
++        return (Math.abs(dOd - dOn) > epsilon) ?
++                ((dOd < dOn) ? -1 : ((dOd > dOn) ? +1 : 0)) : 0;
+     }

@@ -1,0 +1,48 @@
+diff --git a/tmp/7b65549c-1dbd-4503-a15a-da723a19dcdf_buggy.java b/tmp/43a6c7ab-a6bc-4dec-974b-e8719fbfc69e_fixed.java
+index aa351ad..cbb4b55 100644
+--- a/tmp/7b65549c-1dbd-4503-a15a-da723a19dcdf_buggy.java
++++ b/tmp/43a6c7ab-a6bc-4dec-974b-e8719fbfc69e_fixed.java
+@@ -1,41 +1 @@
+-    /**
+-     * Get the data that this form submits. The returned list is a copy of the data, and changes to the contents of the
+-     * list will not be reflected in the DOM.
+-     * @return a list of key vals
+-     */
+-    public List<Connection.KeyVal> formData() {
+-        ArrayList<Connection.KeyVal> data = new ArrayList<>();
+-
+-        // iterate the form control elements and accumulate their values
+-        for (Element el: elements) {
+-            if (!el.tag().isFormSubmittable()) continue; // contents are form listable, superset of submitable
+-            if (el.hasAttr("disabled")) continue; // skip disabled form inputs
+-            String name = el.attr("name");
+-            if (name.length() == 0) continue;
+-            String type = el.attr("type");
+-
+-
+-            if ("select".equals(el.normalName())) {
+-                Elements options = el.select("option[selected]");
+-                boolean set = false;
+-                for (Element option: options) {
+-                    data.add(HttpConnection.KeyVal.create(name, option.val()));
+-                    set = true;
+-                }
+-                if (!set) {
+-                    Element option = el.select("option").first();
+-                    if (option != null)
+-                        data.add(HttpConnection.KeyVal.create(name, option.val()));
+-                }
+-            } else if ("checkbox".equalsIgnoreCase(type) || "radio".equalsIgnoreCase(type)) {
+-                // only add checkbox or radio if they have the checked attribute
+-                if (el.hasAttr("checked")) {
+-                    final String val = el.val().length() >  0 ? el.val() : "on";
+-                    data.add(HttpConnection.KeyVal.create(name, val));
+-                }
+-            } else {
+-                data.add(HttpConnection.KeyVal.create(name, el.val()));
+-            }
+-        }
+-        return data;
+-    }
++junit.framework.AssertionFailedError: expected:<6> but was:<7>
+\ No newline at end of file

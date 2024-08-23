@@ -1,0 +1,84 @@
+diff --git a/tmp/5acc3ea2-c0d4-475e-89b5-5483fb59ba2f_buggy.java b/tmp/20b5521a-f816-49ca-896f-7fde8675b902_fixed.java
+index fa9dfcc..33d5980 100644
+--- a/tmp/5acc3ea2-c0d4-475e-89b5-5483fb59ba2f_buggy.java
++++ b/tmp/20b5521a-f816-49ca-896f-7fde8675b902_fixed.java
+@@ -1,61 +1,79 @@
++import com.google.javascript.jscomp.Compiler;
++import com.google.javascript.jscomp.CompilerOptions;
++import com.google.javascript.jscomp.ClosureCodingConvention;
++import com.google.javascript.jscomp.JqueryCodingConvention;
++import com.google.javascript.jscomp.CompilationLevel;
++import com.google.javascript.jscomp.WarningLevel;
++import com.google.javascript.jscomp.CodingConvention;
++
++class Example {
++ 
+   @Override
+   protected CompilerOptions createOptions() {
+     CompilerOptions options = new CompilerOptions();
++    // FIXME: Add the condition for using the JqueryCodingConvention convention
+     if (flags.processJqueryPrimitives) {
+       options.setCodingConvention(new JqueryCodingConvention());
+     } else {
+       options.setCodingConvention(new ClosureCodingConvention());
+     }
+ 
+     options.setExtraAnnotationNames(flags.extraAnnotationName);
+ 
+     CompilationLevel level = flags.compilationLevel;
+     level.setOptionsForCompilationLevel(options);
+ 
+     if (flags.debug) {
+       level.setDebugOptionsForCompilationLevel(options);
+     }
+ 
+     if (flags.useTypesForOptimization) {
+       level.setTypeBasedOptimizationOptions(options);
+     }
+ 
+     if (flags.generateExports) {
+       options.setGenerateExports(flags.generateExports);
+     }
+ 
+     WarningLevel wLevel = flags.warningLevel;
+     wLevel.setOptionsForWarningLevel(options);
+     for (FormattingOption formattingOption : flags.formatting) {
+       formattingOption.applyToOptions(options);
+     }
+ 
+     options.closurePass = flags.processClosurePrimitives;
+ 
+     options.jqueryPass = CompilationLevel.ADVANCED_OPTIMIZATIONS == level &&
+         flags.processJqueryPrimitives;
+ 
+     options.angularPass = flags.angularPass;
+ 
+     if (!flags.translationsFile.isEmpty()) {
+       try {
+         options.messageBundle = new XtbMessageBundle(
+             new FileInputStream(flags.translationsFile),
+             flags.translationsProject);
+       } catch (IOException e) {
+         throw new RuntimeException("Reading XTB file", e);
+       }
+     } else if (CompilationLevel.ADVANCED_OPTIMIZATIONS == level) {
+       // In SIMPLE or WHITESPACE mode, if the user hasn't specified a
+       // translations file, they might reasonably try to write their own
+       // implementation of goog.getMsg that makes the substitution at
+       // run-time.
+       //
+       // In ADVANCED mode, goog.getMsg is going to be renamed anyway,
+       // so we might as well inline it. But shut off the i18n warnings,
+       // because the user didn't really ask for i18n.
+       options.messageBundle = new EmptyMessageBundle();
+     }
+ 
++    // FIXME: Add the condition to set the closurePass property
++    options.closurePass = CompilationLevel.ADVANCED_OPTIMIZATIONS == level && flags.processClosurePrimitives;
++
++    // FIXME: Add the condition to set the jqueryPass property.
++    options.jqueryPass = CompilationLevel.ADVANCED_OPTIMIZATIONS == level && flags.processJqueryPrimitives;
++
+     return options;
+   }
++}

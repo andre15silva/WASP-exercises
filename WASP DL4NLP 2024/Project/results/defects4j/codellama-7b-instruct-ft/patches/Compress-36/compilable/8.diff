@@ -1,0 +1,31 @@
+diff --git a/tmp/94326f07-412f-40d0-93f1-61dfc4d1c0c6_buggy.java b/tmp/eae14121-7564-4745-be6f-61530e2a8bd6_fixed.java
+index d357c7e..97cd2fd 100644
+--- a/tmp/94326f07-412f-40d0-93f1-61dfc4d1c0c6_buggy.java
++++ b/tmp/eae14121-7564-4745-be6f-61530e2a8bd6_fixed.java
+@@ -1,16 +1,26 @@
+     private InputStream getCurrentStream() throws IOException {
+         if (deferredBlockStreams.isEmpty()) {
+             throw new IllegalStateException("No current 7z entry (call getNextEntry() first).");
+         }
+         
+         while (deferredBlockStreams.size() > 1) {
+             // In solid compression mode we need to decompress all leading folder'
+             // streams to get access to an entry. We defer this until really needed
+             // so that entire blocks can be skipped without wasting time for decompression.
+             final InputStream stream = deferredBlockStreams.remove(0);
+             IOUtils.skip(stream, Long.MAX_VALUE);
+             stream.close();
+         }
+ 
++        final CRC32 crc = new CRC32();
++        int b;
++        while ((b = deferredBlockStreams.get(0).read()) != -1) {
++            crc.update(b);
++        }
++        deferredBlockStreams.get(0).close();
++        if (crc.getValue() == 0) {
++            deferredBlockStreams.remove(0);
++        }
++
+         return deferredBlockStreams.get(0);
+     }

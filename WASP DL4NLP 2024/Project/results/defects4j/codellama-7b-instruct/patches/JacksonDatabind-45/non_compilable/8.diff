@@ -1,0 +1,53 @@
+diff --git a/tmp/e493ba53-9095-4261-a0d7-e1676309e45a_buggy.java b/tmp/eb4e0447-65a0-44c0-acfa-c94e50aa6fc5_fixed.java
+index 0dbce00..722c31b 100644
+--- a/tmp/e493ba53-9095-4261-a0d7-e1676309e45a_buggy.java
++++ b/tmp/eb4e0447-65a0-44c0-acfa-c94e50aa6fc5_fixed.java
+@@ -1,33 +1,38 @@
+ @Override
+ public JsonSerializer<?> createContextual(SerializerProvider serializers,
+         BeanProperty property) throws JsonMappingException
+ {
+     if (property != null) {
+         JsonFormat.Value format = serializers.getAnnotationIntrospector().findFormat((Annotated)property.getMember());
+         if (format != null) {
+-
+-            	// Simple case first: serialize as numeric timestamp?
+-                JsonFormat.Shape shape = format.getShape();
+-                if (shape.isNumeric()) {
+-                    return withFormat(Boolean.TRUE, null);
++            if (format.getShape() != JsonFormat.Shape.ANY) {
++                return this;
+             }
+ 
+-                if (format.getShape() == JsonFormat.Shape.STRING) {
++            if (format.hasPattern()) {
+                 TimeZone tz = format.getTimeZone();
+-                    final String pattern = format.hasPattern()
+-                                    ? format.getPattern()
+-                                    : StdDateFormat.DATE_FORMAT_STR_ISO8601;
++                final String pattern = format.getPattern();
+                 final Locale loc = format.hasLocale()
+                         ? format.getLocale()
+                         : serializers.getLocale();
+                 SimpleDateFormat df = new SimpleDateFormat(pattern, loc);
+                 if (tz == null) {
+                     tz = serializers.getTimeZone();
+                 }
+                 df.setTimeZone(tz);
+                 return withFormat(Boolean.FALSE, df);
+             }
++
++            if (format.hasLocale()) {
++                Locale loc = format.getLocale();
++                return withFormat(Boolean.FALSE, null, loc);
++            }
++
++            if (format.hasTimeZone()) {
++                TimeZone tz = format.getTimeZone();
++                return withFormat(Boolean.FALSE, null, tz);
++            }
+         }
+     }
+     return this;
+ }
+\ No newline at end of file

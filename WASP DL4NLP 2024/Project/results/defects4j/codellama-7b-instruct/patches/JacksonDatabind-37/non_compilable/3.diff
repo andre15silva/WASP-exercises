@@ -1,0 +1,36 @@
+diff --git a/tmp/2ac8b842-8533-40f1-9538-74c57a9f2460_buggy.java b/tmp/2d2cabbc-49b6-48a1-a775-fb82e793dae7_fixed.java
+index e5ad041..bc01161 100644
+--- a/tmp/2ac8b842-8533-40f1-9538-74c57a9f2460_buggy.java
++++ b/tmp/2d2cabbc-49b6-48a1-a775-fb82e793dae7_fixed.java
+@@ -1,19 +1,15 @@
+     @Override
+-    protected JavaType _narrow(Class<?> subclass)
+-    {
+-        if (_class == subclass) {
+-            return this;
++    protected JavaType _narrow(Class<?> clazz) {
++        switch (clazz.getName()) {
++            case "com.fasterxml.jackson.databind.objectid.ObjectId":
++                return this.idType();
++            case "com.fasterxml.jackson.databind.objectid.ObjectIdRef":
++                return this.referenceType();
++            case "com.fasterxml.jackson.databind.objectid.ObjectIdBase":
++                return this.baseType();
++            case "com.fasterxml.jackson.databind.objectid.ObjectIdArray":
++                return this.arrayType();
++            default:
++                throw new IllegalArgumentException("Unsupported type " + clazz.getName());
+         }
+-        // Should we check that there is a sub-class relationship?
+-        // 15-Jan-2016, tatu: Almost yes, but there are some complications with
+-        //    placeholder values, so no.
+-        /*
+-        if (!_class.isAssignableFrom(subclass)) {
+-            throw new IllegalArgumentException("Class "+subclass.getName()+" not sub-type of "
+-                    +_class.getName());
+-        }
+-        */
+-        // 15-Jan-2015, tatu: Not correct; should really re-resolve...
+-        return new SimpleType(subclass, _bindings, _superClass, _superInterfaces,
+-                _valueHandler, _typeHandler, _asStatic);
+     }

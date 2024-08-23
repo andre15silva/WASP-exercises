@@ -1,0 +1,46 @@
+diff --git a/tmp/6e4aa87c-1a81-4cf5-857a-c71a9a82a9b3_buggy.java b/tmp/a2054b18-6812-42e0-872d-27567d9f2157_fixed.java
+index b2d53db..f25f6a1 100644
+--- a/tmp/6e4aa87c-1a81-4cf5-857a-c71a9a82a9b3_buggy.java
++++ b/tmp/a2054b18-6812-42e0-872d-27567d9f2157_fixed.java
+@@ -1,34 +1,38 @@
+ void read(Tokeniser t, CharacterReader r) {
+     if (r.matchesLetter()) {
+         String name = r.consumeLetterSequence();
+         t.tagPending.appendTagName(name.toLowerCase());
+-                t.dataBuffer.append(name);
+         r.advance();
+         return;
+     }
+ 
+     if (t.isAppropriateEndTagToken() && !r.isEmpty()) {
+         char c = r.consume();
+         switch (c) {
+             case '\t':
+             case '\n':
+             case '\f':
+             case ' ':
+                 t.transition(BeforeAttributeName);
+                 break;
+             case '/':
+                 t.transition(SelfClosingStartTag);
+                 break;
+             case '>':
+                 t.emitTagPending();
+                 t.transition(Data);
+                 break;
+             default:
+                 t.dataBuffer.append(c);
+-                        anythingElse(t, r);
++                // Instead of calling anythingElse directly here,
++                // we should not be handling any character as if it's part of a tag,
++                // we should just continue to handle normal text.
++                t.dataBuffer.append(c); 
++                // We call anythingElse only when we want to finalize tag handling,
++                // which should not happen for characters during a comment.
+                 break;
+         }
+     } else {
+         anythingElse(t, r);
+     }
+ }
+\ No newline at end of file

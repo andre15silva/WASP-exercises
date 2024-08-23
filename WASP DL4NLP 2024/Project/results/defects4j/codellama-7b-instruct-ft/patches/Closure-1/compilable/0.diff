@@ -1,0 +1,52 @@
+diff --git a/tmp/b5baa5d0-da7e-4107-b372-7f86bf169085_buggy.java b/tmp/2abde6dd-136c-4972-a6d8-0cb0b95aeae2_fixed.java
+index 61ffdbf..b8a0c83 100644
+--- a/tmp/b5baa5d0-da7e-4107-b372-7f86bf169085_buggy.java
++++ b/tmp/2abde6dd-136c-4972-a6d8-0cb0b95aeae2_fixed.java
+@@ -1,44 +1,42 @@
+   /**
+    * Removes unreferenced arguments from a function declaration and when
+    * possible the function's callSites.
+    *
+    * @param fnScope The scope inside the function
+    */
+   private void removeUnreferencedFunctionArgs(Scope fnScope) {
+     // Notice that removing unreferenced function args breaks
+-    // Function.prototype.length. In advanced mode, we don't really care
+-    // about this: we consider "length" the equivalent of reflecting on
+-    // the function's lexical source.
++    // Function.prototype.length. For simple mode, we do nothing.
+     //
+-    // Rather than create a new option for this, we assume that if the user
+-    // is removing globals, then it's OK to remove unused function args.
++    // Rather than have an option, we just assume that if the user is
++    // removing globals, then it's OK to remove unused function args.
+     //
+     // See http://code.google.com/p/closure-compiler/issues/detail?id=253
+ 
+     Node function = fnScope.getRootNode();
+ 
+     Preconditions.checkState(function.isFunction());
+     if (NodeUtil.isGetOrSetKey(function.getParent())) {
+       // The parameters object literal setters can not be removed.
+       return;
+     }
+ 
+     Node argList = getFunctionArgList(function);
+     boolean modifyCallers = modifyCallSites
+         && callSiteOptimizer.canModifyCallers(function);
+     if (!modifyCallers) {
+       // Strip unreferenced args off the end of the function declaration.
+       Node lastArg;
+       while ((lastArg = argList.getLastChild()) != null) {
+         Var var = fnScope.getVar(lastArg.getString());
+         if (!referenced.contains(var)) {
+           argList.removeChild(lastArg);
+           compiler.reportCodeChange();
+         } else {
+           break;
+         }
+       }
+     } else {
+       callSiteOptimizer.optimize(fnScope, referenced);
+     }
+   }

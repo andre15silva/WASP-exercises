@@ -1,0 +1,26 @@
+diff --git a/tmp/d698dd1f-b5cf-47f4-909d-74795bce6ee2_buggy.java b/tmp/1585f711-3f37-4ebc-b7ac-999849f11b4a_fixed.java
+index 70cafe0..c1e8b1b 100644
+--- a/tmp/d698dd1f-b5cf-47f4-909d-74795bce6ee2_buggy.java
++++ b/tmp/1585f711-3f37-4ebc-b7ac-999849f11b4a_fixed.java
+@@ -1,18 +1,8 @@
+-    /**
+-     * Checks whether the given column is basic.
+-     * @param col index of the column to check
+-     * @return the row that the variable is basic in.  null if the column is not basic
+-     */
+-    private Integer getBasicRow(final int col) {
+-        Integer row = null;
++    private Boolean isBasic(final int col) {
+         for (int i = getNumObjectiveFunctions(); i < getHeight(); i++) {
+             if (!MathUtils.equals(getEntry(i, col), 0.0, epsilon)) {
+-                if (row == null) {
+-                row = i;
+-                } else {
+-                return null;
++                return false;
+             }
+         }
+-        }
+-        return row;
++        return true;
+     }

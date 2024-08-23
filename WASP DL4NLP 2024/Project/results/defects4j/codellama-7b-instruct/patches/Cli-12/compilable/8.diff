@@ -1,0 +1,124 @@
+diff --git a/tmp/c66df5f9-b8e9-416d-a9a7-17353138b1a2_buggy.java b/tmp/7d0de314-e47c-4c71-9f33-4dfd8bd7ac73_fixed.java
+index 7e64f1d..ef2b384 100644
+--- a/tmp/c66df5f9-b8e9-416d-a9a7-17353138b1a2_buggy.java
++++ b/tmp/7d0de314-e47c-4c71-9f33-4dfd8bd7ac73_fixed.java
+@@ -1,78 +1,55 @@
+-    /**
+-     * <p>This flatten method does so using the following rules:
+-     * <ol>
+-     *  <li>If an {@link Option} exists for the first character of 
+-     *  the <code>arguments</code> entry <b>AND</b> an {@link Option} 
+-     *  does not exist for the whole <code>argument</code> then
+-     *  add the first character as an option to the processed tokens
+-     *  list e.g. "-D" and add the rest of the entry to the also.</li>
+-     *  <li>Otherwise just add the token to the processed tokens list.
+-     *  </li>
+-     * </ol>
+-     * </p>
+-     *
+-     * @param options The Options to parse the arguments by.
+-     * @param arguments The arguments that have to be flattened.
+-     * @param stopAtNonOption specifies whether to stop 
+-     * flattening when a non option has been encountered
+-     * @return a String array of the flattened arguments
+-     */
+-    protected String[] flatten(Options options, String[] arguments, boolean stopAtNonOption)
+-    {
+-        List tokens = new ArrayList();
++protected String[] flatten(Options options, String[] arguments, boolean stopAtNonOption) {
++  List<String> tokens = new ArrayList<String>();
+ 
+-        boolean eatTheRest = false;
+-
+-        for (int i = 0; i < arguments.length; i++)
+-        {
++  for (int i = 0; i < arguments.length; i++) {
+     String arg = arguments[i];
+-
+-            if ("--".equals(arg))
+-            {
+-                eatTheRest = true;
++    if ("--".equals(arg)) {
+       tokens.add("--");
+-            }
+-            else if ("-".equals(arg))
+-            {
++    } else if ("-".equals(arg)) {
+       tokens.add("-");
+-            }
+-            else if (arg.startsWith("-"))
+-            {
+-                String opt = Util.stripLeadingHyphens(arg);
++    } else if (arg.startsWith("--")) {
++      // split the argument in two parts: the long option name and the value
++      String[] split = arg.split("=", 2);
++      String longOption = split[0].substring(2);
++      String value = split[1];
+ 
+-                if (options.hasOption(opt))
+-                {
+-                    tokens.add(arg);
+-                }
+-                else
+-                {
+-                    if (options.hasOption(arg.substring(0, 2)))
+-                    {
+-                        // the format is --foo=value or -foo=value
+-                        // the format is a special properties option (-Dproperty=value)
+-                        tokens.add(arg.substring(0, 2)); // -D
+-                        tokens.add(arg.substring(2)); // property=value
+-                    }
+-                    else
+-                    {
+-                        eatTheRest = stopAtNonOption;
+-                        tokens.add(arg);
++      // get the corresponding Option instance from the Options
++      Option option = options.getOption(longOption);
++
++      // add the long option to the token list if it exists in the Options
++      if (option != null) {
++        tokens.add(longOption);
+       }
++
++      // add the value of the long option to the token list if it has an argument
++      if (option != null && option.hasArg()) {
++        tokens.add(value);
+       }
++    } else if (arg.startsWith("-")) {
++      String shortOption = arg.substring(1);
++
++      // get the corresponding Option instance from the Options
++      Option option = options.getOption(shortOption);
++
++      // add the short option to the token list if it exists in the Options
++      if (option != null) {
++        tokens.add(shortOption);
+       }
+-            else
+-            {
+-                tokens.add(arg);
++
++      // add the next argument to the token list if it has an argument and there
++      // is a next argument
++      if (option != null && option.hasArg()) {
++        String nextArg = "";
++        if (i + 1 < arguments.length) {
++          nextArg = arguments[i + 1];
+         }
+ 
+-            if (eatTheRest)
+-            {
+-                for (i++; i < arguments.length; i++)
+-                {
+-                    tokens.add(arguments[i]);
++        tokens.add(nextArg);
+       }
++    } else {
++      tokens.add(arg);
+     }
+   }
+ 
+-        return (String[]) tokens.toArray(new String[tokens.size()]);
++  return tokens.toArray(new String[0]);
+ }
+\ No newline at end of file

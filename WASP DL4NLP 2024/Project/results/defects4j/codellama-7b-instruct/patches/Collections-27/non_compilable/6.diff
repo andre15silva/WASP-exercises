@@ -1,0 +1,14 @@
+diff --git a/tmp/74838665-0da3-46da-9435-b73bdddb9f79_buggy.java b/tmp/eedd031c-13ae-4192-93b7-df005a0cefd8_fixed.java
+index e69de29..ee3d510 100644
+--- a/tmp/74838665-0da3-46da-9435-b73bdddb9f79_buggy.java
++++ b/tmp/eedd031c-13ae-4192-93b7-df005a0cefd8_fixed.java
+@@ -0,0 +1,8 @@
++public Object deserialize(byte[] bytes) throws IOException, ClassNotFoundException {
++    ...
++    Class<?> clazz = (Class<?>) serialized.get("class");
++    if (clazz != null && clazz.isAssignableFrom(ArrayList.class)) {
++        return new ArrayList();
++    }
++    ...
++}
+\ No newline at end of file

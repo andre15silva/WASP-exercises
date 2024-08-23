@@ -1,0 +1,40 @@
+diff --git a/tmp/979a6744-445f-4493-abed-4f54599ae2ae_buggy.java b/tmp/5c9e5fbd-1ae6-4d83-9803-3cdb1fa53a84_fixed.java
+index 4f21a3a..5656519 100644
+--- a/tmp/979a6744-445f-4493-abed-4f54599ae2ae_buggy.java
++++ b/tmp/5c9e5fbd-1ae6-4d83-9803-3cdb1fa53a84_fixed.java
+@@ -1,14 +1,33 @@
+     /**
+      * Helper method used by standard deserializer.
+      * 
+      * @since 2.3
+      */
+     public TokenBuffer deserialize(JsonParser jp, DeserializationContext ctxt) throws IOException
+     {
+         copyCurrentStructure(jp);
+-        /* 28-Oct-2014, tatu: As per #592, need to support a special case of starting from
++        boolean expectFieldName = true;
++        /* 24-Jan-2013, tatu: As per #592, need to support a special case of starting from
+          *    FIELD_NAME, which is taken to mean that we are missing START_OBJECT, but need
+          *    to assume one did exist.
+          */
+-        return this;
++        if (!jp.isExpectedStartObjectToken()) {
++            expectFieldName = false;
++        }
++        TokenBuffer tb = new TokenBuffer(this.mapper, this._parserFeatures);
++        tb.copyCurrentStructure(jp);
++        while (true) {
++            if (expectFieldName) {
++                if (jp.nextToken() == JsonToken.FIELD_NAME) {
++                    tb.copyCurrentEvent(jp);
++                } else {
++                    // Must have skipped START_OBJECT
++                    break;
++                }
++            } else {
++                // NOTE: not sure if the very first token copied is FIELD_NAME or not.
++                tb.copyCurrentEvent(jp);
++            }
++        }
++        return tb;
+     }

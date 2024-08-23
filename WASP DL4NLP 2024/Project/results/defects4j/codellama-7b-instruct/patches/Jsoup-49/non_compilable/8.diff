@@ -1,0 +1,16 @@
+diff --git a/tmp/bfe4d00b-94ed-4c36-b3f4-10a3cb421847_buggy.java b/tmp/a1bb90c6-6954-48fe-b2dc-b213ccd6c4d2_fixed.java
+index a37dc7a..f24457e 100644
+--- a/tmp/bfe4d00b-94ed-4c36-b3f4-10a3cb421847_buggy.java
++++ b/tmp/a1bb90c6-6954-48fe-b2dc-b213ccd6c4d2_fixed.java
+@@ -1,10 +1 @@
+-    protected void addChildren(int index, Node... children) {
+-        Validate.noNullElements(children);
+-        ensureChildNodes();
+-        for (int i = children.length - 1; i >= 0; i--) {
+-            Node in = children[i];
+-            reparentChild(in);
+ childNodes.add(index, in);
+\ No newline at end of file
+-        }
+-        reindexChildren(index);
+-    }

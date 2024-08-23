@@ -1,0 +1,35 @@
+diff --git a/tmp/53a012b7-ac65-4e57-b68f-53eb865632db_buggy.java b/tmp/0a522879-eba5-410c-a928-54e32463a766_fixed.java
+index 1530b34..f540f5c 100644
+--- a/tmp/53a012b7-ac65-4e57-b68f-53eb865632db_buggy.java
++++ b/tmp/0a522879-eba5-410c-a928-54e32463a766_fixed.java
+@@ -1,23 +1,30 @@
+     /**
+      * Declares all of a function's arguments.
+      */
+     private void declareArguments(Node functionNode) {
+       Node astParameters = functionNode.getFirstChild().getNext();
+       Node body = astParameters.getNext();
+       FunctionType functionType = (FunctionType) functionNode.getJSType();
+       if (functionType != null) {
+         Node jsDocParameters = functionType.getParametersNode();
+         if (jsDocParameters != null) {
+           Node jsDocParameter = jsDocParameters.getFirstChild();
+           for (Node astParameter : astParameters.children()) {
+             if (jsDocParameter != null) {
+               defineSlot(astParameter, functionNode,
+                   jsDocParameter.getJSType(), true);
+               jsDocParameter = jsDocParameter.getNext();
+             } else {
+               defineSlot(astParameter, functionNode, null, true);
+             }
+           }
+         }
+       }
++      Node astVar = body.getParent().getFirstChild();
++      while (astVar != null) {
++        if (astVar.getType() == Token.VAR) {
++          checkRepeatedVariableDeclaration(astVar, functionNode);
++        }
++        astVar = astVar.getNext();
++      }
+     } // end declareArguments

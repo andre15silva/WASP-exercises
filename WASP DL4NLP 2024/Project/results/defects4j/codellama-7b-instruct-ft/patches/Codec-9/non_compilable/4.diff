@@ -1,0 +1,47 @@
+diff --git a/tmp/2d192505-ed9f-4a96-8cdb-e8c03521aab8_buggy.java b/tmp/a0c1cd39-6eea-4c5a-ac8b-33287ba61b72_fixed.java
+index 51ebfca..bf0cb57 100644
+--- a/tmp/2d192505-ed9f-4a96-8cdb-e8c03521aab8_buggy.java
++++ b/tmp/a0c1cd39-6eea-4c5a-ac8b-33287ba61b72_fixed.java
+@@ -1,32 +1,26 @@
+     /**
+      * Encodes binary data using the base64 algorithm, optionally chunking the output into 76 character blocks.
+      * 
+      * @param binaryData
+      *            Array containing binary data to encode.
+-     * @param isChunked
+-     *            if <code>true</code> this encoder will chunk the base64 output into 76 character blocks
+-     * @param urlSafe
+-     *            if <code>true</code> this encoder will emit - and _ instead of the usual + and / characters.
+-     * @param maxResultSize
+-     *            The maximum result size to accept.
++     * @param useChunked     if <code>true</code> this encoder will chunk the base64 output into 76 character blocks
++     * @param urlSafe       if <code>true</code> this encoder will emit - and _ instead of the usual + and / characters.
++     * @param maxResultSize  The maximum result size to accept.
+      * @return Base64-encoded data.
+      * @throws IllegalArgumentException
+      *             Thrown when the input array needs an output array bigger than maxResultSize
+      * @since 1.4
+      */
+-    public static byte[] encodeBase64(byte[] binaryData, boolean isChunked, boolean urlSafe, int maxResultSize) {
++    public static byte[] encodeBase64(byte[] binaryData, boolean useChunked, boolean urlSafe, int maxResultSize) {
+         if (binaryData == null || binaryData.length == 0) {
+             return binaryData;
+         }
+ 
+-        long len = getEncodeLength(binaryData, MIME_CHUNK_SIZE, CHUNK_SEPARATOR);
+-        if (len > maxResultSize) {
+-            throw new IllegalArgumentException("Input array too big, the output array would be bigger (" +
+-                len +
+-                ") than the specified maxium size of " +
+-                maxResultSize);
++        //TODO: move codecs to a protected constructor so they can choose their chunk size based on size.
++        final Base64 codec = useChunked ? new Base64(urlSafe) : new Base64(0, CHUNK_SEPARATOR, urlSafe);
++        final long maxCodeSize = maxResultSize / codec.getEncodedLength(binaryData.length);
++        if (maxCodeSize < 0) {
++            throw new IllegalArgumentException("Input array too big, the output array would be bigger than " + maxResultSize);
+         }
+-                
+-        Base64 b64 = isChunked ? new Base64(urlSafe) : new Base64(0, CHUNK_SEPARATOR, urlSafe);
+-        return b64.encode(binaryData);
++        return codec.encode(binaryData);
+     }

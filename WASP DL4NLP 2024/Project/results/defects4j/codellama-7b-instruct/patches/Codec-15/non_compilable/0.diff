@@ -1,0 +1,37 @@
+diff --git a/tmp/05f5cdc0-e3d0-43d4-a507-b8f99ba27b25_buggy.java b/tmp/0f2053f8-fcd3-4c82-961a-f49febc49b33_fixed.java
+index b529d33..bfbbe30 100644
+--- a/tmp/05f5cdc0-e3d0-43d4-a507-b8f99ba27b25_buggy.java
++++ b/tmp/0f2053f8-fcd3-4c82-961a-f49febc49b33_fixed.java
+@@ -1,29 +1,3 @@
+-    /**
+-     * Used internally by the Soundex algorithm.
+-     *
+-     * Consonants from the same code group separated by W or H are treated as one.
+-     *
+-     * @param str
+-     *                  the cleaned working string to encode (in upper case).
+-     * @param index
+-     *                  the character position to encode
+-     * @return Mapping code for a particular character
+-     * @throws IllegalArgumentException
+-     *                  if the character is not mapped
+-     */
+-    private char getMappingCode(final String str, final int index) {
+-        // map() throws IllegalArgumentException
+-        final char mappedChar = this.map(str.charAt(index));
+-        // HW rule check
+-        if (index > 1 && mappedChar != '0') {
+-            final char hwChar = str.charAt(index - 1);
+-            if ('H' == hwChar || 'W' == hwChar) {
+-                final char preHWChar = str.charAt(index - 2);
+-                final char firstCode = this.map(preHWChar);
+-                if (firstCode == mappedChar || 'H' == preHWChar || 'W' == preHWChar) {
+-                    return 0;
+-                }
+-            }
+-        }
+-        return mappedChar;
+     }
++    Assert.assertEquals("A261", this.getStringEncoder().encode("Ashcraft"));
++    Assert.assertEquals("A261", this.getStringEncoder().encode("Ashcroft"));
+\ No newline at end of file

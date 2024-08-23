@@ -1,0 +1,51 @@
+diff --git a/tmp/375db11b-264b-4c3c-8428-177da3cbb94b_buggy.java b/tmp/3be2b922-5c13-4e0a-8706-ad14aed73216_fixed.java
+index 5f1dcf2..c1ef520 100644
+--- a/tmp/375db11b-264b-4c3c-8428-177da3cbb94b_buggy.java
++++ b/tmp/3be2b922-5c13-4e0a-8706-ad14aed73216_fixed.java
+@@ -1,41 +1,28 @@
+-    /** {@inheritDoc} */
+-    @Override
+-    protected void iterateSimplex(final Comparator<RealPointValuePair> comparator)
+-        throws FunctionEvaluationException, OptimizationException, IllegalArgumentException {
+-
++    protected void iterateSimplex(final Comparator<RealPointValuePair> comparator) throws FunctionEvaluationException, OptimizationException, IllegalArgumentException {
+         while (true) {
+-
+             incrementIterationsCounter();
+-
+             // save the original vertex
+             final RealPointValuePair[] original = simplex;
+             final RealPointValuePair best = original[0];
+-
+             // perform a reflection step
+             final RealPointValuePair reflected = evaluateNewSimplex(original, 1.0, comparator);
+             if (comparator.compare(reflected, best) < 0) {
+-
+                 // compute the expanded simplex
+                 final RealPointValuePair[] reflectedSimplex = simplex;
+                 final RealPointValuePair expanded = evaluateNewSimplex(original, khi, comparator);
+                 if (comparator.compare(reflected, expanded) <= 0) {
+                     // accept the reflected simplex
+                     simplex = reflectedSimplex;
+-                }
+-
+                     return;
+-
+                 }
+-
++            }
+             // compute the contracted simplex
+             final RealPointValuePair contracted = evaluateNewSimplex(original, gamma, comparator);
+             if (comparator.compare(contracted, best) < 0) {
+                 // accept the contracted simplex
+-
++                return;
++            }
+             // check convergence
+             return;
+         }
+-
+-        }
+-
+     }
+\ No newline at end of file

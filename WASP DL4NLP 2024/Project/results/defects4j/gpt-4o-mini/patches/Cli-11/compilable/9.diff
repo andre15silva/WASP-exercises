@@ -1,0 +1,51 @@
+diff --git a/tmp/26880eae-d476-4874-8605-784f2b2e5a41_buggy.java b/tmp/2013d6d4-68fe-46dd-bd2c-295aa4f93e6c_fixed.java
+index 6ea5795..608a4be 100644
+--- a/tmp/26880eae-d476-4874-8605-784f2b2e5a41_buggy.java
++++ b/tmp/2013d6d4-68fe-46dd-bd2c-295aa4f93e6c_fixed.java
+@@ -1,37 +1,36 @@
+-    /**
+-     * Appends the usage clause for an Option to a StringBuffer.  
+-     *
+-     * @param buff the StringBuffer to append to
+-     * @param option the Option to append
+-     * @param required whether the Option is required or not
+-     */
+ private static void appendOption(final StringBuffer buff, 
+                                  final Option option, 
+                                  final boolean required)
+ {
+     if (!required)
+     {
+         buff.append("[");
+     }
+ 
+     if (option.getOpt() != null)
+     {
+         buff.append("-").append(option.getOpt());
+     }
+     else
+     {
+         buff.append("--").append(option.getLongOpt());
+     }
+ 
+     // if the Option has a value
+-        if (option.hasArg() && (option.getArgName() != null))
++    if (option.hasArg())
+     {
+-            buff.append(" <").append(option.getArgName()).append(">");
++        String argName = option.getArgName();
++        if (argName != null && !argName.isEmpty()) {
++            buff.append(" <").append(argName).append(">");
++        }
++        else {
++            buff.append(" []");  // or append an empty placeholder
++        }
+     }
+ 
+     // if the Option is not a required option
+     if (!required)
+     {
+         buff.append("]");
+     }
+ }
+\ No newline at end of file

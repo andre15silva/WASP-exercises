@@ -1,0 +1,20 @@
+diff --git a/tmp/a6aff7f7-2211-42d2-b009-86c3c85201e8_buggy.java b/tmp/fccd1c7f-6314-4d06-9196-2d64be213759_fixed.java
+index 4f21a3a..945eabe 100644
+--- a/tmp/a6aff7f7-2211-42d2-b009-86c3c85201e8_buggy.java
++++ b/tmp/fccd1c7f-6314-4d06-9196-2d64be213759_fixed.java
+@@ -1,14 +1,14 @@
+     /**
+      * Helper method used by standard deserializer.
+      * 
+      * @since 2.3
+      */
+     public TokenBuffer deserialize(JsonParser jp, DeserializationContext ctxt) throws IOException
+     {
+             copyCurrentStructure(jp);
+         /* 28-Oct-2014, tatu: As per #592, need to support a special case of starting from
+          *    FIELD_NAME, which is taken to mean that we are missing START_OBJECT, but need
+-         *    to assume one did exist.
++         *    to assume one did exist. This used to be the ONLY case.
+          */
+         return this;
+     }

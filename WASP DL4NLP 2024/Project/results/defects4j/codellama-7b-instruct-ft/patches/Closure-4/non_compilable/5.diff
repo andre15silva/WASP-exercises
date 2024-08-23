@@ -1,0 +1,66 @@
+diff --git a/tmp/02daec3f-edc9-4a65-8a34-80f47e5da616_buggy.java b/tmp/40458792-e33d-4ca2-8b51-081b860b6ee5_fixed.java
+index d6a560a..e816645 100644
+--- a/tmp/02daec3f-edc9-4a65-8a34-80f47e5da616_buggy.java
++++ b/tmp/40458792-e33d-4ca2-8b51-081b860b6ee5_fixed.java
+@@ -1,33 +1,61 @@
+   /**
+    * Resolve the referenced type within the enclosing scope.
+    */
+   @Override
+   JSType resolveInternal(ErrorReporter t, StaticScope<JSType> enclosing) {
+     // TODO(user): Investigate whether it is really necessary to keep two
+     // different mechanisms for resolving named types, and if so, which order
+     // makes more sense. Now, resolution via registry is first in order to
+     // avoid triggering the warnings built into the resolution via properties.
+     boolean resolved = resolveViaRegistry(t, enclosing);
+     if (detectImplicitPrototypeCycle()) {
+       handleTypeCycle(t);
+     }
+ 
+     if (resolved) {
++      // resolveViaProperties may introduce the case for an extension
++      // to an interface-implementing type whose own constructor is
++      // in the same file - avoid a stack overflow
++      if (isImplements() || isExtends()) {
++        super.resolveInternal(t, enclosing);
++        JSType ctr = getImplicitPrototype().getReferencedType();
++        boolean hasCycle = false;
++        while (ctr != null && !hasCycle) {
++          hasCycle = getImplicitPrototype().detectImplicitPrototypeCycle();
++          ctr = ctr.getConstructor().getImplicitPrototype();
++        }
++        if (hasCycle) {
++          handleTypeCycle(t);
++        }
++      }
+       super.resolveInternal(t, enclosing);
+       finishPropertyContinuations();
+       return registry.isLastGeneration() ?
+           getReferencedType() : this;
+     }
+ 
+     resolveViaProperties(t, enclosing);
+     if (detectImplicitPrototypeCycle()) {
+       handleTypeCycle(t);
+     }
+ 
++    if (isImplements() || isExtends()) {
++      super.resolveInternal(t, enclosing);
++      JSType ctr = getImplicitPrototype().getReferencedType();
++      boolean hasCycle = false;
++      while (ctr != null && !hasCycle) {
++        hasCycle = getImplicitPrototype().detectImplicitPrototypeCycle();
++        ctr = ctr.getConstructor().getImplicitPrototype();
++      }
++      if (hasCycle) {
++        handleTypeCycle(t);
++      }
++    }
++
+     super.resolveInternal(t, enclosing);
+     if (isResolved()) {
+       finishPropertyContinuations();
+     }
+     return registry.isLastGeneration() ?
+         getReferencedType() : this;
+   }

@@ -1,0 +1,69 @@
+diff --git a/tmp/fa01c5a5-2eec-4606-98df-baeb56be7c30_buggy.java b/tmp/6c3eceb3-e6bc-4cac-9ff2-b969f2406f40_fixed.java
+index 86553f4..76baad1 100644
+--- a/tmp/fa01c5a5-2eec-4606-98df-baeb56be7c30_buggy.java
++++ b/tmp/6c3eceb3-e6bc-4cac-9ff2-b969f2406f40_fixed.java
+@@ -1,57 +1,57 @@
+-  /**
+-   * Since this pass reports errors only when a global {@code this} keyword
+-   * is encountered, there is no reason to traverse non global contexts.
+-   */
+ public boolean shouldTraverse(NodeTraversal t, Node n, Node parent) {
+-
+     if (n.getType() == Token.FUNCTION) {
+         // Don't traverse functions that are constructors or have the @this
+         // or @override annotation.
+         JSDocInfo jsDoc = getFunctionJsDocInfo(n);
+         if (jsDoc != null &&
+             (jsDoc.isConstructor() ||
+              jsDoc.hasThisType() ||
+              jsDoc.isOverride())) {
+             return false;
+         }
+ 
+         // Don't traverse functions unless they would normally
+         // be able to have a @this annotation associated with them. e.g.,
+         // var a = function() { }; // or
+         // function a() {} // or
+         // a.x = function() {};
+         int pType = parent.getType();
+         if (!(pType == Token.BLOCK ||
+               pType == Token.SCRIPT ||
+               pType == Token.NAME ||
+               pType == Token.ASSIGN)) {
+             return false;
+         }
+     }
+ 
+     if (parent != null && parent.getType() == Token.ASSIGN) {
+         Node lhs = parent.getFirstChild();
+         Node rhs = lhs.getNext();
+ 
+         if (n == lhs) {
+             // Always traverse the left side of the assignment. To handle
+             // nested assignments properly (e.g., (a = this).property = c;),
+             // assignLhsChild should not be overridden.
+             if (assignLhsChild == null) {
+                 assignLhsChild = lhs;
+             }
+         } else {
+             // Only traverse the right side if it's not an assignment to a prototype
+-        // property or subproperty.
++            // property or subproperty, and now also handle cases where `this` is used.
+             if (lhs.getType() == Token.GETPROP &&
+                 lhs.getLastChild().getString().equals("prototype")) {
+                 return false;
+             }
+             if (lhs.getQualifiedName() != null && lhs.getQualifiedName().contains(".prototype.")) {
+                 return false;
+             }
++            // Check if the right-hand side is using global this.
++            if (rhs.getType() == Token.GETPROP &&
++                rhs.getFirstChild().getType() == Token.THIS) {
++                return false;
++            }
+         }
+     }
+ 
+     return true;
+ }
+\ No newline at end of file

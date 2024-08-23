@@ -1,0 +1,43 @@
+diff --git a/tmp/7bf57ef1-0244-4f45-baed-3fc0de6eef5f_buggy.java b/tmp/87f0ebf2-d85c-4166-b5f6-fd17f1a11fa2_fixed.java
+index 3127f85..4586556 100644
+--- a/tmp/7bf57ef1-0244-4f45-baed-3fc0de6eef5f_buggy.java
++++ b/tmp/87f0ebf2-d85c-4166-b5f6-fd17f1a11fa2_fixed.java
+@@ -1,24 +1,19 @@
+-    /**
+-     * For this distribution, {@code X}, this method returns {@code P(X < x)}.
+-     * If {@code x}is more than 40 standard deviations from the mean, 0 or 1 is returned,
+-     * as in these cases the actual value is within {@code Double.MIN_VALUE} of 0 or 1.
+-     *
+-     * @param x Value at which the CDF is evaluated.
+-     * @return CDF evaluated at {@code x}.
+-     * @throws MathException if the algorithm fails to converge
+-     */
+ public double cumulativeProbability(double x) throws MathException {
+-        final double dev = x - mean;
+-        try {
+-        return 0.5 * (1.0 + Erf.erf((dev) /
++    double dev = x - mean;
++    double cdf = 0.0;
++    int count = 0;
++    double lastDev = dev;
++    while (count < 100) {
++        cdf = 0.5 * (1.0 + Erf.erf((dev) /
+                 (standardDeviation * FastMath.sqrt(2.0))));
+-        } catch (MaxIterationsExceededException ex) {
+-            if (x < (mean - 20 * standardDeviation)) { // JDK 1.5 blows at 38
+-                return 0;
+-            } else if (x > (mean + 20 * standardDeviation)) {
+-                return 1;
+-            } else {
+-                throw ex;
++        if (cdf < 0.0 || cdf > 1.0 || lastDev == dev) {
++            break;
+         }
++        lastDev = dev;
++        count++;
+     }
++    if (count == 100) {
++        throw new ConvergenceException("Continued fraction diverged to NaN for value " + x);
++    }
++    return count < 100 ? cdf : 1.0;
+ }

@@ -1,0 +1,34 @@
+diff --git a/tmp/d80e2b77-7c4c-4d72-abfa-4871e6740241_buggy.java b/tmp/17856927-f1a9-4c6a-b457-0b4818fc6b86_fixed.java
+index fb2b020..7f755ed 100644
+--- a/tmp/d80e2b77-7c4c-4d72-abfa-4871e6740241_buggy.java
++++ b/tmp/17856927-f1a9-4c6a-b457-0b4818fc6b86_fixed.java
+@@ -1,27 +1,2 @@
+-  @Override
+-  public void matchConstraint(ObjectType constraintObj) {
+-    // We only want to match contraints on anonymous types.
+ 
+-    // Handle the case where the constraint object is a record type.
+-    //
+-    // param constraintObj {{prop: (number|undefined)}}
+-    // function f(constraintObj) {}
+-    // f({});
+-    //
+-    // We want to modify the object literal to match the constraint, by
+-    // taking any each property on the record and trying to match
+-    // properties on this object.
+-    if (constraintObj.isRecordType()) {
+-      for (String prop : constraintObj.getOwnPropertyNames()) {
+-        JSType propType = constraintObj.getPropertyType(prop);
+-        if (!isPropertyTypeDeclared(prop)) {
+-          JSType typeToInfer = propType;
+-          if (!hasProperty(prop)) {
+-            typeToInfer = getNativeType(JSTypeNative.VOID_TYPE)
+-                .getLeastSupertype(propType);
+-          }
+-          defineInferredProperty(prop, typeToInfer, null);
+-        }
+-      }
+-    }
+-  }
++The output should be the same as before, but with the bug fixed.
+\ No newline at end of file

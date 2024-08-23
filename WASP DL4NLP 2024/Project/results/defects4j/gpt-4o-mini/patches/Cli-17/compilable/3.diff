@@ -1,0 +1,70 @@
+diff --git a/tmp/6c3a38c5-97e4-4ed5-8f0e-17ccfc864495_buggy.java b/tmp/5049167b-64b0-4faa-ba92-5b473b4e6f26_fixed.java
+index 43fb5fd..7fd57c7 100644
+--- a/tmp/6c3a38c5-97e4-4ed5-8f0e-17ccfc864495_buggy.java
++++ b/tmp/5049167b-64b0-4faa-ba92-5b473b4e6f26_fixed.java
+@@ -1,55 +1,33 @@
+-    /**
+-     * <p>Breaks <code>token</code> into its constituent parts
+-     * using the following algorithm.
+-     * <ul>
+-     *  <li>ignore the first character ("<b>-</b>")</li>
+-     *  <li>foreach remaining character check if an {@link Option}
+-     *  exists with that id.</li>
+-     *  <li>if an {@link Option} does exist then add that character
+-     *  prepended with "<b>-</b>" to the list of processed tokens.</li>
+-     *  <li>if the {@link Option} can have an argument value and there 
+-     *  are remaining characters in the token then add the remaining 
+-     *  characters as a token to the list of processed tokens.</li>
+-     *  <li>if an {@link Option} does <b>NOT</b> exist <b>AND</b> 
+-     *  <code>stopAtNonOption</code> <b>IS</b> set then add the special token
+-     *  "<b>--</b>" followed by the remaining characters and also 
+-     *  the remaining tokens directly to the processed tokens list.</li>
+-     *  <li>if an {@link Option} does <b>NOT</b> exist <b>AND</b>
+-     *  <code>stopAtNonOption</code> <b>IS NOT</b> set then add that
+-     *  character prepended with "<b>-</b>".</li>
+-     * </ul>
+-     * </p>
+-     *
+-     * @param token The current token to be <b>burst</b>
+-     * @param stopAtNonOption Specifies whether to stop processing
+-     * at the first non-Option encountered.
+-     */
+ protected void burstToken(String token, boolean stopAtNonOption)
+ {
+     for (int i = 1; i < token.length(); i++)
+     {
+         String ch = String.valueOf(token.charAt(i));
+ 
+         if (options.hasOption(ch))
+         {
+             tokens.add("-" + ch);
+             currentOption = options.getOption(ch);
+ 
+-                if (currentOption.hasArg() && (token.length() != (i + 1)))
++            // Check if the current option has an argument and
++            // ensure there are remaining characters after the option
++            if (currentOption.hasArg() && (token.length() > (i + 1)))
+             {
++                // Add the remaining characters as an argument for the option
+                 tokens.add(token.substring(i + 1));
+-
+                 break;
+             }
+         }
+         else if (stopAtNonOption)
+         {
+-                process(token.substring(i));
++            // If stopAtNonOption is true, process the remaining characters
++            tokens.add("--" + token.substring(i)); // Add special token "--"
++            break; // Stop processing further options
+         }
+         else
+         {
+-                tokens.add(token);
+-                break;
++            // If stopAtNonOption is false, just add the character
++            tokens.add("-" + ch);
+         }
+     }
+ }
+\ No newline at end of file

@@ -1,0 +1,20 @@
+diff --git a/tmp/28b089e6-d5a3-4a20-b75d-47585d754052_buggy.java b/tmp/53c112c6-dea5-4e2f-a9a1-c515fb9abb29_fixed.java
+index 31c6a4b..5049c7c 100644
+--- a/tmp/28b089e6-d5a3-4a20-b75d-47585d754052_buggy.java
++++ b/tmp/53c112c6-dea5-4e2f-a9a1-c515fb9abb29_fixed.java
+@@ -1,11 +1,6 @@
+-    /**
+-     * Encodes binary data using the base64 algorithm into 76 character blocks separated by CRLF.
+-     *
+-     * @param binaryData
+-     *            binary data to encode
+-     * @return String containing Base64 characters.
+-     * @since 1.4
+-     */    
+ public static String encodeBase64String(byte[] binaryData) {
++    if (binaryData == null) {
++        return null;  // Handle null input correctly
++    }
+     return StringUtils.newStringUtf8(encodeBase64(binaryData, true));
+ }
+\ No newline at end of file

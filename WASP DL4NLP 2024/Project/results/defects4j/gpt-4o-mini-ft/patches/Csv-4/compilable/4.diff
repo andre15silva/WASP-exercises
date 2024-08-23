@@ -1,0 +1,20 @@
+diff --git a/tmp/a3962e54-66cf-44f2-beae-61f8396ca84f_buggy.java b/tmp/9e6e9d60-954f-4e67-b2ec-0d9aa9e776a7_fixed.java
+index fd29bad..e41e5db 100644
+--- a/tmp/a3962e54-66cf-44f2-beae-61f8396ca84f_buggy.java
++++ b/tmp/9e6e9d60-954f-4e67-b2ec-0d9aa9e776a7_fixed.java
+@@ -1,10 +1,11 @@
+     /**
+-     * Returns a copy of the header map that iterates in column order.
+-     * <p>
+-     * The map keys are column names. The map values are 0-based indices.
+-     * </p>
++     * @throws UnsupportedOperationException if this parser does not have a
++     *         header map
+      * @return a copy of the header map that iterates in column order.
+      */
+     public Map<String, Integer> getHeaderMap() {
++        if (headerMap == null) {
++            throw new UnsupportedOperationException("No header map found");
++        }
+         return new LinkedHashMap<String, Integer>(this.headerMap);
+     }

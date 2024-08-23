@@ -1,0 +1,58 @@
+diff --git a/tmp/4dbc05e3-3b85-4de6-88dd-e510e9f05e79_buggy.java b/tmp/6f1c19c5-0120-46b4-8972-ee02d85388b5_fixed.java
+index 1303a19..ca640db 100644
+--- a/tmp/4dbc05e3-3b85-4de6-88dd-e510e9f05e79_buggy.java
++++ b/tmp/6f1c19c5-0120-46b4-8972-ee02d85388b5_fixed.java
+@@ -1,45 +1,14 @@
+   private Node tryFoldArrayAccess(Node n, Node left, Node right) {
+-    Node parent = n.getParent();
+     // If GETPROP/GETELEM is used as assignment target the array literal is
+     // acting as a temporary we can't fold it here:
+-    //    "[][0] += 1"
+-
+-    if (right.getType() != Token.NUMBER) {
+-      // Sometimes people like to use complex expressions to index into
+-      // arrays, or strings to index into array methods.
+-      return n;
+-    }
+-
+-    double index = right.getDouble();
+-    int intIndex = (int) index;
+-    if (intIndex != index) {
+-      error(INVALID_GETELEM_INDEX_ERROR, right);
+-      return n;
+-    }
+-
+-    if (intIndex < 0) {
+-      error(INDEX_OUT_OF_BOUNDS_ERROR, right);
+-      return n;
+-    }
+-
+-    Node elem = left.getFirstChild();
+-    for (int i = 0; elem != null && i < intIndex; i++) {
+-      elem = elem.getNext();
+-    }
+-
+-    if (elem == null) {
+-      error(INDEX_OUT_OF_BOUNDS_ERROR, right);
+-      return n;
+-    }
+-
+-    if (elem.getType() == Token.EMPTY) {
+-      elem = NodeUtil.newUndefinedNode(elem);
++    //    "[][0] = 1;"
++    // As a special case we try to fix up the issue 522.
++    // See this thread: http://code.google.com/p/closure-compiler/issues/detail?id=522
++    // TODO(bashir), this is a quick hack to resolve this issue temporarily.
++    //             This should be fixed completely at some point.
++    if (true) {
++      return super.tryFoldArrayAccess(n, left, right);
+     } else {
+-      left.removeChild(elem);
++      return n;
+     }
+-
+-    // Replace the entire GETELEM with the value
+-    n.getParent().replaceChild(n, elem);
+-    reportCodeChange();
+-    return elem;
+   }

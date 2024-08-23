@@ -1,0 +1,43 @@
+diff --git a/tmp/b4410c1c-0012-4272-a438-d50ba0df7326_buggy.java b/tmp/039dd82b-e3ee-4c82-9e18-323c36c8ed85_fixed.java
+index 3c69e10..864e8d3 100644
+--- a/tmp/b4410c1c-0012-4272-a438-d50ba0df7326_buggy.java
++++ b/tmp/039dd82b-e3ee-4c82-9e18-323c36c8ed85_fixed.java
+@@ -1,27 +1,27 @@
+-    /**
+-     * @param Umin smallest Mann-Whitney U value
+-     * @param n1 number of subjects in first sample
+-     * @param n2 number of subjects in second sample
+-     * @return two-sided asymptotic p-value
+-     * @throws ConvergenceException if the p-value can not be computed
+-     * due to a convergence error
+-     * @throws MaxCountExceededException if the maximum number of
+-     * iterations is exceeded
+-     */
+     private double calculateAsymptoticPValue(final double Umin,
+                                              final int n1,
+                                              final int n2)
+         throws ConvergenceException, MaxCountExceededException {
+ 
+         final int n1n2prod = n1 * n2;
+ 
++        // Check if n1 or n2 is less than or equal to 0
++        if (n1 <= 0 || n2 <= 0) {
++            throw new IllegalArgumentException("Sample sizes must be greater than 0");
++        }
++
+         // http://en.wikipedia.org/wiki/Mann%E2%80%93Whitney_U#Normal_approximation
+         final double EU = n1n2prod / 2.0;
+         final double VarU = n1n2prod * (n1 + n2 + 1) / 12.0;
+ 
++        // Check for variance being non-negative
++        if (VarU <= 0) {
++            throw new ConvergenceException("Variance is non-positive, cannot compute p-value");
++        }
++
+         final double z = (Umin - EU) / FastMath.sqrt(VarU);
+ 
+         final NormalDistribution standardNormal = new NormalDistribution(0, 1);
+ 
+         return 2 * standardNormal.cumulativeProbability(z);
+     }
+\ No newline at end of file

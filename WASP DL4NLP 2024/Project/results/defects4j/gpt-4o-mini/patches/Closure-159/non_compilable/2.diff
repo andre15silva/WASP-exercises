@@ -1,0 +1,28 @@
+diff --git a/tmp/babb1ee2-5c74-4abe-b931-58f6b49ed715_buggy.java b/tmp/6cbce8a7-2232-4360-87d2-8bbb657c0086_fixed.java
+index de9af32..83da1d4 100644
+--- a/tmp/babb1ee2-5c74-4abe-b931-58f6b49ed715_buggy.java
++++ b/tmp/6cbce8a7-2232-4360-87d2-8bbb657c0086_fixed.java
+@@ -1,18 +1,17 @@
+-  /**
+-   * @see #findCalledFunctions(Node)
+-   */
+-  private void findCalledFunctions(
+-      Node node, Set<String> changed) {
++private void findCalledFunctions(Node node, Set<String> changed) {
+     Preconditions.checkArgument(changed != null);
+     // For each referenced function, add a new reference
+     if (node.getType() == Token.CALL) {
+         Node child = node.getFirstChild();
+         if (child.getType() == Token.NAME) {
+             changed.add(child.getString());
++        } else if (child.getType() == Token.GETPROP) {
++            // Handling case for property access (e.g., $.fn.method)
++            changed.add(child.getFirstChild().getString() + "." + child.getSecondChild().getString());
+         }
+     }
+ 
+     for (Node c = node.getFirstChild(); c != null; c = c.getNext()) {
+         findCalledFunctions(c, changed);
+     }
+ }
+\ No newline at end of file

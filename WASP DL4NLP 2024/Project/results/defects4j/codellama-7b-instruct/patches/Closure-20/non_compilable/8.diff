@@ -1,0 +1,118 @@
+diff --git a/tmp/f8e074cd-5586-45f6-b1dd-24367254f7ad_buggy.java b/tmp/4d0293de-e6a5-4e84-924d-b61d11279c49_fixed.java
+index d4e6d48..4b72930 100644
+--- a/tmp/f8e074cd-5586-45f6-b1dd-24367254f7ad_buggy.java
++++ b/tmp/4d0293de-e6a5-4e84-924d-b61d11279c49_fixed.java
+@@ -1,23 +1,93 @@
+-  private Node tryFoldSimpleFunctionCall(Node n) {
+-    Preconditions.checkState(n.isCall());
+-    Node callTarget = n.getFirstChild();
+-    if (callTarget != null && callTarget.isName() &&
+-          callTarget.getString().equals("String")) {
+-      // Fold String(a) to '' + (a) on immutable literals,
+-      // which allows further optimizations
+-      //
+-      // We can't do this in the general case, because String(a) has
+-      // slightly different semantics than '' + (a). See
+-      // http://code.google.com/p/closure-compiler/issues/detail?id=759
+-      Node value = callTarget.getNext();
+-      if (value != null) {
+-        Node addition = IR.add(
+-            IR.string("").srcref(callTarget),
+-            value.detachFromParent());
+-        n.getParent().replaceChild(n, addition);
+-        reportCodeChange();
++package com.google.javascript.jscomp;
++
++import javax.annotation.Nullable;
++
++public class Node {
++
++    private Node parent;
++    private Node firstChild;
++    private Node nextSibling;
++    private String stringValue;
++    private String type;
++
++    public Node(String type) {
++        this(null, null, null, type);
++    }
++
++    public Node(Node parent, Node firstChild, Node nextSibling, String type) {
++        this.parent = parent;
++        this.firstChild = firstChild;
++        this.nextSibling = nextSibling;
++        this.stringValue = "";
++        this.type = type;
++    }
++
++    public void addChildToBack(Node child) {
++        if (firstChild == null) {
++            firstChild = child;
++        } else {
++            Node current = firstChild;
++            while (current.nextSibling != null) {
++                current = current.nextSibling;
++            }
++            current.nextSibling = child;
++        }
++    }
++
++    public void removeChild(Node child) {
++        if (firstChild == child) {
++            firstChild = child.nextSibling;
++        } else {
++            Node current = firstChild.nextSibling;
++            while (current != null) {
++                if (current.nextSibling == child) {
++                    current.nextSibling = child.nextSibling;
++                    break;
++                }
++                current = current.nextSibling;
++            }
++        }
++    }
++
++    public Node getFirstChild() {
++        return firstChild;
++    }
++
++    public Node getNextSibling() {
++        return nextSibling;
++    }
++
++    public String getStringValue() {
++        return stringValue;
++    }
++
++    public String getType() {
++        return type;
++    }
++}
++
++// Add a method to Node to handle the folding
++public class NodeUtils {
++
++    public Node foldSimpleFunctionCall(Node caller, Node value) {
++        if (caller != null && value != null) {
++            Node addition = Node.string("").srcref(caller).addChildToBack(value);
++            caller.getParent().replaceChild(caller, addition);
+             return addition;
+         }
++        return caller;
+     }
+-    return n;
++}
++
++// Use the foldSimpleFunctionCall method in a test case
++public class NodeTester {
++
++    public void testFoldSimpleFunctionCall() {
++        Node caller = new Node(Node.CALL);
++        Node argument = new Node(Node.ARGUMENTS);
++        caller.addChildToBack(argument);
++        Node result = Node.foldSimpleFunctionCall(caller, argument);
++        assertEquals(result.getFirstChild(), argument);
++    }
++
+ }
+\ No newline at end of file

@@ -1,0 +1,56 @@
+diff --git a/tmp/13bb3dd4-89bf-473a-8d0a-24e4a80a5d4d_buggy.java b/tmp/51b15d62-96bb-4a59-b0cd-c543e6c23597_fixed.java
+index 1530b34..b7cd98b 100644
+--- a/tmp/13bb3dd4-89bf-473a-8d0a-24e4a80a5d4d_buggy.java
++++ b/tmp/51b15d62-96bb-4a59-b0cd-c543e6c23597_fixed.java
+@@ -1,23 +1,51 @@
+     /**
+      * Declares all of a function's arguments.
+      */
+     private void declareArguments(Node functionNode) {
+       Node astParameters = functionNode.getFirstChild().getNext();
+       Node body = astParameters.getNext();
+       FunctionType functionType = (FunctionType) functionNode.getJSType();
+       if (functionType != null) {
+         Node jsDocParameters = functionType.getParametersNode();
+         if (jsDocParameters != null) {
+           Node jsDocParameter = jsDocParameters.getFirstChild();
+           for (Node astParameter : astParameters.children()) {
+             if (jsDocParameter != null) {
++              if (astParameter.isName()) {       // Check already var/const.
++                if (functionNode.isFromClosure()) {
++                  Node existingDefs = functionScope.getVarAlias(astParameter.getString());
++                  if (existingDefs != null) {
++                    // Check if definitions match.
++                    JSType existingJsType = functionScope.getVarType(existingDefs);
++                    JSType jsDocType = jsDocParameter.getJSType();
++                    if (existingJsType != null &&
++                        jsdocHasAnnotation(astParameter, functionNode) &&
++                        existingJsType.isEquivalentTo(jsDocType)) {
++                      // No-op.
++                    } else if (jsDocParameter.getFirstChild() != null &&
++                        (existingJsType.isSubtype(jsDocParameter.getFirstChild().getJSType()) ||
++                        jsdocHasAnnotation(existingDefs, functionNode))) {
++                      jsdocWarn(ClosureRewriteModule.DUP_VAR_DECL,
++                              astParameter.getSourceFilePosition(),
++                          jsDocParameter.getJSTypeString(), existingJsType);
++                    } else {
++                      jsdocWarn(ClosureRewriteModule.DUP_VAR_WITH_ANNOTATION,
++                          astParameter.getSourceFilePosition(),
++                          jsDocParameter.getJSTypeString(), existingJsType);
++                      defineSlot(astParameter, functionNode, jsDocParameter.getJSType(), true);
++                    }
++                  } else {
++                    defineSlot(astParameter, functionNode, jsDocParameter.getJSType(), true);
++                  }
++                }
++              }
+               defineSlot(astParameter, functionNode,
+                   jsDocParameter.getJSType(), true);
+               jsDocParameter = jsDocParameter.getNext();
+             } else {
+               defineSlot(astParameter, functionNode, null, true);
+             }
+           }
+         }
+       }
+     } // end declareArguments

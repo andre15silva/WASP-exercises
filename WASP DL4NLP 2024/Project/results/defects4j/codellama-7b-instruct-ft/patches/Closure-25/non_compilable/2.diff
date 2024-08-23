@@ -1,0 +1,48 @@
+diff --git a/tmp/a637086b-1160-4fba-a2ee-22525393e49d_buggy.java b/tmp/c1499f2a-26d2-403d-9ed3-985f820725a9_fixed.java
+index b98f0a7..83981aa 100644
+--- a/tmp/a637086b-1160-4fba-a2ee-22525393e49d_buggy.java
++++ b/tmp/c1499f2a-26d2-403d-9ed3-985f820725a9_fixed.java
+@@ -1,29 +1,42 @@
+   private FlowScope traverseNew(Node n, FlowScope scope) {
+ 
+     Node constructor = n.getFirstChild();
+     scope = traverse(constructor, scope);
+     JSType constructorType = constructor.getJSType();
+     JSType type = null;
+     if (constructorType != null) {
+       constructorType = constructorType.restrictByNotNullOrUndefined();
+       if (constructorType.isUnknownType()) {
+         type = getNativeType(UNKNOWN_TYPE);
+       } else {
+         FunctionType ct = constructorType.toMaybeFunctionType();
+         if (ct == null && constructorType instanceof FunctionType) {
+           // If constructorType is a NoObjectType, then toMaybeFunctionType will
+           // return null. But NoObjectType implements the FunctionType
+           // interface, precisely because it can validly construct objects.
+           ct = (FunctionType) constructorType;
+         }
+         if (ct != null && ct.isConstructor()) {
+-          type = ct.getInstanceType();
++          type = type.toMaybeParameterizedType().getNominalType();
++          JSType instanceType = ct.getInstanceType();
++          for (JSType t : type.toMaybeRecordType().getTemplateTypes()) {
++            if (t != null && !t.isUnknownType()) {
++              if (!instanceType.isUnknownType()) {
++                instanceType = instanceType.toMaybeRecordType().getTemplateType(
++                    t.toString());
++              }
++              if (!instanceType.isUnknownType()) {
++                type = instanceType.unify(t, type);
++              }
++            }
++          }
++          type = type.toMaybeRecordType().withTypes(ct.getTypeParameters());
+         }
+       }
+     }
+     n.setJSType(type);
+     for (Node arg = constructor.getNext(); arg != null; arg = arg.getNext()) {
+       scope = traverse(arg, scope);
+     }
+     return scope;
+   }

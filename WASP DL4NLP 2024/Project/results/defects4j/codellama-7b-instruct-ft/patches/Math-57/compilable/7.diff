@@ -1,0 +1,63 @@
+diff --git a/tmp/1c3080fb-ac17-4930-a80a-7ba3560f848e_buggy.java b/tmp/08004200-af92-4f35-ab77-b6a831a45852_fixed.java
+index ad4b0d8..76d4570 100644
+--- a/tmp/1c3080fb-ac17-4930-a80a-7ba3560f848e_buggy.java
++++ b/tmp/08004200-af92-4f35-ab77-b6a831a45852_fixed.java
+@@ -1,47 +1,58 @@
+     /**
+      * Use K-means++ to choose the initial centers.
+      *
+      * @param <T> type of the points to cluster
+      * @param points the points to choose the initial centers from
+      * @param k the number of centers to choose
+      * @param random random generator to use
+      * @return the initial centers
+      */
+     private static <T extends Clusterable<T>> List<Cluster<T>>
+         chooseInitialCenters(final Collection<T> points, final int k, final Random random) {
+ 
+         final List<T> pointSet = new ArrayList<T>(points);
+         final List<Cluster<T>> resultSet = new ArrayList<Cluster<T>>();
+ 
+         // Choose one center uniformly at random from among the data points.
+         final T firstPoint = pointSet.remove(random.nextInt(pointSet.size()));
+         resultSet.add(new Cluster<T>(firstPoint));
+ 
+         final double[] dx2 = new double[pointSet.size()];
++        int tries = 0;
+         while (resultSet.size() < k) {
+             // For each data point x, compute D(x), the distance between x and
+             // the nearest center that has already been chosen.
++            tries++;
+             int sum = 0;
+             for (int i = 0; i < pointSet.size(); i++) {
+                 final T p = pointSet.get(i);
+                 final Cluster<T> nearest = getNearestCluster(resultSet, p);
+                 final double d = p.distanceFrom(nearest.getCenter());
+                 sum += d * d;
+                 dx2[i] = sum;
+             }
++            if (tries == 1) {
++                // For efficiency, only print once.
++                System.err.println("kmeans++ initial clusters: "
++                    + k + " > number of points: " + pointSet.size());
++            } else if (resultSet.size() < k) {
++                // For efficiency, only print if k-means++ is struggling.
++                System.err.println("kmeans++ only chose "
++                    + resultSet.size() + " of " + k + " initial clusters");
++            }
+ 
+             // Add one new data point as a center. Each point x is chosen with
+             // probability proportional to D(x)2
+             final double r = random.nextDouble() * sum;
+             for (int i = 0 ; i < dx2.length; i++) {
+                 if (dx2[i] >= r) {
+                     final T p = pointSet.remove(i);
+                     resultSet.add(new Cluster<T>(p));
+                     break;
+                 }
+             }
+         }
+ 
+         return resultSet;
+ 
+     }

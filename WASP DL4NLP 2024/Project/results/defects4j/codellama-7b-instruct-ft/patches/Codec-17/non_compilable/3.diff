@@ -1,0 +1,113 @@
+diff --git a/tmp/dcc61550-0ee6-4aa3-bde8-298d181f4765_buggy.java b/tmp/bd0558f1-a5ab-40b8-a244-2c25035fa501_fixed.java
+index 780fa1a..96dfcae 100644
+--- a/tmp/dcc61550-0ee6-4aa3-bde8-298d181f4765_buggy.java
++++ b/tmp/bd0558f1-a5ab-40b8-a244-2c25035fa501_fixed.java
+@@ -1,15 +1,105 @@
+     /**
+-     * Constructs a new <code>String</code> by decoding the specified array of bytes using the ISO-8859-1 charset.
++     * Constructs a new <code>String</code> by decoding the specified array of bytes using the {@link StandardCharsets#UTF_8}
++     * charset.
+      *
+      * @param bytes
+      *            The bytes to be decoded into characters, may be <code>null</code>
+-     * @return A new <code>String</code> decoded from the specified array of bytes using the ISO-8859-1 charset, or
+-     *         <code>null</code> if the input byte array was <code>null</code>.
++     * @return A new <code>String</code> decoded from the specified array of bytes using the {@link StandardCharsets#UTF_8}
++     *         charset, or <code>null</code> if the input byte array was <code>null</code>.
++     * @throws NullPointerException
++     *             Thrown if {@link StandardCharsets#UTF_8} is not initialized, which should never happen since it is
++     *             required by the Java platform specification.
++     * @since As of 1.7, throws {@link NullPointerException} instead of UnsupportedEncodingException
++     * @see <a href="http://issues.apache.org/jira/browse/CODEC-229">CODEC-229</a>
++     */
++    public static String newStringUtf8(final byte[] bytes) {
++        return new String(bytes, Charsets.UTF_8);
++    }
++
++    /**
++     * Constructs a new <code>String</code> by decoding the specified array of bytes using the {@link StandardCharsets#ISO_8859_1}
++     * charset.
++     *
++     * @param bytes
++     *            The bytes to be decoded into characters, may be <code>null</code>
++     * @return A new <code>String</code> decoded from the specified array of bytes using the {@link StandardCharsets#ISO_8859_1}
++     *         charset, or <code>null</code> if the input byte array was <code>null</code>.
+      * @throws NullPointerException
+      *             Thrown if {@link Charsets#ISO_8859_1} is not initialized, which should never happen since it is
+      *             required by the Java platform specification.
+      * @since As of 1.7, throws {@link NullPointerException} instead of UnsupportedEncodingException
++     * @see <a href="http://issues.apache.org/jira/browse/CODEC-229">CODEC-229</a>
+      */
+     public static String newStringIso8859_1(final byte[] bytes) {
+         return new String(bytes, Charsets.ISO_8859_1);
+     }
++
++    /**
++     * Constructs a new <code>String</code> by decoding the specified array of bytes using the US-ASCII charset.
++     *
++     * @param bytes
++     *            The bytes to be decoded into characters, may be <code>null</code>
++     * @return A new <code>String</code> decoded from the specified array of bytes using the US-ASCII charset, or
++     *         <code>null</code> if the input byte array was <code>null</code>.
++     * @throws NullPointerException
++     *             Thrown if {@link Charsets#US_ASCII} is not initialized, which should never happen since it is
++     *             required by the Java platform specification.
++     * @since As of 1.7, throws {@link NullPointerException} instead of UnsupportedEncodingException
++     * @see <a href="http://issues.apache.org/jira/browse/CODEC-229">CODEC-229</a>
++     */
++    public static String newStringUsAscii(final byte[] bytes) {
++        return new String(bytes, Charsets.US_ASCII);
++    }
++
++    /**
++     * Constructs a new <code>String</code> by decoding the specified array of bytes using the UTF-16 charset.
++     *
++     * @param bytes
++     *            The bytes to be decoded into characters, may be <code>null</code>
++     * @return A new <code>String</code> decoded from the specified array of bytes using the UTF-16 charset, or
++     *         <code>null</code> if the input byte array was <code>null</code>.
++     * @throws NullPointerException
++     *             Thrown if {@link StandardCharsets#UTF_16} is not initialized, which should never happen since it is
++     *             required by the Java platform specification.
++     * @since As of 1.7, throws {@link NullPointerException} instead of UnsupportedEncodingException
++     * @see <a href="http://issues.apache.org/jira/browse/CODEC-229">CODEC-229</a>
++     */
++    public static String newStringUtf16(final byte[] bytes) {
++        return new String(bytes, Charsets.UTF_16);
++    }
++
++    /**
++     * Constructs a new <code>String</code> by decoding the specified array of bytes using the UTF-16 charset with big-endian
++     * byte order.
++     *
++     * @param bytes
++     *            The bytes to be decoded into characters, may be <code>null</code>
++     * @return A new <code>String</code> decoded from the specified array of bytes using the UTF-16BE charset, or
++     *         <code>null</code> if the input byte array was <code>null</code>.
++     * @throws NullPointerException
++     *             Thrown if {@link StandardCharsets#UTF_16BE} is not initialized, which should never happen since it is
++     *             required by the Java platform specification.
++     * @since As of 1.7, throws {@link NullPointerException} instead of UnsupportedEncodingException
++     * @see <a href="http://issues.apache.org/jira/browse/CODEC-229">CODEC-229</a>
++     */
++    public static String newStringUtf16Be(final byte[] bytes) {
++        return new String(bytes, Charsets.UTF_16BE);
++    }
++
++    /**
++     * Constructs a new <code>String</code> by decoding the specified array of bytes using the UTF-16 charset with little-endian
++     * byte order.
++     *
++     * @param bytes
++     *            The bytes to be decoded into characters, may be <code>null</code>
++     * @return A new <code>String</code> decoded from the specified array of bytes using the UTF-16LE charset, or
++     *         <code>null</code> if the input byte array was <code>null</code>.
++     * @throws NullPointerException
++     *             Thrown if {@link StandardCharsets#UTF_16LE} is not initialized, which should never happen since it is
++     *             required by the Java platform specification.
++     * @since As of 1.7, throws {@link NullPointerException} instead of UnsupportedEncodingException
++     * @see <a href="http://issues.apache.org/jira/browse/CODEC-229">CODEC-229</a>
++     */
++    public static String newStringUsAscii(final byte[] bytes) {
++        return new String(bytes, Charsets.US_ASCII);
++    }

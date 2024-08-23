@@ -1,0 +1,38 @@
+diff --git a/tmp/77d7f063-f24c-4885-8eef-07a9e7f505e0_buggy.java b/tmp/76ca46d4-a40b-4c92-a3cb-568cd80dcaf3_fixed.java
+index 9353941..c461466 100644
+--- a/tmp/77d7f063-f24c-4885-8eef-07a9e7f505e0_buggy.java
++++ b/tmp/76ca46d4-a40b-4c92-a3cb-568cd80dcaf3_fixed.java
+@@ -1,30 +1,33 @@
+   /**
+    * Give an expression and a variable. It returns READ, if the first
+    * reference of that variable is a read. It returns KILL, if the first
+    * reference of that variable is an assignment. It returns MAY_LIVE otherwise.
+    */
+   private VariableLiveness isVariableReadBeforeKill(
+       Node n, String variable) {
+     if (NodeUtil.isName(n) && variable.equals(n.getString())) {
+       if (NodeUtil.isLhs(n, n.getParent())) {
+         // The expression to which the assignment is made is evaluated before
+         // the RHS is evaluated (normal left to right evaluation) but the KILL
+         // occurs after the RHS is evaluated.
+         return VariableLiveness.KILL;
+       } else {
+         return VariableLiveness.READ;
+       }
+     }
+ 
+     // Expressions are evaluated left-right, depth first.
+     for (Node child = n.getFirstChild();
+         child != null; child = child.getNext()) {
+       if (!ControlFlowGraph.isEnteringNewCfgNode(child)) { // Not a FUNCTION
+         VariableLiveness state = isVariableReadBeforeKill(child, variable);
+         if (state != VariableLiveness.MAYBE_LIVE) {
+           return state;
+         }
+       }
+     }
++    // Issue 297: When the variable is assigned to both before and after the &&
++    // short-circuit, the assignment is not really dead.
++    FunctionAnnotations.markAsStayingAlive(n);
+     return VariableLiveness.MAYBE_LIVE;
+   }

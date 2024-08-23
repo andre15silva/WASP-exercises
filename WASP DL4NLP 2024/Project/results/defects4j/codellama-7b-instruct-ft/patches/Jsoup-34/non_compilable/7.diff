@@ -1,0 +1,54 @@
+diff --git a/tmp/110e872a-cbc4-48c7-ba5f-0319b564d27e_buggy.java b/tmp/dc3d891f-702d-4acc-acfa-fc0299f6cd0d_fixed.java
+index 21f64c6..5b7a6c2 100644
+--- a/tmp/110e872a-cbc4-48c7-ba5f-0319b564d27e_buggy.java
++++ b/tmp/dc3d891f-702d-4acc-acfa-fc0299f6cd0d_fixed.java
+@@ -1,23 +1,38 @@
+     /**
+      * Returns the number of characters between the current position and the next instance of the input sequence
+      *
+      * @param seq scan target
+      * @return offset between current position and next instance of target. -1 if not found.
+      */
+     int nextIndexOf(CharSequence seq) {
+         // doesn't handle scanning for surrogates
+-        char startChar = seq.charAt(0);
+-        for (int offset = pos; offset < length; offset++) {
+-            // scan to first instance of startchar:
+-            if (startChar != input[offset])
+-                while(++offset < length && startChar != input[offset]);
+-            int i = offset + 1;
+-            int last = i + seq.length()-1;
+-            if (offset < length) {
+-                for (int j = 1; i < last && seq.charAt(j) == input[i]; i++, j++);
+-                if (i == last) // found full sequence
+-                    return offset - pos;
++        char first = seq.charAt(0);
++        // need to special case when first char has special
++        // escape meaning (e.g. '\t', '\\' or '\r') so start
++        // the scan from the last one.
++        int initialPosition = first < 0 ? length - 1 : pos;
++        for(int offset = initialPosition; offset < length; offset++) {
++            if(input[offset] == first) {
++                // find position of the first char of the seq in the
++                // current element.
++                int offsetOfSeq = offset;
++                for(int i = 1 ; i < seq.length(); ++i)
++                    if(offsetOfSeq + i >= length || input[offsetOfSeq + i] != seq.charAt(i))
++                        continue outer;
++            }
++        }
++        outer:
++        for(int currentPos = pos; currentPos < length; currentPos++)
++        {
++            if(input[currentPos] == first) {
++                // find position of the first char of the seq in the
++                // current element.
++                int offsetOfSeq = currentPos;
++                for(int i = 1 ; i < seq.length(); ++i)
++                    if(offsetOfSeq + i >= length || input[offsetOfSeq + i] != seq.charAt(i))
++                        continue outer;
++                return currentPos - pos;
+             }
+         }
+         return -1;
+     }

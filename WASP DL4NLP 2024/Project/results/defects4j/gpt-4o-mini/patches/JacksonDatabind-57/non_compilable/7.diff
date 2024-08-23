@@ -1,0 +1,27 @@
+diff --git a/tmp/02f08b5f-2903-4e1f-9f0c-a2cf80c50ee1_buggy.java b/tmp/3dba4cab-5c3d-4b94-94d7-25f74f5ea69e_fixed.java
+index 08a41cf..260fdd1 100644
+--- a/tmp/02f08b5f-2903-4e1f-9f0c-a2cf80c50ee1_buggy.java
++++ b/tmp/3dba4cab-5c3d-4b94-94d7-25f74f5ea69e_fixed.java
+@@ -1,12 +1,15 @@
+-    /**
+-     * Overloaded version of {@link #readValue(InputStream)}.
+-     */
+     public <T> MappingIterator<T> readValues(byte[] src, int offset, int length)
+         throws IOException, JsonProcessingException
+     {
++        // Ensure that the byte array is valid for UTF-8 encoding before proceeding
++        if (offset < 0 || length < 0 || offset + length > src.length) {
++            throw new IllegalArgumentException("Invalid offset or length for byte array");
++        }
++        // Convert the byte array to a String using the appropriate charset
++        String data = new String(src, offset, length, StandardCharsets.UTF_8);
++        
+         if (_dataFormatReaders != null) {
+-            return _detectBindAndReadValues(_dataFormatReaders.findFormat(src, offset, length), false);
++            return _detectBindAndReadValues(_dataFormatReaders.findFormat(data.getBytes(StandardCharsets.UTF_8), 0, data.length()), false);
+         }
+-        return _bindAndReadValues(_considerFilter(_parserFactory.createParser(src),
+-                true));
++        return _bindAndReadValues(_considerFilter(_parserFactory.createParser(data), true));
+     }
+\ No newline at end of file

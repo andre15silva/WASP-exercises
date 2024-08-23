@@ -1,0 +1,34 @@
+diff --git a/tmp/d4f71bc6-aeb5-4c7d-94cd-b4b5f661f4ee_buggy.java b/tmp/eaeccd7d-61e5-40cc-b65b-b5dc388bf153_fixed.java
+index 99f4092..e18e5b9 100644
+--- a/tmp/d4f71bc6-aeb5-4c7d-94cd-b4b5f661f4ee_buggy.java
++++ b/tmp/eaeccd7d-61e5-40cc-b65b-b5dc388bf153_fixed.java
+@@ -1,13 +1,27 @@
+     /**
+      * Creates a time period for the week in which the specified date/time
+-     * falls, calculated relative to the specified time zone.
++     * falls, calculated relative to the specified time zone. The locale is
++     * important because some users may have different starting days of the
++     * week.
+      *
+      * @param time  the date/time (<code>null</code> not permitted).
+      * @param zone  the time zone (<code>null</code> not permitted).
+      *
+      * @deprecated As of 1.0.7, use {@link #Week(Date, TimeZone, Locale)}.
+      */
+     public Week(Date time, TimeZone zone) {
+         // defer argument checking...
+-        this(time, RegularTimePeriod.DEFAULT_TIME_ZONE, Locale.getDefault());
++        if (time.getTimezoneOffset() == zone.getRawOffset()) {
++            this(time, RegularTimePeriod.DEFAULT_TIME_ZONE, 
++                    Locale.getDefault());
++        } 
++        else {
++            Calendar calendar = Calendar.getInstance(zone);
++            calendar.setTime(time);
++       //     calendar.setFirstDayOfWeek(Locale.getDefault().getFirstDayOfWeek());
++            calendar.getTime();
++            this.firstmillisecond = calendar.getTime().getTime(); 
++            int wk = calendar.get(Calendar.WEEK_OF_YEAR); // 1-indexed   
++            this.week = (wk == 1 ? 0 : (wk - 2));
++        } 
+     }

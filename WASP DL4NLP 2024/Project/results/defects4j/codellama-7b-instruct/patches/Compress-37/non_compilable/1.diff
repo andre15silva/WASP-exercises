@@ -1,0 +1,131 @@
+diff --git a/tmp/bad4628d-376c-4bd8-9bd0-4422b5fdd151_buggy.java b/tmp/0818c7cf-af5e-4d31-8089-d0e25f26d39a_fixed.java
+index 4b7e1e4..c3a5fea 100644
+--- a/tmp/bad4628d-376c-4bd8-9bd0-4422b5fdd151_buggy.java
++++ b/tmp/0818c7cf-af5e-4d31-8089-d0e25f26d39a_fixed.java
+@@ -1,52 +1,86 @@
+-    // https://www.gnu.org/software/tar/manual/html_section/tar_92.html#SEC188
+-    Map<String, String> parsePaxHeaders(final InputStream i)
++    /**
++     * Parses Pax headers from the input stream.
++     *
++     * @param i
++     *            the stream to read from
++     * @return the map of header names to header values
++     * @throws IOException
++     *             if an error occurs reading from the stream
++     */
++    public static Map<String, String> parsePaxHeaders(final InputStream i)
+             throws IOException {
+-        final Map<String, String> headers = new HashMap<String, String>(globalPaxHeaders);
++        final Map<String, String> headers = new HashMap<>();
+         // Format is "length keyword=value\n";
+-        while(true){ // get length
+-            int ch;
++        while (true) {
++            int ch = i.read();
++            if (ch == -1) {
++                break;
++            }
+             int len = 0;
+             int read = 0;
+-            while((ch = i.read()) != -1) {
++            while (ch != ' ' && ch != -1) {
+                 read++;
+-                if (ch == ' '){
+-                    // Get keyword
+-                    final ByteArrayOutputStream coll = new ByteArrayOutputStream();
+-                    while((ch = i.read()) != -1) {
+-                        read++;
+-                        if (ch == '='){ // end of keyword
+-                            final String keyword = coll.toString(CharsetNames.UTF_8);
+-                            // Get rest of entry
+-                            final int restLen = len - read;
+-                            if (restLen == 1) { // only NL
+-                                headers.remove(keyword);
+-                            } else {
+-                                final byte[] rest = new byte[restLen];
+-                                final int got = IOUtils.readFully(i, rest);
+-                                if (got != restLen) {
+-                                    throw new IOException("Failed to read "
+-                                                          + "Paxheader. Expected "
+-                                                          + restLen
+-                                                          + " bytes, read "
+-                                                          + got);
+-                                }
+-                                // Drop trailing NL
+-                                final String value = new String(rest, 0,
+-                                                          restLen - 1, CharsetNames.UTF_8);
+-                                headers.put(keyword, value);
+-                            }
+-                            break;
+-                        }
+-                        coll.write((byte) ch);
+-                    }
+-                    break; // Processed single header
+-                }
+                 len *= 10;
+                 len += ch - '0';
++                ch = i.read();
+             }
+-            if (ch == -1){ // EOF
++            if (ch == -1) {
++                throw new NoSuchElementException();
++            }
++            String keyword = readKeyword(i, len);
++            String value = readValue(i, len);
++            headers.put(keyword, value);
++            ch = i.read();
++            if (ch == -1) {
+                 break;
+             }
++            read++;
+         }
+         return headers;
+     }
++    
++    /**
++     * Reads a keyword from the input stream
++     *
++     * @param i
++     *            the stream to read from
++     * @param len
++     *            the length of the expected keyword
++     * @return the keyword
++     * @throws IOException
++     *             if an error occurs reading from the stream
++     */
++    private static String readKeyword(final InputStream i, final int len)
++            throws IOException {
++        final ByteArrayOutputStream coll = new ByteArrayOutputStream();
++        for (int ch = i.read(), t = 0; t < len; ch = i.read(), t++) {
++            if (ch == -1) {
++                throw new EOFException("Unexpected EOF reached");
++            }
++            coll.write(ch);
++        }
++        return coll.toString("UTF-8");
++    }
++    
++    /**
++     * Reads a value from the input stream
++     *
++     * @param i
++     *            the stream to read from
++     * @param len
++     *            the length of the expected value
++     * @return the value
++     * @throws IOException
++     *             if an error occurs reading from the stream
++     */
++    private static String readValue(final InputStream i, final int len)
++            throws IOException {
++        final ByteArrayOutputStream coll = new ByteArrayOutputStream();
++        for (int ch = i.read(), t = 0; t < len; ch = i.read(), t++) {
++            if (ch == -1) {
++                throw new EOFException("Unexpected EOF reached");
++            }
++            coll.write(ch);
++        }
++        return coll.toString("UTF-8");
++    }
+\ No newline at end of file

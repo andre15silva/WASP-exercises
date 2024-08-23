@@ -1,0 +1,20 @@
+diff --git a/tmp/68c35293-162f-4687-a56c-da6994b90751_buggy.java b/tmp/9d2eaa51-68ad-48da-ad94-e1c4d00068b6_fixed.java
+index 4d0be80..8d7562f 100644
+--- a/tmp/68c35293-162f-4687-a56c-da6994b90751_buggy.java
++++ b/tmp/9d2eaa51-68ad-48da-ad94-e1c4d00068b6_fixed.java
+@@ -1,10 +1,14 @@
+     @Override
+     Node processForInLoop(ForInLoop loopNode) {
+ 
+-        // Return the bare minimum to put the AST in a valid state.
++        // TODO: does anybody use for-each??
++        if (loopNode.getIterator().getType() != Token.NAME) {
++            return super.processForInLoop(loopNode);
++        }
++
+       return newNode(
+           Token.FOR,
+           transform(loopNode.getIterator()),
+           transform(loopNode.getIteratedObject()),
+           transformBlock(loopNode.getBody()));
+     }

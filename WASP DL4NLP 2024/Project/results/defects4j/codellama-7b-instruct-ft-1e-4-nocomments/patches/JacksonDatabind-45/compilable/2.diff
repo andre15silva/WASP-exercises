@@ -1,0 +1,42 @@
+diff --git a/tmp/66ef39c0-0f24-46d0-a8e3-b34f6a5b2f38_buggy.java b/tmp/30217367-75ce-46e5-82cf-283893ebcf76_fixed.java
+index 0dbce00..e355c3b 100644
+--- a/tmp/66ef39c0-0f24-46d0-a8e3-b34f6a5b2f38_buggy.java
++++ b/tmp/30217367-75ce-46e5-82cf-283893ebcf76_fixed.java
+@@ -1,33 +1,32 @@
+     @Override
+     public JsonSerializer<?> createContextual(SerializerProvider serializers,
+             BeanProperty property) throws JsonMappingException
+     {
+         if (property != null) {
+             JsonFormat.Value format = serializers.getAnnotationIntrospector().findFormat((Annotated)property.getMember());
+             if (format != null) {
+-
+-            	// Simple case first: serialize as numeric timestamp?
+                 JsonFormat.Shape shape = format.getShape();
+-                if (shape.isNumeric()) {
++                if (shape.isNumeric() || shape.equals(JsonFormat.Shape.ANY) && format.hasPattern()
++                        || shape.equals(JsonFormat.Shape.ANY) && format.hasLocale()
++                        || shape.equals(JsonFormat.Shape.ANY) && format.hasTimeZone()) {
+                     return withFormat(Boolean.TRUE, null);
+                 }
+-
+                 if (format.getShape() == JsonFormat.Shape.STRING) {
+                     TimeZone tz = format.getTimeZone();
+                     final String pattern = format.hasPattern()
+                                     ? format.getPattern()
+                                     : StdDateFormat.DATE_FORMAT_STR_ISO8601;
+                     final Locale loc = format.hasLocale()
+                                     ? format.getLocale()
+                                     : serializers.getLocale();
+                     SimpleDateFormat df = new SimpleDateFormat(pattern, loc);
+                     if (tz == null) {
+                         tz = serializers.getTimeZone();
+                     }
+                     df.setTimeZone(tz);
+                     return withFormat(Boolean.FALSE, df);
+                 }
+             }
+         }
+         return this;
+     }
+\ No newline at end of file

@@ -1,0 +1,19 @@
+diff --git a/tmp/34ed4fbb-aade-425c-9df2-32348027179e_buggy.java b/tmp/a29edd80-30a9-48f4-9947-8857be23e06c_fixed.java
+index 4d0be80..745b28d 100644
+--- a/tmp/34ed4fbb-aade-425c-9df2-32348027179e_buggy.java
++++ b/tmp/a29edd80-30a9-48f4-9947-8857be23e06c_fixed.java
+@@ -1,10 +1,12 @@
+     @Override
+     Node processForInLoop(ForInLoop loopNode) {
+ 
+-        // Return the bare minimum to put the AST in a valid state.
++        // If it is a for each, we need to make a new node because the
++        // CODE_GENERATOR keeps CODE_GeneratorImpl.
++        // TODO (felixg): report #1 in the SECREVIEW patch.
+         return newNode(
+             Token.FOR,
+             transform(loopNode.getIterator()),
+-          transform(loopNode.getIteratedObject()),
++            loopNode.getForEach() ? (transform(loopNode.getIteratedObject())) : (transform(loopNode.getIteratedObject())),
+             transformBlock(loopNode.getBody()));
+     }

@@ -1,0 +1,32 @@
+diff --git a/tmp/5d0f7a47-376a-42d5-b9e4-2f4b7c8b47b5_buggy.java b/tmp/47755850-677a-40b4-b64b-4f829abd0cd4_fixed.java
+index 97f28e5..3277112 100644
+--- a/tmp/5d0f7a47-376a-42d5-b9e4-2f4b7c8b47b5_buggy.java
++++ b/tmp/47755850-677a-40b4-b64b-4f829abd0cd4_fixed.java
+@@ -1,26 +1,26 @@
+     /**
+      * Creates a printer that will print values to the given stream following the CSVFormat.
+      * <p>
+      * Currently, only a pure encapsulation format or a pure escaping format is supported. Hybrid formats (encapsulation
+      * and escaping with a different character) are not supported.
+      * </p>
+      * 
+      * @param out
+      *        stream to which to print. Must not be null.
+      * @param format
+      *        the CSV format. Must not be null.
+      * @throws IOException
+      *         thrown if the optional header cannot be printed.
+      * @throws IllegalArgumentException
+      *         thrown if the parameters of the format are inconsistent or if either out or format are null.
+      */
+     public CSVPrinter(final Appendable out, final CSVFormat format) throws IOException {
+         Assertions.notNull(out, "out");
+         Assertions.notNull(format, "format");
+ 
+         this.out = out;
+         this.format = format;
+         this.format.validate();
+         // TODO: Is it a good idea to do this here instead of on the first call to a print method?
+-        // It seems a pain to have to track whether the header has already been printed or not.
++        // Is it a good idea to track whether the header has already been printed or not?
+     }

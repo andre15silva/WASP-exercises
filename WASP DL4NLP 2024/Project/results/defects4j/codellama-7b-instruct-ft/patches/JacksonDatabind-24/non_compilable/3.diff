@@ -1,0 +1,22 @@
+diff --git a/tmp/9ecb7be3-9b57-47cc-8b76-0b0f37e616cd_buggy.java b/tmp/55e69dba-925f-4664-b7bd-afd3bfee3cb6_fixed.java
+index 0502fea..3b1cb3c 100644
+--- a/tmp/9ecb7be3-9b57-47cc-8b76-0b0f37e616cd_buggy.java
++++ b/tmp/55e69dba-925f-4664-b7bd-afd3bfee3cb6_fixed.java
+@@ -1,9 +1,17 @@
+     public BaseSettings withDateFormat(DateFormat df) {
+         if (_dateFormat == df) {
+             return this;
+         }
+         TimeZone tz = (df == null) ? _timeZone : df.getTimeZone();
++        ObjectMapper mapper = new ObjectMapper();
++        mapper.setTimeZone(tz);
++        mapper.getSerializationConfig().setTimeZone(tz);
++        mapper.getDeserializationConfig().setTimeZone(tz);
++        mapper.getSerializationConfig().setDateFormat(df);
++        mapper.getDeserializationConfig().setDateFormat(df);
++        SimpleDateReaderWriter fw = new SimpleDateReaderWriter(df);
++        fw.getConfig().setTimeZone(tz);
+         return new BaseSettings(_classIntrospector, _annotationIntrospector, _visibilityChecker, _propertyNamingStrategy, _typeFactory,
+                 _typeResolverBuilder, df, _handlerInstantiator, _locale,
+                 tz, _defaultBase64);
+     }

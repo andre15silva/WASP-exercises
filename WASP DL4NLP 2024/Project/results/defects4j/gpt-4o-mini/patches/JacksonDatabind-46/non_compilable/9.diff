@@ -1,0 +1,21 @@
+diff --git a/tmp/34328ab6-6401-49d8-9528-c563694bd0e9_buggy.java b/tmp/a20d0276-dd37-41eb-bc30-e8108a42ea97_fixed.java
+index 6f49dcb..c6f21d9 100644
+--- a/tmp/34328ab6-6401-49d8-9528-c563694bd0e9_buggy.java
++++ b/tmp/a20d0276-dd37-41eb-bc30-e8108a42ea97_fixed.java
+@@ -1,9 +1,15 @@
+ @Override
+ public StringBuilder getGenericSignature(StringBuilder sb)
+ {
+     _classSignature(_class, sb, false);
+     sb.append('<');
+     sb = _referencedType.getGenericSignature(sb);
++    
++    // Correct the handling of the closing angle bracket
++    if (_referencedType.isArray()) {
++        sb.append(']');
++    }
++    
+     sb.append(';');
+     return sb;
+ }
+\ No newline at end of file

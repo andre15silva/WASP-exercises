@@ -1,0 +1,46 @@
+diff --git a/tmp/a995764c-02cc-4ef3-a81e-315a29471991_buggy.java b/tmp/66fbb81d-e149-4dc3-a0b3-37f0c3e144a9_fixed.java
+index f47d784..973c66f 100644
+--- a/tmp/a995764c-02cc-4ef3-a81e-315a29471991_buggy.java
++++ b/tmp/66fbb81d-e149-4dc3-a0b3-37f0c3e144a9_fixed.java
+@@ -1,12 +1,41 @@
++
+   @Override
+   public void process(Node externs, Node root) {
+     NodeTraversal.traverse(compiler, root, this);
+     if (MAKE_LOCAL_NAMES_UNIQUE) {
+       MakeDeclaredNamesUnique renamer = new MakeDeclaredNamesUnique();
+       NodeTraversal t = new NodeTraversal(compiler, renamer);
+       t.traverseRoots(externs, root);
+     }
+     removeDuplicateDeclarations(root);
+     new PropogateConstantAnnotations(compiler, assertOnChange)
+         .process(externs, root);
+   }
++
++  private void test(String js, String expected) {
++    Compiler compiler = new Compiler();
++    CompilerInput input = new CompilerInput(SOURCE_MAP);
++    compiler.compile(
++        Compiler.newSourceFile(js, SourceOrigin.unknown()),
++        compiler.getOptions());
++    Node root = compiler.getAstRoot(SOURCE_MAP);
++    PrintPrettyPrinter pp = new PrintPrettyPrinter(compiler.getAstRoot(SOURCE_MAP));
++    System.out.println("actual: " + pp.printToString(root));
++    assertEquals(expected, pp.printToString(root));
++  }
++
++  public void testIssue115() {
++    CompilerRunner.FLAG_compilation_level.setForTest(
++        CompilationLevel.SIMPLE_OPTIMIZATIONS);
++    CompilerRunner.FLAG_warning_level.setForTest(
++        WarningLevel.VERBOSE);
++    test("function f() { " +
++         "  var arguments = Array.prototype.slice.call(arguments, 0);" +
++         "  return arguments[0]; " +
++         "}",
++         "function f() { " +
++         "  arguments = Array.prototype.slice.call(arguments, 0);" +
++         "  return arguments[0]; " +
++         "}");
++  }
++

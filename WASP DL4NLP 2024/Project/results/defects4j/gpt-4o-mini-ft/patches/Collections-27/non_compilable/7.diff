@@ -1,0 +1,26 @@
+diff --git a/tmp/02453805-176d-4b04-a907-e61461b9c59b_buggy.java b/tmp/3c6f274c-fd78-46d3-bc0a-7976704de1a0_fixed.java
+index e69de29..0fa2168 100644
+--- a/tmp/02453805-176d-4b04-a907-e61461b9c59b_buggy.java
++++ b/tmp/3c6f274c-fd78-46d3-bc0a-7976704de1a0_fixed.java
+@@ -0,0 +1,20 @@
++public MultiValueMap<K, V> deserialize(byte[] data) {
++    MenuInputStream stream = new MenuInputStream(data);
++    int count = stream.readInt();
++    MutableMultiValueMap<K, V> result = new MutableMultiValueMap<K, V>(getMapFactory());
++    Class<? extends Collection> collectionClass = getMapCollectionType();
++    for (int i = 0; i < count; i++) {
++        K key = null;
++        V value = null;
++        if (stream.readInt() == 1) {
++            key = readKey(stream);
++        }
++        if (stream.readInt() == 1) {
++            value = readValue(stream);
++        }
++        if (key != null || value != null) {
++            result.add(key, value);
++        };
++    }
++    return result;
++}
+\ No newline at end of file

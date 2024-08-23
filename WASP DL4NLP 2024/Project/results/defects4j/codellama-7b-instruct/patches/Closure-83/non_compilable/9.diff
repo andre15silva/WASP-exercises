@@ -1,0 +1,30 @@
+diff --git a/tmp/60fe912e-9f2d-4dab-895e-820f4022ba86_buggy.java b/tmp/69fbc638-68b6-4d18-bb90-4d293d46f0c9_fixed.java
+index 072c672..411d337 100644
+--- a/tmp/60fe912e-9f2d-4dab-895e-820f4022ba86_buggy.java
++++ b/tmp/69fbc638-68b6-4d18-bb90-4d293d46f0c9_fixed.java
+@@ -1,20 +1,25 @@
+       @Override
+       public int parseArguments(Parameters params) throws CmdLineException {
++        if("--version".equals(params.getParameter(0))) {
++          System.err.println("Closure Compiler (http://code.google.com/closure/compiler)\n" +
++                  "Version: " + ClosureRunner.class.getPackage().getImplementationVersion());
++          return 1;
++        }
+         String param = params.getParameter(0);
+ 
+         if (param == null) {
+           setter.addValue(true);
+           return 0;
+         } else {
+           String lowerParam = param.toLowerCase();
+           if (TRUES.contains(lowerParam)) {
+             setter.addValue(true);
+           } else if (FALSES.contains(lowerParam)) {
+             setter.addValue(false);
+           } else {
+             setter.addValue(true);
+             return 0;
+           }
+           return 1;
+         }
+       }

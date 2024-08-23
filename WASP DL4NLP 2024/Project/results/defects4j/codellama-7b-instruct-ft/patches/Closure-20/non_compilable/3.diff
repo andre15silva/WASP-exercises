@@ -1,0 +1,58 @@
+diff --git a/tmp/c140fe66-22aa-426b-8e26-df5854c6df51_buggy.java b/tmp/866db692-f2d6-4544-a086-dd441c66eb77_fixed.java
+index d4e6d48..e520505 100644
+--- a/tmp/c140fe66-22aa-426b-8e26-df5854c6df51_buggy.java
++++ b/tmp/866db692-f2d6-4544-a086-dd441c66eb77_fixed.java
+@@ -1,23 +1,52 @@
+   private Node tryFoldSimpleFunctionCall(Node n) {
+     Preconditions.checkState(n.isCall());
+     Node callTarget = n.getFirstChild();
+     if (callTarget != null && callTarget.isName() &&
+         callTarget.getString().equals("String")) {
+       // Fold String(a) to '' + (a) on immutable literals,
+       // which allows further optimizations
+       //
+       // We can't do this in the general case, because String(a) has
+       // slightly different semantics than '' + (a). See
+       // http://code.google.com/p/closure-compiler/issues/detail?id=759
+       Node value = callTarget.getNext();
++      Node parent = n.getParent();
+       if (value != null) {
++        // If the argument is a literal immutable value,
++        // then the type of the result String object will be String,
++        // regardless of the type of the argument.
++        if ((value.isNumber() && !value.isObjectLit()) || value.isString()) {
+           Node addition = IR.add(
+               IR.string("").srcref(callTarget),
+               value.detachFromParent());
+-        n.getParent().replaceChild(n, addition);
++          parent.replaceChild(n, addition);
+           reportCodeChange();
+           return addition;
+         }
++        // If the argument is a string object or a value with a
++        // valueOf method, then the type of the result String object
++        // will be same as the type of the the argument,
++        // unless the argument is an object literal. We cannot use
++        // JSType to determine the type here, because we use the
++        // source code to determine the type of the argument.
++        // NOTE: Object and Array literals are immutable, even if the
++        // type of their prototype is mutable.
++        if (!value.isObjectLit()) {
++          if (value.isQualifiedName()) {
++            JSDocInfo info = NodeUtil.getBestJSDocInfo(value);
++            if (info != null && info.isConstant()) {
++              // It really is a value, and not an object or string
++              // object, or undefined, NaN, or Infinity.
++              Node addition = IR.add(
++                  IR.string("").srcref(callTarget),
++                  value.detachFromParent());
++              parent.replaceChild(n, addition);
++              reportCodeChange();
++              return addition;
++            }
++          }
++        }
++      }
+     }
+     return n;
+   }

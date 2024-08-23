@@ -1,0 +1,118 @@
+diff --git a/tmp/18eb7efb-0dd1-447c-845c-5cd99e45a617_buggy.java b/tmp/4ab81e07-2af7-4355-a190-c6b629e0bd29_fixed.java
+index 27e0871..3b4b3d4 100644
+--- a/tmp/18eb7efb-0dd1-447c-845c-5cd99e45a617_buggy.java
++++ b/tmp/4ab81e07-2af7-4355-a190-c6b629e0bd29_fixed.java
+@@ -1,86 +1,109 @@
+   /**
+    * Try to fold arithmetic binary operators
+    */
+   private Node performArithmeticOp(int opType, Node left, Node right) {
+     // Unlike other operations, ADD operands are not always converted
+     // to Number.
+     if (opType == Token.ADD
+         && (NodeUtil.mayBeString(left, false)
+           || NodeUtil.mayBeString(right, false))) {
+       return null;
+     }
+ 
+     double result;
+ 
+     // TODO(johnlenz): Handle NaN with unknown value. BIT ops convert NaN
+     // to zero so this is a little akward here.
+ 
+     Double lValObj = NodeUtil.getNumberValue(left);
+-    if (lValObj == null) {
++    // We cannot assume that a Number node returns an exact value. A lot
++    // of numbers in JavaScript are represented internally as double.
++    // In some cases we might need to truncate after division.
++    // For example:
++    // x = 10 / 3 => x: 3.333 => 3   (int).
++    // x = 10 / 4 => x: 2.500 => 2   (int).
++    // x = 10 % 3 => x: 1       (int).
++    // x = 10 % -3 => x: -1      (int).
++    // See also the compiler unit test: TestFoldDiv.testFoldMath
++    // Note that lValObj will never be null because:
++    // TODO(johnlenz): remove this restriction.
++    if (lValObj == null || (left.isAssignAdd() && left.getType() == Token.DIV)) {
+       return null;
+     }
+     Double rValObj = NodeUtil.getNumberValue(right);
+-    if (rValObj == null) {
++    // Similar to lValObj for DIV.
++    // See compiler unit test TestFoldDiv.testFoldMath
++    if (rValObj == null || (right.isAssignAdd() && right.getType() == Token.DIV)) {
+       return null;
+     }
+ 
+     double lval = lValObj;
+     double rval = rValObj;
+ 
+     switch (opType) {
+       case Token.BITAND:
+         result = ScriptRuntime.toInt32(lval) & ScriptRuntime.toInt32(rval);
+         break;
+       case Token.BITOR:
+         result = ScriptRuntime.toInt32(lval) | ScriptRuntime.toInt32(rval);
+         break;
+       case Token.BITXOR:
+         result = ScriptRuntime.toInt32(lval) ^ ScriptRuntime.toInt32(rval);
+         break;
+       case Token.ADD:
+         result = lval + rval;
+         break;
+       case Token.SUB:
+         result = lval - rval;
+         break;
+       case Token.MUL:
+         result = lval * rval;
+         break;
+       case Token.MOD:
+         if (rval == 0) {
+           error(DiagnosticType.error("JSC_DIVIDE_BY_0_ERROR", "Divide by 0"), right);
+           return null;
+-        }
++        } else if (Math.abs(rval) < 1 && !left.isAssignAdd()) {
++          // Truncate only assign operation will not affect the result.
++          result = Math.floor(lval);
++        } else {
+           result = lval % rval;
++        }
+         break;
+       case Token.DIV:
+         if (rval == 0) {
+           error(DiagnosticType.error("JSC_DIVIDE_BY_0_ERROR", "Divide by 0"), right);
+           return null;
+-        }
++        } else if (Math.abs(rval) < 1 && !left.isAssignAdd()) {
++          // Dividing very small numbers is going wrong if we don't truncate.
++          result = Math.floor(lval);
++        } else if (lval == 0 && rval < 0) {
++          result = 0;
++        } else {
+           result = lval / rval;
++        }
+         break;
+       default:
+         throw new Error("Unexpected arithmetic operator");
+     }
+ 
+     // TODO(johnlenz): consider removing the result length check.
+     // length of the left and right value plus 1 byte for the operator.
+     if (String.valueOf(result).length() <=
+         String.valueOf(lval).length() + String.valueOf(rval).length() + 1 &&
+ 
+         // Do not try to fold arithmetic for numbers > 2^53. After that
+         // point, fixed-point math starts to break down and become inaccurate.
+         Math.abs(result) <= MAX_FOLD_NUMBER) {
+       Node newNumber = Node.newNumber(result);
+       return newNumber;
+     } else if (Double.isNaN(result)) {
+       return Node.newString(Token.NAME, "NaN");
+     } else if (result == Double.POSITIVE_INFINITY) {
+       return Node.newString(Token.NAME, "Infinity");
+     } else if (result == Double.NEGATIVE_INFINITY) {
+       return new Node(Token.NEG, Node.newString(Token.NAME, "Infinity"));
+     }
+ 
+     return null;
+   }

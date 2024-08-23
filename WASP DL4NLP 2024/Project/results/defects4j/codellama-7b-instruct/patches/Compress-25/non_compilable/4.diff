@@ -1,0 +1,30 @@
+diff --git a/tmp/c09cbcb9-97de-48b1-84ce-1d80097e9bfa_buggy.java b/tmp/0c48321a-9a01-4332-83d3-480ea6793425_fixed.java
+index 6c0aa19..4f9328d 100644
+--- a/tmp/c09cbcb9-97de-48b1-84ce-1d80097e9bfa_buggy.java
++++ b/tmp/0c48321a-9a01-4332-83d3-480ea6793425_fixed.java
+@@ -1,20 +1,23 @@
+      /**
+       * @param encoding the encoding to use for file names, use null
+       * for the platform's default encoding
+       * @param useUnicodeExtraFields whether to use InfoZIP Unicode
+       * Extra Fields (if present) to set the file names.
+       * @param allowStoredEntriesWithDataDescriptor whether the stream
+       * will try to read STORED entries that use a data descriptor
+       * @since 1.1
+       */
+      public ZipArchiveInputStream(InputStream inputStream,
+                                   String encoding,
+                                   boolean useUnicodeExtraFields,
+                                   boolean allowStoredEntriesWithDataDescriptor) {
+          zipEncoding = ZipEncodingHelper.getZipEncoding(encoding);
+          this.useUnicodeExtraFields = useUnicodeExtraFields;
+          in = new PushbackInputStream(inputStream, buf.capacity());
+          this.allowStoredEntriesWithDataDescriptor =
+              allowStoredEntriesWithDataDescriptor;
+-        // haven't read anything so far
++         // add the initialization of the first entry in the zip file
++         // here and update the size of the first entry with the actual size
++         firstEntry = new ZipArchiveEntry();
++         firstEntry.setSize(in.available());
+      }
+\ No newline at end of file

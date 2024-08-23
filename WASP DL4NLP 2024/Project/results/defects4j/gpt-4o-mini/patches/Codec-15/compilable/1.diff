@@ -1,0 +1,37 @@
+diff --git a/tmp/5dd0db8d-1a25-4c07-b80a-cf6c0add0f46_buggy.java b/tmp/324884e5-4d4f-444a-82f7-d4ccc6a88003_fixed.java
+index b529d33..ed19914 100644
+--- a/tmp/5dd0db8d-1a25-4c07-b80a-cf6c0add0f46_buggy.java
++++ b/tmp/324884e5-4d4f-444a-82f7-d4ccc6a88003_fixed.java
+@@ -1,29 +1,17 @@
+-    /**
+-     * Used internally by the Soundex algorithm.
+-     *
+-     * Consonants from the same code group separated by W or H are treated as one.
+-     *
+-     * @param str
+-     *                  the cleaned working string to encode (in upper case).
+-     * @param index
+-     *                  the character position to encode
+-     * @return Mapping code for a particular character
+-     * @throws IllegalArgumentException
+-     *                  if the character is not mapped
+-     */
+ private char getMappingCode(final String str, final int index) {
+     // map() throws IllegalArgumentException
+     final char mappedChar = this.map(str.charAt(index));
+     // HW rule check
+     if (index > 1 && mappedChar != '0') {
+         final char hwChar = str.charAt(index - 1);
+         if ('H' == hwChar || 'W' == hwChar) {
+             final char preHWChar = str.charAt(index - 2);
+             final char firstCode = this.map(preHWChar);
+             if (firstCode == mappedChar || 'H' == preHWChar || 'W' == preHWChar) {
+-                    return 0;
++                // Return the correct mappedChar instead of 0
++                return mappedChar;
+             }
+         }
+     }
+     return mappedChar;
+ }
+\ No newline at end of file

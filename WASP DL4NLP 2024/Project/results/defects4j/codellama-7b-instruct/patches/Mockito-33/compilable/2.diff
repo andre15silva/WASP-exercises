@@ -1,0 +1,15 @@
+diff --git a/tmp/2cf86279-a4ef-4712-aaef-ac3a4ce7c8ca_buggy.java b/tmp/e5b0ffc1-afe4-4550-a785-8b8c825a2343_fixed.java
+index e1fc51f..8381977 100644
+--- a/tmp/2cf86279-a4ef-4712-aaef-ac3a4ce7c8ca_buggy.java
++++ b/tmp/e5b0ffc1-afe4-4550-a785-8b8c825a2343_fixed.java
+@@ -1,9 +1,5 @@
+     public boolean hasSameMethod(Invocation candidate) {
+-        //not using method.equals() for 1 good reason:
+-        //sometimes java generates forwarding methods when generics are in play see JavaGenericsForwardingMethodsTest
+         Method m1 = invocation.getMethod();
+         Method m2 = candidate.getMethod();
+-        
+-        	/* Avoid unnecessary cloning */
+         return m1.equals(m2);
+     }
+\ No newline at end of file

@@ -1,0 +1,74 @@
+diff --git a/tmp/c860df39-d4a4-44d5-8520-4fa26a4c0c1b_buggy.java b/tmp/521fba43-6616-4348-84ea-1619caf1a9a5_fixed.java
+index b36c3f0..54117c0 100644
+--- a/tmp/c860df39-d4a4-44d5-8520-4fa26a4c0c1b_buggy.java
++++ b/tmp/521fba43-6616-4348-84ea-1619caf1a9a5_fixed.java
+@@ -1,58 +1,59 @@
+-  /**
+-   * Returns true if calls to this function have side effects.
+-   *
+-   * @param callNode The call node to inspected.
+-   * @param compiler A compiler object to provide program state changing
+-   *     context information. Can be null.
+-   */
+   static boolean functionCallHasSideEffects(
+       Node callNode, @Nullable AbstractCompiler compiler) {
+     if (callNode.getType() != Token.CALL) {
+       throw new IllegalStateException(
+           "Expected CALL node, got " + Token.name(callNode.getType()));
+     }
+ 
+     if (callNode.isNoSideEffectsCall()) {
+       return false;
+     }
+ 
+     Node nameNode = callNode.getFirstChild();
+ 
+     // Built-in functions with no side effects.
+     if (nameNode.getType() == Token.NAME) {
+       String name = nameNode.getString();
+       if (BUILTIN_FUNCTIONS_WITHOUT_SIDEEFFECTS.contains(name)) {
+         return false;
+       }
++
++      // Check if the call is to a method in the Math namespace
++      if ("Math".equals(nameNode.getString())) {
++        String methodName = nameNode.getNext().getString();
++        if (MATH_FUNCTIONS_WITHOUT_SIDEEFFECTS.contains(methodName)) {
++          return false;
++        }
++      }
+     } else if (nameNode.getType() == Token.GETPROP) {
+       if (callNode.hasOneChild()
+           && OBJECT_METHODS_WITHOUT_SIDEEFFECTS.contains(
+                 nameNode.getLastChild().getString())) {
+         return false;
+       }
+ 
+       if (callNode.isOnlyModifiesThisCall()
+           && evaluatesToLocalValue(nameNode.getFirstChild())) {
+         return false;
+       }
+ 
+       // Functions in the "Math" namespace have no side effects.
+-
+       if (compiler != null && !compiler.hasRegExpGlobalReferences()) {
+         if (nameNode.getFirstChild().getType() == Token.REGEXP
+             && REGEXP_METHODS.contains(nameNode.getLastChild().getString())) {
+           return false;
+         } else if (nameNode.getFirstChild().getType() == Token.STRING
+             && STRING_REGEXP_METHODS.contains(
+                 nameNode.getLastChild().getString())) {
+           Node param = nameNode.getNext();
+           if (param != null &&
+               (param.getType() == Token.STRING
+-                  || param.getType() == Token.REGEXP))
++                  || param.getType() == Token.REGEXP)) {
+             return false;
+           }
+         }
+       }
++    }
+ 
+     return true;
+   }
+\ No newline at end of file

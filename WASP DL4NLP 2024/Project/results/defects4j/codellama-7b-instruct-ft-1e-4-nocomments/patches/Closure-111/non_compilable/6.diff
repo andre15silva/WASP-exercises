@@ -1,0 +1,15 @@
+diff --git a/tmp/2fa7e9b2-2103-47a9-a666-7dc111d63af7_buggy.java b/tmp/a777a062-2646-4c24-98fa-dad59f777e4c_fixed.java
+index f1d02c1..cb4cd1a 100644
+--- a/tmp/2fa7e9b2-2103-47a9-a666-7dc111d63af7_buggy.java
++++ b/tmp/a777a062-2646-4c24-98fa-dad59f777e4c_fixed.java
+@@ -1,4 +1,8 @@
+         @Override
+         protected JSType caseTopType(JSType topType) {
+-          return topType;
++          FunctionType googIsArray =
++              registry.getGlobalVar("goog", "isArray").getType().toMaybeFunctionType();
++          return googIsArray == null ?
++              topType :
++              googIsArray.getInstanceType();
+         }
+\ No newline at end of file

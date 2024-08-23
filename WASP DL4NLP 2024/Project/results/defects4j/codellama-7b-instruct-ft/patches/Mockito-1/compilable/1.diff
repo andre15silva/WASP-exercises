@@ -1,0 +1,38 @@
+diff --git a/tmp/f40266dd-53e5-4db5-adf1-a78ea05073f2_buggy.java b/tmp/c8e212ef-796a-4230-aa76-6a2b6a0590c4_fixed.java
+index 1c875ad..fdbffc3 100644
+--- a/tmp/f40266dd-53e5-4db5-adf1-a78ea05073f2_buggy.java
++++ b/tmp/c8e212ef-796a-4230-aa76-6a2b6a0590c4_fixed.java
+@@ -1,31 +1,31 @@
+     public void captureArgumentsFrom(Invocation invocation) {
+         if (invocation.getMethod().isVarArgs()) {
+             int indexOfVararg = invocation.getRawArguments().length - 1;
+-            throw new UnsupportedOperationException();
++            throw new UnsupportedOperationException("It must be an error, but mockito was not able to find the vararg matcher for this overloaded vararg.");
+ 
+         } else {
+             for (int position = 0; position < matchers.size(); position++) {
+                 Matcher m = matchers.get(position);
+                 if (m instanceof CapturesArguments) {
+-                    ((CapturesArguments) m).captureFrom(invocation.getArgumentAt(position, Object.class));
++                    ((CapturesArguments) m).captureFrom(invocation.getRawArguments()[position]);
+                 }
+             }
+         }
+ 
+ //        for (int position = 0; position < matchers.size(); position++) {
+ //            Matcher m = matchers.get(position);
+ //            if (m instanceof CapturesArguments && invocation.getRawArguments().length > position) {
+ //                //TODO SF - this whole lot can be moved captureFrom implementation
+ //                if(isVariableArgument(invocation, position) && isVarargMatcher(m)) {
+ //                    Object array = invocation.getRawArguments()[position];
+ //                    for (int i = 0; i < Array.getLength(array); i++) {
+ //                        ((CapturesArguments) m).captureFrom(Array.get(array, i));
+ //                    }
+ //                    //since we've captured all varargs already, it does not make sense to process other matchers.
+ //                    return;
+ //                } else {
+ //                    ((CapturesArguments) m).captureFrom(invocation.getRawArguments()[position]);
+ //                }
+ //            }
+ //        }
+     }

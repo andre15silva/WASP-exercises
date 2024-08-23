@@ -1,0 +1,41 @@
+diff --git a/tmp/08393c3c-ee54-411d-97e9-e5ca7c4299f9_buggy.java b/tmp/e53c1764-285d-4244-b6de-67d9225f4dce_fixed.java
+index 800e6e1..d3f5a0e 100644
+--- a/tmp/08393c3c-ee54-411d-97e9-e5ca7c4299f9_buggy.java
++++ b/tmp/e53c1764-285d-4244-b6de-67d9225f4dce_fixed.java
+@@ -1,32 +1,36 @@
+     /**
+      * Visit a node in a local scope, and add any local variables or catch
+      * parameters into the local symbol table.
+      *
+      * @param t The node traversal.
+      * @param n The node being visited.
+      * @param parent The parent of n
+      */
+     @Override public void visit(NodeTraversal t, Node n, Node parent) {
+       if (n == scope.getRootNode()) return;
+ 
+       if (n.getType() == Token.LP && parent == scope.getRootNode()) {
+         handleFunctionInputs(parent);
+         return;
+       }
+ 
+       attachLiteralTypes(n);
+       switch (n.getType()) {
+         case Token.FUNCTION:
+           if (parent.getType() == Token.NAME) {
+             return;
+           }
+           defineDeclaredFunction(n, parent);
+           break;
+         case Token.CATCH:
+           defineCatch(n, parent);
+           break;
+         case Token.VAR:
+           defineVar(n, parent);
+           break;
+       }
++      if (n.getType() == Token.NAME &&
++          scope.getDeclarations().isNamespaceDeclaration(n)) {
++        attachLiteralTypes(n.getFirstChild());
++      }
+     }

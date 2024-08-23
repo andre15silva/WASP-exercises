@@ -1,0 +1,16 @@
+diff --git a/tmp/34f17021-57ec-4c4f-bb1a-f7504a4a42d1_buggy.java b/tmp/52535493-173a-4311-9692-efa55b0d09cc_fixed.java
+index 5eedc11..fd4063c 100644
+--- a/tmp/34f17021-57ec-4c4f-bb1a-f7504a4a42d1_buggy.java
++++ b/tmp/52535493-173a-4311-9692-efa55b0d09cc_fixed.java
+@@ -1,6 +1,10 @@
+     private static void handleRawtext(Token.StartTag startTag, HtmlTreeBuilder tb) {
++        boolean parseFollowsHead = tb.inHead() && tb.currNode.nodeName().equals("head");
+         tb.insert(startTag);
+         tb.tokeniser.transition(TokeniserState.Rawtext);
+         tb.markInsertionMode();
++        if (parseFollowsHead && startTag.isKnownEmpty())
++            tb.parseFollowUp = true;
++        else
+             tb.transition(Text);
+     }
+\ No newline at end of file

@@ -1,0 +1,21 @@
+diff --git a/tmp/92ca69dd-764a-4668-b4e9-1877f9d73566_buggy.java b/tmp/0b8acb1c-20c6-43fb-8dba-bc729382b917_fixed.java
+index d56e399..958d56a 100644
+--- a/tmp/92ca69dd-764a-4668-b4e9-1877f9d73566_buggy.java
++++ b/tmp/0b8acb1c-20c6-43fb-8dba-bc729382b917_fixed.java
+@@ -1,11 +1,4 @@
+-    /**
+-     * <p>Formats a <code>Date</code> object.</p>
+-     * 
+-     * @param date  the date to format
+-     * @return the formatted string
+-     */
+-    public String format(Date date) {
+-        Calendar c = new GregorianCalendar(mTimeZone);
+-        c.setTime(date);
+-        return applyRules(c, new StringBuffer(mMaxLengthEstimate)).toString();
+-    }
++def format(date):
++    c = GregorianCalendar(timezone)
++    c.setTime(date)
++    return apply_rules(c, StringBuffer(length_estimate))
+\ No newline at end of file

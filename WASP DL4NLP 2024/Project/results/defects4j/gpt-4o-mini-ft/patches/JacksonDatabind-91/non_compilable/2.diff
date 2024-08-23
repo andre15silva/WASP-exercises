@@ -1,0 +1,25 @@
+diff --git a/tmp/c83e40ed-1e51-4476-be9d-203b9902e046_buggy.java b/tmp/1932f113-3766-4d3f-9e4c-19c6074bf0f9_fixed.java
+index a5ff4fc..30fbfb5 100644
+--- a/tmp/c83e40ed-1e51-4476-be9d-203b9902e046_buggy.java
++++ b/tmp/1932f113-3766-4d3f-9e4c-19c6074bf0f9_fixed.java
+@@ -1,17 +1,19 @@
+     /**
+      * Helper method used to prevent both caching and cache lookups for structured
+      * types that have custom value handlers
+      *
+      * @since 2.8.11
+      */
+     private boolean _hasCustomHandlers(JavaType t) {
+         if (t.isContainerType()) {
+             // First: value types may have both value and type handlers
+             JavaType ct = t.getContentType();
+-            if (ct != null) {
++            // 06-Mar-2012, [JACKSON-363] - due to pure POJO deserialization
++            //   limitation, need to check if it's POJO
++            if (ct != null && !ct.isPojoType()) {
+                 return (ct.getValueHandler() != null) || (ct.getTypeHandler() != null);
+             // Second: map(-like) types may have value handler for key (but not type; keys are untyped)
+             }
+         }
+         return false;
+     }

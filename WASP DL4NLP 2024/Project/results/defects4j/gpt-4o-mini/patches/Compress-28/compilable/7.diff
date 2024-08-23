@@ -1,0 +1,52 @@
+diff --git a/tmp/f5ed7162-de3a-4c15-880f-dacc11d91167_buggy.java b/tmp/86eccce6-dd6c-456b-8fba-c42d81741a16_fixed.java
+index 0f439b3..bbd1d60 100644
+--- a/tmp/f5ed7162-de3a-4c15-880f-dacc11d91167_buggy.java
++++ b/tmp/86eccce6-dd6c-456b-8fba-c42d81741a16_fixed.java
+@@ -1,38 +1,29 @@
+-    /**
+-     * Reads bytes from the current tar archive entry.
+-     *
+-     * This method is aware of the boundaries of the current
+-     * entry in the archive and will deal with them as if they
+-     * were this stream's start and EOF.
+-     *
+-     * @param buf The buffer into which to place bytes read.
+-     * @param offset The offset at which to place bytes read.
+-     * @param numToRead The number of bytes to read.
+-     * @return The number of bytes read, or -1 at EOF.
+-     * @throws IOException on error
+-     */
+ @Override
+ public int read(byte[] buf, int offset, int numToRead) throws IOException {
+-    	int totalRead = 0;
+-
+     if (hasHitEOF || entryOffset >= entrySize) {
+         return -1;
+     }
+ 
+     if (currEntry == null) {
+         throw new IllegalStateException("No current tar entry");
+     }
+ 
+     numToRead = Math.min(numToRead, available());
+ 
+-        totalRead = is.read(buf, offset, numToRead);
+-        count(totalRead);
++    int totalRead = is.read(buf, offset, numToRead);
+     
+     if (totalRead == -1) {
+         hasHitEOF = true;
++        // If we hit EOF, we should check if we've read all bytes for the current entry,
++        // and if not, we need to throw an IOException as it indicates a truncated entry.
++        if (entryOffset < entrySize) {
++            throw new IOException("Truncated entry detected");
++        }
++        return -1;
+     } else {
+         entryOffset += totalRead;
++        count(totalRead);
+     }
+ 
+     return totalRead;
+ }
+\ No newline at end of file

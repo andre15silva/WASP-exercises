@@ -1,0 +1,18 @@
+diff --git a/tmp/8eff53d2-55a2-47b0-a031-28f6895bbd46_buggy.java b/tmp/3f1467a1-cd15-4671-b036-e7c996169430_fixed.java
+index 5a7ae71..69de5b8 100644
+--- a/tmp/8eff53d2-55a2-47b0-a031-28f6895bbd46_buggy.java
++++ b/tmp/3f1467a1-cd15-4671-b036-e7c996169430_fixed.java
+@@ -1,8 +1,9 @@
+     public String getString(String key, String defaultValue) {
+         if (attributes.containsKey(key)) {
+             Object value = attributes.containsKey(key);
+-            return value != null ? value.toString() : null;
+-        } else {
++            if (value != null) {
++                return value.toString();
++            }
++        }
+         return defaultValue;
+     }
+\ No newline at end of file
+-    }

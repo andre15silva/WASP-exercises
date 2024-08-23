@@ -1,0 +1,32 @@
+diff --git a/tmp/d7d93b09-0eb0-484b-83bd-538ae729232d_buggy.java b/tmp/4b209424-bb63-4c40-9988-3b2fead39b28_fixed.java
+index 4d0be80..fa0e7eb 100644
+--- a/tmp/d7d93b09-0eb0-484b-83bd-538ae729232d_buggy.java
++++ b/tmp/4b209424-bb63-4c40-9988-3b2fead39b28_fixed.java
+@@ -1,10 +1,27 @@
+     @Override
+     Node processForInLoop(ForInLoop loopNode) {
+ 
+         // Return the bare minimum to put the AST in a valid state.
+       return newNode(
+           Token.FOR,
+           transform(loopNode.getIterator()),
+           transform(loopNode.getIteratedObject()),
+           transformBlock(loopNode.getBody()));
+     }
++
++    @Override
++    Node processForEachInLoop(ForInLoop loopNode) {
++
++        // Return the bare minimum to put the AST in a valid state.
++        compiler.report(
++            Token.FOR,
++            LOOP_CONSTRUCT_UNSUPPORTED,
++            loopNode.getTokenLocation(),
++            "for each");
++        return newNode(
++        compiler.getCodingConvention(),
++        Token.FOR,
++        transform(loopNode.getIterator()),
++        transform(loopNode.getIteratedObject()),
++        transformBlock(loopNode.getBody()));
++    }

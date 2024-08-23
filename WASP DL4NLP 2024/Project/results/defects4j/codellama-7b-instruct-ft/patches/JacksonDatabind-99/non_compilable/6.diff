@@ -1,0 +1,64 @@
+diff --git a/tmp/0e0ead82-786b-4dc9-b0bd-ed0d0c3c2110_buggy.java b/tmp/ef267018-2c12-4f8b-b62c-08ea3852211e_fixed.java
+index ee836e4..bbc1fa8 100644
+--- a/tmp/0e0ead82-786b-4dc9-b0bd-ed0d0c3c2110_buggy.java
++++ b/tmp/ef267018-2c12-4f8b-b62c-08ea3852211e_fixed.java
+@@ -1,9 +1,58 @@
+     @Override
+     protected String buildCanonicalName()
+     {
+         StringBuilder sb = new StringBuilder();
+         sb.append(_class.getName());
+         sb.append('<');
+-        sb.append(_referencedType.toCanonical());
++
++        // 19-Feb-2020, tatu: Array types are odd wrt type parameter resolution;
++        //   see if we can resolve them (which is not always easy), but should work at least for
++        //   rawtypes.
++        Class<?> erased = _class;
++        if (erased.isArray()) {
++            erased = erased.getComponentType();
++        }
++        if (erased.isGenericType()) {
++            sb.append(ReferenceType.defaultInstance().toCanonical());
++            return sb.toString();
++        }
++        // 13-Mar-2020, tatu: we may have (really?) a raw type for List<?>. We'd like to use
++        //    defaults, but we may also have specific (generic type) resolution too.
++        if (_class != CollectionType.class) {
++            Type[] intfs = _class.getGenericInterfaces();
++            if ((intfs != null) && (intfs.length > 0)) {
++                // 14-Feb-2020, tatu: in JDK8 there seems to be a couple of "wrong" things here
++                //   (involving Generics) that breaks things. So, for now, ignore; mostly likely
++                //   only an issue during BCEL handling and similar.
++                // if (_class.getDeclaringClass() == Collection.class) {
++                //     intfs[0].getCanonicalName();
++                // }
++                if (intfs[0] instanceof ParameterizedType) {
++                    // 13-Mar-2020, tatu: usually there's no subtype info, but if there is,
++                    //   consider first bound as first parameter
++                    int ps = ((ParameterizedType)intfs[0]).getActualTypeArguments().length;
++                    if (ps > 0) {
++                        _referencedType = ((ParameterizedType)intfs[0]).getActualTypeArguments()[0];
++                    }
++                }
++            }
++        }
++        // 18-Feb-2016, tatu: Note that for non-generic types we may have generic type (sub-type)
++        //    but this will not work for "anonymous" types (because they have no canonical form).
++        //   Anonymous sub-types can occur due to things like:
++        //     java.util.Map<String,Integer> m = new java.util.HashMap<>();
++        //     java.util.Set<java.util.Map<String,Integer>> s = new java.util.HashSet<>();
++        if (erased != _referencedType.wrap()) {
++            _referencedType = _referencedType.wrap();
++        }
++        // 13-Mar-2020, tatu: for arrays, we have special canonical form (<TYPE>;TYPE...)
++        //   for more complicated structures, we must use canonical name resolution of the "erased"
++        //   type
++        Class<?> ct = _referencedType.getErasedClass();
++        if (ct.isArray()) {
++            sb.append(ReferenceType.defaultInstance().toCanonical());
++            return sb.toString();
++        }
++        sb.appendTypeAndParameters(_referencedType);
+         return sb.toString();
+     }

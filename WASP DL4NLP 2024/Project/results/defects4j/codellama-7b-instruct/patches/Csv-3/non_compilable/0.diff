@@ -1,0 +1,81 @@
+diff --git a/tmp/c0f978a0-b3c3-464c-b1f4-0e058ea0e695_buggy.java b/tmp/529e04e7-5f02-4a2d-8f2f-dc56f0b853dc_fixed.java
+index 1ad070d..dd2df68 100644
+--- a/tmp/c0f978a0-b3c3-464c-b1f4-0e058ea0e695_buggy.java
++++ b/tmp/529e04e7-5f02-4a2d-8f2f-dc56f0b853dc_fixed.java
+@@ -1,38 +1,69 @@
+     /**
+      * Handle an escape sequence.
+      * The current character must be the escape character.
+      * On return, the next character is available by calling {@link ExtendedBufferedReader#getLastChar()}
+      * on the input stream.
+      * 
+      * @return the unescaped character (as an int) or {@link END_OF_STREAM} if char following the escape is invalid. 
+      * @throws IOException if there is a problem reading the stream or the end of stream is detected: 
+      * the escape character is not allowed at end of strem
+      */
+     int readEscape() throws IOException {
+         // the escape char has just been read (normally a backslash)
+-        final int c = in.read();
+-        switch (c) {
++        final int c1 = in.read();
++        // read the next character
++        final int c2 = in.read();
++        switch (c1) {
+             case 'r':
+                 return CR;
+             case 'n':
+                 return LF;
+             case 't':
+                 return TAB;
+             case 'b':
+                 return BACKSPACE;
+             case 'f':
+                 return FF;
+             case CR:
+             case LF:
+-        case FF: // TODO is this correct?
++            case FF: // TODO is this correct? Do tabs need to be escaped?
+             case TAB: // TODO is this correct? Do tabs need to be escaped?
+-        case BACKSPACE: // TODO is this correct?
+-            return c;
++            case BACKSPACE: // TODO is this correct? Do tabs need to be escaped?
++                return c1;
+             case END_OF_STREAM:
+                 throw new IOException("EOF whilst processing escape sequence");
+             default:
++                if (c2 == 'N') {
++                    return MYSQL_NULL_VALUE;
++                }
+                 // Now check for meta-characters
+-                return c;
+-            // indicate unexpected char - available from in.getLastChar()
++                switch (c2) {
++                    case 'r':
++                        return CR;
++                    case 'n':
++                        return LF;
++                    case 't':
++                        return TAB;
++                    case 'b':
++                        return BACKSPACE;
++                    case 'f':
++                        return FF;
++                    case CR:
++                    case LF:
++                    case FF: // TODO is this correct? Do tabs need to be escaped?
++                    case TAB: // TODO is this correct? Do tabs need to be escaped?
++                    case BACKSPACE: // TODO is this correct? Do tabs need to be escaped?
++                        return c2;
++                    default:
++                        // Now check for octal value
++                        if (isOctalDigit(c2)) {
++                            return (getOctalValue(c2) << 8) + in.read();
++                        } 
++                        // Now check for hex value
++                        else if (c2 == 'x') {
++                            return (convertHex(in.read()) << 8) + in.read();
++                        }
++                   throw new IOException("Invalid escape sequence: \\" + c2);
++                }
+         }
+     }

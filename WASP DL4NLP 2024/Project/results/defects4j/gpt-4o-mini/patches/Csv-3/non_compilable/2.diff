@@ -1,0 +1,51 @@
+diff --git a/tmp/ada1b806-cf32-40be-b7b5-d53b06d37d9c_buggy.java b/tmp/d78391b4-3234-4c9a-82ea-18f736895c11_fixed.java
+index 1ad070d..74dc957 100644
+--- a/tmp/ada1b806-cf32-40be-b7b5-d53b06d37d9c_buggy.java
++++ b/tmp/d78391b4-3234-4c9a-82ea-18f736895c11_fixed.java
+@@ -1,38 +1,25 @@
+-    /**
+-     * Handle an escape sequence.
+-     * The current character must be the escape character.
+-     * On return, the next character is available by calling {@link ExtendedBufferedReader#getLastChar()}
+-     * on the input stream.
+-     * 
+-     * @return the unescaped character (as an int) or {@link END_OF_STREAM} if char following the escape is invalid. 
+-     * @throws IOException if there is a problem reading the stream or the end of stream is detected: 
+-     * the escape character is not allowed at end of strem
+-     */
+ int readEscape() throws IOException {
+     // the escape char has just been read (normally a backslash)
+     final int c = in.read();
++    if (c == END_OF_STREAM) {
++        throw new IOException("EOF whilst processing escape sequence");
++    }
++    
+     switch (c) {
+         case 'r':
+             return CR;
+         case 'n':
+             return LF;
+         case 't':
+             return TAB;
+         case 'b':
+             return BACKSPACE;
+         case 'f':
+             return FF;
+-        case CR:
+-        case LF:
+-        case FF: // TODO is this correct?
+-        case TAB: // TODO is this correct? Do tabs need to be escaped?
+-        case BACKSPACE: // TODO is this correct?
+-            return c;
+-        case END_OF_STREAM:
+-            throw new IOException("EOF whilst processing escape sequence");
++        case 'N': // Handle MySQL null value escape sequence
++            return MYSQL_NULL; // Assume MYSQL_NULL is defined somewhere as the correct value
+         default:
+-            // Now check for meta-characters
++            // Indicate unexpected char or return it directly if needed
+             return c; 
+-            // indicate unexpected char - available from in.getLastChar()
+     }
+ }
+\ No newline at end of file

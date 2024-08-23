@@ -1,0 +1,68 @@
+diff --git a/tmp/040e6e57-62b1-4b24-88dd-750684138dd4_buggy.java b/tmp/bfa5fa9c-66ee-41f4-9fa0-ef5c6095f5de_fixed.java
+index e4d90e7..cc528e4 100644
+--- a/tmp/040e6e57-62b1-4b24-88dd-750684138dd4_buggy.java
++++ b/tmp/bfa5fa9c-66ee-41f4-9fa0-ef5c6095f5de_fixed.java
+@@ -1,45 +1,30 @@
+   @Override
+   String toStringHelper(boolean forAnnotations) {
++    String result = "";
++    boolean prettyPrint = true;
++
++    while (prettyPrint) {
+       if (hasReferenceName()) {
+-      return getReferenceName();
+-    } else if (prettyPrint) {
+-      // Don't pretty print recursively.
++        result = getReferenceName();
++      } else {
+         prettyPrint = false;
+-
+-      // Use a tree set so that the properties are sorted.
+-      Set<String> propertyNames = Sets.newTreeSet();
+-      for (ObjectType current = this;
+-           current != null && !current.isNativeObjectType() &&
+-               propertyNames.size() <= MAX_PRETTY_PRINTED_PROPERTIES;
+-           current = current.getImplicitPrototype()) {
+-        propertyNames.addAll(current.getOwnPropertyNames());
+-      }
+-
+-      StringBuilder sb = new StringBuilder();
+-      sb.append("{");
+-
++        result = "{";
+         int i = 0;
+-      for (String property : propertyNames) {
++        for (String property : getOwnPropertyNames()) {
+           if (i > 0) {
+-          sb.append(", ");
++            result += ", ";
+           }
+ 
+-        sb.append(property);
+-        sb.append(": ");
+-        sb.append(getPropertyType(property).toString());
++          result += property;
++          result += ": ";
++          result += getPropertyType(property).toString();
+ 
+-        ++i;
+-        if (i == MAX_PRETTY_PRINTED_PROPERTIES) {
+-          sb.append(", ...");
+-          break;
++          i++;
+         }
+-      }
+-
+-      sb.append("}");
+ 
+-      prettyPrint = true;
+-      return sb.toString();
+-    } else {
+-      return "{...}";
++        result += "}";
+       }
+     }
++
++    return result;
++  }
+\ No newline at end of file

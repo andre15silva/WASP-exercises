@@ -1,0 +1,17 @@
+diff --git a/tmp/bead2900-8bb8-4d39-98dd-d6fb24129106_buggy.java b/tmp/8cb4f5e4-1587-483d-a722-5e9ac63bae2e_fixed.java
+index d457dbe..5a8e3c7 100644
+--- a/tmp/bead2900-8bb8-4d39-98dd-d6fb24129106_buggy.java
++++ b/tmp/8cb4f5e4-1587-483d-a722-5e9ac63bae2e_fixed.java
+@@ -1,10 +1,8 @@
+     @Override
+     public boolean equals(Object o) {
+         if (this == o) return true;
+         if (o == null || getClass() != o.getClass()) return false;
+         if (!super.equals(o)) return false;
+-
+         Element element = (Element) o;
+-
+-        return this == o;
++        return (getElementName().equals( element.getElementName()) && element.hashCode() == this.hashCode());
+     }
+\ No newline at end of file

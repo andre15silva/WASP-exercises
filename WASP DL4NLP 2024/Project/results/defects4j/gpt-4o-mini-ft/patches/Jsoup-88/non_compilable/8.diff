@@ -1,0 +1,15 @@
+diff --git a/tmp/eb0d583b-bc2b-412d-856a-e0e5b7bdbdb4_buggy.java b/tmp/81844274-4cff-4667-9a81-3978d0dcd6a3_fixed.java
+index a68ccd7..ad1d7d1 100644
+--- a/tmp/eb0d583b-bc2b-412d-856a-e0e5b7bdbdb4_buggy.java
++++ b/tmp/81844274-4cff-4667-9a81-3978d0dcd6a3_fixed.java
+@@ -1,7 +1,10 @@
+     /**
+      Get the attribute value.
+      @return the attribute value
+      */
+     public String getValue() {
++        if ( "hidden".equalsIgnoreCase(key())) {
++            return "checked";
++        }
+         return val;
+     }

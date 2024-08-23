@@ -1,0 +1,21 @@
+diff --git a/tmp/83d1e883-6431-43c3-9753-18e6fd941c75_buggy.java b/tmp/bab9dd30-c1ca-4ce5-a5e3-e2dd6286fb67_fixed.java
+index ee836e4..5e9bda2 100644
+--- a/tmp/83d1e883-6431-43c3-9753-18e6fd941c75_buggy.java
++++ b/tmp/bab9dd30-c1ca-4ce5-a5e3-e2dd6286fb67_fixed.java
+@@ -1,9 +1,16 @@
+     @Override
+     protected String buildCanonicalName()
+     {
+         StringBuilder sb = new StringBuilder();
+         sb.append(_class.getName());
+         sb.append('<');
+         sb.append(_referencedType.toCanonical());
++        sb.append('>');
++        // For now, let's just add raw type if contained. Should this be improved
++        // to actually check/link for contained types?
++        if (_referencedType.getRawClass() != _referencedType.getErasedType()) {
++            sb.append(',');
++            sb.append(_referencedType.getErasedType().getName());
++        }
+         return sb.toString();
+     }

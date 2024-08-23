@@ -1,0 +1,21 @@
+diff --git a/tmp/ff5f52e5-8345-4528-b24a-4bfa62a0e249_buggy.java b/tmp/e99317e7-dccc-4ab9-9dc0-12022abf9acc_fixed.java
+index a6f008f..38cd48f 100644
+--- a/tmp/ff5f52e5-8345-4528-b24a-4bfa62a0e249_buggy.java
++++ b/tmp/e99317e7-dccc-4ab9-9dc0-12022abf9acc_fixed.java
+@@ -1,11 +1,8 @@
+-    /**
+-     * Method that can be called on backends that support passing opaque datatypes of
+-     * non-JSON formats
+-     *
+-     * @since 2.8
+-     */
+     public void writeEmbeddedObject(Object object) throws IOException {
+-        // 01-Sep-2016, tatu: As per [core#318], handle small number of cases
++        if (isEnabled(JsonGenerator.Feature.WRITE_NUMBERS_AS_STRINGS) && canSerializeAsNumber(object)) {
++            writeNum(JsonParser.numberAsString(object));
++        } else {
+             throw new JsonGenerationException("No native support for writing embedded objects",
+                     this);
+         }
++    }
+\ No newline at end of file

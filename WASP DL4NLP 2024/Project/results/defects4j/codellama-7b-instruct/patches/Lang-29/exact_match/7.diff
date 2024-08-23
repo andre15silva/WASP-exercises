@@ -1,0 +1,32 @@
+diff --git a/tmp/6f2c31d7-466e-4864-90d4-ce93fbbb190b_buggy.java b/tmp/bebacf0d-c81f-4ffa-9d25-dbb9debe8dc3_fixed.java
+index 3ec995f..8b13789 100644
+--- a/tmp/6f2c31d7-466e-4864-90d4-ce93fbbb190b_buggy.java
++++ b/tmp/bebacf0d-c81f-4ffa-9d25-dbb9debe8dc3_fixed.java
+@@ -1,26 +1 @@
+-    /**
+-     * <p>
+-     * Converts the given Java version string to an <code>int</code>.
+-     * </p>
+-     * 
+-     * <p>
+-     * Example return values:
+-     * </p>
+-     * <ul>
+-     * <li><code>120</code> for Java 1.2</li>
+-     * <li><code>131</code> for Java 1.3.1</li>
+-     * <li><code>160</code> for Java 1.6.0_20</li>
+-     * </ul>
+-     * 
+-     * <p>
+-     * Patch releases are not reported.
+-     * </p>
+-     * <p>
+-     * This method is package private instead of private to support unit test invocation.
+-     * </p>
+-     * 
+-     * @return the version, for example 131 for Java 1.3.1
+-     */
+-    static float toJavaVersionInt(String version) {
+-        return toVersionInt(toJavaVersionIntArray(version, JAVA_VERSION_TRIM_SIZE));
+-    }
++

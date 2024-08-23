@@ -1,0 +1,150 @@
+diff --git a/tmp/ad03cdd5-8763-4dcf-9b70-5888ec1b70db_buggy.java b/tmp/da86496a-d2da-43c7-b323-397b47990946_fixed.java
+index 1c732f4..d68954c 100644
+--- a/tmp/ad03cdd5-8763-4dcf-9b70-5888ec1b70db_buggy.java
++++ b/tmp/da86496a-d2da-43c7-b323-397b47990946_fixed.java
+@@ -1,88 +1,113 @@
+     @Override
+     protected Object decode(
+             Channel channel, SocketAddress remoteAddress, Object msg) throws Exception {
+ 
+         String sentence = (String) msg;
+-        sentence = sentence.substring(sentence.indexOf('|') + 1, sentence.lastIndexOf('|'));
+ 
+-        Position position = new Position();
+-        position.setProtocol(getProtocolName());
++        DeviceSession deviceSession = null;
++        Position position = new Position(getProtocolName());
++        position.setDeviceId(getDeviceId(channel, remoteAddress));
+ 
+         for (String entry : sentence.split(",")) {
+             int delimiter = entry.indexOf('=');
+             String key = entry.substring(0, delimiter);
+             String value = entry.substring(delimiter + 1);
+             switch (key) {
+                 case "unit":
+-                    DeviceSession deviceSession = getDeviceSession(channel, remoteAddress, value);
++                    deviceSession = getDeviceSession(channel, remoteAddress, value);
+                     if (deviceSession != null) {
+                         position.setDeviceId(deviceSession.getDeviceId());
+                     }
+                     break;
+-                case "gps_valid":
+-                    position.setValid(Integer.parseInt(value) != 0);
++                case "unittype":
++                    position.set(Position.KEY_UNIT_TYPE, Integer.parseInt(value));
++                    continue;
++                case "address":
++                    position.setDeviceId(getDataManager().getDeviceByImei(value));
+                     break;
+-                case "datetime_actual":
++                case "kind":
++                    position.set(Position.KEY_IGNITION, Integer.parseInt(value) == 1);
++                    position.set(Position.KEY_POWER, Integer.parseInt(value) == 1);
++                    break;
++                case "software_version":
++                    position.set("firmwareVersion", Integer.parseInt(value));
++                    break;
++                case "hardware_type":
++                    position.set(Position.KEY_HARDWARE, Integer.parseInt(value));
++                    break;
++                case "gps_type":
++                    position.set(Position.KEY_HDOP, Float.parseFloat(value + ".0"));
++                    break;
++                case "date_time_utc":
+                     position.setTime(new SimpleDateFormat("yyyy/MM/dd HH:mm:ss").parse(value));
+                     break;
+-                case "latitude":
+-                    position.setLatitude(Double.parseDouble(value));
++                case "date_time_actual":
++                    position.setTime(new SimpleDateFormat("yyyy/MM/dd HH:mm:ss").parse(value));
+                     break;
+-                case "longitude":
+-                    position.setLongitude(Double.parseDouble(value));
++                case "emergency_button":
++                    position.set(Position.KEY_POWER, 0);
+                     break;
+                 case "altitude":
+                     position.setAltitude(Double.parseDouble(value));
+                     break;
++                case "longitude":
++                    position.setLongitude(Double.parseDouble(value));
++                    break;
++                case "latitude":
++                    position.setLatitude(Double.parseDouble(value));
++                    break;
++                case "gps_valid":
++                    position.setValid(Integer.parseInt(value) != 0);
++                    break;
++                case "gps_connected":
++                    position.set(Position.KEY_GPS, Integer.parseInt(value) != 0);
++                    break;
++                case "satellites":
++                    position.set(Position.KEY_SATELLITES, Integer.parseInt(value));
++                    break;
+                 case "velocity":
+                     position.setSpeed(UnitsConverter.knotsFromKph(Integer.parseInt(value)));
+                     break;
+                 case "heading":
+                     position.setCourse(Integer.parseInt(value));
+                     break;
+                 case "eventid":
+                     position.set(Position.KEY_EVENT, Integer.parseInt(value));
+                     break;
+                 case "mileage":
+                     position.set(Position.KEY_ODOMETER, (long) (Double.parseDouble(value) * 1000));
+                     break;
+-                case "satellites":
+-                    position.set(Position.KEY_SATELLITES, Integer.parseInt(value));
++                case "pending":
++                    position.set(Position.KEY_GPX_TRACK, Integer.parseInt(value) == 1);
++                    break;
++                case "reason":
++                    position.set(Position.KEY_OPERATOR, Integer.parseInt(value) == 1 ? "sim" : "gps");
++                    break;
++                case "response":
++                    position.set("response", value);
+                     break;
+                 case "ignition":
+-                    position.set(Position.KEY_IGNITION, Integer.parseInt(value) != 0);
++                    position.set(Position.KEY_IGNITION, Integer.parseInt(value) == 1);
+                     break;
+                 case "door":
+-                    position.set(Position.KEY_DOOR, Integer.parseInt(value) != 0);
++                    position.set(Position.KEY_DOOR, Integer.parseInt(value) == 1);
+                     break;
+                 case "arm":
+-                    position.set(Position.KEY_ARMED, Integer.parseInt(value) != 0);
++                    position.set(Position.KEY_ARMED, Integer.parseInt(value) == 1);
+                     break;
+-                case "fuel":
+-                    position.set(Position.KEY_FUEL_LEVEL, Integer.parseInt(value));
+-                    break;
+-                case "rpm":
+-                    position.set(Position.KEY_RPM, Integer.parseInt(value));
+-                    break;
+-                case "main_voltage":
+-                    position.set(Position.KEY_POWER, Double.parseDouble(value));
+-                    break;
+-                case "backup_voltage":
+-                    position.set(Position.KEY_BATTERY, Double.parseDouble(value));
+-                    break;
+-                case "analog1":
+-                case "analog2":
+-                case "analog3":
+-                    position.set(Position.PREFIX_ADC + (key.charAt(key.length() - 1) - '0'), Double.parseDouble(value));
++                case "disarm":
++                    position.set(Position.KEY_DISARMED, Integer.parseInt(value) == 1);
+                     break;
+                 case "extra1":
+                 case "extra2":
+                 case "extra3":
+                 default:
+                     position.set(key, value);
+                     break;
+             }
+         }
+ 
++        position.setNetwork(deviceSession != null ? deviceSession.getNetwork() : null);
++        position.set(Position.KEY_VERSION_FW, deviceSession != null ? deviceSession.getVersion() : null);
+         return position;
+     }

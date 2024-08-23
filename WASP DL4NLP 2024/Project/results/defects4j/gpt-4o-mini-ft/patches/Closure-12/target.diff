@@ -1,0 +1,14 @@
+diff --git a/tmp/22d055ab-d110-4f71-b3eb-4626d0caf518_buggy.java b/tmp/3d1d46ad-8e14-44f4-a4cb-777466534192_fixed.java
+index 22640dd..c566c2c 100644
+--- a/tmp/22d055ab-d110-4f71-b3eb-4626d0caf518_buggy.java
++++ b/tmp/3d1d46ad-8e14-44f4-a4cb-777466534192_fixed.java
+@@ -1,3 +1,9 @@
+   private boolean hasExceptionHandler(Node cfgNode) {
++    List<DiGraphEdge<Node, Branch>> branchEdges = getCfg().getOutEdges(cfgNode);
++    for (DiGraphEdge<Node, Branch> edge : branchEdges) {
++      if (edge.getValue() == Branch.ON_EX) {
++        return true;
++      }
++    }
+     return false;
+   }

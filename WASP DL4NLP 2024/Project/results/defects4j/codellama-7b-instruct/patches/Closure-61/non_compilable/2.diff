@@ -1,0 +1,65 @@
+diff --git a/tmp/9b217980-bb28-4593-b1be-f71fb1f22a0d_buggy.java b/tmp/44e12e7d-b1ae-43ca-a0c1-158b61442d1b_fixed.java
+index b36c3f0..797d6af 100644
+--- a/tmp/9b217980-bb28-4593-b1be-f71fb1f22a0d_buggy.java
++++ b/tmp/44e12e7d-b1ae-43ca-a0c1-158b61442d1b_fixed.java
+@@ -1,58 +1,11 @@
+ /**
+  * Returns true if calls to this function have side effects.
+  *
+  * @param callNode The call node to inspected.
+  * @param compiler A compiler object to provide program state changing
+  *     context information. Can be null.
+  */
+ static boolean functionCallHasSideEffects(
+     Node callNode, @Nullable AbstractCompiler compiler) {
+-    if (callNode.getType() != Token.CALL) {
+-      throw new IllegalStateException(
+-          "Expected CALL node, got " + Token.name(callNode.getType()));
+-    }
+-
+-    if (callNode.isNoSideEffectsCall()) {
+-      return false;
+-    }
+-
+-    Node nameNode = callNode.getFirstChild();
+-
+-    // Built-in functions with no side effects.
+-    if (nameNode.getType() == Token.NAME) {
+-      String name = nameNode.getString();
+-      if (BUILTIN_FUNCTIONS_WITHOUT_SIDEEFFECTS.contains(name)) {
+-        return false;
+-      }
+-    } else if (nameNode.getType() == Token.GETPROP) {
+-      if (callNode.hasOneChild()
+-          && OBJECT_METHODS_WITHOUT_SIDEEFFECTS.contains(
+-                nameNode.getLastChild().getString())) {
+-        return false;
+-      }
+-
+-      if (callNode.isOnlyModifiesThisCall()
+-          && evaluatesToLocalValue(nameNode.getFirstChild())) {
+-        return false;
+-      }
+-
+-      // Functions in the "Math" namespace have no side effects.
+-
+-      if (compiler != null && !compiler.hasRegExpGlobalReferences()) {
+-        if (nameNode.getFirstChild().getType() == Token.REGEXP
+-            && REGEXP_METHODS.contains(nameNode.getLastChild().getString())) {
+-          return false;
+-        } else if (nameNode.getFirstChild().getType() == Token.STRING
+-            && STRING_REGEXP_METHODS.contains(
+-                nameNode.getLastChild().getString())) {
+-          Node param = nameNode.getNext();
+-          if (param != null &&
+-              (param.getType() == Token.STRING
+-                  || param.getType() == Token.REGEXP))
+-          return false;
+-        }
+-      }
+-    }
+-
+-    return true;
++    // YOUR CODE HERE
+ }
+\ No newline at end of file

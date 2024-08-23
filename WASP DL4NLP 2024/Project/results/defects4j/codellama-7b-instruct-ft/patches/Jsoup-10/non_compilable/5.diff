@@ -1,0 +1,52 @@
+diff --git a/tmp/86270ce5-238d-459e-9c72-72d0d19b7ad3_buggy.java b/tmp/6ecad3dc-07ce-488b-b4d2-76239e54f3b5_fixed.java
+index b4e6f03..f09cc58 100644
+--- a/tmp/86270ce5-238d-459e-9c72-72d0d19b7ad3_buggy.java
++++ b/tmp/6ecad3dc-07ce-488b-b4d2-76239e54f3b5_fixed.java
+@@ -1,44 +1,45 @@
+     /**
+      * Get an absolute URL from a URL attribute that may be relative (i.e. an <code>&lt;a href></code> or
+      * <code>&lt;img src></code>).
+      * <p/>
+      * E.g.: <code>String absUrl = linkEl.absUrl("href");</code>
+      * <p/>
+      * If the attribute value is already absolute (i.e. it starts with a protocol, like
+      * <code>http://</code> or <code>https://</code> etc), and it successfully parses as a URL, the attribute is
+      * returned directly. Otherwise, it is treated as a URL relative to the element's {@link #baseUri}, and made
+-     * absolute using that.
++     * absolute using that. If the URL is relative and it has a query portion, the query is preserved
++     * (antislash-escaped to prevent XSS attack by injecting a malformed query).
+      * <p/>
+      * As an alternate, you can use the {@link #attr} method with the <code>abs:</code> prefix, e.g.:
+      * <code>String absUrl = linkEl.attr("abs:href");</code>
+      *
+      * @param attributeKey The attribute key
+      * @return An absolute URL if one could be made, or an empty string (not null) if the attribute was missing or
+      * could not be made successfully into a URL.
+      * @see #attr
+      * @see java.net.URL#URL(java.net.URL, String)
+      */
+     public String absUrl(String attributeKey) {
+         Validate.notEmpty(attributeKey);
+ 
+         String relUrl = attr(attributeKey);
+         if (!hasAttr(attributeKey)) {
+             return ""; // nothing to make absolute with
+         } else {
+             URL base;
+             try {
+                 try {
+                     base = new URL(baseUri);
+                 } catch (MalformedURLException e) {
+                     // the base is unsuitable, but the attribute may be abs on its own, so try that
+                     URL abs = new URL(relUrl);
+                     return abs.toExternalForm();
+                 }
+                 // workaround: java resolves '//path/file + ?foo' to '//path/?foo', not '//path/file?foo' as desired
+                 URL abs = new URL(base, relUrl);
+                 return abs.toExternalForm();
+             } catch (MalformedURLException e) {
+-                return "";
++                return hasRelUrlData(relUrl) ? relUrl.replaceFirst("^[^:]+", baseUri) : "";
+             }
+         }
+     }

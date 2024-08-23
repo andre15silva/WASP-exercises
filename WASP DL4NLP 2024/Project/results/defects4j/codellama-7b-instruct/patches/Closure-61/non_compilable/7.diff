@@ -1,0 +1,121 @@
+diff --git a/tmp/a61d4b69-7b0b-40a1-9f32-0c377ac8108c_buggy.java b/tmp/4fb2c088-60ec-49f8-8932-467da7440852_fixed.java
+index b36c3f0..9674b0f 100644
+--- a/tmp/a61d4b69-7b0b-40a1-9f32-0c377ac8108c_buggy.java
++++ b/tmp/4fb2c088-60ec-49f8-8932-467da7440852_fixed.java
+@@ -1,58 +1,85 @@
+   /**
+    * Returns true if calls to this function have side effects.
+    *
+-   * @param callNode The call node to inspected.
++   * @param callNode The call node to inspect.
+    * @param compiler A compiler object to provide program state changing
+    *     context information. Can be null.
+    */
+-  static boolean functionCallHasSideEffects(
+-      Node callNode, @Nullable AbstractCompiler compiler) {
++  static boolean functionCallHasSideEffects(Node callNode, AbstractCompiler compiler) {
+     if (callNode.getType() != Token.CALL) {
+       throw new IllegalStateException(
+           "Expected CALL node, got " + Token.name(callNode.getType()));
+     }
+ 
+-    if (callNode.isNoSideEffectsCall()) {
+-      return false;
+-    }
+-
++    /* Evaluate the name of the function. */
+     Node nameNode = callNode.getFirstChild();
++    String name = getFunctionName(nameNode);
+ 
+-    // Built-in functions with no side effects.
+-    if (nameNode.getType() == Token.NAME) {
+-      String name = nameNode.getString();
+-      if (BUILTIN_FUNCTIONS_WITHOUT_SIDEEFFECTS.contains(name)) {
++    /* Handle built-in functions with no side effects. */
++    if (isBuiltinFunctionWithoutSideEffects(name)) {
+       return false;
+     }
+-    } else if (nameNode.getType() == Token.GETPROP) {
+-      if (callNode.hasOneChild()
+-          && OBJECT_METHODS_WITHOUT_SIDEEFFECTS.contains(
+-                nameNode.getLastChild().getString())) {
++
++    /* Handle object methods with no side effects. */
++    if (isObjectMethodWithoutSideEffects(nameNode)) {
+       return false;
+     }
+ 
+-      if (callNode.isOnlyModifiesThisCall()
+-          && evaluatesToLocalValue(nameNode.getFirstChild())) {
++    /* Handle RegExp methods with no side effects. */
++    if (!compiler.hasRegExpGlobalReferences() && isRegExpMethodWithoutSideEffects(nameNode)) {
+       return false;
+     }
+ 
+-      // Functions in the "Math" namespace have no side effects.
+-
+-      if (compiler != null && !compiler.hasRegExpGlobalReferences()) {
+-        if (nameNode.getFirstChild().getType() == Token.REGEXP
+-            && REGEXP_METHODS.contains(nameNode.getLastChild().getString())) {
++    // If the function is only modifying the "this" variable and has no side effect,
++    // it does not produce side effects.
++    if (callNode.isOnlyModifiesThisCall()) {
++      // If the function only modifies "this" variable and has no side effect,
++      // it does not produce side effects.
++      if (evaluatesToLocalValue(nameNode.getFirstChild())) {
+         return false;
+-        } else if (nameNode.getFirstChild().getType() == Token.STRING
+-            && STRING_REGEXP_METHODS.contains(
+-                nameNode.getLastChild().getString())) {
+-          Node param = nameNode.getNext();
+-          if (param != null &&
+-              (param.getType() == Token.STRING
+-                  || param.getType() == Token.REGEXP))
+-          return false;
+-        }
+       }
+     }
+ 
++    /* If the function modifies any other variables, we assume it has side effects. */
+     return true;
+   }
++
++  /**
++   * Evaluates the function name of the given call node.
++   *
++   * @param nameNode The name node of the function.
++   * @return The name of the function.
++   */
++  static String getFunctionName(Node nameNode) {
++    return nameNode.getString();
++  }
++
++  /**
++   * Checks whether the given function is a built-in function that has no side effects.
++   *
++   * @param name The name of the function.
++   * @return Whether the function has no side effects.
++   */
++  static boolean isBuiltinFunctionWithoutSideEffects(String name) {
++    return FUNCTION_BUILTIN_FUNCTIONS_WITHOUT_SIDEEFFECTS.contains(name);
++  }
++
++  /**
++   * Checks whether the given function is an object method that has no side effects.
++   *
++   * @param nameNode The name node of the function.
++   * @return Whether the function has no side effects.
++   */
++  static boolean isObjectMethodWithoutSideEffects(Node nameNode) {
++    return FUNCTION_OBJECT_METHODS_WITHOUT_SIDEEFFECTS.contains(nameNode.getString());
++  }
++
++  /**
++   * Check whether the given function is a RegExp method that has no side effects.
++   *
++   * @param nameNode The name node of the function.
++   * @return Whether the function has no side effects.
++   */
++  static boolean isRegExpMethodWithoutSideEffects(Node nameNode) {
++    return FUNCTION_REGEXP_METHODS_WITHOUT_SIDEEFFECTS.contains(nameNode.getString());
++  }

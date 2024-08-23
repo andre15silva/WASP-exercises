@@ -1,0 +1,36 @@
+diff --git a/tmp/45ee4005-b96d-40fd-a1b7-afc011fcfc74_buggy.java b/tmp/d8421517-6f14-444d-b575-108a7fca8310_fixed.java
+index 516fad7..40fc7f5 100644
+--- a/tmp/45ee4005-b96d-40fd-a1b7-afc011fcfc74_buggy.java
++++ b/tmp/d8421517-6f14-444d-b575-108a7fca8310_fixed.java
+@@ -1,8 +1,31 @@
+     /**
+      * If the property contains a collection, then the length of that
+      * collection, otherwise - 1.
+      * @return int length
+      */
+     public int getLength() {
+         return ValueUtils.getLength(getBaseValue());
+     }
++
++    protected void appendFunctionCall(ValueIterator context, StringBuffer xmlOut,
++            String functionName, ValueIterator[] para, int[] paraCount,
++            int valueCount, boolean printSeparator) {
++        int index = 0;
++        boolean first = true;
++        if (functionName.equals("equal"))
++            xmlOut.append(" ");
++        else
++            xmlOut.append("(");
++        xmlOut.append(functionName);
++        xmlOut.append(" ");
++        while (index < paraCount[0]) {
++            if (first)
++                first = false;
++            else
++                xmlOut.append(" ");
++            ValueRecord value = para[0].nextRecord();
++            xmlOut.append(value.getValue(0, valueCount));
++            index++;
++        }
++        xmlOut.append(")");
++    }

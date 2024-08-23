@@ -1,0 +1,39 @@
+diff --git a/tmp/8adfc7b5-ead0-4867-956f-3ce8cc0de131_buggy.java b/tmp/0d0cb0b8-1391-4519-be36-107a933f18ae_fixed.java
+index 7e43c1c..cdde42b 100644
+--- a/tmp/8adfc7b5-ead0-4867-956f-3ce8cc0de131_buggy.java
++++ b/tmp/0d0cb0b8-1391-4519-be36-107a933f18ae_fixed.java
+@@ -1,19 +1,34 @@
+   /**
+    * Visits a NEW node.
+    */
+   private void visitNew(NodeTraversal t, Node n) {
+     Node constructor = n.getFirstChild();
+     JSType type = getJSType(constructor).restrictByNotNullOrUndefined();
+     if (type.isConstructor() || type.isEmptyType() || type.isUnknownType()) {
+       FunctionType fnType = type.toMaybeFunctionType();
+       if (fnType != null) {
+         visitParameterList(t, n, fnType);
+         ensureTyped(t, n, fnType.getInstanceType());
+       } else {
+         ensureTyped(t, n);
+       }
++    } else if (type.isTemplateType()) {
++      // In a function like "new T()", and T is a template type var, the only
++      // safe type to assign this expression to is still 'Object'.
++      // The type param is inferred when the T is resolved.
++      ensureTyped(t, n);
+     } else {
+       report(t, n, NOT_A_CONSTRUCTOR);
++      if (NodeUtil.isInInterface(n.getParent())) {
++        // The type of an expression like "new Foo" in an interface refers to
++        // the base structural type (the "Foo" type). This is needed to support
++        // JS interfaces as superclasses (issue 1002).
++        TypeI nodeTypeI = getJSType(n).registry.createTemplateType(
++            "NewExpression_" + n.getToken() + "_" +
++            type.toString() + "_" + n.getNext().getChildIndex());
++        n.setType(getJSType(n, null, nodeTypeI));
++      } else {
+         ensureTyped(t, n);
+       }
+     }
++  }

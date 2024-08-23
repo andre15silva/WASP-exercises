@@ -1,0 +1,39 @@
+diff --git a/tmp/38851e4d-763f-497f-b9bd-a985b1ffce8b_buggy.java b/tmp/ac5dc95f-23ef-480f-8d6c-e6a753af0568_fixed.java
+index 9a3a9db..552b9c2 100644
+--- a/tmp/38851e4d-763f-497f-b9bd-a985b1ffce8b_buggy.java
++++ b/tmp/ac5dc95f-23ef-480f-8d6c-e6a753af0568_fixed.java
+@@ -1,27 +1,33 @@
+     /**
+      * If the stack contains an element with this tag's name, pop up the stack to remove the first occurrence. If not
+      * found, skips.
+      *
+      * @param endTag tag to close
+      */
+     private void popStackToClose(Token.EndTag endTag) {
+         String elName = endTag.name();
++        Element start = null;
+         Element firstFound = null;
+ 
+         for (int pos = stack.size() -1; pos >= 0; pos--) {
+             Element next = stack.get(pos);
+             if (next.nodeName().equals(elName)) {
+                 firstFound = next;
+                 break;
+             }
+         }
+         if (firstFound == null)
+             return; // not found, skip
+ 
+         for (int pos = stack.size() -1; pos >= 0; pos--) {
+             Element next = stack.get(pos);
+             stack.remove(pos);
+-            if (next == firstFound)
++            if (next == firstFound) {
++                Element last = stack.remove(stack.size() -1);
++                start.appendChild(last.ownerDocument().createComment(
++                        "discarded : " + next.toString().replace("&", "&amp;")
++                                .replaceAll(">$", "&gt;").replaceAll("^<", "&lt;")));
+                 break;
+             }
+         }
++    }

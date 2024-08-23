@@ -1,0 +1,20 @@
+diff --git a/tmp/a7f77d82-bfb6-403d-83a3-6374ba08b385_buggy.java b/tmp/94ab2782-4cdd-49e8-b720-76e465226655_fixed.java
+index f1d02c1..ab25550 100644
+--- a/tmp/a7f77d82-bfb6-403d-83a3-6374ba08b385_buggy.java
++++ b/tmp/94ab2782-4cdd-49e8-b720-76e465226655_fixed.java
+@@ -1,4 +1,15 @@
+         @Override
+         protected JSType caseTopType(JSType topType) {
+           return topType;
+         }
++
++        @Override
++        protected JSType caseNumberType(JSType numberType) {
++          // Check if the return type is a type that comes from the class.
++          JSTypeObject exprType = expr.getDeclaredType();
++          JSDocInfo docInfo = expr.getJSDocInfo();
++          if (exprType != null && exprType.getImplementedInterface() == null) {
++            return exprType; // Should match ..
++          }
++          return super.caseNumberType(numberType);
++        }

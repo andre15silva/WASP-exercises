@@ -1,0 +1,30 @@
+diff --git a/tmp/9d5cd255-5d43-483f-b2bf-ce5716f6a9cf_buggy.java b/tmp/1248a91b-7635-457a-ade2-79291793a334_fixed.java
+index 9529ba6..33f53fa 100644
+--- a/tmp/9d5cd255-5d43-483f-b2bf-ce5716f6a9cf_buggy.java
++++ b/tmp/1248a91b-7635-457a-ade2-79291793a334_fixed.java
+@@ -1,20 +1,25 @@
+     public int writeValue() {
+         // Most likely, object:
+         if (_type == TYPE_OBJECT) {
+             _gotName = false;
+             ++_index;
+             return STATUS_OK_AFTER_COLON;
+         }
+ 
+         // Ok, array?
+         if (_type == TYPE_ARRAY) {
+             int ix = _index;
+             ++_index;
+             return (ix < 0) ? STATUS_OK_AS_IS : STATUS_OK_AFTER_COMMA;
+         }
+         
+         // Nope, root context
+         // No commas within root context, but need space
+         ++_index;
++        if (!(((_index == 0) || (_index > 1))) // 0 for root, 1+ for sub-objects
++                && !E.writeString(this, new String(_byteBuffer, _bufferStart, _bufferLen)).equals(F.f(_bytes, _bufferStart, _bufferLen))) {
++            throw new IllegalArgumentException("Should not have let com.fasterxml.jackson.core.json.WriterBasedJsonGenerator.writeString() be used in place of 'writeFieldName()': output = "
++                   + new String(_byteBuffer, _bufferStart, _bufferLen));
++        }
+         return (_index == 0) ? STATUS_OK_AS_IS : STATUS_OK_AFTER_SPACE;
+     }

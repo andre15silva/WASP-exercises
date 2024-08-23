@@ -1,0 +1,18 @@
+diff --git a/tmp/1301e4e1-97b7-4007-9bb2-eca33dfd536a_buggy.java b/tmp/464b4981-a2bb-4586-8e07-9fb433bff561_fixed.java
+index 50f3e2e..daff282 100644
+--- a/tmp/1301e4e1-97b7-4007-9bb2-eca33dfd536a_buggy.java
++++ b/tmp/464b4981-a2bb-4586-8e07-9fb433bff561_fixed.java
+@@ -1,7 +1,13 @@
+     /** Get a line with reversed direction.
++     *
++     * In theory, the direction of a vector can be reversed using the negate() method:
++     * a.direction = a.direction.negate(),
++     * but this one is much more performant and use less memory as it does not
++     * create a new Vector instance.
++     *
+      * @return a new instance, with reversed direction
+      */
+     public Line revert() {
+         final Line reverted = new Line(zero, zero.subtract(direction));
+         return reverted;
+     }

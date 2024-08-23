@@ -1,0 +1,59 @@
+diff --git a/tmp/80ec8c48-efa8-49ac-812f-cf488c66613d_buggy.java b/tmp/ed9707af-a0ff-40f5-a808-e6212ed6d153_fixed.java
+index 71189c3..0c75063 100644
+--- a/tmp/80ec8c48-efa8-49ac-812f-cf488c66613d_buggy.java
++++ b/tmp/ed9707af-a0ff-40f5-a808-e6212ed6d153_fixed.java
+@@ -1,46 +1,53 @@
++
+     public void validate(final WriteableCommandLine commandLine)
+             throws OptionException {
+         // number of options found
+         int present = 0;
+ 
+         // reference to first unexpected option
+         Option unexpected = null;
+ 
++        System.out.println("options size: " + options.size());
++
+         for (final Iterator i = options.iterator(); i.hasNext();) {
+             final Option option = (Option) i.next();
+ 
+             // needs validation?
+             boolean validate = option.isRequired() || option instanceof Group;
+             if (validate) {
+                 option.validate(commandLine);
+             }
+ 
+             // if the child option is present then validate it
+             if (commandLine.hasOption(option)) {
++                System.out.println("Found: " + option.getLabel());
+                 if (++present > maximum) {
+                     unexpected = option;
+ 
+                     break;
+                 }
+ 
+                 option.validate(commandLine);
+             }
+         }
+ 
+         // too many options
+         if (unexpected != null) {
++            System.out.println("Too many options: " + unexpected.getLabel());
+             throw new OptionException(this, ResourceConstants.UNEXPECTED_TOKEN,
+                                       unexpected.getPreferredName());
+         }
+ 
+         // too few option
+         if (present < minimum) {
++            System.out.println("Too few options: " + present + " < " +
++                    minimum);
+             throw new OptionException(this, ResourceConstants.MISSING_OPTION);
+         }
+ 
+         // validate each anonymous argument
+         for (final Iterator i = anonymous.iterator(); i.hasNext();) {
+             final Option option = (Option) i.next();
+             option.validate(commandLine);
+         }
+     }
+\ No newline at end of file

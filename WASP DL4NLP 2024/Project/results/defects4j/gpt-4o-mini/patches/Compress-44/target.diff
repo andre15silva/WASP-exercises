@@ -1,0 +1,18 @@
+diff --git a/tmp/7e0578c6-0bcf-40d8-b744-62db129e70db_buggy.java b/tmp/f52d3281-9b11-4ade-9e5b-7318c63168d6_fixed.java
+index 741e96b..d349ee3 100644
+--- a/tmp/7e0578c6-0bcf-40d8-b744-62db129e70db_buggy.java
++++ b/tmp/f52d3281-9b11-4ade-9e5b-7318c63168d6_fixed.java
+@@ -1,7 +1,13 @@
+     public ChecksumCalculatingInputStream(final Checksum checksum, final InputStream in) {
+ 
++        if ( checksum == null ){
++            throw new NullPointerException("Parameter checksum must not be null");
++        }
+ 
++        if ( in == null ){
++            throw new NullPointerException("Parameter in must not be null");
++        }
+ 
+         this.checksum = checksum;
+         this.in = in;
+     }

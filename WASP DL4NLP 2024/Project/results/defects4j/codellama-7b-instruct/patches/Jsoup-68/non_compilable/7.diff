@@ -1,0 +1,49 @@
+diff --git a/tmp/56f7fbf7-e7f3-4215-802a-305f3d233b66_buggy.java b/tmp/be70e6e4-9b2e-458a-9544-7e457c6ae57f_fixed.java
+index 511560e..6907c7b 100644
+--- a/tmp/56f7fbf7-e7f3-4215-802a-305f3d233b66_buggy.java
++++ b/tmp/be70e6e4-9b2e-458a-9544-7e457c6ae57f_fixed.java
+@@ -1,21 +1,27 @@
+-    private boolean inSpecificScope(String[] targetNames, String[] baseTypes, String[] extraTypes) {
+-        // https://html.spec.whatwg.org/multipage/parsing.html#has-an-element-in-the-specific-scope
+-        int bottom = stack.size() -1;
+-        if (bottom > MaxScopeSearchDepth) {
+-            bottom = MaxScopeSearchDepth;
+-        }
+-        final int top = bottom > MaxScopeSearchDepth ? bottom - MaxScopeSearchDepth : 0;
+-        // don't walk too far up the tree
++/**
++ * Checks if a string is in the sorted array of strings,
++ * starting from the end of the array.
++ *
++ * @param str the string to search for
++ * @param sortedStrings the sorted array of strings
++ * @return true if the string is in the array, false otherwise
++ */
++public static boolean inSorted(String str, String[] sortedStrings) {
++    int low = 0;
++    int high = sortedStrings.length - 1;
+ 
+-        for (int pos = bottom; pos >= top; pos--) {
+-            final String elName = stack.get(pos).nodeName();
+-            if (inSorted(elName, targetNames))
++    while (low <= high) {
++        int mid = (low + high) >>> 1;
++        int cmp = str.compareTo(sortedStrings[mid]);
++
++        if (cmp < 0) {
++            high = mid - 1;
++        } else if (cmp > 0) {
++            low = mid + 1;
++        } else {
+             return true;
+-            if (inSorted(elName, baseTypes))
+-                return false;
+-            if (extraTypes != null && inSorted(elName, extraTypes))
+-                return false;
+         }
+-        //Validate.fail("Should not be reachable"); // would end up false because hitting 'html' at root (basetypes)
++    }
++
+     return false;
+ }
+\ No newline at end of file

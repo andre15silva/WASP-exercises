@@ -1,0 +1,61 @@
+diff --git a/tmp/8ce10259-a807-461f-a27b-ae18bdd246c0_buggy.java b/tmp/e30d68c5-dbe9-44b2-a045-ae6c980d3cf5_fixed.java
+index 29a9d2f..4d801a2 100644
+--- a/tmp/8ce10259-a807-461f-a27b-ae18bdd246c0_buggy.java
++++ b/tmp/e30d68c5-dbe9-44b2-a045-ae6c980d3cf5_fixed.java
+@@ -1,43 +1,54 @@
+   /**
+    * Handles a goog.require call.
+    */
+   private void processRequireCall(NodeTraversal t, Node n, Node parent) {
+     Node left = n.getFirstChild();
+     Node arg = left.getNext();
+     if (verifyLastArgumentIsString(t, left, arg)) {
+       String ns = arg.getString();
+       ProvidedName provided = providedNames.get(ns);
+       if (provided == null || !provided.isExplicitlyProvided()) {
+         unrecognizedRequires.add(
+             new UnrecognizedRequire(n, ns, t.getSourceName()));
+-      } else {
++      } else if (compiler.usesClosurePass() && !n.isFirstChildOfLhs()) {
++        // NOTE(nicksantos|platinummonkey): We don't want to use undeclaredVar
++        // to check for goog. In many cases, goog is actually declared, such
++        // as for when the programmer adds it in themselves.
++        // The one case where goog is not declared is if it's on the LHS of an
++        // assign, like x = goog.require;
++        // If that happens, then we assume it's being done for side effect
++        // and don't add a undeclared variable call. Because the LHS of an
++        // assign is never removed (like it's done during normal declaration
++        // collection), this won't hurt.
++        compiler.getSymbolTable().declareUndeclaredVarInGlobalScope(left);
++      }
++
+       JSModule providedModule = provided.explicitModule;
+ 
+       // This must be non-null, because there was an explicit provide.
+       Preconditions.checkNotNull(providedModule);
+ 
+       JSModule module = t.getModule();
+       if (moduleGraph != null &&
+           module != providedModule &&
+           !moduleGraph.dependsOn(module, providedModule)) {
+         compiler.report(
+             t.makeError(n, XMODULE_REQUIRE_ERROR, ns,
+                 providedModule.getName(),
+                 module.getName()));
+       }
+-      }
+ 
+       maybeAddToSymbolTable(left);
+       maybeAddStringNodeToSymbolTable(arg);
+ 
+       // Requires should be removed before further processing.
+       // Some clients run closure pass multiple times, first with
+       // the checks for broken requires turned off. In these cases, we
+       // allow broken requires to be preserved by the first run to
+       // let them be caught in the subsequent run.
+       if (provided != null) {
+         parent.detachFromParent();
+         compiler.reportCodeChange();
+       }
+     }
+   }

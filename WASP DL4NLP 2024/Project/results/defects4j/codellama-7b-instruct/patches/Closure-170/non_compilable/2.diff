@@ -1,0 +1,37 @@
+diff --git a/tmp/7c938afe-222b-4509-ad25-69338cbcd798_buggy.java b/tmp/506a1e86-7752-480d-b40d-6d9dec3e389f_fixed.java
+index 5abdeb5..3b9dfef 100644
+--- a/tmp/7c938afe-222b-4509-ad25-69338cbcd798_buggy.java
++++ b/tmp/506a1e86-7752-480d-b40d-6d9dec3e389f_fixed.java
+@@ -1,29 +1,4 @@
+-    /**
+-     * Computes the number of uses of the variable varName and store it in
+-     * numUseWithinUseCfgNode.
+-     */
+-    private void getNumUseInUseCfgNode(final Node cfgNode) {
+ 
+-      numUsesWithinCfgNode = 0;
+-      AbstractCfgNodeTraversalCallback gatherCb =
+-          new AbstractCfgNodeTraversalCallback() {
++To fix this, we need to modify the check in the visitor callback to make sure that the "side effect" check is more exact and includes a special case for this situation. We can add a check to see if the current node is the first child of the parent node, and only count a use if it is not the first child of an assignment statement.
+ 
+-        @Override
+-        public void visit(NodeTraversal t, Node n, Node parent) {
+-          if (n.isName() && n.getString().equals(varName) &&
+-            // We make a special exception when the entire cfgNode is a chain
+-            // of assignments, since in that case the assignment statements
+-            // will happen after the inlining of the right hand side.
+-            // TODO(blickly): Make the SIDE_EFFECT_PREDICATE check more exact
+-            //   and remove this special case.
+-              !(parent.isAssign() &&
+-               (parent.getFirstChild() == n))) {
+-              // Don't count lhs of top-level assignment chain
+-              numUsesWithinCfgNode++;
+-          }
+-        }
+-
+-      };
+-
+-      NodeTraversal.traverse(compiler, cfgNode, gatherCb);
+-    }
++Here is a possible fix:
+\ No newline at end of file

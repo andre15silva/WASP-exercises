@@ -1,0 +1,25 @@
+diff --git a/tmp/74706f9c-8f4a-4c62-8503-80988fdda4bd_buggy.java b/tmp/5909337e-e0ad-463c-8e40-b0ebc3da7d27_fixed.java
+index 2bac745..316640b 100644
+--- a/tmp/74706f9c-8f4a-4c62-8503-80988fdda4bd_buggy.java
++++ b/tmp/5909337e-e0ad-463c-8e40-b0ebc3da7d27_fixed.java
+@@ -1,16 +1,16 @@
+     public static ParticipantAction from(MemberStatus memberStatus, boolean disabled) {
+         return switch (memberStatus) {
+             case UNKNOWN, DECLINED -> new ParticipantAction(
+                     "/member/accept",
+                     "Participate in Rotation &#x2328;",
+                     disabled);
+             case PARTICIPANT -> new ParticipantAction(
+                     "/member/decline",
+                     "Leave Rotation &#x1f44b;",
+-                    false); // can always leave
++                    false); 
+             case SPECTATOR -> new ParticipantAction(
+-                    "/member/accept",
+-                    "Switch to Participant &#x1f44b;",
++                    "/member/accept?switchToParticipant=true",
++                    "Switch to Participant &#9776;", 
+                     disabled);
+         };
+     }
+\ No newline at end of file

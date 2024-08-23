@@ -1,0 +1,163 @@
+diff --git a/tmp/8803d750-f1e3-46a9-b67f-9198f7d51655_buggy.java b/tmp/b010f1fb-6b3f-49d4-9596-acb59142a3ef_fixed.java
+index a3709ee..4804133 100644
+--- a/tmp/8803d750-f1e3-46a9-b67f-9198f7d51655_buggy.java
++++ b/tmp/b010f1fb-6b3f-49d4-9596-acb59142a3ef_fixed.java
+@@ -1,71 +1,140 @@
+   /**
+    * @param locals A predicate to apply to unknown local values.
+    * @return Whether the node is known to be a value that is not a reference
+    *     outside the expression scope.
+    */
+   static boolean evaluatesToLocalValue(Node value, Predicate<Node> locals) {
+     switch (value.getType()) {
+       case Token.ASSIGN:
+         // A result that is aliased by a non-local name, is the effectively the
+         // same as returning a non-local name, but this doesn't matter if the
+         // value is immutable.
+         return NodeUtil.isImmutableValue(value.getLastChild())
+             || (locals.apply(value)
+                 && evaluatesToLocalValue(value.getLastChild(), locals));
++      case Token.AND:
++        return evaluatesToLocalValue(value.getFirstChild(), locals)
++            && evaluatesToLocalValue(value.getLastChild(), locals);
++      case Token.CALL:
++        // If the call has no side-effect, and the return value of the function
++        // does not matter, it reduces to nothing.
++        return !hasSideEffects(value.getFirstChild())
++            && evaluatesToLocalValue(value.getLastChild(), locals);
+       case Token.COMMA:
+         return evaluatesToLocalValue(value.getLastChild(), locals);
+-      case Token.AND:
+-      case Token.OR:
+-        return evaluatesToLocalValue(value.getFirstChild(), locals)
+-           && evaluatesToLocalValue(value.getLastChild(), locals);
+       case Token.HOOK:
+         return evaluatesToLocalValue(value.getFirstChild().getNext(), locals)
+             && evaluatesToLocalValue(value.getLastChild(), locals);
+       case Token.INC:
+       case Token.DEC:
+         if (value.getBooleanProp(Node.INCRDECR_PROP)) {
+           return evaluatesToLocalValue(value.getFirstChild(), locals);
+         } else {
+           return true;
+         }
+-      case Token.THIS:
+-        return locals.apply(value);
+       case Token.NAME:
+-        return isImmutableValue(value) || locals.apply(value);
++        // Names with side-effects should be qualified.
++        if (!locals.apply(value) || NodeUtil.mayHaveSideEffects(value)) {
++          return true;
++        }
++        // Otherwise, it might be an alias.
++        return isImmutableValue(value);
+       case Token.GETELEM:
+       case Token.GETPROP:
+-        // There is no information about the locality of object properties.
+         return locals.apply(value);
+-      case Token.CALL:
+-        return callHasLocalResult(value)
+-            || isToStringMethodCall(value)
+-            || locals.apply(value);
++      case Token.FUNCTION:
++        // If there are no side-effecting parameters, and no side effects in the
++        // body of the code, it reduces to nothing.
++        if (isSimpleFunction(value)
++            && !mayHaveSideEffects(value.getFirstChild().getNext())
++            && evaluatesToLocalValue(value.getLastChild(), locals)) {
++          return true;
++        }
++        return isImmutableValue(value);
+       case Token.NEW:
+         // TODO(nicksantos): This needs to be changed so that it
+         // returns true iff we're sure the value was never aliased from inside
+         // the constructor (similar to callHasLocalResult)
+         return true;
+-      case Token.FUNCTION:
+-      case Token.REGEXP:
+-      case Token.ARRAYLIT:
+-      case Token.OBJECTLIT:
+-        // Literals objects with non-literal children are allowed.
+-        return true;
+       case Token.IN:
+         // TODO(johnlenz): should IN operator be included in #isSimpleOperator?
+         return true;
++      case Token.GETRANDOM:
++      case Token.THIS:
++        // The 'this' has local side effects, not of the 'this' pointer itself.
++        // TODO(nicksantos): We need to special case this to only include
++        // side-effect-free use of 'this' in the global scope.
++        return true;
++      case Token.ARRAYLIT:
++      case Token.OBJECTLIT:
++        // Literals objects with non-local children are allowed.
++        if (NodeUtil.mayHaveSideEffects(value)) {
++          return true;
++        }
++        // The contents of arrays and objects don't matter
++        // TODO(nicksantos): We need a more principled way to ignore
++        // the side-effects of arrays and objects.
++        for (Node child = value.getFirstChild();
++             child != null;
++             child = child.getNext()) {
++          if (evaluatesToLocalValue(child, locals)) {
++            // Object/arrays containing only immutable data types have no side
++            // effects.
++            return true;
++          }
++        }
++        return true;
++      case Token.TO_OBJECT:
++        return isImmutableValue(value);
++      case Token.INC:
++      case Token.DEC:
++        if (value.getBooleanProp(Node.INCRDECR_PROP)) {
++          return isImmutableValue(value.getFirstChild());
++        } else {
++          return true;
++        }
++      case Token.COMMA:
++      case Token.OR:
++        Node firstChild = value.getFirstChild();
++        // The right side of a Comma is not analyzed for unknown local names.
++        // It's only analyzed for side effects.
++        return firstChild.getType() != Token.COMMA
++            && evaluatesToLocalValue(firstChild, locals);
++      case Token.AND:
++        return evaluatesToLocalValue(value.getFirstChild(), locals)
++           && evaluatesToLocalValue(value.getLastChild(), locals);
++      case Token.HOOK:
++        return evaluatesToLocalValue(value.getFirstChild().getNext(), locals)
++           && evaluatesToLocalValue(value.getLastChild(), locals);
++      case Token.NAME:
++        return isImmutableValue(value) || locals.apply(value);
++      case Token.REGEXP:
++      case Token.FUNCTION:
++      case Token.RETURN:
++      case Token.DELPROP:
++      case Token.TYPEOF:
++      case Token.TICK:
++      case Token.VAE_INFO_BAR:
++      case Token.VAE_GLOBAL_OBJECT:
++      case Token.VAE_EVAL_OBJECT:
++      case Token.FINALIZE_STACK:
++        return true;
++      case Token.INCLUSIVE_RANGE:
++      case Token.OBJECT_CONSTRUCTOR:
++         // These can have side effectful property creation.
++         return true;
+       default:
+         // Other op force a local value:
+         //  x = '' + g (x is now an local string)
+         //  x -= g (x is now an local number)
+         if (isAssignmentOp(value)
+             || isSimpleOperator(value)
+             || isImmutableValue(value)) {
+           return true;
+         }
+ 
+         throw new IllegalStateException(
+             "Unexpected expression node" + value +
+             "\n parent:" + value.getParent());
+     }
+   }

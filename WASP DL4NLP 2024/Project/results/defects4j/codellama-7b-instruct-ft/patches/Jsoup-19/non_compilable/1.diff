@@ -1,0 +1,25 @@
+diff --git a/tmp/f4c8edce-4427-47bf-bec1-a9d60e85a258_buggy.java b/tmp/271d5eb6-3ee0-4665-99f5-bade6a1e422d_fixed.java
+index 4aff4e4..4e401cf 100644
+--- a/tmp/f4c8edce-4427-47bf-bec1-a9d60e85a258_buggy.java
++++ b/tmp/271d5eb6-3ee0-4665-99f5-bade6a1e422d_fixed.java
+@@ -1,15 +1,20 @@
+     private boolean testValidProtocol(Element el, Attribute attr, Set<Protocol> protocols) {
+         // try to resolve relative urls to abs, and optionally update the attribute so output html has abs.
+         // rels without a baseuri get removed
+         String value = el.absUrl(attr.getKey());
+         if (!preserveRelativeLinks)
+             attr.setValue(value);
+         
+         for (Protocol protocol : protocols) {
+             String prot = protocol.toString() + ":";
+             if (value.toLowerCase().startsWith(prot)) {
+                 return true;
+             }
+         }
++        // for things that are not relative protocols, see if we are configured to allow
++        if (!attr.hasKey("src" && protocols.contains(Protocol.CID) && cidProtocolWhitelist.contains(attr.getValue())) {
++            // protocol matches allowed patterns (data, gzdata, gzdata64, cid) + base dataUri
++            return true;
++        }
+         return false;
+     }

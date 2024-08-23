@@ -1,0 +1,42 @@
+diff --git a/tmp/801fa440-f0f6-4a9c-b398-bd1dad7c2ada_buggy.java b/tmp/c9d57d9f-3c76-4480-897f-1db6e84e233f_fixed.java
+index 01967cc..dc6840e 100644
+--- a/tmp/801fa440-f0f6-4a9c-b398-bd1dad7c2ada_buggy.java
++++ b/tmp/c9d57d9f-3c76-4480-897f-1db6e84e233f_fixed.java
+@@ -1,35 +1,36 @@
+         /**
+          * Method called to check if the default type handler should be
+          * used for given type.
+          * Note: "natural types" (String, Boolean, Integer, Double) will never
+          * use typing; that is both due to them being concrete and final,
+          * and since actual serializers and deserializers will also ignore any
+          * attempts to enforce typing.
+          */
+         public boolean useForType(JavaType t)
+         {
+             switch (_appliesFor) {
+             case NON_CONCRETE_AND_ARRAYS:
+                 while (t.isArrayType()) {
+                     t = t.getContentType();
+                 }
+                 // fall through
+             case OBJECT_AND_NON_CONCRETE:
+-//                return t.isJavaLangObject() || 
+                 return (t.getRawClass() == Object.class)
+                         || (!t.isConcrete()
+                                 // [databind#88] Should not apply to JSON tree models:
+                         || TreeNode.class.isAssignableFrom(t.getRawClass()));
+ 
+             case NON_FINAL:
+                 while (t.isArrayType()) {
+                     t = t.getContentType();
+                 }
+                 // [Issue#88] Should not apply to JSON tree models:
+                 return !t.isFinal() && !TreeNode.class.isAssignableFrom(t.getRawClass());
++            case ARRAYS_AND_OBJECTS:
++                return t.isContainerType();
+             default:
+             //case JAVA_LANG_OBJECT:
+ //                return t.isJavaLangObject();
+                 return (t.getRawClass() == Object.class);
+             }
+         }

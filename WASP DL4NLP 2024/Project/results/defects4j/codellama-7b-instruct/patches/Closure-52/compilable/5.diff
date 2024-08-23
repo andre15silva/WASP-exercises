@@ -1,0 +1,19 @@
+diff --git a/tmp/e911b32e-20a9-4249-b115-01daac2b8ddf_buggy.java b/tmp/f67efee2-095d-4c98-bf53-76b12695fb6a_fixed.java
+index 4b7f469..fe0bd55 100644
+--- a/tmp/e911b32e-20a9-4249-b115-01daac2b8ddf_buggy.java
++++ b/tmp/f67efee2-095d-4c98-bf53-76b12695fb6a_fixed.java
+@@ -1,10 +1,8 @@
+   static boolean isSimpleNumber(String s) {
+-    int len = s.length();
+-    for (int index = 0; index < len; index++) {
+-      char c = s.charAt(index);
+-      if (c < '0' || c > '9') {
++    try {
++      double num = Double.parseDouble(s);
++      return Double.isInfinite(num) || Double.isNaN(num) ? false : true;
++    } catch (NumberFormatException e) {
+       return false;
+     }
+   }
+-    return len > 0;
+-  }

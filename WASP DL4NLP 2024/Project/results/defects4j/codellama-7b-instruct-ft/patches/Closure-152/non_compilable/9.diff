@@ -1,0 +1,66 @@
+diff --git a/tmp/4a64a1a8-49b9-4ad3-b26f-8e00ac1af4b2_buggy.java b/tmp/d6ccf150-e391-4cd3-958f-09d8b90881a1_fixed.java
+index 58a1651..595c05a 100644
+--- a/tmp/4a64a1a8-49b9-4ad3-b26f-8e00ac1af4b2_buggy.java
++++ b/tmp/d6ccf150-e391-4cd3-958f-09d8b90881a1_fixed.java
+@@ -1,32 +1,61 @@
+   @Override
+   JSType resolveInternal(ErrorReporter t, StaticScope<JSType> scope) {
+     setResolvedTypeInternal(this);
+ 
+     call = (ArrowType) safeResolve(call, t, scope);
+     prototype = (FunctionPrototypeType) safeResolve(prototype, t, scope);
+ 
+     // Warning about typeOfThis if it doesn't resolve to an ObjectType
+     // is handled further upstream.
+     // TODO(nicksantos): Handle this correctly if we have a UnionType.
+     typeOfThis = (ObjectType) safeResolve(typeOfThis, t, scope);
+ 
+     boolean changed = false;
+     ImmutableList.Builder<ObjectType> resolvedInterfaces =
+         ImmutableList.builder();
+     for (ObjectType iface : implementedInterfaces) {
+       ObjectType resolvedIface = (ObjectType) iface.resolve(t, scope);
+       resolvedInterfaces.add(resolvedIface);
+       changed |= (resolvedIface != iface);
+     }
+     if (changed) {
+       implementedInterfaces = resolvedInterfaces.build();
+     }
+ 
+     if (subTypes != null) {
+       for (int i = 0; i < subTypes.size(); i++) {
+         subTypes.set(i, (FunctionType) subTypes.get(i).resolve(t, scope));
+       }
+     }
+ 
++    // In some cases when you resolve a typedef, you end up creating
++    // a backwards typedef. e.g.
++    //   function f() {
++    //     /** @this {ns1.AnotherClass} */ function g() {}
++    //   }
++    //
++    // In the case of this typedef, the type doesn't match the
++    // expected type at call-site.
++    // Whenever this happens, we produce a warning that advises the developer
++    // to use a forward-typedef if at call-site you specify this type is from
++    // a namespace.
++    if (t.fromPrototype) {
++      if (this.getTypeOfThis() != null) {
++        if (this.getTypeOfThis() instanceof UnionType) {
++          CheckPoint checkPoint2 = CheckPoint.create();
++          t.fromTypedef = false;
++          t.fromPrototype = false;
++          t.backwardsTypedef = true;
++          ((FunctionType)this).resolve(t, scope);
++          t.backwardsTypedef = false;
++          if (checkPoint2.isUnchanged()) {
++            t.report(
++                INVALID_TYPEDEF_USE,
++                this.getTypeOfThis(),
++                this.type.getObjectType());
++          }
++        }
++      }
++    }
+     return super.resolveInternal(t, scope);
+   }

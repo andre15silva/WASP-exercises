@@ -1,0 +1,47 @@
+diff --git a/tmp/183b9281-beaf-4135-ac2b-8e2ad713fc84_buggy.java b/tmp/2d276deb-30f0-4ee1-a7ff-e201ea947057_fixed.java
+index 9d42346..597ac68 100644
+--- a/tmp/183b9281-beaf-4135-ac2b-8e2ad713fc84_buggy.java
++++ b/tmp/2d276deb-30f0-4ee1-a7ff-e201ea947057_fixed.java
+@@ -1,37 +1,39 @@
+ private ReflectiveTypeAdapterFactory.BoundField createBoundField(
+     final Gson context, final Field field, final String name,
+     final TypeToken<?> fieldType, boolean serialize, boolean deserialize) {
+   final boolean isPrimitive = Primitives.isPrimitive(fieldType.getRawType());
+-    // special casing primitives here saves ~5% on Android...
+   JsonAdapter annotation = field.getAnnotation(JsonAdapter.class);
+   TypeAdapter<?> mapped = null;
+   if (annotation != null) {
+     mapped = getTypeAdapter(constructorConstructor, context, fieldType, annotation);
+   }
+   final boolean jsonAdapterPresent = mapped != null;
+   if (mapped == null) mapped = context.getAdapter(fieldType);
+ 
+   final TypeAdapter<?> typeAdapter = mapped;
+   return new ReflectiveTypeAdapterFactory.BoundField(name, serialize, deserialize) {
+     @SuppressWarnings({"unchecked", "rawtypes"}) // the type adapter and field type always agree
+     @Override void write(JsonWriter writer, Object value)
+         throws IOException, IllegalAccessException {
+       Object fieldValue = field.get(value);
+       TypeAdapter t =
+         new TypeAdapterRuntimeTypeWrapper(context, typeAdapter, fieldType.getType());
+       t.write(writer, fieldValue);
+     }
+     @Override void read(JsonReader reader, Object value)
+         throws IOException, IllegalAccessException {
+       Object fieldValue = typeAdapter.read(reader);
++      // Fixed: corrected deserialize to handle primitive and non-primitive fields correctly
+       if (fieldValue != null || !isPrimitive) {
+         field.set(value, fieldValue);
++      } else {
++        field.set(value, 0); // Handle default value for primitive types
+       }
+     }
+     @Override public boolean writeField(Object value) throws IOException, IllegalAccessException {
+-        if (!serialized) return false;
++      if (!serialize) return false; // Fixed: corrected the variable name to serialize
+       Object fieldValue = field.get(value);
+       return fieldValue != value; // avoid recursion for example for Throwable.cause
+     }
+   };
+ }
+\ No newline at end of file

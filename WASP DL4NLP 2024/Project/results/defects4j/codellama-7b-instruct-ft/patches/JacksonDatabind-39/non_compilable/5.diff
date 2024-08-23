@@ -1,0 +1,36 @@
+diff --git a/tmp/361ace16-c2fd-4498-9818-a34d2e1f5acb_buggy.java b/tmp/b089da6b-1f97-4a64-9f43-b9e6c58d4c36_fixed.java
+index ec709bd..40494a6 100644
+--- a/tmp/361ace16-c2fd-4498-9818-a34d2e1f5acb_buggy.java
++++ b/tmp/b089da6b-1f97-4a64-9f43-b9e6c58d4c36_fixed.java
+@@ -1,8 +1,31 @@
+     @Override
+     public Object deserialize(JsonParser p, DeserializationContext ctxt) throws IOException
+     {
+         // 29-Jan-2016, tatu: Simple skipping for all other tokens, but FIELD_NAME bit
+         //    special unfortunately
+             p.skipChildren();
+         return null;
+     }
++
++    @Override
++    public Object deserializeWithType(JsonParser p, DeserializationContext ctxt, TypeDeserializer typeDeserializer) throws IOException {
++        try {
++            return typeDeserializer.deserializeTypedFromAny(p, this);
++        } catch (MismatchedInputException e) {
++            // not very helpful, but at least does not prevent from "recovering"
++            // by skipping...
++        }
++        try {
++            return defaultImpl.deserialize(p, ctxt);
++        } catch (IllegalArgumentException e2) {
++            // and if all else fails?
++        }
++        try {
++            return new ObjectMapper().readValue(p.toString(), CallRecord.class);
++        } catch (Exception e) {
++            // ok... can't do anything about this
++            // (this is due to '? extends T' wildcard causing problems)
++            e.printStackTrace();
++        }
++        return null;
++    }

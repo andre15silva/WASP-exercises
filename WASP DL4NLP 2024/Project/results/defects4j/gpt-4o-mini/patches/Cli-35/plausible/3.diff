@@ -1,0 +1,47 @@
+diff --git a/tmp/e0ea5d7c-f616-4ae0-9b22-865650500249_buggy.java b/tmp/2b38d643-affd-4778-9c01-b09c0f28f3b3_fixed.java
+index c6b65da..9fb844b 100644
+--- a/tmp/e0ea5d7c-f616-4ae0-9b22-865650500249_buggy.java
++++ b/tmp/2b38d643-affd-4778-9c01-b09c0f28f3b3_fixed.java
+@@ -1,25 +1,31 @@
+-    /**
+-     * Returns the options with a long name starting with the name specified.
+-     * 
+-     * @param opt the partial name of the option
+-     * @return the options matching the partial name specified, or an empty list if none matches
+-     * @since 1.3
+-     */
+ public List<String> getMatchingOptions(String opt)
+ {
+     opt = Util.stripLeadingHyphens(opt);
+     
+     List<String> matchingOpts = new ArrayList<String>();
++    boolean exactMatchFound = false;
+ 
+     // for a perfect match return the single option only
+-
+     for (String longOpt : longOpts.keySet())
+     {
+-            if (longOpt.startsWith(opt))
++        if (longOpt.equals(opt))
+         {
++            matchingOpts.clear(); // Clear previous matches for exact match
+             matchingOpts.add(longOpt);
++            exactMatchFound = true;
++            break; // Exit loop if exact match is found
+         }
++        else if (longOpt.startsWith(opt))
++        {
++            matchingOpts.add(longOpt);
++        }
++    }
++
++    // If an exact match was found, no need to look for others
++    if (exactMatchFound)
++    {
++        return matchingOpts; // Return the exact match found
+     }
+     
+-        return matchingOpts;
++    return matchingOpts; // Return all matches found
+ }
+\ No newline at end of file

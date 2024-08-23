@@ -1,0 +1,13 @@
+diff --git a/tmp/4f3da82b-066c-4866-b113-44d40bb7173f_buggy.java b/tmp/fa8c1dc7-b391-41a9-b9fa-de3fbb8a548f_fixed.java
+index e69de29..d9ce6f5 100644
+--- a/tmp/4f3da82b-066c-4866-b113-44d40bb7173f_buggy.java
++++ b/tmp/fa8c1dc7-b391-41a9-b9fa-de3fbb8a548f_fixed.java
+@@ -0,0 +1,8 @@
++    @Override
++    public JsonGenerator disable(Feature f) {
++        super.disable(f);
++        if (f == Feature.QUOTE_FIELD_NAMES) {
++            _cfgUnqNames = true;
++        }
++        return this;
++    }

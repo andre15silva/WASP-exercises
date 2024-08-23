@@ -1,0 +1,43 @@
+diff --git a/tmp/5db6d8ac-5e11-4e46-b618-1e5e84003042_buggy.java b/tmp/670f7015-9ba6-431d-8c0f-8dc83429b72a_fixed.java
+index 6ea5795..15f3d34 100644
+--- a/tmp/5db6d8ac-5e11-4e46-b618-1e5e84003042_buggy.java
++++ b/tmp/670f7015-9ba6-431d-8c0f-8dc83429b72a_fixed.java
+@@ -1,37 +1,37 @@
+     /**
+      * Appends the usage clause for an Option to a StringBuffer.  
+      *
+      * @param buff the StringBuffer to append to
+      * @param option the Option to append
+      * @param required whether the Option is required or not
+      */
+     private static void appendOption(final StringBuffer buff, 
+                                      final Option option, 
+                                      final boolean required)
+     {
+         if (!required)
+         {
+             buff.append("[");
+         }
+ 
+         if (option.getOpt() != null)
+         {
+             buff.append("-").append(option.getOpt());
+         }
+         else
+         {
+             buff.append("--").append(option.getLongOpt());
+         }
+ 
+         // if the Option has a value
+-        if (option.hasArg() && (option.getArgName() != null))
++        if (!option.getArgName().equals(""))
+         {
+             buff.append(" <").append(option.getArgName()).append(">");
+         }
+ 
+         // if the Option is not a required option
+         if (!required)
+         {
+             buff.append("]");
+         }
+     }

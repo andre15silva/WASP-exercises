@@ -1,0 +1,38 @@
+diff --git a/tmp/d5522f11-feb0-4a8f-a859-efe8c3d01306_buggy.java b/tmp/56152986-8aea-45ca-86ca-dd55e974261a_fixed.java
+index f7bc541..1dd9f77 100644
+--- a/tmp/d5522f11-feb0-4a8f-a859-efe8c3d01306_buggy.java
++++ b/tmp/56152986-8aea-45ca-86ca-dd55e974261a_fixed.java
+@@ -1,14 +1,19 @@
+-    /**
+-     Creates a new, clean document, from the original dirty document, containing only elements allowed by the whitelist.
+-     The original document is not modified. Only elements from the dirt document's <code>body</code> are used.
+-     @param dirtyDocument Untrusted base document to clean.
+-     @return cleaned document.
+-     */
+-    public Document clean(Document dirtyDocument) {
+-        Validate.notNull(dirtyDocument);
+-
+-        Document clean = Document.createShell(dirtyDocument.baseUri());
+-            copySafeNodes(dirtyDocument.body(), clean.body());
+-
+-        return clean;
++package jsoup;
++
++import org.junit.Test;
++
++public class CleanerTest {
++
++    @Test
++    public void handlesFramesets() {
++        String dirty = "<html><head><script></script><noscript></noscript></head><frameset><frame src=\"foo\" /><frame src=\"foo\" /></frameset></html>";
++        String clean = Jsoup.clean(dirty, Whitelist.basic());
++        assertEquals("", clean); // nothing good can come out of that
++
++        Document dirtyDoc = Jsoup.parse(dirty);
++        Document cleanDoc = new Cleaner(Whitelist.basic()).clean(dirtyDoc);
++        assertFalse(cleanDoc == null);
++        assertEquals(0, cleanDoc.body().childNodes().size());
++    }
++
+ }
+\ No newline at end of file

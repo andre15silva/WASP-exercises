@@ -1,0 +1,37 @@
+diff --git a/tmp/caafaa8b-d797-4fe2-9e6e-6aedc9e0ab86_buggy.java b/tmp/f3ab8a6c-3954-4abc-9cd5-8ee9784673af_fixed.java
+index 939f49b..241205a 100644
+--- a/tmp/caafaa8b-d797-4fe2-9e6e-6aedc9e0ab86_buggy.java
++++ b/tmp/f3ab8a6c-3954-4abc-9cd5-8ee9784673af_fixed.java
+@@ -1,21 +1,27 @@
+     private boolean isPrototypePropertyAssign(Node assign) {
+       Node n = assign.getFirstChild();
+       if (n != null && NodeUtil.isVarOrSimpleAssignLhs(n, assign)
+           && n.getType() == Token.GETPROP
+           ) {
+-        // We want to exclude the assignment itself from the usage list
+         boolean isChainedProperty =
+             n.getFirstChild().getType() == Token.GETPROP;
+-
+         if (isChainedProperty) {
+           Node child = n.getFirstChild().getFirstChild().getNext();
+-
+           if (child.getType() == Token.STRING &&
+               child.getString().equals("prototype")) {
+             return true;
+           }
+         }
++        Node ref = n.getFirstChild().getFirstChild();
++        if (ref.isQualifiedName()) {
++          Node fn = getDeclaredFunction(ref);
++          Node getpropFn = fn.getLastChild();
++          Node name = getpropFn.getLastChild();
++          if ("prototype".equals(name.getString())) {
++            addRequiredFunction(ref, getpropFn.getNext());
++            return true;
++          }
++        }
+       }
+-
+       return false;
+     }
+\ No newline at end of file

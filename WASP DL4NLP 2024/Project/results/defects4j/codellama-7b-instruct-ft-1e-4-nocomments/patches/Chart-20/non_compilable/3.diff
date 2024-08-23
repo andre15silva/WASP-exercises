@@ -1,0 +1,25 @@
+diff --git a/tmp/644156f0-4497-4fe1-9e62-163e86c34a6b_buggy.java b/tmp/78777dc1-6103-4b3e-8de5-0619ae53ac6d_fixed.java
+index 1695d7b..6bc15b4 100644
+--- a/tmp/644156f0-4497-4fe1-9e62-163e86c34a6b_buggy.java
++++ b/tmp/78777dc1-6103-4b3e-8de5-0619ae53ac6d_fixed.java
+@@ -1,15 +1,17 @@
+     /**
+      * Creates a new value marker.
+      * 
+      * @param value  the value.
+      * @param paint  the paint (<code>null</code> not permitted).
++     * @param paint2  a second paint for the marker outline (<code>null</code>
++     *                permitted).
+      * @param stroke  the stroke (<code>null</code> not permitted).
+      * @param outlinePaint  the outline paint (<code>null</code> permitted).
+      * @param outlineStroke  the outline stroke (<code>null</code> permitted).
+      * @param alpha  the alpha transparency (in the range 0.0f to 1.0f).
+      */
+-    public ValueMarker(double value, Paint paint, Stroke stroke, 
++    public ValueMarker(double value, Paint paint, Paint paint2, Stroke stroke, 
+                        Paint outlinePaint, Stroke outlineStroke, float alpha) {
+-        super(paint, stroke, paint, stroke, alpha);
++        super(paint, paint2, stroke, outlineStroke, alpha);
+         this.value = value;
+     }
+\ No newline at end of file

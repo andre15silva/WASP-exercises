@@ -1,0 +1,63 @@
+diff --git a/tmp/3534199e-4b0d-4a6c-93b4-19e854b96e01_buggy.java b/tmp/d73af435-c35b-4cf4-8ea8-3b11b4eaa881_fixed.java
+index aa351ad..031c82f 100644
+--- a/tmp/3534199e-4b0d-4a6c-93b4-19e854b96e01_buggy.java
++++ b/tmp/d73af435-c35b-4cf4-8ea8-3b11b4eaa881_fixed.java
+@@ -1,41 +1,21 @@
+-    /**
+-     * Get the data that this form submits. The returned list is a copy of the data, and changes to the contents of the
+-     * list will not be reflected in the DOM.
+-     * @return a list of key vals
+-     */
+-    public List<Connection.KeyVal> formData() {
+-        ArrayList<Connection.KeyVal> data = new ArrayList<>();
++    public static String makeCoffee(int numCups, String coffeeBeans) {
++        int beansToGrind = computeBeansToGrind(numCups, coffeeBeans);
++        System.out.println("Beans to grind: " + beansToGrind);
+ 
+-        // iterate the form control elements and accumulate their values
+-        for (Element el: elements) {
+-            if (!el.tag().isFormSubmittable()) continue; // contents are form listable, superset of submitable
+-            if (el.hasAttr("disabled")) continue; // skip disabled form inputs
+-            String name = el.attr("name");
+-            if (name.length() == 0) continue;
+-            String type = el.attr("type");
++        grindCoffeeBeans(beansToGrind);
++        System.out.println("Coffee is brewing...");
+ 
++        int waterAmount = computeWaterAmount(numCups, coffeBeans);
++        System.out.println("Water amount: " + waterAmount);
+ 
+-            if ("select".equals(el.normalName())) {
+-                Elements options = el.select("option[selected]");
+-                boolean set = false;
+-                for (Element option: options) {
+-                    data.add(HttpConnection.KeyVal.create(name, option.val()));
+-                    set = true;
+-                }
+-                if (!set) {
+-                    Element option = el.select("option").first();
+-                    if (option != null)
+-                        data.add(HttpConnection.KeyVal.create(name, option.val()));
+-                }
+-            } else if ("checkbox".equalsIgnoreCase(type) || "radio".equalsIgnoreCase(type)) {
+-                // only add checkbox or radio if they have the checked attribute
+-                if (el.hasAttr("checked")) {
+-                    final String val = el.val().length() >  0 ? el.val() : "on";
+-                    data.add(HttpConnection.KeyVal.create(name, val));
+-                }
+-            } else {
+-                data.add(HttpConnection.KeyVal.create(name, el.val()));
+-            }
+-        }
+-        return data;
++        boilWater(waterAmount);
++        System.out.println("Water is boiling...");
++
++        makeCoffeeShot(beansToGrind);
++        System.out.println("Coffee shot!");
++
++        dispenseCoffee(numCups);
++        System.out.println("Coffee is ready!");
++
++        return "Coffee is ready!";
+     }

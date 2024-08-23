@@ -1,0 +1,33 @@
+diff --git a/tmp/da45440b-da60-4a58-b595-46774d880814_buggy.java b/tmp/1be94458-96b8-4931-857d-d37c184ad847_fixed.java
+index 46799da..d309664 100644
+--- a/tmp/da45440b-da60-4a58-b595-46774d880814_buggy.java
++++ b/tmp/1be94458-96b8-4931-857d-d37c184ad847_fixed.java
+@@ -1,8 +1,25 @@
+         /**
+          * @param x Normalized objective variables.
+-         * @return the original objective variables, possibly repaired.
++         * @return the original objective variables, repaired.
+          */
+         public double[] repairAndDecode(final double[] x) {
+-            return
+-                decode(x);
++            final double[] res = decode(x);
++            if (bInBounds(res)) {
++                return res;
++            }
++            final boolean[] lowerFinished = new boolean[res.length];
++            for (int i = 0; i < res.length; ++i) {
++                if (res[i] > upperBounds[i]) {
++                    res[i] = upperBounds[i];
++                    lowerFinished[i] = true;
++                }
++            }
++            final boolean[] upperFinished = new boolean[res.length];
++            for (int i = 0; i < res.length; ++i) {
++                if (res[i] < lowerBounds[i]) {
++                    res[i] = lowerBounds[i];
++                    upperFinished[i] = true;
++                }
++            }
++            return res;
+         }

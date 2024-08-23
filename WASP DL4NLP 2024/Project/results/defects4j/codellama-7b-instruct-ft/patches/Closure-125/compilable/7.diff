@@ -1,0 +1,35 @@
+diff --git a/tmp/a28fcdac-a9f3-47d0-b6f6-1fdf0a13b653_buggy.java b/tmp/b9b343f9-974d-4bf9-a97a-ef63957976d0_fixed.java
+index 7e43c1c..35926a0 100644
+--- a/tmp/a28fcdac-a9f3-47d0-b6f6-1fdf0a13b653_buggy.java
++++ b/tmp/b9b343f9-974d-4bf9-a97a-ef63957976d0_fixed.java
+@@ -1,19 +1,30 @@
+   /**
+    * Visits a NEW node.
+    */
+   private void visitNew(NodeTraversal t, Node n) {
+     Node constructor = n.getFirstChild();
+     JSType type = getJSType(constructor).restrictByNotNullOrUndefined();
+     if (type.isConstructor() || type.isEmptyType() || type.isUnknownType()) {
+       FunctionType fnType = type.toMaybeFunctionType();
+       if (fnType != null) {
+         visitParameterList(t, n, fnType);
+         ensureTyped(t, n, fnType.getInstanceType());
+       } else {
+         ensureTyped(t, n);
+       }
++    } else if (type.isInterface()) {
++      ensureTyped(t, n);
++    } else if (type.isEquivalentTo(constructor.getJSType())) {
++      FunctionType fnType = type.toMaybeFunctionType();
++      if (fnType != null) {
++        visitParameterList(t, n, fnType);
++        ensureTyped(t, n, fnType.getInstanceType());
+       } else {
++        ensureTyped(t, n);
++      }
++    } else if (constructor.isQualifiedName() &&
++        !"I".equals(constructor.getQualifiedName())) {
+       report(t, n, NOT_A_CONSTRUCTOR);
+       ensureTyped(t, n);
+     }
+   }

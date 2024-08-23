@@ -1,0 +1,27 @@
+diff --git a/tmp/fc6bfec7-a5eb-4703-bfa5-4588b8fa88c4_buggy.java b/tmp/650f8862-14b5-4ad4-83dd-a4f4936402ff_fixed.java
+index 1a63a66..4e23af8 100644
+--- a/tmp/fc6bfec7-a5eb-4703-bfa5-4588b8fa88c4_buggy.java
++++ b/tmp/650f8862-14b5-4ad4-83dd-a4f4936402ff_fixed.java
+@@ -1,21 +1,21 @@
+     @Override
+     @Deprecated
+     protected JavaType _narrow(Class<?> subclass)
+     {
+         if (_class == subclass) {
+             return this;
+         }
+         // Should we check that there is a sub-class relationship?
+         // 15-Jan-2016, tatu: Almost yes, but there are some complications with
+         //    placeholder values (`Void`, `NoClass`), so can not quite do yet.
+         // TODO: fix in 2.8
+             /*
+             throw new IllegalArgumentException("Class "+subclass.getName()+" not sub-type of "
+                     +_class.getName());
+                     */
+-            return new SimpleType(subclass, _bindings, this, _superInterfaces,
++            return new SimpleType(subclass, _bindings, this, _superInterfaces, _defaultImpl,
+                     _valueHandler, _typeHandler, _asStatic);
+         // Otherwise, stitch together the hierarchy. First, super-class
+         // if not found, try a super-interface
+         // should not get here but...
+     }

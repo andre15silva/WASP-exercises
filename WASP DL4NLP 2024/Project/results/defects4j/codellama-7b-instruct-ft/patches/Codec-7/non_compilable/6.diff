@@ -1,0 +1,35 @@
+diff --git a/tmp/9cf86034-1a7a-4ec3-86e9-887fc91d5270_buggy.java b/tmp/09b34b25-5df6-4318-878c-17be60befad3_fixed.java
+index 31c6a4b..e89f04d 100644
+--- a/tmp/9cf86034-1a7a-4ec3-86e9-887fc91d5270_buggy.java
++++ b/tmp/09b34b25-5df6-4318-878c-17be60befad3_fixed.java
+@@ -1,11 +1,30 @@
+     /**
+      * Encodes binary data using the base64 algorithm into 76 character blocks separated by CRLF.
+      *
+      * @param binaryData
+      *            binary data to encode
+      * @return String containing Base64 characters.
+      * @since 1.4
+      */    
+     public static String encodeBase64String(byte[] binaryData) {
+         return StringUtils.newStringUtf8(encodeBase64(binaryData, true));
+     }
++
++    /**
++     * Encodes the byte array into a BASE64 string per RFC 2045.
++     * <p>
++     * This method first reads the entire byte array into a byte array, and then repeatedly applies {@link #encodeBase64(byte[], boolean)}
++     * until the entire array's worth of bytes has been read and encoded.
++     * </p>
++     * <p>
++     * For more information, see <a 
++     * href="http://www.ietf.org/rfc/rfc2045.txt">RFC 2045</a>.
++     * </p>
++     *
++     * @param binaryData
++     *            byte array to encode
++     * @return a String containing Base64 characters in accordance with RFC 2045
++     */
++    public static String encodeBase64String(byte[] binaryData) {
++        return StringUtils.newStringUtf8(encodeBase64(binaryData, true));
++    }

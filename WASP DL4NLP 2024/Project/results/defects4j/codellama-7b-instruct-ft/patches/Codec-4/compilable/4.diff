@@ -1,0 +1,19 @@
+diff --git a/tmp/31c92b31-28ff-465b-b439-f1bd813e7c75_buggy.java b/tmp/ec288eea-0d52-4290-a3a2-1ab882e17787_fixed.java
+index 3fb3172..92e2307 100644
+--- a/tmp/31c92b31-28ff-465b-b439-f1bd813e7c75_buggy.java
++++ b/tmp/ec288eea-0d52-4290-a3a2-1ab882e17787_fixed.java
+@@ -1,13 +1,13 @@
+     /**
+      * Creates a Base64 codec used for decoding (all modes) and encoding in URL-unsafe mode.
+      * <p>
+      * When encoding the line length is 0 (no chunking), and the encoding table is STANDARD_ENCODE_TABLE.
+      * </p>
+      * 
+      * <p>
+      * When decoding all variants are supported.
+      * </p>
+      */
+     public Base64() {
+-        this(false);
++        this(false); // we ignore the argument
+     }

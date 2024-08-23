@@ -1,0 +1,41 @@
+diff --git a/tmp/c4b45439-1637-4261-9b7c-9aa7a8a52c67_buggy.java b/tmp/108e1311-95c1-4027-86dd-41e588a65e1e_fixed.java
+index bc80637..5f61a9a 100644
+--- a/tmp/c4b45439-1637-4261-9b7c-9aa7a8a52c67_buggy.java
++++ b/tmp/108e1311-95c1-4027-86dd-41e588a65e1e_fixed.java
+@@ -1,33 +1,32 @@
+     @Override
+     public KeyDeserializer createKeyDeserializer(DeserializationContext ctxt,
+             JavaType type)
+         throws JsonMappingException
+     {
+         final DeserializationConfig config = ctxt.getConfig();
+         KeyDeserializer deser = null;
+         if (_factoryConfig.hasKeyDeserializers()) {
+             BeanDescription beanDesc = config.introspectClassAnnotations(type.getRawClass());
+             for (KeyDeserializers d  : _factoryConfig.keyDeserializers()) {
+                 deser = d.findKeyDeserializer(type, config, beanDesc);
+                 if (deser != null) {
+                     break;
+                 }
+             }
+         }
+-        // the only non-standard thing is this:
+         if (deser == null) {
+             if (type.isEnumType()) {
+                 return _createEnumKeyDeserializer(ctxt, type);
+             }
+             deser = StdKeyDeserializers.findStringBasedKeyDeserializer(config, type);
+         }
+-        // and then post-processing
+         if (deser != null) {
+             if (_factoryConfig.hasDeserializerModifiers()) {
++                JavaType enumType = new SimpleType(type.getRawClass());
+                 for (BeanDeserializerModifier mod : _factoryConfig.deserializerModifiers()) {
+-                    deser = mod.modifyKeyDeserializer(config, type, deser);
++                    deser = mod.modifyKeyDeserializer(config, enumType, deser);
+                 }
+             }
+         }
+         return deser;
+     }
+\ No newline at end of file

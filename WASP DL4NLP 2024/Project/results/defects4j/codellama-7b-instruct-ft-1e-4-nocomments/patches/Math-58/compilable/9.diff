@@ -1,0 +1,16 @@
+diff --git a/tmp/fa93c329-e950-41ab-9a56-c4e85f489d77_buggy.java b/tmp/913b1c3e-0d19-49a9-84b9-cd87df4c7469_fixed.java
+index 3002587..5ffd634 100644
+--- a/tmp/fa93c329-e950-41ab-9a56-c4e85f489d77_buggy.java
++++ b/tmp/913b1c3e-0d19-49a9-84b9-cd87df4c7469_fixed.java
+@@ -1,10 +1,4 @@
+-    /**
+-     * Fits a Gaussian function to the observed points.
+-     *
+-     * @return the parameters of the Gaussian function that best fits the
+-     * observed points (in the same order as above).
+-     */
+     public double[] fit() {
+         final double[] guess = (new ParameterGuesser(getObservations())).guess();
+         return fit(new Gaussian.Parametric(), guess);
+     }
+\ No newline at end of file

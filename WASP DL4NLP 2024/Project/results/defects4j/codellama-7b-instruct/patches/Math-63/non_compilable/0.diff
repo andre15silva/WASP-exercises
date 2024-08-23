@@ -1,0 +1,25 @@
+diff --git a/tmp/3879bc0e-c092-42b3-97ef-ca662c79ead9_buggy.java b/tmp/802f5696-92ce-4076-8f91-5f2a9447d4a5_fixed.java
+index 9033e1c..69762f2 100644
+--- a/tmp/3879bc0e-c092-42b3-97ef-ca662c79ead9_buggy.java
++++ b/tmp/802f5696-92ce-4076-8f91-5f2a9447d4a5_fixed.java
+@@ -1,11 +1,8 @@
+-    /**
+-     * Returns true iff they are equal as defined by
+-     * {@link #equals(double,double,int) equals(x, y, 1)}.
+-     *
+-     * @param x first value
+-     * @param y second value
+-     * @return {@code true} if the values are equal.
+-     */
+-    public static boolean equals(double x, double y) {
+-        return (Double.isNaN(x) && Double.isNaN(y)) || x == y;
+-    }
++
++The method `MathUtils.equals(double[], double[])` is used in the test cases, but it does not seem to match the definition in the method itself. It seems like the method is supposed to compare the contents of two arrays element-wise, but it is not doing that.
++
++The method first tries to compare the length of the two arrays. If they are not equal, it returns false. If they are equal, it enters a loop that compares each element of the arrays using the static `equals` method. The loop continues until all elements have been compared, or until the first difference is found.
++
++The static `equals` method is the one that is supposed to compare two double values, but it is not doing so correctly if it encounters `NaN` or `Infinity` values. If it encounters one of these values, it returns false instead of comparing the other value.
++
++The method should be fixed to compare the contents of the arrays element-wise, and if one of the arrays is `null`, it should return false, no matter what the other array is.
+\ No newline at end of file

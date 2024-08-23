@@ -1,0 +1,34 @@
+diff --git a/tmp/cb321603-f03a-40f5-9d8c-944ed51ccc64_buggy.java b/tmp/79823fc2-a1dd-4911-ac2b-cd41db413652_fixed.java
+index 192e83d..5f0a6c1 100644
+--- a/tmp/cb321603-f03a-40f5-9d8c-944ed51ccc64_buggy.java
++++ b/tmp/79823fc2-a1dd-4911-ac2b-cd41db413652_fixed.java
+@@ -1,21 +1,28 @@
+     /**
+      * Return whether or not this entry represents a directory.
+      *
+      * @return True if this entry is a directory.
+      */
+     @Override
+     public boolean isDirectory() {
+         if (file != null) {
+             return file.isDirectory();
+         }
+ 
+         if (linkFlag == LF_DIR) {
+             return true;
+         }
+ 
++        // In the case of pax extended headers there's a slash at the end of the entry's
++        // name in cases where the GNU tar program itself creates the tar file. That
++        // means when the PAX Extended header indicates a filename ending in a slash
++        // that the pax program will append another slash to the name when storing
++        // the file entry in the output.
++        // The fix for this issue is to not return true when we detect that this is a
++        // PAX extended header that ends in a slash.
+         if(getName().endsWith("/")) {
+-            return true;
++            return !(isExtended() && getName().endsWith("/."));
+         }
+ 
+         return false;
+     }

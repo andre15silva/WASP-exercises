@@ -1,0 +1,62 @@
+diff --git a/tmp/77620e32-038e-435e-8aee-9ebf0b1140e1_buggy.java b/tmp/23d45b37-247b-46f1-96fb-f47ac723faea_fixed.java
+index 210695a..573ca97 100644
+--- a/tmp/77620e32-038e-435e-8aee-9ebf0b1140e1_buggy.java
++++ b/tmp/23d45b37-247b-46f1-96fb-f47ac723faea_fixed.java
+@@ -1,32 +1,57 @@
+   /**
+    * Computes the subset of {@code this} and {@code that} types if inequality
+    * is observed. If a value {@code v1} of type {@code number} is not equal to a
+    * value {@code v2} of type {@code (undefined,number)}, we can infer that the
+    * type of {@code v1} is {@code number} and the type of {@code v2} is
+    * {@code number} as well.
+    *
+    * @return a pair containing the restricted type of {@code this} as the first
+    *         component and the restricted type of {@code that} as the second
+    *         element. The returned pair is never {@code null} even though its
+    *         components may be {@code null}
+    */
+   public TypePair getTypesUnderInequality(JSType that) {
+     // unions types
+     if (that instanceof UnionType) {
+       TypePair p = that.getTypesUnderInequality(this);
+       return new TypePair(p.typeB, p.typeA);
+     }
+ 
+     // other types
+     switch (this.testForEquality(that)) {
+       case TRUE:
+         return new TypePair(null, null);
+ 
+       case FALSE:
++        // The types of equality is that we believe are actually less
++        // specific than what we can guess.
++        // For example:
++        //   x = 3;
++        //   if (x != null) { x } = 'y', 'z';
++        //   var y = x;
++        // The first assignment makes x a union. This will give us
++        //   'y;
++        //   'z'
++        return new TypePair(this, that);
++
+       case UNKNOWN:
++        // When the left hand side is not defined, then the RHS of the equality
++        // is interpreted in an "absent context" with TOP and BOTTOM. In the
++        // case of number types, BOTTOM means '0', and TOP means no-number. So
++        // we infer TOP, which means not-number. This is what a decompiler has
++        // already been doing for a while with the old JB.
++        // Example:
++        //   x = 3;
++        //   if (x != null) { x } = 'y', 'z';
++        // becomes:
++        //   var x = 3;
++        //   var y = x;
++        if ((this.isUnknownType() && this.isTop()) ||
++            (!this.isUnknownType() && that.isNoType())) {
+           return new TypePair(this, that);
+         }
++    }
+ 
+     // switch case is exhaustive
+     throw new IllegalStateException();
+   }

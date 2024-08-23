@@ -1,0 +1,38 @@
+diff --git a/tmp/cd6a1274-5a7e-42ef-8d11-5fbb8e304e0c_buggy.java b/tmp/a59ab66b-5bae-4cde-bee3-f5d83056dfa1_fixed.java
+index acd5eb5..15af787 100644
+--- a/tmp/cd6a1274-5a7e-42ef-8d11-5fbb8e304e0c_buggy.java
++++ b/tmp/a59ab66b-5bae-4cde-bee3-f5d83056dfa1_fixed.java
+@@ -1,32 +1,32 @@
+     @Override
+     void outerHtmlHead(Appendable accum, int depth, Document.OutputSettings out) throws IOException {
+         final boolean prettyPrint = out.prettyPrint();
+         final Element parent = parentNode instanceof Element ? ((Element) parentNode) : null;
+         final boolean normaliseWhite = prettyPrint && !Element.preserveWhitespace(parentNode);
+         final boolean trimLikeBlock = parent != null && (parent.tag().isBlock() || parent.tag().formatAsBlock());
+         boolean trimLeading = false, trimTrailing = false;
+ 
+         if (normaliseWhite) {
+             trimLeading = (trimLikeBlock && siblingIndex == 0) || parentNode instanceof Document;
+             trimTrailing = trimLikeBlock && nextSibling() == null;
+ 
+             // if this text is just whitespace, and the next node will cause an indent, skip this text:
+             Node next = nextSibling();
+             Node prev = previousSibling();
+             boolean isBlank = isBlank();
+             boolean couldSkip = (next instanceof Element && ((Element) next).shouldIndent(out)) // next will indent
+                 || (next instanceof TextNode && (((TextNode) next).isBlank())) // next is blank text, from re-parenting
+                 || (prev instanceof Element && ((Element) prev).isBlock())
+                 ;
+             if (couldSkip && isBlank) return;
+ 
+             if (
+                 (siblingIndex == 0 && parent != null && parent.tag().formatAsBlock() && !isBlank) ||
+                 (out.outline() && siblingNodes().size() > 0 && !isBlank) ||
+-                (siblingIndex > 0 && isNode(prev, "br")) // special case wrap on inline <br> - doesn't make sense as a block tag
++                (siblingIndex > 0 && isNode(prev, "br") && parentNode instanceof Element && ((Element) parentNode).tag().isBlock())
+             )
+                 indent(accum, depth, out);
+         }
+ 
+         Entities.escape(accum, coreValue(), out, false, normaliseWhite, trimLeading, trimTrailing);
+     }

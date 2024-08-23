@@ -1,0 +1,29 @@
+diff --git a/tmp/d439813c-9708-4c33-a16e-8220a050624c_buggy.java b/tmp/c3196859-798b-493f-9b79-39c4a95279c6_fixed.java
+index 939f49b..bdf02fa 100644
+--- a/tmp/d439813c-9708-4c33-a16e-8220a050624c_buggy.java
++++ b/tmp/c3196859-798b-493f-9b79-39c4a95279c6_fixed.java
+@@ -1,21 +1,23 @@
+     private boolean isPrototypePropertyAssign(Node assign) {
+       Node n = assign.getFirstChild();
+       if (n != null && NodeUtil.isVarOrSimpleAssignLhs(n, assign)
+           && n.getType() == Token.GETPROP
+           ) {
+         // We want to exclude the assignment itself from the usage list
+         boolean isChainedProperty =
+             n.getFirstChild().getType() == Token.GETPROP;
+ 
+         if (isChainedProperty) {
++          // Note that .prototype can't legally be aliased off into AOP types.
++          // This check may be over-safe.
+           Node child = n.getFirstChild().getFirstChild().getNext();
+ 
+-          if (child.getType() == Token.STRING &&
++          if (child != null && child.getType() == Token.STRING &&
+               child.getString().equals("prototype")) {
+             return true;
+           }
+         }
+       }
+ 
+       return false;
+     }

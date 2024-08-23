@@ -1,0 +1,36 @@
+diff --git a/tmp/439c35be-058b-45ff-811b-0b0052187ecb_buggy.java b/tmp/f5002770-3099-48fd-a4f8-039179d0edda_fixed.java
+index abd3198..ef5c482 100644
+--- a/tmp/439c35be-058b-45ff-811b-0b0052187ecb_buggy.java
++++ b/tmp/f5002770-3099-48fd-a4f8-039179d0edda_fixed.java
+@@ -1,28 +1,27 @@
+     @Override
+     protected Object encodeCommand(Command command) {
+ 
+         ByteBuf content = Unpooled.buffer();
+ 
+         switch (command.getType()) {
+             case Command.TYPE_POSITION_SINGLE:
+                 return encodeContent(command.getDeviceId(), GatorProtocolDecoder.MSG_POSITION_REQUEST, content);
+             case Command.TYPE_ENGINE_STOP:
+                 return encodeContent(command.getDeviceId(), GatorProtocolDecoder.MSG_CLOSE_THE_OIL_DUCT, content);
+             case Command.TYPE_ENGINE_RESUME:
+                 return encodeContent(command.getDeviceId(), GatorProtocolDecoder.MSG_RESTORES_THE_OIL_DUCT, content);
+             case Command.TYPE_SET_SPEED_LIMIT:
+                 content.writeByte(command.getInteger(Command.KEY_DATA));
+                 return encodeContent(command.getDeviceId(), GatorProtocolDecoder.MSG_SET_SPEED_LIMIT, content);
+             case Command.TYPE_SET_ODOMETER:
+                 content.writeShort(command.getInteger(Command.KEY_DATA));
+                 return encodeContent(command.getDeviceId(), GatorProtocolDecoder.MSG_SET_ODOMETER, content);
+             case Command.TYPE_POSITION_PERIODIC:
+                 String[] data = command.getString(Command.KEY_FREQUENCY).split(";");
+-                content.writeShort(Integer.valueOf(data[0]));
+-                content.writeShort(Integer.valueOf(data[1]));
+-                content.writeShort(Integer.valueOf(data[2]));
++                content.writeInt(Integer.valueOf(data[0]) << 16 | Integer.valueOf(data[1]));
++                content.writeInt(Integer.valueOf(data[2]) << 16);
+                 return encodeContent(command.getDeviceId(), GatorProtocolDecoder.MSG_POSITION_PERIODIC, content);
+             default:
+                 return null;
+         }
+     }
+\ No newline at end of file

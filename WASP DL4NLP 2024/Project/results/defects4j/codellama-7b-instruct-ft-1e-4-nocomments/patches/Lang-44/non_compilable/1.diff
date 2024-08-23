@@ -1,0 +1,209 @@
+diff --git a/tmp/818dac1e-693e-4688-9ba7-9b31d1e2daa5_buggy.java b/tmp/32c0163f-cc18-46cf-a7db-6535f1aa5b35_fixed.java
+index 4a05f03..ead1c4e 100644
+--- a/tmp/818dac1e-693e-4688-9ba7-9b31d1e2daa5_buggy.java
++++ b/tmp/32c0163f-cc18-46cf-a7db-6535f1aa5b35_fixed.java
+@@ -1,170 +1,116 @@
+-    /**
+-     * <p>Turns a string value into a java.lang.Number.</p>
+-     *
+-     * <p>First, the value is examined for a type qualifier on the end
+-     * (<code>'f','F','d','D','l','L'</code>).  If it is found, it starts 
+-     * trying to create successively larger types from the type specified
+-     * until one is found that can hold the value.</p>
+-     *
+-     * <p>If a type specifier is not found, it will check for a decimal point
+-     * and then try successively larger types from <code>Integer</code> to
+-     * <code>BigInteger</code> and from <code>Float</code> to
+-     * <code>BigDecimal</code>.</p>
+-     *
+-     * <p>If the string starts with <code>0x</code> or <code>-0x</code>, it
+-     * will be interpreted as a hexadecimal integer.  Values with leading
+-     * <code>0</code>'s will not be interpreted as octal.</p>
+-     *
+-     * @param val String containing a number
+-     * @return Number created from the string
+-     * @throws NumberFormatException if the value cannot be converted
+-     */
+-    public static Number createNumber(String val) throws NumberFormatException {
+-        if (val == null) {
++    public static Number createNumber(String arg) throws NumberFormatException {
++        if (arg == null) {
+             return null;
+         }
+-        if (val.length() == 0) {
++        if (arg.length() == 0) {
+             throw new NumberFormatException("\"\" is not a valid number.");
+         }
+-        if (val.startsWith("--")) {
+-            // this is protection for poorness in java.lang.BigDecimal.
+-            // it accepts this as a legal value, but it does not appear 
+-            // to be in specification of class. OS X Java parses it to 
+-            // a wrong value.
++        if (arg.startsWith("--")) {
+             return null;
+         }
+-        if (val.startsWith("0x") || val.startsWith("-0x")) {
+-            return createInteger(val);
++        if (arg.startsWith("0x") || arg.startsWith("-0x")) {
++            return createInteger(arg);
+         }   
+-        char lastChar = val.charAt(val.length() - 1);
++        char lastChar = arg.charAt(arg.length() - 1);
+         String mant;
+         String dec;
+         String exp;
+-        int decPos = val.indexOf('.');
+-        int expPos = val.indexOf('e') + val.indexOf('E') + 1;
+-
++        int decPos = arg.indexOf('.');
++        int expPos = arg.indexOf('e') + arg.indexOf('E') + 1;
+         if (decPos > -1) {
+-
+             if (expPos > -1) {
+                 if (expPos < decPos) {
+-                    throw new NumberFormatException(val + " is not a valid number.");
++                    throw new NumberFormatException(arg + " is not a valid number.");
+                 }
+-                dec = val.substring(decPos + 1, expPos);
++                dec = arg.substring(decPos + 1, expPos);
+             } else {
+-                dec = val.substring(decPos + 1);
++                dec = arg.substring(decPos + 1);
+             }
+-            mant = val.substring(0, decPos);
++            mant = arg.substring(0, decPos);
+         } else {
+             if (expPos > -1) {
+-                mant = val.substring(0, expPos);
++                mant = arg.substring(0, expPos);
+             } else {
+-                mant = val;
++                mant = arg;
+             }
+             dec = null;
+         }
+         if (!Character.isDigit(lastChar)) {
+-            if (expPos > -1 && expPos < val.length() - 1) {
+-                exp = val.substring(expPos + 1, val.length() - 1);
++            if (expPos > -1 && expPos < arg.length() - 1) {
++                exp = arg.substring(expPos + 1, arg.length() - 1);
+             } else {
+                 exp = null;
+             }
+-            //Requesting a specific type..
+-            String numeric = val.substring(0, val.length() - 1);
++            String numeric = arg.substring(0, arg.length() - 1);
+             boolean allZeros = isAllZeros(mant) && isAllZeros(exp);
+             switch (lastChar) {
+                 case 'l' :
+                 case 'L' :
+                     if (dec == null
+                         && exp == null
+                         && (numeric.charAt(0) == '-' && isDigits(numeric.substring(1)) || isDigits(numeric))) {
+                         try {
+                             return createLong(numeric);
+                         } catch (NumberFormatException nfe) {
+-                            //Too big for a long
+                         }
+                         return createBigInteger(numeric);
+-
+                     }
+-                    throw new NumberFormatException(val + " is not a valid number.");
++                    throw new NumberFormatException(arg + " is not a valid number.");
+                 case 'f' :
+                 case 'F' :
+                     try {
+-                        Float f = NumberUtils.createFloat(numeric);
+-                        if (!(f.isInfinite() || (f.floatValue() == 0.0F && !allZeros))) {
+-                            //If it's too big for a float or the float value = 0 and the string
+-                            //has non-zeros in it, then float does not have the precision we want
++                        float f = NumberUtils.createFloat(numeric);
++                        if (!(f == 0.0F && !allZeros)) {
+                             return f;
+                         }
+-
+                     } catch (NumberFormatException e) {
+-                        // ignore the bad number
+                     }
+-                    //Fall through
+                 case 'd' :
+                 case 'D' :
+                     try {
+-                        Double d = NumberUtils.createDouble(numeric);
+-                        if (!(d.isInfinite() || (d.floatValue() == 0.0D && !allZeros))) {
++                        double d = NumberUtils.createDouble(numeric);
++                        if (!(d == 0.0D && !allZeros)) {
+                             return d;
+                         }
+-                    } catch (NumberFormatException nfe) {
+-                        // empty catch
+-                    }
+-                    try {
+-                        return createBigDecimal(numeric);
+                     } catch (NumberFormatException e) {
+-                        // empty catch
+                     }
+-                    //Fall through
++                    return createBigDecimal(arg);
+                 default :
+-                    throw new NumberFormatException(val + " is not a valid number.");
+-
++                    throw new NumberFormatException(arg + " is not a valid number.");
+             }
+         } else {
+-            //User doesn't have a preference on the return type, so let's start
+-            //small and go from there...
+-            if (expPos > -1 && expPos < val.length() - 1) {
+-                exp = val.substring(expPos + 1, val.length());
++            if (expPos > -1 && expPos < arg.length() - 1) {
++                exp = arg.substring(expPos + 1, arg.length());
+             } else {
+                 exp = null;
+             }
+             if (dec == null && exp == null) {
+-                //Must be an int,long,bigint
+                 try {
+-                    return createInteger(val);
++                    return createInteger(arg);
+                 } catch (NumberFormatException nfe) {
+-                    // empty catch
+                 }
+                 try {
+-                    return createLong(val);
++                    return createLong(arg);
+                 } catch (NumberFormatException nfe) {
+-                    // empty catch
+                 }
+-                return createBigInteger(val);
+-
++                return createBigInteger(arg);
+             } else {
+-                //Must be a float,double,BigDec
+                 boolean allZeros = isAllZeros(mant) && isAllZeros(exp);
+                 try {
+-                    Float f = createFloat(val);
++                    Float f = createFloat(arg);
+                     if (!(f.isInfinite() || (f.floatValue() == 0.0F && !allZeros))) {
+                         return f;
+                     }
+                 } catch (NumberFormatException nfe) {
+-                    // empty catch
+                 }
+                 try {
+-                    Double d = createDouble(val);
++                    Double d = createDouble(arg);
+                     if (!(d.isInfinite() || (d.doubleValue() == 0.0D && !allZeros))) {
+                         return d;
+                     }
+                 } catch (NumberFormatException nfe) {
+-                    // empty catch
+                 }
+-
+-                return createBigDecimal(val);
+-
++                return createBigDecimal(arg);
+             }
+-
+         }
+     }
+\ No newline at end of file

@@ -1,0 +1,38 @@
+diff --git a/tmp/d34a2158-f19d-4208-a45b-93aaa1a6eef6_buggy.java b/tmp/3def8d18-8133-41f5-b199-5fa46263963f_fixed.java
+index 1530b34..012a976 100644
+--- a/tmp/d34a2158-f19d-4208-a45b-93aaa1a6eef6_buggy.java
++++ b/tmp/3def8d18-8133-41f5-b199-5fa46263963f_fixed.java
+@@ -1,23 +1,28 @@
+-    /**
+-     * Declares all of a function's arguments.
+-     */
+ private void declareArguments(Node functionNode) {
+     Node astParameters = functionNode.getFirstChild().getNext();
+     Node body = astParameters.getNext();
+     FunctionType functionType = (FunctionType) functionNode.getJSType();
+     if (functionType != null) {
+         Node jsDocParameters = functionType.getParametersNode();
+         if (jsDocParameters != null) {
+             Node jsDocParameter = jsDocParameters.getFirstChild();
+             for (Node astParameter : astParameters.children()) {
+                 if (jsDocParameter != null) {
+                     defineSlot(astParameter, functionNode,
+                         jsDocParameter.getJSType(), true);
+                     jsDocParameter = jsDocParameter.getNext();
+                 } else {
++                    // If jsDocParameter is null but we are still at the same level of scope,
++                    // we should be aware of the variable redefinition.
++                    // Here we need to check if this parameter has already been defined.
++                    JSType existingType = getSlotType(astParameter.getString());
++                    if (existingType != null) {
++                        // If there's an existing definition, raise a warning about the redefinition.
++                        reportWarning(astParameter, existingType, functionNode);
++                    }
+                     defineSlot(astParameter, functionNode, null, true);
+                 }
+             }
+         }
+     }
+-    } // end declareArguments
++}
+\ No newline at end of file

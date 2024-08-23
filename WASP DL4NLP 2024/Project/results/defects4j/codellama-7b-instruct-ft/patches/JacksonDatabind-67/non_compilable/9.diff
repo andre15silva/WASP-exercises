@@ -1,0 +1,45 @@
+diff --git a/tmp/ab431ecc-6ee2-4c2f-95a2-6c5463eea992_buggy.java b/tmp/95a43e40-0558-407a-b280-0dd4da27c815_fixed.java
+index bc80637..00ff25f 100644
+--- a/tmp/ab431ecc-6ee2-4c2f-95a2-6c5463eea992_buggy.java
++++ b/tmp/95a43e40-0558-407a-b280-0dd4da27c815_fixed.java
+@@ -1,33 +1,40 @@
+     @Override
+     public KeyDeserializer createKeyDeserializer(DeserializationContext ctxt,
+             JavaType type)
+         throws JsonMappingException
+     {
+         final DeserializationConfig config = ctxt.getConfig();
+         KeyDeserializer deser = null;
+         if (_factoryConfig.hasKeyDeserializers()) {
+             BeanDescription beanDesc = config.introspectClassAnnotations(type.getRawClass());
+             for (KeyDeserializers d  : _factoryConfig.keyDeserializers()) {
+                 deser = d.findKeyDeserializer(type, config, beanDesc);
+                 if (deser != null) {
+                     break;
+                 }
+             }
+         }
+         // the only non-standard thing is this:
+         if (deser == null) {
++            KeyDeserializers.TypeIdResolver typeIdResolver = KeyDeserializers.findTypeIdResolver(config, type);
++            if (typeIdResolver != null) {
++                deser = KeyDeserializers.constructEnumKeyDeserializer(ctxt,
++                        beanDesc.getEnumResolver(true).getReferencedType(),
++                        typeIdResolver);
++            } else {
+                 if (type.isEnumType()) {
+                     return _createEnumKeyDeserializer(ctxt, type);
+                 }
+                 deser = StdKeyDeserializers.findStringBasedKeyDeserializer(config, type);
+             }
++        }
+         // and then post-processing
+         if (deser != null) {
+             if (_factoryConfig.hasDeserializerModifiers()) {
+                 for (BeanDeserializerModifier  mod : _factoryConfig.deserializerModifiers()) {
+                     deser = mod.modifyKeyDeserializer(config, type, deser);
+                 }
+             }
+         }
+         return deser;
+     }

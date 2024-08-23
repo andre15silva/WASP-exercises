@@ -1,0 +1,22 @@
+diff --git a/tmp/1cc0bbf9-86d0-47b7-9f0d-692e4b297329_buggy.java b/tmp/82c3c37c-7d16-4bec-bfe0-08c6dfe92d57_fixed.java
+index 42b7b48..2e892a9 100644
+--- a/tmp/1cc0bbf9-86d0-47b7-9f0d-692e4b297329_buggy.java
++++ b/tmp/82c3c37c-7d16-4bec-bfe0-08c6dfe92d57_fixed.java
+@@ -1,16 +1,16 @@
+     /**
+      * Adds 1 to the frequency count for v.
+      * <p>
+      * If other objects have already been added to this Frequency, v must
+      * be comparable to those that have already been added.
+      * </p>
+      * 
+      * @param v the value to add.
+      * @throws IllegalArgumentException if <code>v</code> is not Comparable, 
+      *         or is not comparable with previous entries
+      * @deprecated use {@link #addValue(Comparable)} instead
+      */
+     @Deprecated
+     public void addValue(Object v) {
+-            addValue((Comparable<?>) v);            
++            addValue((Comparable) v);            
+     }

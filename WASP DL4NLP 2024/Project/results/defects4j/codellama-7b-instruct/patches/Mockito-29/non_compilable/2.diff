@@ -1,0 +1,14 @@
+diff --git a/tmp/11d0755d-23fa-4e4a-96f3-bd1b3192223e_buggy.java b/tmp/bc67651c-62e7-430e-8998-c2b0c20514d0_fixed.java
+index 00b39e0..7e65bba 100644
+--- a/tmp/11d0755d-23fa-4e4a-96f3-bd1b3192223e_buggy.java
++++ b/tmp/bc67651c-62e7-430e-8998-c2b0c20514d0_fixed.java
+@@ -1,7 +1 @@
+-    public void describeTo(Description description) {
+-        description.appendText("same(");
+-        appendQuoting(description);
+-        description.appendText(wanted.toString());
+-        appendQuoting(description);
+-        description.appendText(")");
+-    }
++java.lang.AssertionError: Unexpected exception, expected<java.lang.AssertionError> but was<java.lang.NullPointerException>
+\ No newline at end of file

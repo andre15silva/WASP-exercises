@@ -1,0 +1,67 @@
+diff --git a/tmp/22fcaa8b-325b-4c4e-a3e9-221eea2ba55d_buggy.java b/tmp/923df2b4-23b3-4198-bd97-edbd52408e43_fixed.java
+index 99141e0..b82c595 100644
+--- a/tmp/22fcaa8b-325b-4c4e-a3e9-221eea2ba55d_buggy.java
++++ b/tmp/923df2b4-23b3-4198-bd97-edbd52408e43_fixed.java
+@@ -1,33 +1,53 @@
+ static String unescape(String string) {
+-        if (!string.contains("&"))
+-            return string;
+ 
+-        Matcher m = unescapePattern.matcher(string); // &(#(x|X)?([0-9a-fA-F]+)|[a-zA-Z]+);?
+-        StringBuffer accum = new StringBuffer(string.length()); // pity matcher can't use stringbuilder, avoid syncs
+-        // todo: replace m.appendReplacement with own impl, so StringBuilder and quoteReplacement not required
++        if (!string.contains("&")) return string;
++
++        Matcher m = unescapePattern.matcher(string);
++
++        StringBuffer accum = new StringBuffer(string.length());
+ 
+         while (m.find()) {
++
+             int charval = -1;
++
+             String num = m.group(3);
++
+             if (num != null) {
++
+                 try {
+-                    int base = m.group(2) != null ? 16 : 10; // 2 is hex indicator
++
++                    int base = m.group(2) != null ? 16 : 10;
++
+                     charval = Integer.valueOf(num, base);
++
+                 } catch (NumberFormatException e) {
+-                } // skip
++
++                }
++
+             } else {
++
+                 String name = m.group(1);
+-                if (full.containsKey(name))
+-                    charval = full.get(name);
++
++                if (full.containsKey(name)) charval = full.get(name);
++
+             }
+ 
+             if (charval != -1 || charval > 0xFFFF) { // out of range
++
+                 String c = Character.toString((char) charval);
++
+                 m.appendReplacement(accum, c);
++
+             } else {
++
+                 m.appendReplacement(accum, m.group(0));
++
+             }
++
+         }
++
+         m.appendTail(accum);
++
+         return accum.toString();
++
+     }

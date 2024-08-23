@@ -1,0 +1,40 @@
+diff --git a/tmp/71003cf1-58ff-4650-8376-fe993b79c8b4_buggy.java b/tmp/4c4be8f3-e741-4fe5-93db-b1c2e9116808_fixed.java
+index 3cb9232..b1f9dd2 100644
+--- a/tmp/71003cf1-58ff-4650-8376-fe993b79c8b4_buggy.java
++++ b/tmp/4c4be8f3-e741-4fe5-93db-b1c2e9116808_fixed.java
+@@ -1,26 +1,34 @@
+     @Override
+     public PropertyName findNameForSerialization(Annotated a)
+     {
+         String name = null;
+ 
+         JsonGetter jg = _findAnnotation(a, JsonGetter.class);
+         if (jg != null) {
+             name = jg.value();
+         } else {
+             JsonProperty pann = _findAnnotation(a, JsonProperty.class);
+             if (pann != null) {
+                 name = pann.value();
+                 /* 22-Apr-2014, tatu: Should figure out a better way to do this, but
+                  *   it's actually bit tricky to do it more efficiently (meta-annotations
+                  *   add more lookups; AnnotationMap costs etc)
+                  */
+             } else if (_hasAnnotation(a, JsonSerialize.class)
+                     || _hasAnnotation(a, JsonView.class)
+                     || _hasAnnotation(a, JsonRawValue.class)) {
+                 name = "";
+             } else {
+                 return null;
+             }
+         }
+-        return PropertyName.construct(name);
++        // !!! 26-Nov-2013, tatu: One issue with using a blank name. Need to figure out
++        //     a bit of a "magic" name to indicate that this represents unwrapped
++        //     properties? Something that won't match any real (real-life) field
++        //     name... but then again... might be better to not unwrap fields in general?!
++        final PropertyName aname = PropertyName.construct(name);
++        if (name.length() == 0) {
++            aname.withSimpleName(aname.getSimpleName()+":unwrapped");
++        }
++        return aname;
+     }

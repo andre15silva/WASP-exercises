@@ -1,0 +1,23 @@
+diff --git a/tmp/9ded4a58-a1ab-40af-91c7-ada5387f0f34_buggy.java b/tmp/00ea6a5c-83ad-4996-a07d-25502c8898d2_fixed.java
+index e69de29..a733d87 100644
+--- a/tmp/9ded4a58-a1ab-40af-91c7-ada5387f0f34_buggy.java
++++ b/tmp/00ea6a5c-83ad-4996-a07d-25502c8898d2_fixed.java
+@@ -0,0 +1,17 @@
++public void prefixMapClear() {
++    Trie<String, Integer> trie = new PatriciaTrie<Integer>();
++    trie.put("Anna", 1);
++    trie.put("Anael", 2);
++    trie.put("Analu", 3);
++    trie.put("Andreas", 4);
++    trie.put("Andrea", 5);
++    trie.put("Andres", 6);
++    trie.put("Anatole", 7);
++    SortedMap<String, Integer> prefixMap = trie.prefixMap("And");
++    prefixMap.clear();
++    assertTrue(prefixMap.isEmpty());
++    assertTrue(prefixMap.keySet().isEmpty());
++    assertTrue(prefixMap.values().isEmpty());
++    assertEquals(new HashSet<String>(Arrays.asList("Anael", "Analu", "Anatole", "Anna")), trie.keySet());
++    assertEquals(Arrays.asList(2, 3, 7, 1), new ArrayList<Integer>(trie.values()));
++}
+\ No newline at end of file

@@ -1,0 +1,42 @@
+diff --git a/tmp/882bb300-9d36-42ce-870a-ef306cab17d5_buggy.java b/tmp/bcc97f9b-292a-40a8-9a2c-dc8d47ff705e_fixed.java
+index 602226b..b9fba95 100644
+--- a/tmp/882bb300-9d36-42ce-870a-ef306cab17d5_buggy.java
++++ b/tmp/bcc97f9b-292a-40a8-9a2c-dc8d47ff705e_fixed.java
+@@ -1,26 +1,35 @@
+     private void findAliases(NodeTraversal t) {
+       Scope scope = t.getScope();
+       for (Var v : scope.getVarIterable()) {
+         Node n = v.getNode();
+         int type = n.getType();
+         Node parent = n.getParent();
+         if (parent.isVar()) {
+           if (n.hasChildren() && n.getFirstChild().isQualifiedName()) {
+           String name = n.getString();
+           Var aliasVar = scope.getVar(name);
+           aliases.put(name, aliasVar);
+ 
+           String qualifiedName =
+               aliasVar.getInitialValue().getQualifiedName();
+           transformation.addAlias(name, qualifiedName);
+           // Bleeding functions already get a BAD_PARAMETERS error, so just
+           // do nothing.
+           // Parameters of the scope function also get a BAD_PARAMETERS
+           // error.
+         } else {
+-          // TODO(robbyw): Support using locals for private variables.
+-          report(t, n, GOOG_SCOPE_NON_ALIAS_LOCAL, n.getString());
++          // If the local has a qualified name, do nothing.
++          if (!aliasVar.getInitialValue().isQualifiedName()) {
++            // If the local is an additive expression, do nothing.
++            if (v.getInitialValue() != null
++                && v.getInitialValue().isAdditiveExpression()) {
++              continue;
++            }
++            if (!aliasVar.isLocal()) {
++              report(t, v.getNode(), ScopedAliases.GOOG_SCOPE_NON_ALIAS_LOCAL,
++                  v.getName());
++            }
+           }
+         }
+       }
+     }

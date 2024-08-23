@@ -1,0 +1,10 @@
+diff --git a/tmp/3111995d-df03-445d-854f-12c585e60b05_buggy.java b/tmp/05120778-a0ca-49f7-bfe4-7ab10f924eff_fixed.java
+index 2d36d6e..a62b6d9 100644
+--- a/tmp/3111995d-df03-445d-854f-12c585e60b05_buggy.java
++++ b/tmp/05120778-a0ca-49f7-bfe4-7ab10f924eff_fixed.java
+@@ -1,4 +1,4 @@
+     public void joinAsSpectator(MemberId memberId) {
+         membersAsSpectators.add(memberId);
+-        membersWhoAccepted.remove(memberId);
++        declinedMembers.remove(memberId);
+     }

@@ -1,0 +1,29 @@
+diff --git a/tmp/83f3ebce-ac53-4f78-b5db-c0bbe9d1e01b_buggy.java b/tmp/2df5bbe6-d474-4b30-8997-6eef3d133d32_fixed.java
+index 4b7f469..3d0e8e9 100644
+--- a/tmp/83f3ebce-ac53-4f78-b5db-c0bbe9d1e01b_buggy.java
++++ b/tmp/2df5bbe6-d474-4b30-8997-6eef3d133d32_fixed.java
+@@ -1,10 +1,18 @@
+ static boolean isSimpleNumber(String s) {
+-    int len = s.length();
+-    for (int index = 0; index < len; index++) {
++    if (s.length() == 0) return false;
++
++    boolean hasDecimalPoint = false;
++    for (int index = 0; index < s.length(); index++) {
+         char c = s.charAt(index);
+-      if (c < '0' || c > '9') {
+-        return false;
++        if (c == '.') {
++            if (hasDecimalPoint) {
++                return false; // Only one decimal point is allowed
+             }
++            hasDecimalPoint = true;
++        } else if (c < '0' || c > '9') {
++            return false; // Not a digit
+         }
+-    return len > 0;
++    }
++    
++    return true; // Valid numeric string
+ }
+\ No newline at end of file

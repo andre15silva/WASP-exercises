@@ -1,0 +1,19 @@
+diff --git a/tmp/b6e6ee66-bda0-4f72-98cc-a4b1272e2fdd_buggy.java b/tmp/88827bde-1749-4f6b-9147-bf42ac419511_fixed.java
+index 00b39e0..3fe926c 100644
+--- a/tmp/b6e6ee66-bda0-4f72-98cc-a4b1272e2fdd_buggy.java
++++ b/tmp/88827bde-1749-4f6b-9147-bf42ac419511_fixed.java
+@@ -1,7 +1,7 @@
+-    public void describeTo(Description description) {
+-        description.appendText("same(");
+-        appendQuoting(description);
+-        description.appendText(wanted.toString());
+-        appendQuoting(description);
+-        description.appendText(")");
++    public void appendQuoting(Description description) {
++        if (description == null) {
++            throw new IllegalArgumentException("Description cannot be null");
++        }
++
++        description.appendText("'");
+     }
+\ No newline at end of file

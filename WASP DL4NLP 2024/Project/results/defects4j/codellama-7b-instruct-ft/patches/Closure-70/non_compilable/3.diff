@@ -1,0 +1,52 @@
+diff --git a/tmp/b261a834-03e9-473b-bf3a-ad27d759f378_buggy.java b/tmp/6c712f9b-9ec4-4390-9749-a35819db577f_fixed.java
+index 1530b34..5d4c844 100644
+--- a/tmp/b261a834-03e9-473b-bf3a-ad27d759f378_buggy.java
++++ b/tmp/6c712f9b-9ec4-4390-9749-a35819db577f_fixed.java
+@@ -1,23 +1,47 @@
+     /**
+      * Declares all of a function's arguments.
+      */
+     private void declareArguments(Node functionNode) {
+       Node astParameters = functionNode.getFirstChild().getNext();
+       Node body = astParameters.getNext();
+       FunctionType functionType = (FunctionType) functionNode.getJSType();
+       if (functionType != null) {
+         Node jsDocParameters = functionType.getParametersNode();
+         if (jsDocParameters != null) {
+           Node jsDocParameter = jsDocParameters.getFirstChild();
+           for (Node astParameter : astParameters.children()) {
+             if (jsDocParameter != null) {
+               defineSlot(astParameter, functionNode,
+                   jsDocParameter.getJSType(), true);
+               jsDocParameter = jsDocParameter.getNext();
+             } else {
+               defineSlot(astParameter, functionNode, null, true);
+             }
+           }
+         }
+       }
++      if (body.isBlock()) {
++        for (Node nameDecl : body.children()) {
++          if (nameDecl.isName()) {
++            String name = nameDecl.getString();
++            Node nameNode = getName(name, nameDecl);
++            if (nameNode != null) {
++              warnDuplicate(name, "function parameter", null,
++                  false, nameNode);
++            }
++          } else if (nameDecl.isVar()) {
++            Node nameNode = nameDecl.getFirstChild();
++            String name = nameNode.getString();
++            Node nameVarNode = getName(name, nameNode);
++            if (nameVarNode != null) {
++              warnVariableRedeclaration(name, nameVarNode);
++              this.usedVars[nodeIdMap.getOrAddId(nameNode)] = true;
++              warnInitializingVariable(name, nameNode,
++                  nameNode.getJSType());
++            } else {
++              this.togetherUsed[nodeIdMap.getOrAddId(nameNode)] = true;
++            }
++          }
++        }
++      }
+     } // end declareArguments

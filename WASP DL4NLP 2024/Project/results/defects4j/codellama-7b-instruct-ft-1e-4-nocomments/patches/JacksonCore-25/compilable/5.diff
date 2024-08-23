@@ -1,0 +1,52 @@
+diff --git a/tmp/88ee07e9-9720-4d22-a32c-f20c82c186d6_buggy.java b/tmp/d59a0505-8d87-4ffa-accd-6d708b18e257_fixed.java
+index 8dfbd84..acb7054 100644
+--- a/tmp/88ee07e9-9720-4d22-a32c-f20c82c186d6_buggy.java
++++ b/tmp/d59a0505-8d87-4ffa-accd-6d708b18e257_fixed.java
+@@ -1,43 +1,38 @@
+     private String _handleOddName2(int startPtr, int hash, int[] codes) throws IOException
+     {
+         _textBuffer.resetWithShared(_inputBuffer, startPtr, (_inputPtr - startPtr));
+         char[] outBuf = _textBuffer.getCurrentSegment();
+         int outPtr = _textBuffer.getCurrentSegmentSize();
+         final int maxCode = codes.length;
+-
+         while (true) {
+             if (_inputPtr >= _inputEnd) {
+-                if (!_loadMore()) { // acceptable for now (will error out later)
++                if (!_loadMore()) { 
+                     break;
+                 }
+             }
+             char c = _inputBuffer[_inputPtr];
+-            int i = (int) c;
++            int i = Character.codePointAt(_inputBuffer, _inputPtr);
++            _inputPtr += Character.charCount(i);
+             if (i <= maxCode) {
+                 if (codes[i] != 0) {
+                     break;
+                 }
+             } else if (!Character.isJavaIdentifierPart(c)) {
+                 break;
+             }
+-            ++_inputPtr;
+             hash = (hash * CharsToNameCanonicalizer.HASH_MULT) + i;
+-            // Ok, let's add char to output:
+             outBuf[outPtr++] = c;
+-
+-            // Need more room?
+             if (outPtr >= outBuf.length) {
+                 outBuf = _textBuffer.finishCurrentSegment();
+                 outPtr = 0;
+             }
+         }
+         _textBuffer.setCurrentLength(outPtr);
+         {
+             TextBuffer tb = _textBuffer;
+             char[] buf = tb.getTextBuffer();
+             int start = tb.getTextOffset();
+             int len = tb.size();
+-
+             return _symbols.findSymbol(buf, start, len, hash);
+         }
+     }
+\ No newline at end of file

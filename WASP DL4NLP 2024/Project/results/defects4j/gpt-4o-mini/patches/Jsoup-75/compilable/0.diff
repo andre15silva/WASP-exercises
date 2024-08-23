@@ -1,0 +1,26 @@
+diff --git a/tmp/71674202-bef3-40ca-8ae6-e168ab651684_buggy.java b/tmp/1d1277ca-784d-4539-b2e2-c2c930cc8494_fixed.java
+index 98b456f..2a9b6d7 100644
+--- a/tmp/71674202-bef3-40ca-8ae6-e168ab651684_buggy.java
++++ b/tmp/1d1277ca-784d-4539-b2e2-c2c930cc8494_fixed.java
+@@ -1,17 +1,19 @@
+ final void html(final Appendable accum, final Document.OutputSettings out) throws IOException {
+     final int sz = size;
+     for (int i = 0; i < sz; i++) {
+-            // inlined from Attribute.html()
+         final String key = keys[i];
+         final String val = vals[i];
+         accum.append(' ').append(key);
+ 
+         // collapse checked=null, checked="", checked=checked; write out others
+         if (!(out.syntax() == Document.OutputSettings.Syntax.html
+             && (val == null || val.equals(key) && Attribute.isBooleanAttribute(key)))) {
+             accum.append("=\"");
+             Entities.escape(accum, val == null ? EmptyString : val, out, true, false, false);
+             accum.append('"');
++        } else if (Attribute.isBooleanAttribute(key) && (val == null || val.equals(key))) {
++            // No value to append for boolean attributes
++            // Do nothing; this will ensure no value is added.
+         }
+     }
+ }
+\ No newline at end of file

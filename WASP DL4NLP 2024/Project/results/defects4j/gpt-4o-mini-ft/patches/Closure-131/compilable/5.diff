@@ -1,0 +1,29 @@
+diff --git a/tmp/a3ab76e0-48bd-49f9-84f6-bc79e6a4fd4e_buggy.java b/tmp/ee15c345-0234-479e-a22e-629429e16cb3_fixed.java
+index 19fe1b4..a346054 100644
+--- a/tmp/a3ab76e0-48bd-49f9-84f6-bc79e6a4fd4e_buggy.java
++++ b/tmp/ee15c345-0234-479e-a22e-629429e16cb3_fixed.java
+@@ -1,17 +1,24 @@
+     public static boolean isJSIdentifier(String s) {
+       int length = s.length();
+ 
+       if (length == 0 ||
+           !Character.isJavaIdentifierStart(s.charAt(0))) {
+         return false;
+       }
+ 
+       for (int i = 1; i < length; i++) {
+         if (
+             !Character.isJavaIdentifierPart(s.charAt(i))) {
+           return false;
+         }
+       }
+ 
++      // Allow for quoted properties
++      if (length > 1 && s.charAt(0) == '\'' && s.charAt(length-1) == '\'') {
++          return true;
++      }
++      if (length > 1 && s.charAt(0) == '"' && s.charAt(length-1) == '"') {
++          return true;
++      }
+       return true;
+     }

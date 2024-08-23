@@ -1,0 +1,226 @@
+diff --git a/tmp/e671a130-bfac-43cf-a769-183cac2c427c_buggy.java b/tmp/ef688232-50cc-4dac-823b-7ebd471afec4_fixed.java
+index d64eec3..7773eff 100644
+--- a/tmp/e671a130-bfac-43cf-a769-183cac2c427c_buggy.java
++++ b/tmp/ef688232-50cc-4dac-823b-7ebd471afec4_fixed.java
+@@ -1,122 +1,112 @@
+-    /**
+-     * Draws the axis label.
+-     *
+-     * @param label  the label text.
+-     * @param g2  the graphics device.
+-     * @param plotArea  the plot area.
+-     * @param dataArea  the area inside the axes.
+-     * @param edge  the location of the axis.
+-     * @param state  the axis state (<code>null</code> not permitted).
+-     * @param plotState  the plot state (<code>null</code> permitted).
+-     *
+-     * @return Information about the axis.
+-     */
+-    protected AxisState drawLabel(String label, Graphics2D g2, 
+-            Rectangle2D plotArea, Rectangle2D dataArea, RectangleEdge edge, 
+-            AxisState state, PlotRenderingInfo plotState) {
++package org.jfree.chart.renderer.category;
+ 
+-        // it is unlikely that 'state' will be null, but check anyway...
+-        if (state == null) {
+-            throw new IllegalArgumentException("Null 'state' argument.");
+-        }
++import org.jfree.chart.renderer.RendererState;
++import org.jfree.chart.text.TextUtilities;
++import org.jfree.data.Range;
++import org.jfree.data.category.CategoryDataset;
++import org.jfree.chart.JFreeChart;
++import org.jfree.chart.plot.CategoryPlot;
++import org.jfree.chart.plot.PlotRenderingInfo;
++import org.jfree.chart.plot.ValueMarker;
++import org.jfree.chart.plot.ValueAxisPlot;
++import org.jfree.data.general.SortedArrayDataset;
++import java.awt.geom.Rectangle2D;
++import java.awt.Graphics2D;
++import java.awt.geom.Rectangle2D.Float;
++import java.awt.Shape;
++import org.jfree.chart.axis.AxisLocation;
++import org.jfree.chart.axis.ValueAxis;
++import org.jfree.chart.axis.AxisState;
++import java.awt.geom.Ellipse2D;
++import org.jfree.chart.axis.LinearAxis;
++import org.jfree.chart.event.AxisChangeEvent;
++import java.awt.Paint;
++import org.jfree.chart.event.PlotChangeEvent;
++import java.awt.Stroke;
++import java.awt.BasicStroke;
++import java.awt.geom.Rectangle2D;
++import org.jfree.chart.event.RendererChangeEvent;
++import org.jfree.chart.event.PlotChangeListener;
++import org.jfree.chart.event.AxisChangeListener;
++import org.jfree.chart.draw.*;
+ 
+-        if ((label == null) || (label.equals(""))) {
+-            return state;
+-        }
++public class BarRenderer extends CategoryItemRenderer {
++  protected float barPadding;
++  protected RendererState state;
++  protected Paint barOutlinePaint = Color.black;
++  protected Paint barPaint = Color.red;
++  protected Stroke barOutlineStroke;
++  protected boolean renderAsPercentages = false;
++  protected boolean drawBarOutline = true;
++  protected boolean fillBar = true;
++  protected int passCount = 1;
++  protected AxisState rangeAxisState;
++  protected AxisState domainAxisState;
++  protected AxisLocation domainAxisLocation = AxisLocation.BOTTOM_OR_LEFT;
++  protected RectangleEdge domainAxisEdge;
++  protected boolean drawAxisLine = true;
++  protected boolean showOutlines = true;
++  protected boolean toolTipsOnTop = false;
++  protected String toolTipTextKey;
++  protected String urlTextKey;
++  protected Object toolTipText;
++  protected Object urlText;
+ 
+-        Font font = getLabelFont();
+-        RectangleInsets insets = getLabelInsets();
+-        g2.setFont(font);
+-        g2.setPaint(getLabelPaint());
+-        FontMetrics fm = g2.getFontMetrics();
+-        Rectangle2D labelBounds = TextUtilities.getTextBounds(label, g2, fm);
+-        Shape hotspot = null;
++  public BarRenderer()
++  {
++    this.barPadding = 0.0F;
++    this.state = new RendererState();
++    setAutoPopulateSeriesPaint(true);
++    setAutoPopulateSeriesStroke(true);
++    this.domainAxisEdge = RectangleEdge.BOTTOM;
++    this.showOutlines = true;
++  }
+ 
+-        if (edge == RectangleEdge.TOP) {
+-            AffineTransform t = AffineTransform.getRotateInstance(
+-                    getLabelAngle(), labelBounds.getCenterX(), 
+-                    labelBounds.getCenterY());
+-            Shape rotatedLabelBounds = t.createTransformedShape(labelBounds);
+-            labelBounds = rotatedLabelBounds.getBounds2D();
+-            float w = (float) labelBounds.getWidth();
+-            float h = (float) labelBounds.getHeight();
+-            float labelx = (float) dataArea.getCenterX();
+-            float labely = (float) (state.getCursor() - insets.getBottom() 
+-                    - h / 2.0);
+-            TextUtilities.drawRotatedString(label, g2, labelx, labely, 
+-                    TextAnchor.CENTER, getLabelAngle(), TextAnchor.CENTER);
+-            hotspot = new Rectangle2D.Float(labelx - w / 2.0f, 
+-                    labely - h / 2.0f, w, h);
+-            state.cursorUp(insets.getTop() + labelBounds.getHeight() 
+-                    + insets.getBottom());
++  public Paint getBarOutlinePaint()
++  {
++    return this.barOutlinePaint;
+   }
+-        else if (edge == RectangleEdge.BOTTOM) {
+-            AffineTransform t = AffineTransform.getRotateInstance(
+-                    getLabelAngle(), labelBounds.getCenterX(), 
+-                    labelBounds.getCenterY());
+-            Shape rotatedLabelBounds = t.createTransformedShape(labelBounds);
+-            labelBounds = rotatedLabelBounds.getBounds2D();
+-            float w = (float) labelBounds.getWidth();
+-            float h = (float) labelBounds.getHeight();
+-            float labelx = (float) dataArea.getCenterX();
+-            float labely = (float) (state.getCursor() + insets.getTop() 
+-                    + h / 2.0);
+-            TextUtilities.drawRotatedString(label, g2, labelx, labely, 
+-                    TextAnchor.CENTER, getLabelAngle(), TextAnchor.CENTER);
+-            hotspot = new Rectangle2D.Float(labelx - w / 2.0f, 
+-                    labely - h / 2.0f, w, h);
+-            state.cursorDown(insets.getTop() + labelBounds.getHeight() 
+-                    + insets.getBottom());
++
++  public void setBarOutlinePaint(Paint paint) {
++    Paint old = getBarOutlinePaint();
++    Args.nullNotPermitted(paint, "paint");
++    this.barOutlinePaint = paint;
++    firePropertyChange("barOutlinePaint", old, getBarOutlinePaint());
+   }
+-        else if (edge == RectangleEdge.LEFT) {
+-            AffineTransform t = AffineTransform.getRotateInstance(
+-                    getLabelAngle() - Math.PI / 2.0, labelBounds.getCenterX(), 
+-                    labelBounds.getCenterY());
+-            Shape rotatedLabelBounds = t.createTransformedShape(labelBounds);
+-            labelBounds = rotatedLabelBounds.getBounds2D();
+-            float w = (float) labelBounds.getWidth();
+-            float h = (float) labelBounds.getHeight();
+-            float labelx = (float) (state.getCursor() - insets.getRight() 
+-                    - w / 2.0);
+-            float labely = (float) dataArea.getCenterY();
+-            TextUtilities.drawRotatedString(label, g2, labelx, labely, 
+-                    TextAnchor.CENTER, getLabelAngle() - Math.PI / 2.0, 
+-                    TextAnchor.CENTER);
+-            hotspot = new Rectangle2D.Float(labelx - w / 2.0f, 
+-                    labely - h / 2.0f, w, h);
+-            state.cursorLeft(insets.getLeft() + labelBounds.getWidth() 
+-                    + insets.getRight());
++
++  public Stroke getBarOutlineStroke()
++  {
++    return this.barOutlineStroke;
+   }
+-        else if (edge == RectangleEdge.RIGHT) {
+ 
+-            AffineTransform t = AffineTransform.getRotateInstance(
+-                    getLabelAngle() + Math.PI / 2.0, 
+-                    labelBounds.getCenterX(), labelBounds.getCenterY());
+-            Shape rotatedLabelBounds = t.createTransformedShape(labelBounds);
+-            labelBounds = rotatedLabelBounds.getBounds2D();
+-            float w = (float) labelBounds.getWidth();
+-            float h = (float) labelBounds.getHeight();
+-            float labelx = (float) (state.getCursor() 
+-                            + insets.getLeft() + w / 2.0);
+-            float labely = (float) (dataArea.getY() + dataArea.getHeight() 
+-                    / 2.0);
+-            TextUtilities.drawRotatedString(label, g2, labelx, labely, 
+-                    TextAnchor.CENTER, getLabelAngle() + Math.PI / 2.0, 
+-                    TextAnchor.CENTER);
+-            hotspot = new Rectangle2D.Float(labelx - w / 2.0f, 
+-                    labely - h / 2.0f, w, h);
+-            state.cursorRight(insets.getLeft() + labelBounds.getWidth() 
+-                    + insets.getRight());
++  public void setBarOutlineStroke(Stroke stroke)
++  {
++    Stroke old = getBarOutlineStroke();
++    Args.nullNotPermitted(stroke, "stroke");
++    this.barOutlineStroke = stroke;
++    firePropertyChange("barOutlineStroke", old, getBarOutlineStroke());
++  }
+ 
++  public Paint getBarPaint()
++  {
++    return this.barPaint;
+   }
+-        if (plotState != null && hotspot != null) {
+-            ChartRenderingInfo owner = plotState.getOwner();
+-                EntityCollection entities = owner.getEntityCollection();
+-                if (entities != null) {
+-                    entities.add(new AxisLabelEntity(this, hotspot, 
+-                            this.labelToolTip, this.labelURL));
++
++  public void setBarPaint(Paint paint) {
++    Args.nullNotPermitted(paint, "paint");
++    Paint old = getBarPaint();
++    this.barPaint = paint;
++    firePropertyChange("barPaint", old, getBarPaint());
+   }
++
++  public boolean getDrawBarOutline()
++  {
++    return this.drawBarOutline;
+   }
+-        return state;
+ 
++  public void setDrawBarOutline(boolean on) {
++    boolean old = getDrawBarOutline();
++    this.drawBarOutline = on;
++    firePropertyChange("drawBarOutline", old, getDrawBarOutline());
++  }
+ }
+\ No newline at end of file

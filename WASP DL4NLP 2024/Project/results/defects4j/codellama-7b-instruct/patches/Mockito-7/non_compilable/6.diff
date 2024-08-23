@@ -1,0 +1,15 @@
+diff --git a/tmp/e9489e7e-a909-4db3-b95b-2b7b6798086e_buggy.java b/tmp/e2b51c86-831b-4fe3-aed8-1f2f58fca826_fixed.java
+index 91b7957..70a4398 100644
+--- a/tmp/e9489e7e-a909-4db3-b95b-2b7b6798086e_buggy.java
++++ b/tmp/e2b51c86-831b-4fe3-aed8-1f2f58fca826_fixed.java
+@@ -1,6 +1,5 @@
+-        private void readTypeVariables() {
+-            for (Type type : typeVariable.getBounds()) {
+-                registerTypeVariablesOn(type);
+-            }
+-            registerTypeVariablesOn(getActualTypeArgumentFor(typeVariable));
++  @Test
++  public void discoverDeepMockingOfGenerics() {
++    MyClass1 myMock1 = mock(MyClass1.class, RETURNS_DEEP_STUBS);
++    when(myMock1.getNested().getNested().returnSomething()).thenReturn("Hello World.");
+   }

@@ -1,0 +1,19 @@
+diff --git a/tmp/4fe3b569-6ca7-42ce-9ecf-ada6732f3085_buggy.java b/tmp/bfbdb012-69db-4f2f-b509-da8212209b2b_fixed.java
+index e69de29..0e8b080 100644
+--- a/tmp/4fe3b569-6ca7-42ce-9ecf-ada6732f3085_buggy.java
++++ b/tmp/bfbdb012-69db-4f2f-b509-da8212209b2b_fixed.java
+@@ -0,0 +1,13 @@
++public static void removeFormElement(String html) {
++    Document doc = Jsoup.parse(html);
++    FormElement form = (FormElement) doc.selectFirst("form");
++    Element pass = form.selectFirst("input[name=pass]");
++    pass.remove();
++
++    // Fixed code
++    List<Connection.KeyVal> data = form.formData();
++    assertEquals(2, data.size());
++    assertEquals("user", data.get(0).key());
++    assertEquals("login", data.get(1).key());
++    assertEquals(null, doc.selectFirst("input[name=pass]"));
++}
+\ No newline at end of file

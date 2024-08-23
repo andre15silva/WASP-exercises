@@ -1,0 +1,17 @@
+diff --git a/tmp/d4adb3ec-d15f-4fbf-a56c-1d7835f691d8_buggy.java b/tmp/54bc4ed8-4fad-442d-a687-6cd9393c8e46_fixed.java
+index e69de29..2f3bd38 100644
+--- a/tmp/d4adb3ec-d15f-4fbf-a56c-1d7835f691d8_buggy.java
++++ b/tmp/54bc4ed8-4fad-442d-a687-6cd9393c8e46_fixed.java
+@@ -0,0 +1,11 @@
++public Object deserialize(byte[] bytes) {
++    Object obj = // ... your deserialization logic (e.g., using ObjectInputStream)
++    if (obj instanceof MultiValueMap) {
++        MultiValueMap map = (MultiValueMap) obj;
++        Class<?> valueClass = map.getValueClass();
++        if (valueClass != ArrayList.class) {
++            throw new UnsupportedOperationException("Unsafe class accepted when de-serializing MultiValueMap");
++        }
++    }
++    return obj;
++}
+\ No newline at end of file

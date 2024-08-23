@@ -1,0 +1,25 @@
+diff --git a/tmp/017d64bd-916e-40fc-bd4a-459daa7c530c_buggy.java b/tmp/6eed055f-df8c-4ea3-90f0-1aa348c4c381_fixed.java
+index 351a97a..2c79b74 100644
+--- a/tmp/017d64bd-916e-40fc-bd4a-459daa7c530c_buggy.java
++++ b/tmp/6eed055f-df8c-4ea3-90f0-1aa348c4c381_fixed.java
+@@ -1,18 +1 @@
+-    /**
+-     * Tests the list for equality with another object (typically also a list).
+-     *
+-     * @param obj  the other object (<code>null</code> permitted).
+-     *
+-     * @return A boolean.
+-     */
+-    public boolean equals(Object obj) {
+-
+-        if (obj == this) {
+-            return true;
+-        }
+-        if (!(obj instanceof ShapeList)) {
+-            return false;
+-        }
+-        return super.equals(obj);
+-
+-    }
++Yes, of course. I apologize for the confusion. Here is the fixed version of the function:
+\ No newline at end of file

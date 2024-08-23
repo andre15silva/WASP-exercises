@@ -1,0 +1,19 @@
+diff --git a/tmp/ba703967-0c3c-4395-951a-1515e6c9bfa9_buggy.java b/tmp/9018af95-40c1-4a31-b844-b2aec5d04759_fixed.java
+index a5093b1..b2ac62a 100644
+--- a/tmp/ba703967-0c3c-4395-951a-1515e6c9bfa9_buggy.java
++++ b/tmp/9018af95-40c1-4a31-b844-b2aec5d04759_fixed.java
+@@ -1,11 +1,13 @@
+     private static <E extends Element> Integer indexInList(Element search, List<E> elements) {
+         Validate.notNull(search);
+         Validate.notNull(elements);
+ 
+         for (int i = 0; i < elements.size(); i++) {
+             E element = elements.get(i);
+-            if (element.equals(search))
++            // need to include an additional nextSibling().equals check to fix issue 1172 where document text nodes were being
++            // counted as siblings and the equal comparison fails if sibling child text nodes have the same content 
++            if (element.equals(search) && (search.nextSibling().equals(element.nextSibling()) || search.elementSiblingIndex() == element.elementSiblingIndex()))
+                 return i;
+         }
+         return null;
+     }

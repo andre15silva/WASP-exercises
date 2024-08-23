@@ -1,0 +1,51 @@
+diff --git a/tmp/9dfe4529-b66f-414a-806e-0250bcf7ef17_buggy.java b/tmp/0c88a6cb-b3f3-47f0-a8aa-5f2fd45af988_fixed.java
+index 58a1651..a4b5e37 100644
+--- a/tmp/9dfe4529-b66f-414a-806e-0250bcf7ef17_buggy.java
++++ b/tmp/0c88a6cb-b3f3-47f0-a8aa-5f2fd45af988_fixed.java
+@@ -1,32 +1,36 @@
+   @Override
+   JSType resolveInternal(ErrorReporter t, StaticScope<JSType> scope) {
+     setResolvedTypeInternal(this);
+-
+     call = (ArrowType) safeResolve(call, t, scope);
+     prototype = (FunctionPrototypeType) safeResolve(prototype, t, scope);
+-
+-    // Warning about typeOfThis if it doesn't resolve to an ObjectType
+-    // is handled further upstream.
+-    // TODO(nicksantos): Handle this correctly if we have a UnionType.
+-    typeOfThis = (ObjectType) safeResolve(typeOfThis, t, scope);
+-
++    typeOfThis = safeResolve(typeOfThis, t, scope);
++    ObjectType realTypeOfThis = typeOfThis;
++    if (typeOfThis.isUnionType()) {
++      if (typeOfThis.isSubtype(
++          t.getNativeType(JSTypeNative.STRING)).isEqualTo(
++              JSType.TRUE)) {
++        realTypeOfThis = t.getNativeType(JSTypeNative.STRING);
++      } else if (!typeOfThis.isSubtype(
++          t.getNativeType(JSTypeNative.NO_TYPE)).isEqualTo(
++              JSType.TRUE)) {
++        realTypeOfThis = t.getNativeType(JSTypeNative.NO_TYPE);
++      }
++    }
+     boolean changed = false;
+     ImmutableList.Builder<ObjectType> resolvedInterfaces =
+         ImmutableList.builder();
+     for (ObjectType iface : implementedInterfaces) {
+       ObjectType resolvedIface = (ObjectType) iface.resolve(t, scope);
+       resolvedInterfaces.add(resolvedIface);
+       changed |= (resolvedIface != iface);
+     }
+     if (changed) {
+       implementedInterfaces = resolvedInterfaces.build();
+     }
+-
+     if (subTypes != null) {
+       for (int i = 0; i < subTypes.size(); i++) {
+         subTypes.set(i, (FunctionType) subTypes.get(i).resolve(t, scope));
+       }
+     }
+-
+     return super.resolveInternal(t, scope);
+   }
+\ No newline at end of file

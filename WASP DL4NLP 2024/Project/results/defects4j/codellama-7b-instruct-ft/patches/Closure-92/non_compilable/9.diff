@@ -1,0 +1,98 @@
+diff --git a/tmp/75a84afa-a98a-4f70-92b7-516b5f7f5dae_buggy.java b/tmp/6b94417e-9bcd-42b1-bb1b-47bfc5b1f7c8_fixed.java
+index 851ffc2..91e8bc9 100644
+--- a/tmp/75a84afa-a98a-4f70-92b7-516b5f7f5dae_buggy.java
++++ b/tmp/6b94417e-9bcd-42b1-bb1b-47bfc5b1f7c8_fixed.java
+@@ -1,70 +1,92 @@
+     /**
+      * Replace the provide statement.
+      *
+      * If we're providing a name with no definition, then create one.
+      * If we're providing a name with a duplicate definition, then make sure
+      * that definition becomes a declaration.
+      */
+     void replace() {
+       if (firstNode == null) {
+         // Don't touch the base case ('goog').
+         replacementNode = candidateDefinition;
+         return;
+       }
+ 
+       // Handle the case where there is a duplicate definition for an explicitly
+       // provided symbol.
+       if (candidateDefinition != null && explicitNode != null) {
+         explicitNode.detachFromParent();
+         compiler.reportCodeChange();
+ 
+         // Does this need a VAR keyword?
+         replacementNode = candidateDefinition;
+         if (NodeUtil.isExpressionNode(candidateDefinition)) {
+           candidateDefinition.putBooleanProp(Node.IS_NAMESPACE, true);
+           Node assignNode = candidateDefinition.getFirstChild();
+           Node nameNode = assignNode.getFirstChild();
+           if (nameNode.getType() == Token.NAME) {
+             // Need to convert this assign to a var declaration.
+             Node valueNode = nameNode.getNext();
+             assignNode.removeChild(nameNode);
+             assignNode.removeChild(valueNode);
+             nameNode.addChildToFront(valueNode);
+             Node varNode = new Node(Token.VAR, nameNode);
+             varNode.copyInformationFrom(candidateDefinition);
+             candidateDefinition.getParent().replaceChild(
+                 candidateDefinition, varNode);
+             nameNode.setJSDocInfo(assignNode.getJSDocInfo());
+             compiler.reportCodeChange();
+             replacementNode = varNode;
+           }
+         }
+       } else {
+         // Handle the case where there's not a duplicate definition.
+         replacementNode = createDeclarationNode();
+         if (firstModule == minimumModule) {
+           firstNode.getParent().addChildBefore(replacementNode, firstNode);
+-        } else {
++        } else if (this == (ProvidedName) ProvidedName.PROVIDE) {
+           // In this case, the name was implicitly provided by two independent
+           // modules. We need to move this code up to a common module.
+           int indexOfDot = namespace.indexOf('.');
+           if (indexOfDot == -1) {
+             // Any old place is fine.
+             compiler.getNodeForCodeInsertion(minimumModule)
+                 .addChildToBack(replacementNode);
+           } else {
+             // Add it after the parent namespace.
+             ProvidedName parentName =
+                 providedNames.get(namespace.substring(0, indexOfDot));
+             Preconditions.checkNotNull(parentName);
+             Preconditions.checkNotNull(parentName.replacementNode);
+             parentName.replacementNode.getParent().addChildAfter(
+                 replacementNode, parentName.replacementNode);
+           }
++        } else {
++          // This is a goog.provide('namespace.namespace2') in a file that
++          // has been combined with another file that does
++          // goog.module(namespace.namespace2).
++          // We can't tell where those namespace's were referenced. We need to
++          // treat them as if they were independently "provided" by another
++          // module with a lower priority.
++          if (indexOfDot != -1) {
++            ProvidedName parentName =
++                providedNames.get(namespace.substring(0, indexOfDot));
++            if (parentName == null || parentName.moduleFileIndex == -1) {
++              // Add it after the parent namespace, if that's a goog.module,
++              // or in the end of namespace if the parent has no module directive.
++              compiler.getNodeForCodeInsertion(minimumModule)
++                  .addChildToBack(replacementNode);
++            } else {
++              // Add it in the beginning of the module
++              firstNode.getParent().addChildBefore(
++                  replacementNode,
++                  firstNode.getFirstChild());
++            }
++          }
+         }
+         if (explicitNode != null) {
+           explicitNode.detachFromParent();
+         }
+         compiler.reportCodeChange();
+       }
+     }

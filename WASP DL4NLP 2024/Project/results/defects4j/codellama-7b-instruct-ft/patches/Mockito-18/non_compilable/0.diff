@@ -1,0 +1,62 @@
+diff --git a/tmp/8817a73d-1fe0-4566-b4c3-8a3a762cb30e_buggy.java b/tmp/542e09aa-cad0-4628-aca8-cf2e15579c5b_fixed.java
+index 710fcc0..0992f62 100644
+--- a/tmp/8817a73d-1fe0-4566-b4c3-8a3a762cb30e_buggy.java
++++ b/tmp/542e09aa-cad0-4628-aca8-cf2e15579c5b_fixed.java
+@@ -1,37 +1,43 @@
+     Object returnValueFor(Class<?> type) {
+         if (Primitives.isPrimitiveOrWrapper(type)) {
+             return Primitives.defaultValueForPrimitiveOrWrapper(type);
+             //new instances are used instead of Collections.emptyList(), etc.
+             //to avoid UnsupportedOperationException if code under test modifies returned collection
++        } else if (type == Iterable.class) {
++            return values.returnValueFor(List.class);
+         } else if (type == Collection.class) {
+-            return new LinkedList<Object>();
++            return values.returnValueFor(List.class);
+         } else if (type == Set.class) {
+-            return new HashSet<Object>();
++            return values.returnValueFor(List.class);
+         } else if (type == HashSet.class) {
+-            return new HashSet<Object>();
++            return values.returnValueFor(List.class);
+         } else if (type == SortedSet.class) {
+-            return new TreeSet<Object>();
++            return values.returnValueFor(List.class);
+         } else if (type == TreeSet.class) {
+-            return new TreeSet<Object>();
++            return values.returnValueFor(List.class);
+         } else if (type == LinkedHashSet.class) {
+-            return new LinkedHashSet<Object>();
++            return values.returnValueFor(List.class);
+         } else if (type == List.class) {
+-            return new LinkedList<Object>();
++            return values.returnValueFor(List.class);
+         } else if (type == LinkedList.class) {
+-            return new LinkedList<Object>();
++            return values.returnValueFor(List.class);
+         } else if (type == ArrayList.class) {
+-            return new ArrayList<Object>();
++            return values.returnValueFor(List.class);
+         } else if (type == Map.class) {
+-            return new HashMap<Object, Object>();
++            return values.returnValueFor(HashMap.class);
+         } else if (type == HashMap.class) {
+-            return new HashMap<Object, Object>();
++            return values.returnValueFor(HashMap.class);
+         } else if (type == SortedMap.class) {
+-            return new TreeMap<Object, Object>();
++            return values.returnValueFor(HashMap.class);
+         } else if (type == TreeMap.class) {
+-            return new TreeMap<Object, Object>();
++            return values.returnValueFor(HashMap.class);
+         } else if (type == LinkedHashMap.class) {
+-            return new LinkedHashMap<Object, Object>();
++            return values.returnValueFor(HashMap.class);
++        } else if (type == Queue.class) {
++            return values.returnValueFor(Queue.class);
++        } else if (type == LinkedList.class) {
++            return values.returnValueFor(Queue.class);
+         }
+         //Let's not care about the rest of collections.
+         return null;
+     }

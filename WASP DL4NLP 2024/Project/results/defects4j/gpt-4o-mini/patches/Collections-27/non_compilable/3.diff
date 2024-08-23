@@ -1,0 +1,18 @@
+diff --git a/tmp/2836a385-45ae-4a55-8a3a-9de341620734_buggy.java b/tmp/6161b730-a27d-4385-b390-033e921b8bec_fixed.java
+index e69de29..f327c96 100644
+--- a/tmp/2836a385-45ae-4a55-8a3a-9de341620734_buggy.java
++++ b/tmp/6161b730-a27d-4385-b390-033e921b8bec_fixed.java
+@@ -0,0 +1,12 @@
++public Object deserialize(byte[] bytes) throws IOException, ClassNotFoundException {
++    Object result = SerializationUtils.deserialize(bytes);
++    
++    if (result instanceof MultiValueMap) {
++        MultiValueMap map = (MultiValueMap) result;
++        if (map.getGenericType() != ArrayList.class) {
++            throw new UnsupportedOperationException("Unsafe clazz accepted when de-serializing MultiValueMap");
++        }
++    }
++    
++    return result;
++}
+\ No newline at end of file

@@ -1,0 +1,67 @@
+diff --git a/tmp/bed5f685-9a91-409b-bace-12c4bbea72da_buggy.java b/tmp/23c84170-4ef0-4575-a68c-97d08ed3a603_fixed.java
+index 61ffdbf..b9a3db7 100644
+--- a/tmp/bed5f685-9a91-409b-bace-12c4bbea72da_buggy.java
++++ b/tmp/23c84170-4ef0-4575-a68c-97d08ed3a603_fixed.java
+@@ -1,44 +1,60 @@
+   /**
+    * Removes unreferenced arguments from a function declaration and when
+    * possible the function's callSites.
+    *
+    * @param fnScope The scope inside the function
+    */
+   private void removeUnreferencedFunctionArgs(Scope fnScope) {
+     // Notice that removing unreferenced function args breaks
+     // Function.prototype.length. In advanced mode, we don't really care
+     // about this: we consider "length" the equivalent of reflecting on
+     // the function's lexical source.
+     //
+     // Rather than create a new option for this, we assume that if the user
+     // is removing globals, then it's OK to remove unused function args.
+     //
+     // See http://code.google.com/p/closure-compiler/issues/detail?id=253
+ 
+     Node function = fnScope.getRootNode();
+ 
+     Preconditions.checkState(function.isFunction());
+     if (NodeUtil.isGetOrSetKey(function.getParent())) {
+       // The parameters object literal setters can not be removed.
+       return;
+     }
+ 
+     Node argList = getFunctionArgList(function);
+     boolean modifyCallers = modifyCallSites
+         && callSiteOptimizer.canModifyCallers(function);
+-    if (!modifyCallers) {
++    if (modifyCallers || !isSimpleMode()) {
+       // Strip unreferenced args off the end of the function declaration.
+       Node lastArg;
+       while ((lastArg = argList.getLastChild()) != null) {
+         Var var = fnScope.getVar(lastArg.getString());
+         if (!referenced.contains(var)) {
+           argList.removeChild(lastArg);
+           compiler.reportCodeChange();
+         } else {
+           break;
+         }
+       }
+     } else {
++      // If this is in simple mode, we don't really know that functions have
++      // unreferenced named parameters, and it might be that they do.
++      // So we play it safe and leave them in. They'll be removed during
++      // dead code removal later.
++      Node arg = argList.getFirstChild();
++      while (arg != null) {
++        Var var = fnScope.getVar(arg.getString());
++        if (!referenced.contains(var)) {
++          argList.removeChild(arg);
++          compiler.reportCodeChange();
++        }
++        arg = arg.getNext();
++      }
++      if (argList.getFirstChild() == null) {
++        getFunctionCalls(function).clear();
++      }
++    }
+     callSiteOptimizer.optimize(fnScope, referenced);
+   }
+-  }

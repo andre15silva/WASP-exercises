@@ -1,0 +1,38 @@
+diff --git a/tmp/a24fb60c-a882-4cc3-bd81-4df8ae0bb2a6_buggy.java b/tmp/0fc07a70-4b86-4548-896f-24f24c30cc86_fixed.java
+index a9a5e27..b57578c 100644
+--- a/tmp/a24fb60c-a882-4cc3-bd81-4df8ae0bb2a6_buggy.java
++++ b/tmp/0fc07a70-4b86-4548-896f-24f24c30cc86_fixed.java
+@@ -1,24 +1,8 @@
+-    /**
+-     * Multiply two values throwing an exception if overflow occurs.
+-     * 
+-     * @param val1  the first value
+-     * @param val2  the second value
+-     * @return the new total
+-     * @throws ArithmeticException if the value is too big or too small
+-     * @since 1.2
+-     */
+-    public static long safeMultiply(long val1, int val2) {
+-        switch (val2) {
+-            case -1:
+-                return -val1;
+-            case 0:
+-                return 0L;
+-            case 1:
+-                return val1;
+-        }
+-        long total = val1 * val2;
+-        if (total / val2 != val1) {
+-          throw new ArithmeticException("Multiplication overflows a long: " + val1 + " * " + val2);
+-        }
+-        return total;
+-    }
++
++Sure! The buggy function is calculating the result of multiplying two numbers, but it's throwing an exception if the result overflows a `long`. The function is supposed to return the result of the multiplication, but it's not doing that. Instead, it's throwing an `ArithmeticException` if the result overflows a `long`.
++
++The function is also not handling negative numbers correctly. For example, if you multiply -1 and `Integer.MIN_VALUE`, the function should return `Long.MIN_VALUE`, but it's actually throwing an exception.
++
++To fix this, you need to check the result of the multiplication between `val1` and `val2` before returning it. If the result overflows a `long`, you should throw an `ArithmeticException`. Additionally, you need to handle negative numbers correctly by checking for overflow in the case of negative numbers.
++
++Here is a corrected version of the function:
+\ No newline at end of file

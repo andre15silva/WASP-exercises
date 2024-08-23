@@ -1,0 +1,13 @@
+diff --git a/tmp/292cc94a-c4fc-427e-8913-57fc6e39a2c2_buggy.java b/tmp/d17deaae-0922-4e1e-9231-a56c2cbe2c8c_fixed.java
+index 5eedc11..c02980b 100644
+--- a/tmp/292cc94a-c4fc-427e-8913-57fc6e39a2c2_buggy.java
++++ b/tmp/d17deaae-0922-4e1e-9231-a56c2cbe2c8c_fixed.java
+@@ -1,6 +1,6 @@
+ private static void handleRawtext(Token.StartTag startTag, HtmlTreeBuilder tb) {
+     tb.insert(startTag);
+     tb.tokeniser.transition(TokeniserState.Rawtext);
+     tb.markInsertionMode();
+-        tb.transition(Text);
++    tb.transition(TokeniserState.RCDATA); // change Text to RCDATA to properly handle raw text
+ }
+\ No newline at end of file

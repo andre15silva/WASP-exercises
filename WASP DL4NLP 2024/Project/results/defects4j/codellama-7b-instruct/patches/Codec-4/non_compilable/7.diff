@@ -1,0 +1,22 @@
+diff --git a/tmp/e15615d5-9d98-4d08-8ec1-69f69d2983e7_buggy.java b/tmp/9d2d8737-cb12-461b-bfb1-608e464120c1_fixed.java
+index 3fb3172..ceb06b3 100644
+--- a/tmp/e15615d5-9d98-4d08-8ec1-69f69d2983e7_buggy.java
++++ b/tmp/9d2d8737-cb12-461b-bfb1-608e464120c1_fixed.java
+@@ -1,13 +1,4 @@
+-    /**
+-     * Creates a Base64 codec used for decoding (all modes) and encoding in URL-unsafe mode.
+-     * <p>
+-     * When encoding the line length is 0 (no chunking), and the encoding table is STANDARD_ENCODE_TABLE.
+-     * </p>
+-     * 
+-     * <p>
+-     * When decoding all variants are supported.
+-     * </p>
+-     */
+-    public Base64() {
+-        this(false);
++public byte[] encode(byte[] binary) {
++    // encode the binary data and return the base64 encoded data
++    return Base64.getEncoder().encode(binary);
+ }
+\ No newline at end of file

@@ -1,0 +1,20 @@
+diff --git a/tmp/3735d47a-84c7-469e-bfcd-5459d1907a5b_buggy.java b/tmp/d257a9e5-e4a5-4e5e-873a-f927c27409a6_fixed.java
+index 7498011..db487f1 100644
+--- a/tmp/3735d47a-84c7-469e-bfcd-5459d1907a5b_buggy.java
++++ b/tmp/d257a9e5-e4a5-4e5e-873a-f927c27409a6_fixed.java
+@@ -1,12 +1,14 @@
+     /**
+      * Retrieves the element's inner HTML. E.g. on a {@code <div>} with one empty {@code <p>}, would return
+      * {@code <p></p>}. (Whereas {@link #outerHtml()} would return {@code <div><p></p></div>}.)
+      * 
+      * @return String of HTML.
+      * @see #outerHtml()
+      */
+     public String html() {
+         StringBuilder accum = new StringBuilder();
+         html(accum);
+-        return accum.toString().trim();
++        Document doc = ownerDocument();
++        final Document doc2 = (doc != null) ? doc : Jsoup.parse("");
++        return doc2.prettyPrint() ? accum.toString().trim() : accum.toString().trim().replace("\n", " \n");
+     }

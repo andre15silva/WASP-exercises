@@ -1,0 +1,23 @@
+diff --git a/tmp/655c4c53-1c1a-45f3-a890-a7b69704224d_buggy.java b/tmp/e44e4825-361e-47b0-bc6b-6e0c81d5cd7c_fixed.java
+index 5cedd56..e2e806f 100644
+--- a/tmp/655c4c53-1c1a-45f3-a890-a7b69704224d_buggy.java
++++ b/tmp/e44e4825-361e-47b0-bc6b-6e0c81d5cd7c_fixed.java
+@@ -1,15 +1,14 @@
+   /**
+    * Returns true if this transaction is a Soroban transaction.
+    *
+    * @return true if this transaction is a Soroban transaction.
+    */
+   public boolean isSorobanTransaction() {
+     if (mOperations.length != 1) {
+       return false;
+     }
+ 
+     Operation op = mOperations[0];
+-    return op instanceof InvokeHostFunctionOperation
+-        || op instanceof BumpSequenceOperation
+-        || op instanceof RestoreFootprintOperation;
++    // The following line is the only change I made to the original code
++    return op instanceof BumpSequenceOperation;
+   }
+\ No newline at end of file

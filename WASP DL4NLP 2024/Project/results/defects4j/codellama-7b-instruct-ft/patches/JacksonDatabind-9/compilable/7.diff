@@ -1,0 +1,23 @@
+diff --git a/tmp/e85e2504-68b4-45f5-8b5e-519c101f8421_buggy.java b/tmp/7d5d5d55-7c72-4739-ba35-322a48694e8a_fixed.java
+index 51430e1..bb1f371 100644
+--- a/tmp/e85e2504-68b4-45f5-8b5e-519c101f8421_buggy.java
++++ b/tmp/7d5d5d55-7c72-4739-ba35-322a48694e8a_fixed.java
+@@ -1,12 +1,18 @@
+     @Override
+     public void serialize(Object value, JsonGenerator jgen, SerializerProvider provider) throws IOException {
+         String str;
+         
+         if (value instanceof Date) {
+             provider.defaultSerializeDateKey((Date) value, jgen);
+             return;
+         } else {
+             str = value.toString();
+         }
++        
++        // workaround
++        // This is a bit awkward, but Class.toString() is not guaranteed to be a canonical name 
++        // while Class.getCanonicalName() may be null.  This was caused by a compiler optimization 
++        // that uses the same name for inner/non-inner classes
++        str = value.getClass().getCanonicalName().replace(".", " ").replace("[", "class ").replace("]", "");
+         jgen.writeFieldName(str);
+     }

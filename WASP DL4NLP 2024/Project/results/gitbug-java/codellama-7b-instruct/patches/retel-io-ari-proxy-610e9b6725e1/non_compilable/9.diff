@@ -1,0 +1,45 @@
+diff --git a/tmp/4e832773-7fc4-4a96-8beb-e7f9df730037_buggy.java b/tmp/8e7b681d-67c8-45be-9647-133d13d7c8d2_fixed.java
+index eb0a5c8..f6ea345 100644
+--- a/tmp/4e832773-7fc4-4a96-8beb-e7f9df730037_buggy.java
++++ b/tmp/8e7b681d-67c8-45be-9647-133d13d7c8d2_fixed.java
+@@ -1,27 +1,14 @@
+-  public static Try<Done> registerCallContext(
+-      final ActorRef<CallContextProviderMessage> callContextProvider,
+-      final String callContext,
+-      final AriCommand ariCommand) {
+-
+-    if (!ariCommand.extractCommandType().isCreationCommand()) {
+-      return Try.success(Done.done());
+-    }
+-
+-    final Option<AriResource> maybeResource =
+-        ariCommand
+-            .extractResourceRelations()
+-            .find(AriResourceRelation::isCreated)
+-            .map(AriResourceRelation::getResource);
+-
+-    if (maybeResource.isEmpty()) {
+-      return Try.failure(
+-          new RuntimeException(
+-              String.format(
+-                  "Failed to extract resourceId from command '%s'", ariCommand.toString())));
+-    }
+-
+-    final AriResource resource = maybeResource.get();
+-
+-    callContextProvider.tell(new RegisterCallContext(resource.getId(), callContext));
+-    return Try.success(Done.done());
++  @Test
++  void doesNotTryToRegisterACallContextForDeleteRequests() {
++    final TestableCallContextProvider callContextProvider =
++        new TestableCallContextProvider(testKit);
++
++    final Try<Done> result =
++        AriCommandResponseProcessing.registerCallContext(
++            callContextProvider.ref(),
++            CALL_CONTEXT,
++            new AriCommand("DELETE", "/channels/CHANNEL_ID", null));
++
++    assertTrue(result.isSuccess());
++    callContextProvider.probe().expectNoMessage();
+   }

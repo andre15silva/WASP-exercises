@@ -1,0 +1,48 @@
+diff --git a/tmp/e2f199ce-f393-4246-bac5-b779cb5103a4_buggy.java b/tmp/8e90733e-17e7-40d8-85f3-2587aebecc26_fixed.java
+index 9033e1c..67aae01 100644
+--- a/tmp/e2f199ce-f393-4246-bac5-b779cb5103a4_buggy.java
++++ b/tmp/8e90733e-17e7-40d8-85f3-2587aebecc26_fixed.java
+@@ -1,11 +1,43 @@
+     /**
+      * Returns true iff they are equal as defined by
+      * {@link #equals(double,double,int) equals(x, y, 1)}.
+      *
+      * @param x first value
+      * @param y second value
+      * @return {@code true} if the values are equal.
+      */
+     public static boolean equals(double x, double y) {
+         return (Double.isNaN(x) && Double.isNaN(y)) || x == y;
+     }
++
++    /**
++     * Returns true iff they are equal as defined by
++     * {@link #equals(double,double,int) equals(x, y, 1)}.
++     * This function has been deprecated because
++     * {@link #equals(Object,Object)} is used by all arrays, and this
++     * comparison fails in certain cases where {@link #equals} is correct.
++     * For example, this failure occurs if x is a sparse array, and
++     * y == x[x.length].  In addition, because {@link #equals} is used
++     * directly on arrays in the test {@link #testArrayEquals} (at least
++     * on some JAva versions), it is much harder to isolate the source
++     * of the bug when it is discovered.
++     *
++     * @param x first value
++     * @param y second value
++     * @return {@code true} if the values are equal.
++     *
++     * @deprecated To be removed in release 3.0.  Use {@link #equals(Object,Object)}.
++     */
++    @Deprecated
++    public static boolean equals(double[] x, double[] y) {
++        int len = x.length;
++        if (y == null || len != y.length) {
++            return false;
++        }
++        for (int i=0; i<len; i++) {
++            if (!equals(x[i], y[i])) {
++                return false;
++            }
++        }
++        return true;
++    }

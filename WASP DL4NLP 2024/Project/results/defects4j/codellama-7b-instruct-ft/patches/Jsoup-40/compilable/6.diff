@@ -1,0 +1,22 @@
+diff --git a/tmp/32d6df99-b00d-47d5-b708-1118f61b56b1_buggy.java b/tmp/076b55cb-4c39-4bc6-aa4a-39f302141aa0_fixed.java
+index 79fa300..5414b35 100644
+--- a/tmp/32d6df99-b00d-47d5-b708-1118f61b56b1_buggy.java
++++ b/tmp/076b55cb-4c39-4bc6-aa4a-39f302141aa0_fixed.java
+@@ -1,15 +1,17 @@
+     /**
+      * Create a new doctype element.
+      * @param name the doctype's name
+      * @param publicId the doctype's public ID
+      * @param systemId the doctype's system ID
+      * @param baseUri the doctype's base URI
+      */
+     public DocumentType(String name, String publicId, String systemId, String baseUri) {
+         super(baseUri);
+ 
+         Validate.notEmpty(name);
+         attr("name", name);
+         attr("publicId", publicId);
++        attr("public", publicId);
+         attr("systemId", systemId);
++        attr("system", systemId);
+     }

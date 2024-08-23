@@ -1,0 +1,24 @@
+diff --git a/tmp/7fbb7c5f-9500-4310-81ae-1b9a001ca9fd_buggy.java b/tmp/565fa3b9-6d0f-4377-bc96-d9de7b5d3246_fixed.java
+index f1d02c1..21ddc19 100644
+--- a/tmp/7fbb7c5f-9500-4310-81ae-1b9a001ca9fd_buggy.java
++++ b/tmp/565fa3b9-6d0f-4377-bc96-d9de7b5d3246_fixed.java
+@@ -1,4 +1,19 @@
+         @Override
+         protected JSType caseTopType(JSType topType) {
+           return topType;
+         }
++        protected JSType caseArrayType(JSType arrayType, JSType elementType) {
++          return arrayType;
++        }
++        @Override
++        protected JSType caseGoogArrayFunction(
++            final Node callee, final JSType typeArgument) {
++          JSType typeArgumentResult = caseFunctionArgument(callee, typeArgument);
++          if (typeArgumentResult == ALL_TYPE) {
++            return ARRAY_TYPE.autoboxesTo((ObjectType)ARRAY_TYPE);
++          } else if (typeArgumentResult == EMPTY_TYPE) {
++            return UNDEFINED_TYPE;
++          } else {
++            return ARRAY_TYPE.autoboxesTo(typeArgumentResult);
++          }
++        }

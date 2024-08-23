@@ -1,0 +1,63 @@
+diff --git a/tmp/82b4b747-a7ae-4ef0-ad9b-afa36d0a3f7b_buggy.java b/tmp/6d3e7e4a-ca27-4d0d-b3be-bb936809b821_fixed.java
+index 2573d30..3156b8e 100644
+--- a/tmp/82b4b747-a7ae-4ef0-ad9b-afa36d0a3f7b_buggy.java
++++ b/tmp/6d3e7e4a-ca27-4d0d-b3be-bb936809b821_fixed.java
+@@ -1,20 +1,53 @@
+   /**
+-   * Checks name referenced in node to determine if it might have
+-   * changed.
++   * Checks a node for safe replacements.
+    * @return Whether the replacement can be made.
+    */
+   private boolean isSafeReplacement(Node node, Node replacement) {
+     // No checks are needed for simple names.
+     if (node.isName()) {
+       return true;
+     }
+     Preconditions.checkArgument(node.isGetProp());
+ 
+-      node = node.getFirstChild();
+-    if (node.isName()
+-        && isNameAssignedTo(node.getString(), replacement)) {
++    if (node.getBooleanProp(Node.IS_QUOTED_NAME) && node.hasChildren()) {
++      // The last child of a quoted expression is the thing being referenced.
++      node = node.getLastChild();
++      if (node.isName() &&
++          isNameAssignedTo(node.getString(), replacement)) {
++        // If it's not the whole expression, we might be making a change that could
++        // break the property reference.
++        Node parent = node.getParent();
++        while (parent != null && parent.getBooleanProp(Node.QUOTED_PROP)) {
++          parent = parent.getParent();
++        }
++        if (parent.isGetProp()) {
++          // The expression is a quoted expression, the current node's getprop
++          // is one in a chain. E.g. `parent.parentNode`.
+           return false;
+         }
++      }
++    }
++
++    // Only worry that the reference is changing if it is actually changing.
++    if (node.isGetProp() && node.getBooleanProp(Node.QUOTED_PROP) &&
++        node.hasChildren() && node.getFirstChild() == node) {
++      // E.g. parent.parentNode.parentNode.parent
++      Node parent = node.getParent();
++      while (parent != null && parent.getBooleanProp(Node.QUOTED_PROP)) {
++        // Keep looking for the first quoted property.
++        parent = parent.getParent();
++      }
++      if (parent.isGetProp() && parent.getQualifiedName().endsWith(
++          ReplacementOptimizer.UNQUOTED_SPECIAL_PROP)) {
++        // The last property is a special, unquoted one. It's possible that we're
++        // unquoting it to make an optimized assignment. So look one further
++        // up and if it's a property access, then just unquote it!
++        Node greatParent = parent.getParent();
++        if (greatParent.isGetProp()) {
++          return false;
++        }
++      }
++    }
+ 
+     return true;
+   }

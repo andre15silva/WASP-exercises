@@ -1,0 +1,50 @@
+diff --git a/tmp/94c755d4-f8f2-42c6-8d95-20543ef6d60e_buggy.java b/tmp/97141439-fac9-4cf6-abf4-d75e14d14506_fixed.java
+index b98f0a7..7464bac 100644
+--- a/tmp/94c755d4-f8f2-42c6-8d95-20543ef6d60e_buggy.java
++++ b/tmp/97141439-fac9-4cf6-abf4-d75e14d14506_fixed.java
+@@ -1,29 +1,45 @@
+   private FlowScope traverseNew(Node n, FlowScope scope) {
+ 
+     Node constructor = n.getFirstChild();
+     scope = traverse(constructor, scope);
+     JSType constructorType = constructor.getJSType();
+     JSType type = null;
+     if (constructorType != null) {
+       constructorType = constructorType.restrictByNotNullOrUndefined();
+       if (constructorType.isUnknownType()) {
+         type = getNativeType(UNKNOWN_TYPE);
+       } else {
+         FunctionType ct = constructorType.toMaybeFunctionType();
+         if (ct == null && constructorType instanceof FunctionType) {
+           // If constructorType is a NoObjectType, then toMaybeFunctionType will
+           // return null. But NoObjectType implements the FunctionType
+           // interface, precisely because it can validly construct objects.
+           ct = (FunctionType) constructorType;
+         }
+         if (ct != null && ct.isConstructor()) {
+           type = ct.getInstanceType();
+         }
+       }
+     }
+     n.setJSType(type);
+     for (Node arg = constructor.getNext(); arg != null; arg = arg.getNext()) {
+       scope = traverse(arg, scope);
+     }
++    scope = traverseChildren(n, scope);
++    JSType argObjType = ((Node)n.getFirstChild().getNext()).getJSType();
++    if (argObjType != null && backwardInfer && !argObjType.isUnknownType()) {
++      for (JSType argType : argObjType.getTypesNoAlloc()) {
++        for (JSType member : argType.getPropertyMap().values()) {
++          if (member.isUnknownType()) {
++            continue;
++          }
++          JSType maybeArgObjType = typeOfThis(member);
++          if (maybeArgObjType != null) {
++            argObjType = argObjType.getLeastSupertype(maybeArgObjType);
++          }
++        }
++      }
++      ((Node)n.getFirstChild().getNext()).setJSType(argObjType);
++    }
+     return scope;
+   }

@@ -1,0 +1,44 @@
+diff --git a/tmp/cfcb3527-032f-4e04-8a6c-4f5c0d927fe2_buggy.java b/tmp/576a92fc-b360-4498-850f-4b612dafb14a_fixed.java
+index 08a41cf..bd1c1b4 100644
+--- a/tmp/cfcb3527-032f-4e04-8a6c-4f5c0d927fe2_buggy.java
++++ b/tmp/576a92fc-b360-4498-850f-4b612dafb14a_fixed.java
+@@ -1,12 +1,39 @@
+     /**
+      * Overloaded version of {@link #readValue(InputStream)}.
+      */
+     public <T> MappingIterator<T> readValues(byte[] src, int offset, int length)
+         throws IOException, JsonProcessingException
+     {
+         if (_dataFormatReaders != null) {
+             return _detectBindAndReadValues(_dataFormatReaders.findFormat(src, offset, length), false);
+         }
+         return _bindAndReadValues(_considerFilter(_parserFactory.createParser(src),
+                 true));
+     }
++
++    protected <T> MappingIterator<T> _detectBindAndReadValues(
++        MappingJsonParser p, boolean closeParser)
++        throws IOException
++    {
++        if (_dataFormatReaders == null) {
++            return _bindAndReadValues(p, closeParser);
++        }
++        T value = null;
++        // true for JSON
++        try {
++            value = _bindAndRead(p, true);
++        } catch (JsonMappingException e2) {
++            try {
++                p = _dataFormatReaders.findFormat(p);
++                value = _bindAndRead(p, closeParser);
++            } catch (JacksonException e3) {
++                throw new JsonMappingException(
++                    p, "Could not read content as Json", e3);
++            }
++        }
++        MappingIterator<T> it = readValues(p);
++        if (closeParser) {
++            p.close();
++        }
++        return it;
++    }

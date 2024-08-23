@@ -1,0 +1,64 @@
+diff --git a/tmp/e8dc7a76-82b3-402a-8d68-6905b2ff0f27_buggy.java b/tmp/dbb31c63-176c-4ed1-8921-129458e8ca1f_fixed.java
+index a7549f0..5bc465f 100644
+--- a/tmp/e8dc7a76-82b3-402a-8d68-6905b2ff0f27_buggy.java
++++ b/tmp/dbb31c63-176c-4ed1-8921-129458e8ca1f_fixed.java
+@@ -1,50 +1,56 @@
+     /**
+      * Sets the values of Options using the values in <code>properties</code>.
+      *
+      * @param properties The value properties to be processed.
+      */
+     protected void processProperties(Properties properties)
+     {
+         if (properties == null)
+         {
+             return;
+         }
+ 
+         for (Enumeration e = properties.propertyNames(); e.hasMoreElements();)
+         {
+             String option = e.nextElement().toString();
+ 
+             if (!cmd.hasOption(option))
+             {
+                 Option opt = getOptions().getOption(option);
+ 
+                 // get the value from the properties instance
+                 String value = properties.getProperty(option);
+ 
+                 if (opt.hasArg())
+                 {
+                     if (opt.getValues() == null || opt.getValues().length == 0)
+                     {
+                         try
+                         {
+                             opt.addValueForProcessing(value);
+                         }
+                         catch (RuntimeException exp)
+                         {
+                             // if we cannot add the value don't worry about it
+                         }
+                     }
+                 }
+-                else if (!("yes".equalsIgnoreCase(value)
++                else 
++                {
++                    if (!("yes".equalsIgnoreCase(value)
+                             || "true".equalsIgnoreCase(value)
+                             || "1".equalsIgnoreCase(value)))
+                     {
+-                    // if the value is not yes, true or 1 then don't add the
+-                    // option to the CommandLine
++                        // if the value is not yes, true or 1 then doesn't allow
++                        // activating the option unless it is a flag option
++                        if ("".equals(opt.getArgName()))
++                        {
+                             break;
+                         }
++                    }
++                }
+ 
+                 cmd.addOption(opt);
+             }
+         }
+     }

@@ -1,0 +1,12 @@
+diff --git a/tmp/d82226d3-178d-4837-a23d-6e8f955d3af2_buggy.java b/tmp/7498e117-be88-4541-a5f0-ed6f3290953e_fixed.java
+index ae12a4d..c8cf4c7 100644
+--- a/tmp/d82226d3-178d-4837-a23d-6e8f955d3af2_buggy.java
++++ b/tmp/7498e117-be88-4541-a5f0-ed6f3290953e_fixed.java
+@@ -1,3 +1,6 @@
+     private boolean isFormatAsBlock(Document.OutputSettings out) {
+-        return tag.formatAsBlock() || (parent() != null && parent().tag().formatAsBlock()) || out.outline();
++        return tag.formatAsBlock() || (parent() != null && parent().tag().formatAsBlock()) || out.outline() ||
++            // nested inline prints, ie. with span, font, etc
++            // todo - this is a hack for tables and lists - so we should really pretty print with nested elements
++            nestingInlines();
+     }

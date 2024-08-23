@@ -1,0 +1,17 @@
+diff --git a/tmp/752aa44c-8783-4e36-bb8c-e65a58a14b46_buggy.java b/tmp/de54652d-f2fe-4b8c-8c2a-0d3b68d93d13_fixed.java
+index d68a69c..a909e38 100644
+--- a/tmp/752aa44c-8783-4e36-bb8c-e65a58a14b46_buggy.java
++++ b/tmp/de54652d-f2fe-4b8c-8c2a-0d3b68d93d13_fixed.java
+@@ -1,9 +1,11 @@
+ public void captureArgumentsFrom(Invocation i) {
+     int k = 0;
+     for (Matcher m : matchers) {
+         if (m instanceof CapturesArguments) {
++            if (k < i.getArguments().length) { // Check if k is within bounds
+                 ((CapturesArguments) m).captureFrom(i.getArguments()[k]);
+             }
++        }
+         k++;
+     }
+ }
+\ No newline at end of file

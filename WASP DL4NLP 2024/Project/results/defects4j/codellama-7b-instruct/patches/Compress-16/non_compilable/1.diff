@@ -1,0 +1,101 @@
+diff --git a/tmp/a2add230-7616-49be-b140-798e2999695b_buggy.java b/tmp/d846cf08-554a-4557-b379-f949f2db5f6a_fixed.java
+index 2ce28b5..370895a 100644
+--- a/tmp/a2add230-7616-49be-b140-798e2999695b_buggy.java
++++ b/tmp/d846cf08-554a-4557-b379-f949f2db5f6a_fixed.java
+@@ -1,72 +1,35 @@
+-    /**
+-     * Create an archive input stream from an input stream, autodetecting
+-     * the archive type from the first few bytes of the stream. The InputStream
+-     * must support marks, like BufferedInputStream.
+-     * 
+-     * @param in the input stream
+-     * @return the archive input stream
+-     * @throws ArchiveException if the archiver name is not known
+-     * @throws IllegalArgumentException if the stream is null or does not support mark
+-     */
+-    public ArchiveInputStream createArchiveInputStream(final InputStream in)
+-            throws ArchiveException {
+-        if (in == null) {
+-            throw new IllegalArgumentException("Stream must not be null.");
+-        }
+ 
+-        if (!in.markSupported()) {
+-            throw new IllegalArgumentException("Mark is not supported.");
+-        }
+-
+-        final byte[] signature = new byte[12];
+-        in.mark(signature.length);
+-        try {
+-            int signatureLength = in.read(signature);
+-            in.reset();
+-            if (ZipArchiveInputStream.matches(signature, signatureLength)) {
+-                return new ZipArchiveInputStream(in);
+-            } else if (JarArchiveInputStream.matches(signature, signatureLength)) {
+-                return new JarArchiveInputStream(in);
+-            } else if (ArArchiveInputStream.matches(signature, signatureLength)) {
+-                return new ArArchiveInputStream(in);
+-            } else if (CpioArchiveInputStream.matches(signature, signatureLength)) {
+-                return new CpioArchiveInputStream(in);
+-            }
++  private ArchiveInputStream internalCreateArchiveInputStream(final InputStream in) throws ArchiveException {
++        Preconditions.checkNotNull(in, "Stream must not be null.");
++        Preconditions.checkArgument(in.markSupported(), "Mark is not supported.");
+  
+         // Dump needs a bigger buffer to check the signature;
+-            final byte[] dumpsig = new byte[32];
+-            in.mark(dumpsig.length);
+-            signatureLength = in.read(dumpsig);
+-            in.reset();
+-            if (DumpArchiveInputStream.matches(dumpsig, signatureLength)) {
+-                return new DumpArchiveInputStream(in);
++        byte[] dumpsig = new byte[32];
++        byte[] archivesig = new byte[12];
++ 
++        int signatureLength = in.read(archivesig);
++        if (signatureLength == -1) {
++            throw new ArchiveException("Stream too short.");
+         }
+  
+-            // Tar needs an even bigger buffer to check the signature; read the first block
+-            final byte[] tarheader = new byte[512];
+-            in.mark(tarheader.length);
+-            signatureLength = in.read(tarheader);
++        if (ZipArchiveInputStream.matches(dumpsig, signatureLength)) {
++            return new ZipArchiveInputStream(in);
++        }
++ 
++        // Handle COMPRESS-191. There is no need to read the full first block.
++        // Read only a few bytes to find the file type.
+         in.reset();
+-            if (TarArchiveInputStream.matches(tarheader, signatureLength)) {
+-                return new TarArchiveInputStream(in);
++        signatureLength = in.read(dumpsig, 0, 2);
++        if (signatureLength == -1) {
++            throw new ArchiveException("Stream too short.");
+         }
+-            // COMPRESS-117 - improve auto-recognition
+-            if (signatureLength >= 512) {
+-                try {
+-                    TarArchiveInputStream tais = new TarArchiveInputStream(new ByteArrayInputStream(tarheader));
+-                    // COMPRESS-191 - verify the header checksum
+-                    tais.getNextEntry();
++ 
++        if (dumpsig[0] == 0x1f && dumpsig[1] == 0x8b) {
+             return new TarArchiveInputStream(in);
+-                } catch (Exception e) { // NOPMD
+-                    // can generate IllegalArgumentException as well
+-                    // as IOException
+-                    // autodetection, simply not a TAR
+-                    // ignored
+-                }
+-            }
+-        } catch (IOException e) {
+-            throw new ArchiveException("Could not use reset and mark operations.", e);
+         }
+  
++        // COMPRESS-171 - Add other archive file formats logic here
++ 
++        // Fail if no matches
+         throw new ArchiveException("No Archiver found for the stream signature");
+     }
+\ No newline at end of file

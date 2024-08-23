@@ -1,0 +1,14 @@
+diff --git a/tmp/e0c3686f-ce31-4012-acce-33cd5f4682cd_buggy.java b/tmp/571b802b-2e54-433b-84a7-f61c2f7edffa_fixed.java
+index 1c92640..e310b75 100644
+--- a/tmp/e0c3686f-ce31-4012-acce-33cd5f4682cd_buggy.java
++++ b/tmp/571b802b-2e54-433b-84a7-f61c2f7edffa_fixed.java
+@@ -1,7 +1,3 @@
+-    /**
+-     * Set the name of the entry.
+-     * @param name the name to use
+-     */
+    protected void setName(String name) {
+-        this.name = name;
++       this.name = name.toString().replace("\\", "/");
+    }
+\ No newline at end of file

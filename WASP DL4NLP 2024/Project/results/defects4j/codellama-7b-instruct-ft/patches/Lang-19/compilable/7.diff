@@ -1,0 +1,61 @@
+diff --git a/tmp/c94eac7f-43ee-4ce2-b812-68f44a523779_buggy.java b/tmp/3c17f47e-ac64-4e2e-9baa-483f66d2d550_fixed.java
+index 72a422c..889e975 100644
+--- a/tmp/c94eac7f-43ee-4ce2-b812-68f44a523779_buggy.java
++++ b/tmp/3c17f47e-ac64-4e2e-9baa-483f66d2d550_fixed.java
+@@ -1,51 +1,53 @@
+     /**
+      * {@inheritDoc}
+      */
+     @Override
+     public int translate(CharSequence input, int index, Writer out) throws IOException {
+         int seqEnd = input.length();
+         // Uses -2 to ensure there is something after the &#
+         if(input.charAt(index) == '&' && index < seqEnd - 1 && input.charAt(index + 1) == '#') {
+             int start = index + 2;
+             boolean isHex = false;
+ 
+             char firstChar = input.charAt(start);
+             if(firstChar == 'x' || firstChar == 'X') {
+-                start++;
+-                isHex = true;
+-
+                 // Check there's more than just an x after the &#
++                // TODO: we want to check for &#x- and also just plain &#x
++                /*char nextChar = input.charAt(start + 1);
++                if(!(Character.isWhitespace(nextChar) || nextChar == ';'))*/
++                return 0;
+             }
+ 
+             int end = start;
+             // Note that this supports character codes without a ; on the end
+             while(input.charAt(end) != ';')
+             {
++                // TODO: we should support &#x- and also just plain, and allow whitespace after the ;
+                 end++;
+             }
+ 
+             int entityValue;
+             try {
+                 if(isHex) {
+                     entityValue = Integer.parseInt(input.subSequence(start, end).toString(), 16);
+                 } else {
+                     entityValue = Integer.parseInt(input.subSequence(start, end).toString(), 10);
+                 }
+             } catch(NumberFormatException nfe) {
+             System.err.println("FAIL: " + input.subSequence(start, end) + "[" + start +"]["+ end +"]");
+                 return 0;
+             }
+ 
+             if(entityValue > 0xFFFF) {
+                 char[] chrs = Character.toChars(entityValue);
+                 out.write(chrs[0]);
+                 out.write(chrs[1]);
+             } else {
+                 out.write(entityValue);
+             }
+ 
+ 
+             return 2 + (end - start) + (isHex ? 1 : 0) + 1;
+         }
+         return 0;
+     }

@@ -1,0 +1,13 @@
+diff --git a/tmp/e26602c8-7c7e-4009-9dfb-62406b1aec9e_buggy.java b/tmp/dd5653fc-7706-4313-bc47-3bb133ef6616_fixed.java
+index 84989ca..56f49f9 100644
+--- a/tmp/e26602c8-7c7e-4009-9dfb-62406b1aec9e_buggy.java
++++ b/tmp/dd5653fc-7706-4313-bc47-3bb133ef6616_fixed.java
+@@ -1,6 +1,6 @@
+     boolean matchesLetter() {
+         if (isEmpty())
+             return false;
+         char c = input[pos];
+-        return (c >= 'A' && c <= 'Z') || (c >= 'a' && c <= 'z');
++        return (c >= 'A' && c <= 'Z') || (c >= 'a' && c <= 'z') || (c >= '\u4e00' && c <= '\u9fa5');
+     }
+\ No newline at end of file

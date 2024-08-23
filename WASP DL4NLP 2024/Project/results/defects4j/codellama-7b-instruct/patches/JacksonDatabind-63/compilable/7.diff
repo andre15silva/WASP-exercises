@@ -1,0 +1,46 @@
+diff --git a/tmp/05c179c2-8350-4b29-bbeb-6abd8c520a8c_buggy.java b/tmp/df767e59-7fa7-4239-ae85-947c02de57fa_fixed.java
+index f955f47..ea78824 100644
+--- a/tmp/05c179c2-8350-4b29-bbeb-6abd8c520a8c_buggy.java
++++ b/tmp/df767e59-7fa7-4239-ae85-947c02de57fa_fixed.java
+@@ -1,34 +1,13 @@
+ public String getDescription() {
+-            if (_desc == null) {
+-                StringBuilder sb = new StringBuilder();
+-
+-                if (_from == null) { // can this ever occur?
+-                    sb.append("UNKNOWN");
+-                } else {
+-                    Class<?> cls = (_from instanceof Class<?>) ? (Class<?>)_from : _from.getClass();
+-                    // Hmmh. Although Class.getName() is mostly ok, it does look
+-                    // butt-ugly for arrays.
+-                    // 06-Oct-2016, tatu: as per [databind#1403], `getSimpleName()` not so good
+-                    //   as it drops enclosing class. So let's try bit different approach
+-                    String pkgName = com.fasterxml.jackson.databind.util.ClassUtil.getPackageName(cls);
+-                    if (pkgName != null) {
+-                        sb.append(pkgName);
+-                        sb.append('.');
+-                    }
+-                    sb.append(cls.getSimpleName());
+-                }
+-                sb.append('[');
++    StringBuffer sb = new StringBuffer();
++    if (_from != null) {
+         if (_fieldName != null) {
+-                    sb.append('"');
+-                    sb.append(_fieldName);
+-                    sb.append('"');
++            sb.append(_from).append(':').append(_fieldName);
+         } else if (_index >= 0) {
+-                    sb.append(_index);
++            sb.append(_from).append('[').append(_index).append(']');
+         } else {
+-                    sb.append('?');
++            sb.append(_from);
+         }
+-                sb.append(']');
+-                _desc = sb.toString();
+     }
+-            return _desc;
++    return sb.toString();
+ }
+\ No newline at end of file

@@ -1,0 +1,40 @@
+diff --git a/tmp/5c703ef4-cb75-4f86-8c47-db9eed05c5b0_buggy.java b/tmp/569102ac-8ee5-4000-9eca-a3e1fce81bd7_fixed.java
+index b2d53db..31392eb 100644
+--- a/tmp/5c703ef4-cb75-4f86-8c47-db9eed05c5b0_buggy.java
++++ b/tmp/569102ac-8ee5-4000-9eca-a3e1fce81bd7_fixed.java
+@@ -1,34 +1,35 @@
+         void read(Tokeniser t, CharacterReader r) {
+             if (r.matchesLetter()) {
+                 String name = r.consumeLetterSequence();
+                 t.tagPending.appendTagName(name.toLowerCase());
+                 t.dataBuffer.append(name);
+                 r.advance();
+                 return;
+             }
+ 
+             if (t.isAppropriateEndTagToken() && !r.isEmpty()) {
+                 char c = r.consume();
+                 switch (c) {
+                     case '\t':
+                     case '\n':
+                     case '\f':
+                     case ' ':
+                         t.transition(BeforeAttributeName);
+                         break;
+                     case '/':
+                         t.transition(SelfClosingStartTag);
+                         break;
+                     case '>':
+                         t.emitTagPending();
+                         t.transition(Data);
+                         break;
+                     default:
++                        // todo: encode
+                         t.dataBuffer.append(c);
+                         anythingElse(t, r);
+                         break;
+                 }
+             } else {
+                 anythingElse(t, r);
+             }
+         }

@@ -1,0 +1,10 @@
+diff --git a/tmp/d1cded25-3538-4f0e-9828-37a87678b73a_buggy.java b/tmp/8f20cc4c-d257-4442-a925-bb881192dba2_fixed.java
+index f1d02c1..8dee918 100644
+--- a/tmp/d1cded25-3538-4f0e-9828-37a87678b73a_buggy.java
++++ b/tmp/8f20cc4c-d257-4442-a925-bb881192dba2_fixed.java
+@@ -1,4 +1,4 @@
+         @Override
+         protected JSType caseTopType(JSType topType) {
+-          return topType;
++          return registry.getTopType();
+         }

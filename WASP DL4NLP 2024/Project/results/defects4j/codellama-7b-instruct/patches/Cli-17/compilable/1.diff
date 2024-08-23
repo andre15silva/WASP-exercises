@@ -1,0 +1,88 @@
+diff --git a/tmp/93c0754e-4c6e-42ad-8634-c0544a9bfb37_buggy.java b/tmp/728e26a8-7c7f-4dff-8ed6-e2bf38813b57_fixed.java
+index 43fb5fd..1af4625 100644
+--- a/tmp/93c0754e-4c6e-42ad-8634-c0544a9bfb37_buggy.java
++++ b/tmp/728e26a8-7c7f-4dff-8ed6-e2bf38813b57_fixed.java
+@@ -1,55 +1,49 @@
+-    /**
+-     * <p>Breaks <code>token</code> into its constituent parts
+-     * using the following algorithm.
+-     * <ul>
+-     *  <li>ignore the first character ("<b>-</b>")</li>
+-     *  <li>foreach remaining character check if an {@link Option}
+-     *  exists with that id.</li>
+-     *  <li>if an {@link Option} does exist then add that character
+-     *  prepended with "<b>-</b>" to the list of processed tokens.</li>
+-     *  <li>if the {@link Option} can have an argument value and there 
+-     *  are remaining characters in the token then add the remaining 
+-     *  characters as a token to the list of processed tokens.</li>
+-     *  <li>if an {@link Option} does <b>NOT</b> exist <b>AND</b> 
+-     *  <code>stopAtNonOption</code> <b>IS</b> set then add the special token
+-     *  "<b>--</b>" followed by the remaining characters and also 
+-     *  the remaining tokens directly to the processed tokens list.</li>
+-     *  <li>if an {@link Option} does <b>NOT</b> exist <b>AND</b>
+-     *  <code>stopAtNonOption</code> <b>IS NOT</b> set then add that
+-     *  character prepended with "<b>-</b>".</li>
+-     * </ul>
+-     * </p>
+-     *
+-     * @param token The current token to be <b>burst</b>
+-     * @param stopAtNonOption Specifies whether to stop processing
+-     * at the first non-Option encountered.
+-     */
+ protected void burstToken(String token, boolean stopAtNonOption)
+ {
++    // Use a local variable to keep track of the start of the option
++    int optionStart = 1;
++
++    // Iterate over each character in the token
+     for (int i = 1; i < token.length(); i++)
+     {
+-            String ch = String.valueOf(token.charAt(i));
++        // Get the current character
++        char ch = token.charAt(i);
+ 
+-            if (options.hasOption(ch))
++        // Check if the character is an option
++        if (options.hasOption(String.valueOf(ch)))
+         {
+-                tokens.add("-" + ch);
+-                currentOption = options.getOption(ch);
++            // If the option is found, add the token prefixed with a -
++            tokens.add("-" + String.valueOf(ch));
+ 
+-                if (currentOption.hasArg() && (token.length() != (i + 1)))
++            // Update the current option and the start of the option
++            currentOption = options.getOption(String.valueOf(ch));
++            optionStart = i;
++
++            // If the option can have an argument value and there are more characters in the token
++            if (currentOption.hasArg() && (token.length() > (i + 1)))
+             {
++                // Add the remaining characters as a token
+                 tokens.add(token.substring(i + 1));
+ 
++                // Break the loop
+                 break;
+             }
+         }
+-            else if (stopAtNonOption)
++        // Check if stopAtNonOption is true and the option was not found
++        else if (stopAtNonOption && !options.hasOption(String.valueOf(ch)))
+         {
+-                process(token.substring(i));
++            // Add the remaining characters as a token if stopAtNonOption is true
++            tokens.add(token.substring(optionStart));
++
++            // Break the loop
++            break;
+         }
+         else
+         {
+             tokens.add(token);
++
++            // Break the loop
+             break;
+         }
+     }
+ }
+\ No newline at end of file

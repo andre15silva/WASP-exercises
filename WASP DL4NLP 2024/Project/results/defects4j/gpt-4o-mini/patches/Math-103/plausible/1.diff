@@ -1,0 +1,21 @@
+diff --git a/tmp/725f44ad-7c05-403e-9512-184dd339a4eb_buggy.java b/tmp/c6853610-6a58-46b0-b42f-dada89cdca0a_fixed.java
+index 6cfa79b..9f0fc1a 100644
+--- a/tmp/725f44ad-7c05-403e-9512-184dd339a4eb_buggy.java
++++ b/tmp/c6853610-6a58-46b0-b42f-dada89cdca0a_fixed.java
+@@ -1,12 +1,7 @@
+-    /**
+-     * For this disbution, X, this method returns P(X &lt; <code>x</code>).
+-     * @param x the value at which the CDF is evaluated.
+-     * @return CDF evaluted at <code>x</code>. 
+-     * @throws MathException if the algorithm fails to converge; unless
+-     * x is more than 20 standard deviations from the mean, in which case the
+-     * convergence exception is caught and 0 or 1 is returned.
+-     */
+ public double cumulativeProbability(double x) throws MathException {
++    if (Math.abs(x - mean) > 20 * standardDeviation) {
++        return x < mean ? 0.0 : 1.0; // handle extreme values directly
++    }
+     return 0.5 * (1.0 + Erf.erf((x - mean) /
+             (standardDeviation * Math.sqrt(2.0))));
+ }
+\ No newline at end of file

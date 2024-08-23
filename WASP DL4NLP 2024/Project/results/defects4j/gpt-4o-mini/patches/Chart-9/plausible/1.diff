@@ -1,0 +1,70 @@
+diff --git a/tmp/e0647567-96bd-41cf-a553-1c8e6ef1c6f3_buggy.java b/tmp/044d9493-4e23-4e72-a2c3-106c6ee1e9ef_fixed.java
+index b4af58a..e59e602 100644
+--- a/tmp/e0647567-96bd-41cf-a553-1c8e6ef1c6f3_buggy.java
++++ b/tmp/044d9493-4e23-4e72-a2c3-106c6ee1e9ef_fixed.java
+@@ -1,53 +1,36 @@
+-    /**
+-     * Creates a new timeseries by copying a subset of the data in this time
+-     * series.
+-     *
+-     * @param start  the first time period to copy (<code>null</code> not
+-     *         permitted).
+-     * @param end  the last time period to copy (<code>null</code> not
+-     *         permitted).
+-     *
+-     * @return A time series containing a copy of this time series from start
+-     *         until end.
+-     *
+-     * @throws CloneNotSupportedException if there is a cloning problem.
+-     */
+ public TimeSeries createCopy(RegularTimePeriod start, RegularTimePeriod end)
+     throws CloneNotSupportedException {
+ 
+     if (start == null) {
+         throw new IllegalArgumentException("Null 'start' argument.");
+     }
+     if (end == null) {
+         throw new IllegalArgumentException("Null 'end' argument.");
+     }
+     if (start.compareTo(end) > 0) {
+         throw new IllegalArgumentException(
+                 "Requires start on or before end.");
+     }
+-        boolean emptyRange = false;
++    
+     int startIndex = getIndex(start);
++    int endIndex = getIndex(end);
++
++    // If start is not found in the series, get the insertion point
+     if (startIndex < 0) {
+         startIndex = -(startIndex + 1);
+-            if (startIndex == this.data.size()) {
+-                emptyRange = true;  // start is after last data item
+-            }
+-        }
+-        int endIndex = getIndex(end);
+-        if (endIndex < 0) {             // end period is not in original series
+-            endIndex = -(endIndex + 1); // this is first item AFTER end period
+-            endIndex = endIndex - 1;    // so this is last item BEFORE end
+     }
++
++    // If end is not found, we need to handle accordingly
+     if (endIndex < 0) {
+-            emptyRange = true;
++        endIndex = -(endIndex + 1) - 1; // Get last index before the end period
+     }
+-        if (emptyRange) {
++
++    // If the calculated endIndex is less than startIndex, we have an empty range
++    if (startIndex > endIndex) {
+         TimeSeries copy = (TimeSeries) super.clone();
+         copy.data = new java.util.ArrayList();
+         return copy;
+-        }
+-        else {
++    } else {
+         return createCopy(startIndex, endIndex);
+     }
+-
+ }
+\ No newline at end of file

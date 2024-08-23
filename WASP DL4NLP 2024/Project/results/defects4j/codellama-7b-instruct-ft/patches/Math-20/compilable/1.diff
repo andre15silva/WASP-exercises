@@ -1,0 +1,14 @@
+diff --git a/tmp/80069a75-ee2d-4c6d-ae01-65021d9b05a8_buggy.java b/tmp/746d4235-b805-4e85-956d-746dc3496d5e_fixed.java
+index 46799da..29e7a66 100644
+--- a/tmp/80069a75-ee2d-4c6d-ae01-65021d9b05a8_buggy.java
++++ b/tmp/746d4235-b805-4e85-956d-746dc3496d5e_fixed.java
+@@ -1,8 +1,8 @@
+         /**
+          * @param x Normalized objective variables.
+-         * @return the original objective variables, possibly repaired.
++         * @return the original objective variables.
+          */
+         public double[] repairAndDecode(final double[] x) {
+             return
+                 decode(x);
+         }

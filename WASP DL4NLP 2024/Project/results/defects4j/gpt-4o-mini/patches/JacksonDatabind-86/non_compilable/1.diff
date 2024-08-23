@@ -1,0 +1,15 @@
+diff --git a/tmp/df7ee6b9-35fe-42ca-8163-476f8d006a57_buggy.java b/tmp/6481a88d-b6f0-467d-ba77-2d39eb42dc72_fixed.java
+index e69de29..d5e2510 100644
+--- a/tmp/df7ee6b9-35fe-42ca-8163-476f8d006a57_buggy.java
++++ b/tmp/6481a88d-b6f0-467d-ba77-2d39eb42dc72_fixed.java
+@@ -0,0 +1,9 @@
++@Override
++public JavaType getSuperClass() {
++    // Ensure the type is resolved from the cache
++    if (superClass == null) {
++        superClass = constructSuperClass();
++    }
++    // Additionally cache and return the resolved super class
++    return superClass;
++}
+\ No newline at end of file

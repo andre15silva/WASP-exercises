@@ -1,0 +1,48 @@
+diff --git a/tmp/36132606-9963-473f-bb27-2e2cd27323c1_buggy.java b/tmp/13094935-6e27-4e6c-a77d-131595bbe596_fixed.java
+index 1c875ad..65f156f 100644
+--- a/tmp/36132606-9963-473f-bb27-2e2cd27323c1_buggy.java
++++ b/tmp/13094935-6e27-4e6c-a77d-131595bbe596_fixed.java
+@@ -1,31 +1,22 @@
+ public void captureArgumentsFrom(Invocation invocation) {
+     if (invocation.getMethod().isVarArgs()) {
+         int indexOfVararg = invocation.getRawArguments().length - 1;
+-            throw new UnsupportedOperationException();
+-
++        Object varargArray = invocation.getRawArguments()[indexOfVararg];
++        if (varargArray instanceof Object[]) {
++            for (Object arg : (Object[]) varargArray) {
++                for (Matcher m : matchers) {
++                    if (m instanceof CapturesArguments) {
++                        ((CapturesArguments) m).captureFrom(arg);
++                    }
++                }
++            }
++        }
+     } else {
+         for (int position = 0; position < matchers.size(); position++) {
+             Matcher m = matchers.get(position);
+-                if (m instanceof CapturesArguments) {
++            if (m instanceof CapturesArguments && invocation.getRawArguments().length > position) {
+                 ((CapturesArguments) m).captureFrom(invocation.getArgumentAt(position, Object.class));
+             }
+         }
+     }
+-
+-//        for (int position = 0; position < matchers.size(); position++) {
+-//            Matcher m = matchers.get(position);
+-//            if (m instanceof CapturesArguments && invocation.getRawArguments().length > position) {
+-//                //TODO SF - this whole lot can be moved captureFrom implementation
+-//                if(isVariableArgument(invocation, position) && isVarargMatcher(m)) {
+-//                    Object array = invocation.getRawArguments()[position];
+-//                    for (int i = 0; i < Array.getLength(array); i++) {
+-//                        ((CapturesArguments) m).captureFrom(Array.get(array, i));
+-//                    }
+-//                    //since we've captured all varargs already, it does not make sense to process other matchers.
+-//                    return;
+-//                } else {
+-//                    ((CapturesArguments) m).captureFrom(invocation.getRawArguments()[position]);
+-//                }
+-//            }
+-//        }
+ }
+\ No newline at end of file

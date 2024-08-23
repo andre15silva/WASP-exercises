@@ -1,0 +1,25 @@
+diff --git a/tmp/1dfb8a6e-3a74-4418-9faa-ec3f59a0038a_buggy.java b/tmp/d40de124-6501-4ef9-8ef3-d36b84233f3b_fixed.java
+index 29d025a..e7e304d 100644
+--- a/tmp/1dfb8a6e-3a74-4418-9faa-ec3f59a0038a_buggy.java
++++ b/tmp/d40de124-6501-4ef9-8ef3-d36b84233f3b_fixed.java
+@@ -1,13 +1,20 @@
+     private void _verifySharing()
+     {
+         if (_hashShared) {
+             _hashArea = Arrays.copyOf(_hashArea, _hashArea.length);
+             _names = Arrays.copyOf(_names, _names.length);
+             _hashShared = false;
+             // 09-Sep-2015, tatu: As per [jackson-core#216], also need to ensure
+             //    we rehash as needed, as need-rehash flag is not copied from parent
++            // but also needs to ensure that we have enough room for new bytes
++            // as well as existing ones, as (re-)hashing might fill up the table
++            int oldLen = _hashArea.length;
++            _hashArea = Arrays.copyOf(_hashArea, oldLen+512);
++            _hashArea = Arrays.copyOf(_hashArea, _hashArea.length);
++            _names = Arrays.copyOf(_names, _names.length+512);
++            _names = Arrays.copyOf(_names, _names.length);
+         }
+         if (_needRehash) {
+             rehash();
+         }
+     }

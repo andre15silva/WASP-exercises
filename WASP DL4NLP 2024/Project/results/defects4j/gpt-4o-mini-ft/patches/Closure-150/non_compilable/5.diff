@@ -1,0 +1,45 @@
+diff --git a/tmp/19fb45f3-b01a-44a1-a3f1-7e747fc32e94_buggy.java b/tmp/4e46ac56-cffa-4ca6-bc23-d2d178d24124_fixed.java
+index 800e6e1..ee26950 100644
+--- a/tmp/19fb45f3-b01a-44a1-a3f1-7e747fc32e94_buggy.java
++++ b/tmp/4e46ac56-cffa-4ca6-bc23-d2d178d24124_fixed.java
+@@ -1,32 +1,40 @@
+     /**
+      * Visit a node in a local scope, and add any local variables or catch
+      * parameters into the local symbol table.
+      *
+      * @param t The node traversal.
+      * @param n The node being visited.
+      * @param parent The parent of n
+      */
+     @Override public void visit(NodeTraversal t, Node n, Node parent) {
+       if (n == scope.getRootNode()) return;
+ 
+       if (n.getType() == Token.LP && parent == scope.getRootNode()) {
+         handleFunctionInputs(parent);
+         return;
+       }
+ 
+       attachLiteralTypes(n);
+       switch (n.getType()) {
+         case Token.FUNCTION:
+           if (parent.getType() == Token.NAME) {
+             return;
+           }
+           defineDeclaredFunction(n, parent);
+           break;
+         case Token.CATCH:
+           defineCatch(n, parent);
+           break;
+         case Token.VAR:
+           defineVar(n, parent);
+           break;
++        case Token.INC:
++        case Token.DEC:
++          if (parent.isAssign() && parent.getFirstChild() != n) {
++            return;  // Fine, it's just part of the assignment.
+           }
++          break;
++      }
++
++      defineUseStmt(n.getType(), null, false);
+     }

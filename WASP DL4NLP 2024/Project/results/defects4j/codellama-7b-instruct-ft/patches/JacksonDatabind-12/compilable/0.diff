@@ -1,0 +1,27 @@
+diff --git a/tmp/2893b93a-1053-49e7-93c9-38bb320ecd54_buggy.java b/tmp/78070d82-785a-4c6d-84f4-3cf625d739e2_fixed.java
+index 845704e..73a1c7f 100644
+--- a/tmp/2893b93a-1053-49e7-93c9-38bb320ecd54_buggy.java
++++ b/tmp/78070d82-785a-4c6d-84f4-3cf625d739e2_fixed.java
+@@ -1,21 +1,21 @@
+     /**
+      * Turns out that these are expensive enough to create so that caching
+      * does make sense.
+      *<p>
+      * IMPORTANT: but, note, that instances CAN NOT BE CACHED if there is
+      * a value type deserializer; this caused an issue with 2.4.4 of
+      * JAXB Annotations (failing a test).
+      * It is also possible that some other settings could make deserializers
+      * un-cacheable; but on the other hand, caching can make a big positive
+      * difference with performance... so it's a hard choice.
+      * 
+-     * @since 2.4.4
++     * @since 2.4.4; 2.5.0: cache custom, but deserializer settings (such as custom deserializer)
+      */
+     @Override
+     public boolean isCachable() {
+         /* As per [databind#735], existence of value or key deserializer (only passed
+          * if annotated to use non-standard one) should also prevent caching.
+          */
+         return (_valueTypeDeserializer == null)
+                 && (_ignorableProperties == null);
+     }

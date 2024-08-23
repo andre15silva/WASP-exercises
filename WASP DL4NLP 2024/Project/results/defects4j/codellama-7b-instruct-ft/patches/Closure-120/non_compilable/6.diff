@@ -1,0 +1,46 @@
+diff --git a/tmp/73388736-3665-40f9-b12d-3bf86777301f_buggy.java b/tmp/0041739e-9e9b-4521-b73b-7ba2d91853d8_fixed.java
+index 07b0792..543b9a0 100644
+--- a/tmp/73388736-3665-40f9-b12d-3bf86777301f_buggy.java
++++ b/tmp/0041739e-9e9b-4521-b73b-7ba2d91853d8_fixed.java
+@@ -1,22 +1,39 @@
+     /**
+      * @return Whether the variable is only assigned a value once for its
+      *     lifetime.
+      */
+-    boolean isAssignedOnceInLifetime() {
++    public boolean isAssignedOnceInLifetime() {
++      if (isAliasedName() || !isDeclared()) {
++        return false;
++      }
++      // Issue 1053: don't count a function as assign once, but it is assigned
++      // once per function call.
++      Node name = getNameNode();
++      Node value = getRValue();
++      if (value != null && value.isFunction()) {
+         Reference ref = getOneAndOnlyAssignment();
+         if (ref == null) {
+           return false;
+         }
+ 
+         // Make sure this assignment is not in a loop.
+         for (BasicBlock block = ref.getBasicBlock();
+              block != null; block = block.getParent()) {
+           if (block.isFunction) {
+             break;
+           } else if (block.isLoop) {
+             return false;
+           }
+         }
+-
++        // Issue 249: function that is only assigned once is not considered
++        // assign once lifetime. So if the function does not have alias,
++        // just return false and it will NOT be replaced with a constant
++        // from the function's only parameter
++        if (name.getParent().isVar() && name.getParent().getLastChild() == name) {
++          return false;
++        }
+         return true;
+       }
++      return (this instanceof Global) ? isDefinedInGlobalScope()
++          : isDeclaredInLexicalScope();
++    }

@@ -1,0 +1,29 @@
+diff --git a/tmp/017bd255-fb6f-4c12-8586-570ab7ec2a5b_buggy.java b/tmp/645ce590-45b7-4dfc-a8d5-b03dea865840_fixed.java
+index 70cafe0..3427133 100644
+--- a/tmp/017bd255-fb6f-4c12-8586-570ab7ec2a5b_buggy.java
++++ b/tmp/645ce590-45b7-4dfc-a8d5-b03dea865840_fixed.java
+@@ -1,18 +1,15 @@
+     /**
+      * Checks whether the given column is basic.
+      * @param col index of the column to check
+      * @return the row that the variable is basic in.  null if the column is not basic
+      */
+     private Integer getBasicRow(final int col) {
+-        Integer row = null;
++        final List<LinearConstraint> constraints = new ArrayList<LinearConstraint>();
++        final RealPointValuePair solution = optimizeSingleVariable(col, constraints);
+         for (int i = getNumObjectiveFunctions(); i < getHeight(); i++) {
+-            if (!MathUtils.equals(getEntry(i, col), 0.0, epsilon)) {
+-                if (row == null) {
+-                row = i;
+-                } else {
++            if (solution.getValue() == getEntry(i, col)) {
++                return i;
++            }
++        }
+         return null;
+     }
+-            }
+-        }
+-        return row;
+-    }

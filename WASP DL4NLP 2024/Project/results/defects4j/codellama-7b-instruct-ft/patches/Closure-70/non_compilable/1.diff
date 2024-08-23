@@ -1,0 +1,73 @@
+diff --git a/tmp/4bbdc925-783d-43b9-bcdc-3ebae364e893_buggy.java b/tmp/cbbe29a3-d9da-453d-ad84-46998dfa13a8_fixed.java
+index 1530b34..97d4471 100644
+--- a/tmp/4bbdc925-783d-43b9-bcdc-3ebae364e893_buggy.java
++++ b/tmp/cbbe29a3-d9da-453d-ad84-46998dfa13a8_fixed.java
+@@ -1,23 +1,68 @@
+     /**
+      * Declares all of a function's arguments.
+      */
+     private void declareArguments(Node functionNode) {
+       Node astParameters = functionNode.getFirstChild().getNext();
+       Node body = astParameters.getNext();
+       FunctionType functionType = (FunctionType) functionNode.getJSType();
+       if (functionType != null) {
+         Node jsDocParameters = functionType.getParametersNode();
+         if (jsDocParameters != null) {
+           Node jsDocParameter = jsDocParameters.getFirstChild();
+           for (Node astParameter : astParameters.children()) {
+             if (jsDocParameter != null) {
++              // Don't warn about duplicate function params - those just use
++              // different doc annotations, not different types.
++              String name = astParameter.getFirstChild().getString();
++              for (Scope s = body.getParent().getParent().getScope();
++                  s != null; s = s.getParent()) {
++                if (s.isDeclared(name, false)) {
++                  Node previousDeclaration = s.getSlot(name);
++                  JSType previousType = s.getDeclaredType(name);
++                  JSType astParameterType = astParameter.getFirstChild().getJSType();
++                  Node function = functionNode;
++                  JSType definedType = null;
++                  boolean definedByTypechecker = false;
++                  if (previousType != null &&
++                      !previousType.equals(astParameterType)) {
++                    if (previousType.isStructuralObject() &&
++                        astParameterType.isStructuralInterface()) {
++                      definedByTypechecker = true;
++                    } else {
++                      this.warning(
++                          CheckGlobalNames.DUPLICATE_JSDOC,
++                          "variable " + name +
++                          " redefined with type " + astParameterType.toString() +
++                          ", original definition" + " at  [testcode] :2" +
++                          " with type " +
++                          previousType.toString(),
++                          astParameter);
++                    }
++                  } else if (previousType != null &&
++                      previousType.isStructuralObject()) {
++                    definedByTypechecker = true;
++                  } else if (astParameterType.isStructuralInterface()) {
++                    definedByTypechecker = true;
++                  }
++                  if (definedByTypechecker) {
++                    definedType = previousType;
++                  } else {
++                    definedType = astParameterType;
++                  }
++                  this.inferTypesForQualifiedName(jsDocParameter.getFirstChild(),
++                      astParameter.getFirstChild(), function, true, definedType);
++                  this.inferTypesForQualifiedName(astParameter.getFirstChild(),
++                      previousDeclaration, function, true, astParameterType);
++                  jsDocParameter = jsDocParameter.getNext();
++                }
++              }
+               defineSlot(astParameter, functionNode,
+                   jsDocParameter.getJSType(), true);
+               jsDocParameter = jsDocParameter.getNext();
+             } else {
+               defineSlot(astParameter, functionNode, null, true);
+             }
+           }
+         }
+       }
+     } // end declareArguments

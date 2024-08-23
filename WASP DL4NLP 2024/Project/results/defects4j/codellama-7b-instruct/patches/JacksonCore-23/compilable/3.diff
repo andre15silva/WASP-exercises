@@ -1,0 +1,10 @@
+diff --git a/tmp/c525a462-06fa-4721-b69b-2714eb141735_buggy.java b/tmp/e1b01e25-bc51-404e-99b6-81407f61ddef_fixed.java
+index fc49bcd..d7aa811 100644
+--- a/tmp/c525a462-06fa-4721-b69b-2714eb141735_buggy.java
++++ b/tmp/e1b01e25-bc51-404e-99b6-81407f61ddef_fixed.java
+@@ -1,4 +1,4 @@
+     @Override
+     public DefaultPrettyPrinter createInstance() {
+-        return new DefaultPrettyPrinter(this);
++        throw new RuntimeException("This method should not be called");
+     }

@@ -1,0 +1,20 @@
+diff --git a/tmp/6c9ef4e3-4512-48f4-9cd8-1a98a20fd1ff_buggy.java b/tmp/3e704cdf-72b5-4d82-b458-e402ebb2440a_fixed.java
+index 0463b58..ef020e0 100644
+--- a/tmp/6c9ef4e3-4512-48f4-9cd8-1a98a20fd1ff_buggy.java
++++ b/tmp/3e704cdf-72b5-4d82-b458-e402ebb2440a_fixed.java
+@@ -1,13 +1,13 @@
+     /**
+      * Create a new attribute from unencoded (raw) key and value.
+      * @param key attribute key; case is preserved.
+      * @param val attribute value
+      * @param parent the containing Attributes (this Attribute is not automatically added to said Attributes)
+      * @see #createFromEncoded*/
+     public Attribute(String key, String val, Attributes parent) {
+         Validate.notNull(key);
+         this.key = key.trim();
+-        Validate.notEmpty(key); // trimming could potentially make empty, so validate here
++        Validate.notBlank(key, "key must be set"); 
+         this.val = val;
+         this.parent = parent;
+     }
+\ No newline at end of file

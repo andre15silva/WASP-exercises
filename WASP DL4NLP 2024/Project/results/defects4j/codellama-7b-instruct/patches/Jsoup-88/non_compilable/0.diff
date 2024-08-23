@@ -1,0 +1,21 @@
+diff --git a/tmp/465428da-8ad5-4a5d-9769-c22dc4d22371_buggy.java b/tmp/287fed89-0a39-4597-9b55-4aeb19f3dfb9_fixed.java
+index a68ccd7..4d7f3b1 100644
+--- a/tmp/465428da-8ad5-4a5d-9769-c22dc4d22371_buggy.java
++++ b/tmp/287fed89-0a39-4597-9b55-4aeb19f3dfb9_fixed.java
+@@ -1,7 +1,9 @@
+-    /**
+-     Get the attribute value.
+-     @return the attribute value
+-     */
+-    public String getValue() {
+-        return val;
++@Test public void booleanAttributesAreEmptyStringValues() {
++    Document doc = Jsoup.parse("<div hidden>");
++    Attributes attributes = doc.body().child(0).attributes();
++    assertEquals("", attributes.get("hidden"));
++
++    Attribute first = attributes.iterator().next();
++    assertEquals("hidden", first.getKey());
++    assertEquals("", first.getValue());
+ }
+\ No newline at end of file

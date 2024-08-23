@@ -1,0 +1,17 @@
+diff --git a/tmp/157b0f6e-8372-4fad-a988-075dc2500054_buggy.java b/tmp/55e6577a-8d49-48a8-a5f7-467636288110_fixed.java
+index 1648a8d..846b55c 100644
+--- a/tmp/157b0f6e-8372-4fad-a988-075dc2500054_buggy.java
++++ b/tmp/55e6577a-8d49-48a8-a5f7-467636288110_fixed.java
+@@ -1,9 +1,2 @@
+-    /**
+-     * Returns an iterator over the unmodifiable list of chromosomes.
+-     * <p>Any call to {@link Iterator#remove()} will result in a {@link UnsupportedOperationException}.</p>
+-     *
+-     * @return chromosome iterator
+-     */
+-    public Iterator<Chromosome> iterator() {
+-        return chromosomes.iterator();
+-    }
++java.lang.AssertionError: Expected same: <[Chromosome@[0..0]: 0]>
++ but was: <[Chromosome@[0..0]: 1]>
+\ No newline at end of file

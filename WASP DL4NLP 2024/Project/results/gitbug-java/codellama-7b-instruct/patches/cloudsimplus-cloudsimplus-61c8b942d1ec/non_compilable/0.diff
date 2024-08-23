@@ -1,0 +1,9 @@
+diff --git a/tmp/39599e55-0195-4ed1-a1bf-85f2192a73cf_buggy.java b/tmp/e07b0398-2580-4c4c-9a7d-cb0a90591963_fixed.java
+index a2af134..d275449 100644
+--- a/tmp/39599e55-0195-4ed1-a1bf-85f2192a73cf_buggy.java
++++ b/tmp/e07b0398-2580-4c4c-9a7d-cb0a90591963_fixed.java
+@@ -1,3 +1,4 @@
+     public HostAbstract(final List<Pe> peList, final boolean activate) {
+         this(defaultBwCapacity, defaultStorageCapacity, new HarddriveStorage(defaultRamCapacity), peList, activate);
++        this.ramProvisioner = new RamProvisionerSimple(getPeList(), getRamCapacity());
+     }

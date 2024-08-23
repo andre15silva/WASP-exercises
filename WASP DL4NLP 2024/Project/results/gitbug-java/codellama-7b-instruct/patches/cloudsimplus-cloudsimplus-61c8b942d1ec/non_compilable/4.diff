@@ -1,0 +1,18 @@
+diff --git a/tmp/59340a7b-a973-442b-bc1f-3166f2963e7c_buggy.java b/tmp/f1a1a1cb-b349-4091-b8fc-c2bb57178216_fixed.java
+index a2af134..fc0eb27 100644
+--- a/tmp/59340a7b-a973-442b-bc1f-3166f2963e7c_buggy.java
++++ b/tmp/f1a1a1cb-b349-4091-b8fc-c2bb57178216_fixed.java
+@@ -1,3 +1,11 @@
+ public HostAbstract(final List<Pe> peList, final boolean activate) {
+-        this(defaultBwCapacity, defaultStorageCapacity, new HarddriveStorage(defaultRamCapacity), peList, activate);
++    this(new HostBuilder()
++            .buildRam(defaultRamCapacity)
++            .buildStorage(defaultStorageCapacity)
++            .buildBw(defaultBwCapacity)
++            .build()
++            .getRam())
++            .buildStorage(new HarddriveStorage(defaultRamCapacity))
++            .build()
++        ;
+ }
+\ No newline at end of file

@@ -1,0 +1,32 @@
+diff --git a/tmp/4dc7ae12-57c9-44f4-a0e8-9ad8a7e1bb85_buggy.java b/tmp/98f6d507-0722-46e5-9f34-7efa325b0d80_fixed.java
+index 42d4174..ad7c288 100644
+--- a/tmp/4dc7ae12-57c9-44f4-a0e8-9ad8a7e1bb85_buggy.java
++++ b/tmp/98f6d507-0722-46e5-9f34-7efa325b0d80_fixed.java
+@@ -1,7 +1,27 @@
+   /**
+    * Returns the remainder of the line.
+    */
+   private String getRemainingJSDocLine() {
+     String result = stream.getRemainingJSDocLine();
+     return result;
+   }
++
++  @Override
++  public void reportError(int start, int end, String kind, String msg) {
++    super.reportError(start, end, kind, msg);
++  }
++
++
++  /**
++   * Gets the extents of a type as text.
++   *
++   * @param start
++   * @param end
++   * @return the text description of the type or {@code error} if there's an
++   *     unrecoverable parsing error.
++   */
++  @Override
++  public String getTypeForText(int start, int end) {
++    String text = stream.getTextForExtent(start, end);
++    return checkIfBadType(text);
++  }

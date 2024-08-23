@@ -1,0 +1,24 @@
+diff --git a/tmp/d6def147-296f-4436-8fa4-e13b335c7c35_buggy.java b/tmp/1fcaebb3-5cc6-456e-9254-7afcc8b2647d_fixed.java
+index 1ea204a..55c460e 100644
+--- a/tmp/d6def147-296f-4436-8fa4-e13b335c7c35_buggy.java
++++ b/tmp/1fcaebb3-5cc6-456e-9254-7afcc8b2647d_fixed.java
+@@ -1,17 +1,18 @@
+   private static String extractClassNameIfGoog(Node node, Node parent,
+       String functionName){
+     String className = null;
+     if (NodeUtil.isExprCall(parent)) {
+       Node callee = node.getFirstChild();
+       if (callee != null && callee.getType() == Token.GETPROP) {
+         String qualifiedName = callee.getQualifiedName();
+-        if (functionName.equals(qualifiedName)) {
++        if (functionName.equals(qualifiedName) &&
++            callee.getNext().isCall()) {
+           Node target = callee.getNext();
+           if (target != null) {
+             className = target.getString();
+           }
+         }
+       }
+     }
+     return className;
+   }

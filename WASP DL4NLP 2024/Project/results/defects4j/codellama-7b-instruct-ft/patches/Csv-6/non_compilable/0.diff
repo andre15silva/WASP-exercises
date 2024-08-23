@@ -1,0 +1,33 @@
+diff --git a/tmp/2b457cf3-e320-41a1-8ffb-b26512d04f4f_buggy.java b/tmp/0f293d27-7f63-4878-a8d6-778344b32719_fixed.java
+index 163b2e1..e890173 100644
+--- a/tmp/2b457cf3-e320-41a1-8ffb-b26512d04f4f_buggy.java
++++ b/tmp/0f293d27-7f63-4878-a8d6-778344b32719_fixed.java
+@@ -1,13 +1,28 @@
+     /**
+      * Puts all values of this record into the given Map.
+      *
+      * @param map The Map to populate.
+      * @return the given map.
+      */
+     <M extends Map<String, String>> M putIn(final M map) {
+         for (final Entry<String, Integer> entry : mapping.entrySet()) {
+             final int col = entry.getValue().intValue();
+                 map.put(entry.getKey(), values[col]);
+         }
+         return map;
+     }
++
++    /**
++     * Creates a map of all record values. The map contains pairs: the keys of the
++     * record columns, the values of the record values.
++     *
++     * @return a map containing the values.
++     */
++    public final Map<String, String> toMap() {
++        final Map<String, String> result = new HashMap<String, String>(size(), 1.0f);
++        for (final Entry<String, Integer> entry : mapping.entrySet()) {
++            final int col = entry.getValue().intValue();
++                result.put(entry.getKey(), values[col]);
++        }
++        return result;
++    }

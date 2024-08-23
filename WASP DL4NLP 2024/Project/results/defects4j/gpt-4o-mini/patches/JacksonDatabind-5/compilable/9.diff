@@ -1,0 +1,50 @@
+diff --git a/tmp/0443175b-75db-475c-89b3-43e2f9b87665_buggy.java b/tmp/f4717012-8a6e-40b9-9467-1a660d0a7bf4_fixed.java
+index b2db1d6..6367fa3 100644
+--- a/tmp/0443175b-75db-475c-89b3-43e2f9b87665_buggy.java
++++ b/tmp/f4717012-8a6e-40b9-9467-1a660d0a7bf4_fixed.java
+@@ -1,29 +1,35 @@
+ protected void _addMethodMixIns(Class<?> targetClass, AnnotatedMethodMap methods,
+         Class<?> mixInCls, AnnotatedMethodMap mixIns)
+ {
+     List<Class<?>> parents = new ArrayList<Class<?>>();
+     parents.add(mixInCls);
+     ClassUtil.findSuperTypes(mixInCls, targetClass, parents);
+     for (Class<?> mixin : parents) {
+         for (Method m : mixin.getDeclaredMethods()) {
+             if (!_isIncludableMemberMethod(m)) {
+                 continue;
+             }
++            // Ensure we consider the method visibility
+             AnnotatedMethod am = methods.find(m);
+-                /* Do we already have a method to augment (from sub-class
+-                 * that will mask this mixIn)? If so, add if visible
+-                 * without masking (no such annotation)
+-                 */
+             if (am != null) {
+                 _addMixUnders(m, am);
+-                    /* Otherwise will have precedence, but must wait
+-                     * until we find the real method (mixIn methods are
+-                     * just placeholder, can't be called)
+-                     */
+             } else {
+-                    // Well, or, as per [Issue#515], multi-level merge within mixins...
++                // If method is not found in methods, add to mixIns
++                // Check if the mixin method is not already shadowed by a method in targetClass
++                if (!_isMethodShadowed(m, targetClass)) {
+                     mixIns.add(_constructMethod(m));
+                 }
+             }
+         }
+     }
++}
++
++private boolean _isMethodShadowed(Method m, Class<?> targetClass) {
++    // Check if a method with the same name and parameter types exists in the target class
++    try {
++        targetClass.getDeclaredMethod(m.getName(), m.getParameterTypes());
++        return true;  // Found a shadowing method
++    } catch (NoSuchMethodException e) {
++        return false; // No shadowing method found
++    }
++}
+\ No newline at end of file

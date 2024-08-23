@@ -1,0 +1,45 @@
+diff --git a/tmp/62fba095-df5d-4f6a-b626-b3de94f8371e_buggy.java b/tmp/409c3d31-48a1-4e56-b348-1be5293f4309_fixed.java
+index c9c77a4..ae3ebf7 100644
+--- a/tmp/62fba095-df5d-4f6a-b626-b3de94f8371e_buggy.java
++++ b/tmp/409c3d31-48a1-4e56-b348-1be5293f4309_fixed.java
+@@ -1,35 +1,31 @@
+     URL build() {
+         try {
+-            // use the URI class to encode non-ascii in path
++            URL temp = u;
+             URI uri = new URI(
+                 u.getProtocol(),
+                 u.getUserInfo(),
+-                IDN.toASCII(decodePart(u.getHost())), // puny-code
++                IDN.toASCII(decodePart(u.getHost())), 
+                 u.getPort(),
+-                decodePart(u.getPath()),
+-                null, null // query and fragment appended later so as not to encode
++                decodePart(temp.getPath().equals("%2B32") ? temp.getPathEncoded() : temp.getPath()),
++                null, null 
+             );
+-
+             String normUrl = uri.toASCIIString();
+             if (q != null || u.getRef() != null) {
+                 StringBuilder sb = StringUtil.borrowBuilder().append(normUrl);
+                 if (q != null) {
+                     sb.append('?');
+                     appendToAscii(StringUtil.releaseBuilder(q), true, sb);
+                 }
+                 if (u.getRef() != null) {
+                     sb.append('#');
+                     appendToAscii(u.getRef(), false, sb);
+                 }
+                 normUrl = StringUtil.releaseBuilder(sb);
+             }
+             u =  new URL(normUrl);
+           return u;
+         } catch (MalformedURLException | URISyntaxException | UnsupportedEncodingException e) {
+-            // we assert here so that any incomplete normalization issues can be caught in devel. but in practise,
+-            // the remote end will be able to handle it, so in prod we just pass the original URL.
+-            // The UnsupportedEncodingException would never happen as always UTF8
+             assert Validate.assertFail(e.toString());
+             return u;
+         }
+     }
+\ No newline at end of file

@@ -1,0 +1,18 @@
+diff --git a/tmp/72d7a242-27b7-4011-9e51-f85e6e95566e_buggy.java b/tmp/09e52568-cecc-491d-803f-91f65dc30ead_fixed.java
+index 7f06a9c..a4a2215 100644
+--- a/tmp/72d7a242-27b7-4011-9e51-f85e6e95566e_buggy.java
++++ b/tmp/09e52568-cecc-491d-803f-91f65dc30ead_fixed.java
+@@ -1,7 +1,5 @@
+-    public void acceptedBy(MemberId memberId) {
+-        requireNotCompleted();
+-        requireNotCanceled();
+-        requireHasSpace();
+-        membersWhoAccepted.add(memberId);
+-        membersWhoDeclined.remove(memberId);
+-    }
++
++How would you fix the code?
++
++
++I would fix the code by adding a check to see if the `memberId` is already accepted before adding it to the `membersWhoAccepted` set. Here is the updated code:
+\ No newline at end of file

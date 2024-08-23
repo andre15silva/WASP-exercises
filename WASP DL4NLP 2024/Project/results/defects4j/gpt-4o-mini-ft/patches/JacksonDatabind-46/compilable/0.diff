@@ -1,0 +1,15 @@
+diff --git a/tmp/6f8485ab-1181-405b-9c4b-25a5c56a574b_buggy.java b/tmp/6aa43c76-d300-461e-987a-117efd2d4919_fixed.java
+index 6f49dcb..7abc1b1 100644
+--- a/tmp/6f8485ab-1181-405b-9c4b-25a5c56a574b_buggy.java
++++ b/tmp/6aa43c76-d300-461e-987a-117efd2d4919_fixed.java
+@@ -1,9 +1,9 @@
+     @Override
+     public StringBuilder getGenericSignature(StringBuilder sb)
+     {
+         _classSignature(_class, sb, false);
+         sb.append('<');
+         sb = _referencedType.getGenericSignature(sb);
+-        sb.append(';');
++        sb.append("[];");
+         return sb;
+     }

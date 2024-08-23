@@ -1,0 +1,69 @@
+diff --git a/tmp/6a7c3338-cbc4-4be8-9e54-c8cd8e0f26bf_buggy.java b/tmp/d9f253c5-b637-426b-9828-ce3aecbe309f_fixed.java
+index 1695d7b..eca5728 100644
+--- a/tmp/6a7c3338-cbc4-4be8-9e54-c8cd8e0f26bf_buggy.java
++++ b/tmp/d9f253c5-b637-426b-9828-ce3aecbe309f_fixed.java
+@@ -1,15 +1,50 @@
+-    /**
+-     * Creates a new value marker.
+-     * 
+-     * @param value  the value.
+-     * @param paint  the paint (<code>null</code> not permitted).
+-     * @param stroke  the stroke (<code>null</code> not permitted).
+-     * @param outlinePaint  the outline paint (<code>null</code> permitted).
+-     * @param outlineStroke  the outline stroke (<code>null</code> permitted).
+-     * @param alpha  the alpha transparency (in the range 0.0f to 1.0f).
+-     */
+-    public ValueMarker(double value, Paint paint, Stroke stroke, 
+-                       Paint outlinePaint, Stroke outlineStroke, float alpha) {
+-        super(paint, stroke, paint, stroke, alpha);
++package org.example;
++
++import java.awt.BasicStroke;
++import java.awt.Color;
++import java.awt.Paint;
++import java.awt.Stroke;
++
++public class ValueMarker {
++
++    private final double value;
++    private final Paint paint;
++    private final Stroke stroke;
++    private final Paint outlinePaint;
++    private final Stroke outlineStroke;
++    private final float alpha;
++
++    public ValueMarker(double value, Paint paint, Stroke stroke, Paint outlinePaint, Stroke outlineStroke, float alpha) {
+         this.value = value;
++        this.paint = paint;
++        this.stroke = stroke;
++        this.outlinePaint = outlinePaint;
++        this.outlineStroke = outlineStroke;
++        this.alpha = alpha;
++    }
++
++    public double getValue() {
++        return value;
++    }
++
++    public Paint getPaint() {
++        return paint;
++    }
++
++    public Stroke getStroke() {
++        return stroke;
++    }
++
++    public Paint getOutlinePaint() {
++        return outlinePaint;
++    }
++
++    public Stroke getOutlineStroke() {
++        return outlineStroke;
++    }
++
++    public float getAlpha() {
++        return alpha;
++    }
++
+ }
+\ No newline at end of file

@@ -1,0 +1,30 @@
+diff --git a/tmp/e1619f87-7cf2-4d88-8206-7b57a88b970f_buggy.java b/tmp/f96ab6d5-4c18-4aa1-9e7e-d5617388d47e_fixed.java
+index b86b44d..545502d 100644
+--- a/tmp/e1619f87-7cf2-4d88-8206-7b57a88b970f_buggy.java
++++ b/tmp/f96ab6d5-4c18-4aa1-9e7e-d5617388d47e_fixed.java
+@@ -1,4 +1,21 @@
+-    public final Object computeValue(EvalContext context) {
+-        return compute(args[0].computeValue(context), args[1].computeValue(context))
+-                ? Boolean.TRUE : Boolean.FALSE;
++    private EvalContext context;
++
++    public XPathTester(EvalContext context) {
++        this.context = context;
++    }
++
++    public void testEmptyNodeSetOperations() {
++        assertXPathValue(context, "/idonotexist = 0", Boolean.FALSE, Boolean.class);
++        assertXPathValue(context, "/idonotexist != 0", Boolean.FALSE, Boolean.class);
++        assertXPathValue(context, "/idonotexist < 0", Boolean.FALSE, Boolean.class);
++        assertXPathValue(context, "/idonotexist > 0", Boolean.FALSE, Boolean.class);
++        assertXPathValue(context, "/idonotexist >= 0", Boolean.FALSE, Boolean.class);
++        assertXPathValue(context, "/idonotexist <= 0", Boolean.FALSE, Boolean.class);
++        assertXPathValue(context, "$array[position() < 1] = 0", Boolean.FALSE, Boolean.class);
++        assertXPathValue(context, "$array[position() < 1] != 0", Boolean.FALSE, Boolean.class);
++        assertXPathValue(context, "$array[position() < 1] < 0", Boolean.FALSE, Boolean.class);
++        assertXPathValue(context, "$array[position() < 1] > 0", Boolean.FALSE, Boolean.class);
++        assertXPathValue(context, "$array[position() < 1] >= 0", Boolean.FALSE, Boolean.class);
++        assertXPathValue(context, "$array[position() < 1] <= 0", Boolean.FALSE, Boolean.class);
++    }
+ }
+\ No newline at end of file

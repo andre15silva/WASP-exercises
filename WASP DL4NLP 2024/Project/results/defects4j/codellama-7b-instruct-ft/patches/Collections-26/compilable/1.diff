@@ -1,0 +1,17 @@
+diff --git a/tmp/c4a77ff4-9782-4681-af8f-7a4641c53534_buggy.java b/tmp/a84e1450-e6ac-4f04-8edd-b9d906e29ef6_fixed.java
+index a667cbe..2685914 100644
+--- a/tmp/c4a77ff4-9782-4681-af8f-7a4641c53534_buggy.java
++++ b/tmp/a84e1450-e6ac-4f04-8edd-b9d906e29ef6_fixed.java
+@@ -1,10 +1,6 @@
+-    /**
+-     * Recalculate the hash code after deserialization. The hash code of some
+-     * keys might have change (hash codes based on the system hash code are
+-     * only stable for the same process).
+-     * @return the instance with recalculated hash code
+-     */
+     private Object readResolve() {
++        if (this.getClass() != MultiKey.class) {
+             calculateHashCode(keys);
++        }
+         return this;
+     }

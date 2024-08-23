@@ -1,0 +1,45 @@
+diff --git a/tmp/48525b1b-3739-4802-8616-28f3f308c440_buggy.java b/tmp/20fb3dc2-1751-4c62-a593-0939a0652cbd_fixed.java
+index 7e43c1c..928adc9 100644
+--- a/tmp/48525b1b-3739-4802-8616-28f3f308c440_buggy.java
++++ b/tmp/20fb3dc2-1751-4c62-a593-0939a0652cbd_fixed.java
+@@ -1,19 +1,36 @@
+-  /**
+-   * Visits a NEW node.
+-   */
+   private void visitNew(NodeTraversal t, Node n) {
+     Node constructor = n.getFirstChild();
++    if (NodeUtil.isConstructorInvocationResult(n)) {
++      Node parent = n.getParent();
++      Node grandparent = null;
++      if (parent.isExprResult()) {
++        grandparent = parent.getParent();
++      }
++      if (constructor.isQualifiedName()) {
++        String name = constructor.getQualifiedName();
++        if (t.inGlobalScope() || t.getScope().isDeclared(name, false)) {
++          if (grandparent != null &&
++              NodeUtil.isObjLitKey(grandparent) &&
++              parent.isObjLit()) {
++            maybeAddObjectlitNamedType(t, (Node) grandparent.getParent(),
++                name);
++          }
+           JSType type = getJSType(constructor).restrictByNotNullOrUndefined();
+           if (type.isConstructor() || type.isEmptyType() || type.isUnknownType()) {
+             FunctionType fnType = type.toMaybeFunctionType();
+             if (fnType != null) {
+               visitParameterList(t, n, fnType);
+               ensureTyped(t, n, fnType.getInstanceType());
+             } else {
+               ensureTyped(t, n);
+             }
+           } else {
+             report(t, n, NOT_A_CONSTRUCTOR);
+             ensureTyped(t, n);
+           }
+         }
++      }
++    } else {
++      visitExpression(t, n);
++    }
++  }
+\ No newline at end of file

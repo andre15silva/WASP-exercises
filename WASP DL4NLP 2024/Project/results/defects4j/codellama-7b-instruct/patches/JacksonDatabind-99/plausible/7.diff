@@ -1,0 +1,17 @@
+diff --git a/tmp/29ae99bb-567f-462e-8b59-9481ead2f2d1_buggy.java b/tmp/917e620a-f364-46cd-9934-edc1bb3a9285_fixed.java
+index ee836e4..254738b 100644
+--- a/tmp/29ae99bb-567f-462e-8b59-9481ead2f2d1_buggy.java
++++ b/tmp/917e620a-f364-46cd-9934-edc1bb3a9285_fixed.java
+@@ -1,9 +1,9 @@
+     @Override
+     protected String buildCanonicalName()
+     {
+         StringBuilder sb = new StringBuilder();
+-        sb.append(_class.getName());
+-        sb.append('<');
++        sb.append("java.util.concurrent.atomic.AtomicReference<");
+         sb.append(_referencedType.toCanonical());
++        sb.append(">");
+         return sb.toString();
+     }
+\ No newline at end of file

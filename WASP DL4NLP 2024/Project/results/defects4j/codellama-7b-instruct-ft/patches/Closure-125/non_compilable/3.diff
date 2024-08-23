@@ -1,0 +1,34 @@
+diff --git a/tmp/aebd866b-11db-4564-a900-12914669c3d8_buggy.java b/tmp/b4386f82-510c-4162-9f25-50d832a22b2e_fixed.java
+index 7e43c1c..32eb3d5 100644
+--- a/tmp/aebd866b-11db-4564-a900-12914669c3d8_buggy.java
++++ b/tmp/b4386f82-510c-4162-9f25-50d832a22b2e_fixed.java
+@@ -1,19 +1,27 @@
+   /**
+    * Visits a NEW node.
+    */
+   private void visitNew(NodeTraversal t, Node n) {
+     Node constructor = n.getFirstChild();
+-    JSType type = getJSType(constructor).restrictByNotNullOrUndefined();
++    if (constructor.isQualifiedName()) {
++      String className = constructor.getQualifiedName();
++      String interfaceName = className + "$interface";
++      if (t.getScope().getVar(interfaceName) != null) {
++        JSType type =
++            getJSType(constructor).restrictByNotNullOrUndefined().restrictByNotNull();
+         if (type.isConstructor() || type.isEmptyType() || type.isUnknownType()) {
+           FunctionType fnType = type.toMaybeFunctionType();
+           if (fnType != null) {
+             visitParameterList(t, n, fnType);
+             ensureTyped(t, n, fnType.getInstanceType());
+           } else {
+             ensureTyped(t, n);
+           }
++          return;
+         } else {
+           report(t, n, NOT_A_CONSTRUCTOR);
++        }
++      }
++    }
+     ensureTyped(t, n);
+   }
+-  }

@@ -1,0 +1,23 @@
+diff --git a/tmp/cdb9e4f8-3d37-4f92-8efc-a90bc8c1f10d_buggy.java b/tmp/9165b4fc-502a-427b-bc2d-b21ee5e7943a_fixed.java
+index 826e9ae..ec80f4a 100644
+--- a/tmp/cdb9e4f8-3d37-4f92-8efc-a90bc8c1f10d_buggy.java
++++ b/tmp/9165b4fc-502a-427b-bc2d-b21ee5e7943a_fixed.java
+@@ -1,15 +1,14 @@
+     /**
+-     * Puts all values of this record into the given Map.
++     * Transform this record to a map where the header of the first row in csv file determines the keys.
+      *
+-     * @param map The Map to populate.
+-     * @return the given map.
++     * @return a new map from column name (as String) to the value. Each column is optional in the map.
+      */
+-    <M extends Map<String, String>> M putIn(final M map) {
++    <M extends Map<String, String>> M toMap(final M map) {
+         for (final Entry<String, Integer> entry : mapping.entrySet()) {
+             final int col = entry.getValue().intValue();
+             if (col < values.length) {
+                 map.put(entry.getKey(), values[col]);
+             }
+         }
+         return map;
+     }

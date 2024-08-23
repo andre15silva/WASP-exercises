@@ -1,0 +1,27 @@
+diff --git a/tmp/2922125c-3e6f-48c0-a827-885f885aab20_buggy.java b/tmp/6cb2c520-14d4-41da-a528-3eef85c8fc64_fixed.java
+index ec709bd..3eb3759 100644
+--- a/tmp/2922125c-3e6f-48c0-a827-885f885aab20_buggy.java
++++ b/tmp/6cb2c520-14d4-41da-a528-3eef85c8fc64_fixed.java
+@@ -1,8 +1,17 @@
+ @Override
+-    public Object deserialize(JsonParser p, DeserializationContext ctxt) throws IOException
+-    {
+-        // 29-Jan-2016, tatu: Simple skipping for all other tokens, but FIELD_NAME bit
+-        //    special unfortunately
++public Object deserialize(JsonParser p, DeserializationContext ctxt) throws IOException {
++    // Handle different token types accordingly
++    if (p.getCurrentToken() == JsonToken.FIELD_NAME) {
++        String fieldName = p.getCurrentName();
++        p.nextToken(); // Move to the value
++        // Currently we will ignore the "location" field if it's not recognized
++        if ("location".equals(fieldName)) {
++            // Skip the location field value
++            p.skipChildren();
++            return null;
++        }
++    }
++    // Skip any other tokens
+     p.skipChildren();
+     return null;
+ }
+\ No newline at end of file

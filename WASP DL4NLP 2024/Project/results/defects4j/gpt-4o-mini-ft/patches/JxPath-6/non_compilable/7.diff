@@ -1,0 +1,65 @@
+diff --git a/tmp/d7e3c931-aea6-440e-ae11-839b368e5c4d_buggy.java b/tmp/a0ce6fd5-39bf-4787-b7f3-664c67c7f364_fixed.java
+index f650982..b0b7feb 100644
+--- a/tmp/d7e3c931-aea6-440e-ae11-839b368e5c4d_buggy.java
++++ b/tmp/a0ce6fd5-39bf-4787-b7f3-664c67c7f364_fixed.java
+@@ -1,42 +1,60 @@
+     /**
+      * Compares two values
+      */
+     protected boolean equal(
+         EvalContext context,
+         Expression left,
+         Expression right) 
+     {
+         Object l = left.compute(context);
+         Object r = right.compute(context);
+ 
+ //        System.err.println("COMPARING: " +
+ //            (l == null ? "null" : l.getClass().getName()) + " " +
+ //            (r == null ? "null" : r.getClass().getName()));
+ 
+         if (l instanceof InitialContext || l instanceof SelfContext) {
+             l = ((EvalContext) l).getSingleNodePointer();
+         }
+ 
+         if (r instanceof InitialContext || r instanceof SelfContext) {
+             r = ((EvalContext) r).getSingleNodePointer();
+         }
+ 
+         if (l instanceof Collection) {
+             l = ((Collection) l).iterator();
+         }
+ 
+         if (r instanceof Collection) {
+             r = ((Collection) r).iterator();
+         }
+ 
+         if ((l instanceof Iterator) && !(r instanceof Iterator)) {
+             return contains((Iterator) l, r);
+         }
+         if (!(l instanceof Iterator) && (r instanceof Iterator)) {
+             return contains((Iterator) r, l);
+         }
+         if (l instanceof Iterator && r instanceof Iterator) {
+             return findMatch((Iterator) l, (Iterator) r);
+         }
++        if (l instanceof Iterator) {
++            List<Object> values = makeValueIterator((Iterator) l);
++            for (Iterator<Object> valueIter = values.iterator(); valueIter.hasNext();) { 
++                if (equal(context, valueIter.next(), r)) {
++                    return true;
++                }
++            }
++            return false;
++        }
++        if (r instanceof Iterator) {
++            List<Object> values = makeValueIterator((Iterator) r);
++            for (Iterator<Object> valueIter = values.iterator(); valueIter.hasNext();) {
++                if (equal(context, l, valueIter.next())) {
++                    return true;
++                }
++            }
++            return false;
++        }
+         return equal(l, r);
+     }

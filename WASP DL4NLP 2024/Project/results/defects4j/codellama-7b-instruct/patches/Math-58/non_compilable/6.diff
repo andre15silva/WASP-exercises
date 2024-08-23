@@ -1,0 +1,18 @@
+diff --git a/tmp/e8ea6657-b6ac-4975-ade0-1dcac54048b5_buggy.java b/tmp/cd2a2eed-8026-4ab3-80e1-85b467abc979_fixed.java
+index 3002587..0c21e2e 100644
+--- a/tmp/e8ea6657-b6ac-4975-ade0-1dcac54048b5_buggy.java
++++ b/tmp/cd2a2eed-8026-4ab3-80e1-85b467abc979_fixed.java
+@@ -1,10 +1,2 @@
+-    /**
+-     * Fits a Gaussian function to the observed points.
+-     *
+-     * @return the parameters of the Gaussian function that best fits the
+-     * observed points (in the same order as above).
+-     */
+-    public double[] fit() {
+-        final double[] guess = (new ParameterGuesser(getObservations())).guess();
+-        return fit(new Gaussian.Parametric(), guess);
+-    }
++
++Thank you for pointing out the errors in the code. Here is the fixed version of the function:
+\ No newline at end of file

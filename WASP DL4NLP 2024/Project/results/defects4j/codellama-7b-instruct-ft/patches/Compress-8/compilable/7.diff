@@ -1,0 +1,66 @@
+diff --git a/tmp/b8298656-7673-4e76-b72e-05255f30e9e7_buggy.java b/tmp/23ef1e4c-a49d-4d1c-b25e-a9c64bd65444_fixed.java
+index e087f95..b52905e 100644
+--- a/tmp/b8298656-7673-4e76-b72e-05255f30e9e7_buggy.java
++++ b/tmp/23ef1e4c-a49d-4d1c-b25e-a9c64bd65444_fixed.java
+@@ -1,53 +1,61 @@
+     /**
+      * Parse an octal string from a buffer.
+      * Leading spaces are ignored.
+      * The buffer must contain a trailing space or NUL,
+      * and may contain an additional trailing space or NUL.
+      *
+      * The input buffer is allowed to contain all NULs,
+      * in which case the method returns 0L
+      * (this allows for missing fields).
+      *
++     * Note that there are two (2) byte boundaries.
++     *
+      * @param buffer The buffer from which to parse.
+      * @param offset The offset into the buffer from which to parse.
+      * @param length The maximum number of bytes to parse - must be at least 2 bytes.
+      * @return The long value of the octal string.
+      * @throws IllegalArgumentException if the trailing space/NUL is missing or if a invalid byte is detected.
+      */
+     public static long parseOctal(final byte[] buffer, final int offset, final int length) {
+         long    result = 0;
+         boolean stillPadding = true;
+         int     end = offset + length;
+         int     start = offset;
+ 
++        if (length < 2) {
++            throw new IllegalArgumentException(
++                    "not long enough to hold octal number (length="+length+")");
++        }
+         for (int i = start; i < end; i++){
+             final byte currentByte = buffer[i];
+             if (currentByte == 0) {
++                // End of buffer
+                 break;
+             }
+ 
+         // Skip leading spaces
+             if (currentByte == (byte) ' ' || currentByte == '0') {
+                 if (stillPadding) {
+                    continue;
+                 }
++             // Is it all NUL ?
+             if (currentByte == (byte) ' ') {
+                 break;
+             }
+             }
+ 
+         // Must have trailing NUL or space
+         // May have additional NUL or space
+ 
+             stillPadding = false;
+             // CheckStyle:MagicNumber OFF
+             if (currentByte < '0' || currentByte > '7'){
+                 throw new IllegalArgumentException(
+                         exceptionMessage(buffer, offset, length, start, currentByte));
+             }
+             result = (result << 3) + (currentByte - '0'); // convert from ASCII
+             // CheckStyle:MagicNumber ON
+         }
+ 
+         return result;
+     }

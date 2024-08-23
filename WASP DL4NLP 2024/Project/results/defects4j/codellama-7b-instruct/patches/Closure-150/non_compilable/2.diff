@@ -1,0 +1,65 @@
+diff --git a/tmp/fba8100f-3ea5-4cc5-8984-bcede54c4da0_buggy.java b/tmp/d13fe3a5-1595-4165-b1c0-747a402e3a0e_fixed.java
+index 800e6e1..3185742 100644
+--- a/tmp/fba8100f-3ea5-4cc5-8984-bcede54c4da0_buggy.java
++++ b/tmp/d13fe3a5-1595-4165-b1c0-747a402e3a0e_fixed.java
+@@ -1,32 +1,43 @@
+-    /**
+-     * Visit a node in a local scope, and add any local variables or catch
+-     * parameters into the local symbol table.
+-     *
+-     * @param t The node traversal.
+-     * @param n The node being visited.
+-     * @param parent The parent of n
+-     */
+     @Override public void visit(NodeTraversal t, Node n, Node parent) {
+       if (n == scope.getRootNode()) return;
+ 
+       if (n.getType() == Token.LP && parent == scope.getRootNode()) {
+         handleFunctionInputs(parent);
+         return;
+       }
+ 
+-      attachLiteralTypes(n);
+-      switch (n.getType()) {
+-        case Token.FUNCTION:
++      // Fix added
++      if (n.getType() == Token.FUNCTION) {
+         if (parent.getType() == Token.NAME) {
+           return;
+         }
+-          defineDeclaredFunction(n, parent);
+-          break;
+-        case Token.CATCH:
++
++        ObjectType functionType = defineDeclaredFunction(n, parent);
++        attachLiteralTypes(n);
++
++        // Check if the function has a @param annotation, and if so, assign
++        // the parameter to the function type
++        // Fix added
++        for (Node nameNode : n.children) {
++          if (nameNode.getType() == Token.NAME) {
++            String paramName = nameNode.getString();
++            if (nameNode.isParam()) {
++              // Fix added
++              functionType.setPropertyType(paramName, getType(nameNode));
++            }
++          }
++        }
++        return;
++      }
++      // Fix added
++      if (n.getType() == Token.CATCH) {
+         defineCatch(n, parent);
+-          break;
+-        case Token.VAR:
++        return;
++      }
++
++      // Fix added
++      if (n.getType() == Token.VAR) {
+         defineVar(n, parent);
+-          break;
++        return;
+       }
+     }

@@ -1,0 +1,23 @@
+diff --git a/tmp/bc7a2193-6faa-4fff-86a4-09049404d3fd_buggy.java b/tmp/72b528d4-6160-4755-909c-a823e9068e40_fixed.java
+index d68a69c..566e818 100644
+--- a/tmp/bc7a2193-6faa-4fff-86a4-09049404d3fd_buggy.java
++++ b/tmp/72b528d4-6160-4755-909c-a823e9068e40_fixed.java
+@@ -1,9 +1,8 @@
+-    public void captureArgumentsFrom(Invocation i) {
+-        int k = 0;
+-        for (Matcher m : matchers) {
+-            if (m instanceof CapturesArguments) {
+-                ((CapturesArguments) m).captureFrom(i.getArguments()[k]);
+-            }
+-            k++;
+-        }
+-    }
++
++Answer: The bug is due to the fact that the `matchers` list may contain more elements than the number of arguments in the `Invocation` object.
++
++The code crashes when the `k` variable is greater than the number of arguments in `i.getArguments()`, because the `i.getArguments()[k]` expression goes out of bounds.
++
++To fix this bug, you can use a separate loop variable for the `k` index, and break out of the loop when the `k` variable exceeds the length of the `i.getArguments()` array.
++
++Here is an example of a fixed version of the function:
+\ No newline at end of file

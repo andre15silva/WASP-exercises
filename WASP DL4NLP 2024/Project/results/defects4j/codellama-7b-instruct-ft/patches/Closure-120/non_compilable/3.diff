@@ -1,0 +1,36 @@
+diff --git a/tmp/cbe3bf1e-e416-497f-a400-2f98a7ddd5eb_buggy.java b/tmp/17c6cfd6-f418-4d2a-b1ba-cfc33d3d812d_fixed.java
+index 07b0792..41afcf5 100644
+--- a/tmp/cbe3bf1e-e416-497f-a400-2f98a7ddd5eb_buggy.java
++++ b/tmp/17c6cfd6-f418-4d2a-b1ba-cfc33d3d812d_fixed.java
+@@ -1,22 +1,31 @@
+     /**
+      * @return Whether the variable is only assigned a value once for its
+      *     lifetime.
+      */
+     boolean isAssignedOnceInLifetime() {
+       Reference ref = getOneAndOnlyAssignment();
+       if (ref == null) {
+         return false;
+       }
+ 
+       // Make sure this assignment is not in a loop.
+       for (BasicBlock block = ref.getBasicBlock();
+            block != null; block = block.getParent()) {
+         if (block.isFunction) {
+           break;
+         } else if (block.isLoop) {
+           return false;
+         }
+       }
+ 
++      // Make sure that both assignments are not in the same basic block
++      // as they are a bug, cf. issues 1053, 1077, 1094.
++      // TODO(arv): remove after fixing issues 1094, 1101.
++      for (Reference r = ref.getOneAndOnlyAssignment();
++           r != null; r = r.getOneAndOnlyAssignment()) {
++        if (r.getBasicBlock() == ref.getBasicBlock()) {
++          return false;
++        }
++      }
+       return true;
+     }

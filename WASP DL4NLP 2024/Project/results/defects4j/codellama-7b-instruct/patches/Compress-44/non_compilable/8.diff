@@ -1,0 +1,16 @@
+diff --git a/tmp/bbef6b22-6036-436a-afca-dc9246a63824_buggy.java b/tmp/34e7c64a-e1ec-48f5-bad1-56bb702a2664_fixed.java
+index 741e96b..80ed5e4 100644
+--- a/tmp/bbef6b22-6036-436a-afca-dc9246a63824_buggy.java
++++ b/tmp/34e7c64a-e1ec-48f5-bad1-56bb702a2664_fixed.java
+@@ -1,7 +1,6 @@
+-    public ChecksumCalculatingInputStream(final Checksum checksum, final InputStream in) {
++    @Test(expected = NullPointerException.class)
++    public void testClassInstantiationWithParameterBeingNullThrowsNullPointerExceptionOne() {
+ 
++        ChecksumCalculatingInputStream checksumCalculatingInputStream = new ChecksumCalculatingInputStream(null, null);
+ 
+-
+-        this.checksum = checksum;
+-        this.in = in;
+     }
+\ No newline at end of file

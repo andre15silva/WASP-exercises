@@ -1,0 +1,23 @@
+diff --git a/tmp/7884b76e-15ab-45e7-a9e7-ad7182311acf_buggy.java b/tmp/48d2a4d8-d332-4171-9721-7a6a5fc58216_fixed.java
+index 7cd18df..28d8316 100644
+--- a/tmp/7884b76e-15ab-45e7-a9e7-ad7182311acf_buggy.java
++++ b/tmp/48d2a4d8-d332-4171-9721-7a6a5fc58216_fixed.java
+@@ -1,9 +1,18 @@
+         @Override
+         protected Object _deserializeFromEmptyString() throws IOException {
+             // As per [databind#398], URI requires special handling
+             if (_kind == STD_URI) {
+                 return URI.create("");
+             }
+             // As per [databind#1123], Locale too
++            try {
+                 return super._deserializeFromEmptyString();
++            } catch (IllegalArgumentException ok) {
++                /* As per [databind#841], Locale doesn't like "". So catch, recognize, & re-raise: */
++                String str = _peekedString;
++                if ("".equals(str) || "null".equals(str)) {
++                    return Locale.ROOT;
++                }
++                throw ok;
++            }
+         }

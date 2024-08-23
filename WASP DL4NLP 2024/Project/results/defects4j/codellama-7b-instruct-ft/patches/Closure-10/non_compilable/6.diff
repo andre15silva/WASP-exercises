@@ -1,0 +1,26 @@
+diff --git a/tmp/bcd05983-793e-4158-a6ea-9d3aa5926a68_buggy.java b/tmp/9f53efe8-1778-47ae-9733-d0d7869c0d6f_fixed.java
+index 6fecc90..0e4cb67 100644
+--- a/tmp/bcd05983-793e-4158-a6ea-9d3aa5926a68_buggy.java
++++ b/tmp/9f53efe8-1778-47ae-9733-d0d7869c0d6f_fixed.java
+@@ -1,7 +1,21 @@
+   static boolean mayBeString(Node n, boolean recurse) {
+     if (recurse) {
+       return allResultsMatch(n, MAY_BE_STRING_PREDICATE);
+     } else {
+       return mayBeStringHelper(n);
+     }
+   }
++
++  static boolean isTruthyStringResultExpr(Node n) {
++    if (n.isAdd()) {
++      Node left = n.getFirstChild();
++      Node right = left.getNext();
++      return (isString(left) && or2(isString(right), orNull(right)));
++    } else {
++      return false;
++    }
++  }
++  public static boolean mayBeString(Node n) {
++    Node expr = getExprTopStmtExpr(n);
++    return expr != null && isTruthyStringResultExpr(expr);
++  }

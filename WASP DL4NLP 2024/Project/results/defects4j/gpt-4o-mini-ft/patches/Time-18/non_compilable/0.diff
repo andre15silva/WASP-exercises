@@ -1,0 +1,50 @@
+diff --git a/tmp/20ee336a-3dcf-4dd1-8432-327b55bc2cc6_buggy.java b/tmp/b58a19ce-34c4-49d3-b63f-82cb32083f34_fixed.java
+index be2af16..49c6bea 100644
+--- a/tmp/20ee336a-3dcf-4dd1-8432-327b55bc2cc6_buggy.java
++++ b/tmp/b58a19ce-34c4-49d3-b63f-82cb32083f34_fixed.java
+@@ -1,29 +1,43 @@
+     public long getDateTimeMillis(int year, int monthOfYear, int dayOfMonth,
+                                   int hourOfDay, int minuteOfHour,
+                                   int secondOfMinute, int millisOfSecond)
+         throws IllegalArgumentException
+     {
+         Chronology base;
+         if ((base = getBase()) != null) {
+             return base.getDateTimeMillis
+                 (year, monthOfYear, dayOfMonth,
+                  hourOfDay, minuteOfHour, secondOfMinute, millisOfSecond);
+         }
+ 
+         // Assume date is Gregorian.
+         long instant;
+         instant = iGregorianChronology.getDateTimeMillis
+             (year, monthOfYear, dayOfMonth,
+              hourOfDay, minuteOfHour, secondOfMinute, millisOfSecond);
+         if (instant < iCutoverMillis) {
+             // Maybe it's Julian.
+             instant = iJulianChronology.getDateTimeMillis
+                 (year, monthOfYear, dayOfMonth,
+                  hourOfDay, minuteOfHour, secondOfMinute, millisOfSecond);
+-            if (instant >= iCutoverMillis) {
++            if (instant < iCutoverMillis) {
+                 // Okay, it's in the illegal cutover gap.
+-                throw new IllegalArgumentException("Specified date does not exist");
++                incrementJulianMislabeledLeapYear(iJulianChronology);
++            }
++        }
++        if (instant < iJulianChronology.getMinYear() && monthOfYear == 2
++                && dayOfMonth >=29) {
++            // Julian chronology February 29 is too early
++            year--;
++            if (iJulianChronology.isLeapYear(year)) {
++                iJulianChronology.getDateTimeMillis(year, monthOfYear, dayOfMonth,
++                   hourOfDay, minuteOfHour, secondOfMinute, millisOfSecond);
++            } else {
++                instant = (year == 1) ? -1 : Math.min(instant,
++                        iJulianChronology.getDateTimeMillis(year, monthOfYear, 28,
++                                hourOfDay, minuteOfHour, secondOfMinute,
++                                millisOfSecond));
+             }
+         }
+         return instant;
+     }
