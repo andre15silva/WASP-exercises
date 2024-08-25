@@ -1,7 +1,7 @@
-diff --git a/tmp/0715c688-53ba-43e8-a420-e962cfa2d8bb_buggy.java b/tmp/f1e172d2-4c9a-462a-a00c-ef8bce0650a4_fixed.java
+diff --git a/tmp/42799a0f-67eb-4d03-9768-cd0ec3c2292c_buggy.java b/tmp/3797dabc-9d92-40e0-9220-8ac43729cbcf_fixed.java
 index a5093b1..0195b32 100644
---- a/tmp/0715c688-53ba-43e8-a420-e962cfa2d8bb_buggy.java
-+++ b/tmp/f1e172d2-4c9a-462a-a00c-ef8bce0650a4_fixed.java
+--- a/tmp/42799a0f-67eb-4d03-9768-cd0ec3c2292c_buggy.java
++++ b/tmp/3797dabc-9d92-40e0-9220-8ac43729cbcf_fixed.java
 @@ -1,11 +1,13 @@
  private static <E extends Element> Integer indexInList(Element search, List<E> elements) {
      Validate.notNull(search);

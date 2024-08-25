@@ -1,7 +1,7 @@
-diff --git a/tmp/e669159a-3a20-4469-a058-3e95bb0c7926_buggy.java b/tmp/d7e2fefd-17a2-4113-9691-b95795df0929_fixed.java
+diff --git a/tmp/0a21d41a-66c3-49a9-91c4-6b2b8bb6d26c_buggy.java b/tmp/7296dfc1-c578-47f1-8322-cdd59e9de41d_fixed.java
 index dd3b100..eac0d97 100644
---- a/tmp/e669159a-3a20-4469-a058-3e95bb0c7926_buggy.java
-+++ b/tmp/d7e2fefd-17a2-4113-9691-b95795df0929_fixed.java
+--- a/tmp/0a21d41a-66c3-49a9-91c4-6b2b8bb6d26c_buggy.java
++++ b/tmp/7296dfc1-c578-47f1-8322-cdd59e9de41d_fixed.java
 @@ -1,12 +1,13 @@
          public TreeNode lowestCommonAncestor(TreeNode root, TreeNode p, TreeNode q) {
              if (root == null || p == root || q == root) {

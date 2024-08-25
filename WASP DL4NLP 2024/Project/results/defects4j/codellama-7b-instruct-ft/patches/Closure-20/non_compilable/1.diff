@@ -1,7 +1,7 @@
-diff --git a/tmp/f0532cc4-c5b2-4eb8-9e93-28494baa9796_buggy.java b/tmp/077f86bb-aa72-4cb8-b439-5771892bf7b2_fixed.java
+diff --git a/tmp/a94fa8d0-9ab4-4995-853f-3711362a9812_buggy.java b/tmp/0ce4a4f2-2f00-4897-a76b-0256854e19b4_fixed.java
 index d4e6d48..347be45 100644
---- a/tmp/f0532cc4-c5b2-4eb8-9e93-28494baa9796_buggy.java
-+++ b/tmp/077f86bb-aa72-4cb8-b439-5771892bf7b2_fixed.java
+--- a/tmp/a94fa8d0-9ab4-4995-853f-3711362a9812_buggy.java
++++ b/tmp/0ce4a4f2-2f00-4897-a76b-0256854e19b4_fixed.java
 @@ -1,23 +1,22 @@
    private Node tryFoldSimpleFunctionCall(Node n) {
      Preconditions.checkState(n.isCall());

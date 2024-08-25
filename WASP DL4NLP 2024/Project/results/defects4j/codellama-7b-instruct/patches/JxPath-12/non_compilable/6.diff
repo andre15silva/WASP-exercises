@@ -1,7 +1,7 @@
-diff --git a/tmp/0099d3a3-3405-47cc-9c8f-b355cf67222f_buggy.java b/tmp/44dca508-d3a5-4d81-a4dd-afc50e4e4eb2_fixed.java
+diff --git a/tmp/fa495c24-c64a-4baa-8673-d942fba12bf8_buggy.java b/tmp/cb97f26d-a40a-40b4-9756-4f69f094fe91_fixed.java
 index 40f74f7..6f2161b 100644
---- a/tmp/0099d3a3-3405-47cc-9c8f-b355cf67222f_buggy.java
-+++ b/tmp/44dca508-d3a5-4d81-a4dd-afc50e4e4eb2_fixed.java
+--- a/tmp/fa495c24-c64a-4baa-8673-d942fba12bf8_buggy.java
++++ b/tmp/cb97f26d-a40a-40b4-9756-4f69f094fe91_fixed.java
 @@ -1,50 +1,55 @@
 -    public static boolean testNode(Node node, NodeTest test) {
 +    public static boolean testNode(DomNode node, NodeTest test) {

@@ -1,7 +1,7 @@
-diff --git a/tmp/0285c140-631f-4f2e-b604-c78e86491408_buggy.java b/tmp/9b91b332-9231-4fdb-84ff-d9c0b234c5b3_fixed.java
+diff --git a/tmp/81681ee2-d93b-46fc-8229-e404cb818891_buggy.java b/tmp/a464d18f-9e5d-4b47-8e2f-6862a9488777_fixed.java
 index 6dd359b..6ec842e 100644
---- a/tmp/0285c140-631f-4f2e-b604-c78e86491408_buggy.java
-+++ b/tmp/9b91b332-9231-4fdb-84ff-d9c0b234c5b3_fixed.java
+--- a/tmp/81681ee2-d93b-46fc-8229-e404cb818891_buggy.java
++++ b/tmp/a464d18f-9e5d-4b47-8e2f-6862a9488777_fixed.java
 @@ -1,125 +1,121 @@
  public void collect(JSModule module, Scope scope, Node n) {
    Node parent = n.getParent();

@@ -1,0 +1,29 @@
+diff --git a/tmp/45d871df-f216-441c-88b3-187f9f1a0bec_buggy.java b/tmp/d6a128c8-8945-4180-b784-e63cdb07e8a1_fixed.java
+index 46817a7..89defea 100644
+--- a/tmp/45d871df-f216-441c-88b3-187f9f1a0bec_buggy.java
++++ b/tmp/d6a128c8-8945-4180-b784-e63cdb07e8a1_fixed.java
+@@ -1,16 +1,23 @@
+ @Override
+ public JSType getLeastSupertype(JSType that) {
+   if (!that.isRecordType()) {
+     return super.getLeastSupertype(that);
+   }
++
++  // Create an empty record type if the input `that` is a record type but does not have any matching properties
++  if (that.toMaybeRecordType().getProperties().isEmpty()) {
++    return new JSType(JSTypeNative.RECORD_TYPE_INFO, registry);
++  }
++
++  // If all properties are present, continue with the original logic
+   RecordTypeBuilder builder = new RecordTypeBuilder(registry);
+   for (String property : properties.keySet()) {
+     if (that.toMaybeRecordType().hasProperty(property) &&
+         that.toMaybeRecordType().getPropertyType(property).isEquivalentTo(
+             getPropertyType(property))) {
+       builder.addProperty(property, getPropertyType(property),
+           getPropertyNode(property));
+     }
+   }
+   return builder.build();
+ }
+\ No newline at end of file

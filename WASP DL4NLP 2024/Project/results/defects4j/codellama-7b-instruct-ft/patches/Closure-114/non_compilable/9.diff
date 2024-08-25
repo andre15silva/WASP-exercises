@@ -1,7 +1,7 @@
-diff --git a/tmp/ea8bcdd8-26c4-4680-a528-a5bb82922ff1_buggy.java b/tmp/7e411c72-0a68-4090-809e-2f73709653ff_fixed.java
+diff --git a/tmp/e4044bba-c095-42d7-b99b-d94cc1fa3dc8_buggy.java b/tmp/12f3ac8c-022d-4e9e-a210-15cd383ce305_fixed.java
 index c51c8b1..811d670 100644
---- a/tmp/ea8bcdd8-26c4-4680-a528-a5bb82922ff1_buggy.java
-+++ b/tmp/7e411c72-0a68-4090-809e-2f73709653ff_fixed.java
+--- a/tmp/e4044bba-c095-42d7-b99b-d94cc1fa3dc8_buggy.java
++++ b/tmp/12f3ac8c-022d-4e9e-a210-15cd383ce305_fixed.java
 @@ -1,31 +1,39 @@
      private void recordAssignment(NodeTraversal t, Node n, Node recordNode) {
        Node nameNode = n.getFirstChild();

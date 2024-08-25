@@ -1,7 +1,7 @@
-diff --git a/tmp/60dd2369-7813-40b6-bef9-da8611f11670_buggy.java b/tmp/922af47d-06b7-49d8-9fb0-b0b3d4f54c4d_fixed.java
+diff --git a/tmp/f7a2fe18-8278-4e7b-afc4-0f77dc797445_buggy.java b/tmp/69a4a24f-15b4-4a88-adac-020601842aed_fixed.java
 index cfdcd9c..6fc39ae 100644
---- a/tmp/60dd2369-7813-40b6-bef9-da8611f11670_buggy.java
-+++ b/tmp/922af47d-06b7-49d8-9fb0-b0b3d4f54c4d_fixed.java
+--- a/tmp/f7a2fe18-8278-4e7b-afc4-0f77dc797445_buggy.java
++++ b/tmp/69a4a24f-15b4-4a88-adac-020601842aed_fixed.java
 @@ -1,51 +1,28 @@
  private Node tryFoldArrayAccess(Node n, Node left, Node right) {
 -    Node parent = n.getParent();

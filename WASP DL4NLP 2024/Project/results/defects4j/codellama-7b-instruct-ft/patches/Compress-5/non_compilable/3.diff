@@ -1,7 +1,7 @@
-diff --git a/tmp/cadb043b-92f3-4d01-b848-1f3d1f12852e_buggy.java b/tmp/aebffadb-66c1-4a36-a3cb-39e25321503c_fixed.java
+diff --git a/tmp/339b844e-973f-408c-bf22-e0b52f8b0e0d_buggy.java b/tmp/44a017b8-df20-4e90-9300-e3649b63998a_fixed.java
 index d907b39..c425766 100644
---- a/tmp/cadb043b-92f3-4d01-b848-1f3d1f12852e_buggy.java
-+++ b/tmp/aebffadb-66c1-4a36-a3cb-39e25321503c_fixed.java
+--- a/tmp/339b844e-973f-408c-bf22-e0b52f8b0e0d_buggy.java
++++ b/tmp/44a017b8-df20-4e90-9300-e3649b63998a_fixed.java
 @@ -1,56 +1,121 @@
      public int read(byte[] buffer, int start, int length) throws IOException {
          if (closed) {

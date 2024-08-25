@@ -1,7 +1,7 @@
-diff --git a/tmp/df3d303f-fb3e-41a7-b82c-c25d6006427d_buggy.java b/tmp/5991b04e-ce77-4ce4-ae82-99fcbd31162f_fixed.java
+diff --git a/tmp/a49acbdf-150c-4357-a641-69346308ac51_buggy.java b/tmp/e085f080-ef19-496f-936e-fd9ed2288287_fixed.java
 index 2bac745..4c1f4ae 100644
---- a/tmp/df3d303f-fb3e-41a7-b82c-c25d6006427d_buggy.java
-+++ b/tmp/5991b04e-ce77-4ce4-ae82-99fcbd31162f_fixed.java
+--- a/tmp/a49acbdf-150c-4357-a641-69346308ac51_buggy.java
++++ b/tmp/e085f080-ef19-496f-936e-fd9ed2288287_fixed.java
 @@ -1,16 +1,22 @@
  public static ParticipantAction from(MemberStatus memberStatus, boolean disabled) {
      return switch (memberStatus) {

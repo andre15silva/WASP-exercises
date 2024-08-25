@@ -1,7 +1,7 @@
-diff --git a/tmp/6c654d53-4ee3-423b-a3c7-db12cfc5c9cc_buggy.java b/tmp/18f523ec-87e8-453d-9e9c-f1aad6a6f245_fixed.java
+diff --git a/tmp/b3733348-2c6c-4b45-827d-2b8cea885f85_buggy.java b/tmp/d436e0f3-a8d1-4c5b-9196-8a6c39459613_fixed.java
 index bdde834..633ade5 100644
---- a/tmp/6c654d53-4ee3-423b-a3c7-db12cfc5c9cc_buggy.java
-+++ b/tmp/18f523ec-87e8-453d-9e9c-f1aad6a6f245_fixed.java
+--- a/tmp/b3733348-2c6c-4b45-827d-2b8cea885f85_buggy.java
++++ b/tmp/d436e0f3-a8d1-4c5b-9196-8a6c39459613_fixed.java
 @@ -1,10 +1,8 @@
  static boolean isNonRetryableHTTPCode(CloseableHttpResponse response, boolean retryHTTP403) {
      return response != null

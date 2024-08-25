@@ -1,7 +1,7 @@
-diff --git a/tmp/d21833fe-1194-4cd5-9e8e-6955d791a7c0_buggy.java b/tmp/425df770-e745-4471-b6a2-530c5d90c9f7_fixed.java
+diff --git a/tmp/e864ae78-b77d-4feb-98e9-d51a89a141fe_buggy.java b/tmp/6fe4d5c8-0e39-46ab-a165-b9cc24cba00a_fixed.java
 index 2b96a40..e8d47ab 100644
---- a/tmp/d21833fe-1194-4cd5-9e8e-6955d791a7c0_buggy.java
-+++ b/tmp/425df770-e745-4471-b6a2-530c5d90c9f7_fixed.java
+--- a/tmp/e864ae78-b77d-4feb-98e9-d51a89a141fe_buggy.java
++++ b/tmp/6fe4d5c8-0e39-46ab-a165-b9cc24cba00a_fixed.java
 @@ -1,101 +1,5 @@
 -    protected Object decodePosition(DeviceSession deviceSession, String content) throws Exception {
 +Based on the provided test data, the issue seems to be with the parsing of the latitude and longitude coordinates. The parser is using the nextInt() method, which expects the input to be a signed integer, but the coordinates are in the form of a latitude/longitude pair (double).

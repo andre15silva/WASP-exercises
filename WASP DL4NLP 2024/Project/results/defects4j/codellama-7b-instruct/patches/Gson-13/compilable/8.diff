@@ -1,7 +1,7 @@
-diff --git a/tmp/8f115850-8d54-41c0-84a8-c4803bae5a56_buggy.java b/tmp/ca5f0e24-b692-41b3-97ca-193122f3d23f_fixed.java
+diff --git a/tmp/f9821cae-0c3c-4637-b6f6-6a6954dfa478_buggy.java b/tmp/83484d4f-0aab-4246-ba66-8c903aee7303_fixed.java
 index 2bd7d6c..7cba83a 100644
---- a/tmp/8f115850-8d54-41c0-84a8-c4803bae5a56_buggy.java
-+++ b/tmp/ca5f0e24-b692-41b3-97ca-193122f3d23f_fixed.java
+--- a/tmp/f9821cae-0c3c-4637-b6f6-6a6954dfa478_buggy.java
++++ b/tmp/83484d4f-0aab-4246-ba66-8c903aee7303_fixed.java
 @@ -1,102 +1,82 @@
    private int peekNumber() throws IOException {
 -    // Like nextNonWhitespace, this uses locals 'p' and 'l' to save inner-loop field access.

@@ -1,7 +1,7 @@
-diff --git a/tmp/0a64e42a-4550-4bfa-b681-22b837bcf0a7_buggy.java b/tmp/200adf76-f004-4ff9-b232-6f576de30225_fixed.java
+diff --git a/tmp/7e3669bd-3155-40a9-beab-504eeb73b04c_buggy.java b/tmp/e96053d7-f937-4eaa-b2f8-5e42d203d14c_fixed.java
 index 2d36d6e..1af24e8 100644
---- a/tmp/0a64e42a-4550-4bfa-b681-22b837bcf0a7_buggy.java
-+++ b/tmp/200adf76-f004-4ff9-b232-6f576de30225_fixed.java
+--- a/tmp/7e3669bd-3155-40a9-beab-504eeb73b04c_buggy.java
++++ b/tmp/e96053d7-f937-4eaa-b2f8-5e42d203d14c_fixed.java
 @@ -1,4 +1,4 @@
 -    public void joinAsSpectator(MemberId memberId) {
 +    public void joinAsSpectator(final MemberId memberId) {

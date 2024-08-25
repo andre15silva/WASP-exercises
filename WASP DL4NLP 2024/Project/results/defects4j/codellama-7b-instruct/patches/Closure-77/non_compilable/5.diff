@@ -1,7 +1,7 @@
-diff --git a/tmp/9d020ea0-0d37-4b73-845f-c198a5637b67_buggy.java b/tmp/a8908ab4-e492-4b74-a41c-3cf23114de5d_fixed.java
+diff --git a/tmp/a3b75dbe-5ceb-491d-ae47-6e9e1d062c7b_buggy.java b/tmp/ee2797c1-8636-4b08-aead-f3fbf030041a_fixed.java
 index 89c5bf7..b84e090 100644
---- a/tmp/9d020ea0-0d37-4b73-845f-c198a5637b67_buggy.java
-+++ b/tmp/a8908ab4-e492-4b74-a41c-3cf23114de5d_fixed.java
+--- a/tmp/a3b75dbe-5ceb-491d-ae47-6e9e1d062c7b_buggy.java
++++ b/tmp/ee2797c1-8636-4b08-aead-f3fbf030041a_fixed.java
 @@ -1,71 +1,80 @@
 -  /** Helper to escape javascript string as well as regular expression */
 +  private static String appendHexJavaScriptRepresentation(StringBuilder sb, char c) {

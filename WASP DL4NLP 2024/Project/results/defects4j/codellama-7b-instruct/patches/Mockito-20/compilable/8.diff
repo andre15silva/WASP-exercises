@@ -1,7 +1,7 @@
-diff --git a/tmp/165fcf5d-894b-4cb9-b2ba-250733a3bc4f_buggy.java b/tmp/a26bf828-23a5-4ebb-8457-7c37dbbb3b5d_fixed.java
+diff --git a/tmp/e8796602-879f-4035-9855-620c664b99ce_buggy.java b/tmp/84e69181-6e20-4dc3-a5e4-7a076d64806e_fixed.java
 index f9a9b5b..ea473fd 100644
---- a/tmp/165fcf5d-894b-4cb9-b2ba-250733a3bc4f_buggy.java
-+++ b/tmp/a26bf828-23a5-4ebb-8457-7c37dbbb3b5d_fixed.java
+--- a/tmp/e8796602-879f-4035-9855-620c664b99ce_buggy.java
++++ b/tmp/84e69181-6e20-4dc3-a5e4-7a076d64806e_fixed.java
 @@ -1,30 +1,6 @@
      public <T> T createMock(MockCreationSettings<T> settings, MockHandler handler) {
 -        if (settings.getSerializableMode() == SerializableMode.ACROSS_CLASSLOADERS) {

@@ -1,7 +1,7 @@
-diff --git a/tmp/fa226af8-768e-40a0-ba23-c5fd5539ac58_buggy.java b/tmp/bb8b661e-2faf-4c2b-a49d-96c38352c673_fixed.java
+diff --git a/tmp/934bcf34-1127-4c83-b52d-3449fea46b60_buggy.java b/tmp/648d55f5-6e58-4324-ab48-801ca80fe890_fixed.java
 index d357c7e..95da4ec 100644
---- a/tmp/fa226af8-768e-40a0-ba23-c5fd5539ac58_buggy.java
-+++ b/tmp/bb8b661e-2faf-4c2b-a49d-96c38352c673_fixed.java
+--- a/tmp/934bcf34-1127-4c83-b52d-3449fea46b60_buggy.java
++++ b/tmp/648d55f5-6e58-4324-ab48-801ca80fe890_fixed.java
 @@ -1,16 +1,19 @@
      private InputStream getCurrentStream() throws IOException {
 +        if (archive.files[currentEntryIndex].getSize() == 0) {

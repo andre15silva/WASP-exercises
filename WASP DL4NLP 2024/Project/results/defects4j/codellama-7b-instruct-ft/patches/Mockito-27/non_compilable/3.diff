@@ -1,7 +1,7 @@
-diff --git a/tmp/7e1d04a4-f59c-4c5f-aac5-a3050105af77_buggy.java b/tmp/457f0b19-0ee9-455b-b065-51f33be3090a_fixed.java
+diff --git a/tmp/f106c808-8dc6-4c68-b10f-0e6f6ba27154_buggy.java b/tmp/247d2302-94f2-4eb0-92e6-beb8f8a6e65c_fixed.java
 index 5c5286c..3ba66d3 100644
---- a/tmp/7e1d04a4-f59c-4c5f-aac5-a3050105af77_buggy.java
-+++ b/tmp/457f0b19-0ee9-455b-b065-51f33be3090a_fixed.java
+--- a/tmp/f106c808-8dc6-4c68-b10f-0e6f6ba27154_buggy.java
++++ b/tmp/247d2302-94f2-4eb0-92e6-beb8f8a6e65c_fixed.java
 @@ -1,6 +1,8 @@
      public <T> void resetMock(T mock) {
 +        InvocationListener invocationListener = ((List) mock).getInvocationListeners().get(0);

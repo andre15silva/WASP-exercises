@@ -1,7 +1,7 @@
-diff --git a/tmp/cdbd9699-68dd-4841-b5d8-c7f074e725ac_buggy.java b/tmp/cfc5423a-a51b-49bf-8917-97df436ff948_fixed.java
+diff --git a/tmp/1fe1b493-a1de-4c2e-87f8-19c4c3254854_buggy.java b/tmp/25ffcfb8-9039-4ba2-9b47-37a10e7972b4_fixed.java
 index 7dc89ed..285efc6 100644
---- a/tmp/cdbd9699-68dd-4841-b5d8-c7f074e725ac_buggy.java
-+++ b/tmp/cfc5423a-a51b-49bf-8917-97df436ff948_fixed.java
+--- a/tmp/1fe1b493-a1de-4c2e-87f8-19c4c3254854_buggy.java
++++ b/tmp/25ffcfb8-9039-4ba2-9b47-37a10e7972b4_fixed.java
 @@ -1,20 +1,22 @@
          boolean anyOtherEndTag(Token t, HtmlTreeBuilder tb) {
              String name = t.asEndTag().normalName();

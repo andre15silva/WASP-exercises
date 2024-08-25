@@ -1,7 +1,7 @@
-diff --git a/tmp/987e56d5-9a80-45d2-9e96-2eb3b304491e_buggy.java b/tmp/54885f2c-5143-4834-8b8a-7f95f25d7ae8_fixed.java
+diff --git a/tmp/ffd3700b-4ea6-40b3-af01-0d8c361bbcc5_buggy.java b/tmp/88900edd-005f-4fac-afaa-d95ac0d62a68_fixed.java
 index d68a69c..e71f5c9 100644
---- a/tmp/987e56d5-9a80-45d2-9e96-2eb3b304491e_buggy.java
-+++ b/tmp/54885f2c-5143-4834-8b8a-7f95f25d7ae8_fixed.java
+--- a/tmp/ffd3700b-4ea6-40b3-af01-0d8c361bbcc5_buggy.java
++++ b/tmp/88900edd-005f-4fac-afaa-d95ac0d62a68_fixed.java
 @@ -1,9 +1,16 @@
      public void captureArgumentsFrom(Invocation i) {
 +        if (i.getArguments() == null || i.getArguments().length == 0) {

@@ -1,7 +1,7 @@
-diff --git a/tmp/8533ff19-4a24-43c1-b958-7edc6bdb3c66_buggy.java b/tmp/56ec7cb3-1a5c-4094-a886-26d48e654844_fixed.java
+diff --git a/tmp/2f2afcb5-42f0-4ec4-a96f-5a1e27e9909e_buggy.java b/tmp/23eeee41-35b1-4a20-b9ae-6d80f5291876_fixed.java
 index d5b3da9..13c9273 100644
---- a/tmp/8533ff19-4a24-43c1-b958-7edc6bdb3c66_buggy.java
-+++ b/tmp/56ec7cb3-1a5c-4094-a886-26d48e654844_fixed.java
+--- a/tmp/2f2afcb5-42f0-4ec4-a96f-5a1e27e9909e_buggy.java
++++ b/tmp/23eeee41-35b1-4a20-b9ae-6d80f5291876_fixed.java
 @@ -1,7 +1,9 @@
          private void copyAttributes(org.jsoup.nodes.Node source, Element el) {
              for (Attribute attribute : source.attributes()) {

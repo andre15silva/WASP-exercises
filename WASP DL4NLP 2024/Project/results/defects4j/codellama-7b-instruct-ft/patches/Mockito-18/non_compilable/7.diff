@@ -1,7 +1,7 @@
-diff --git a/tmp/6d4dc94e-5393-4b12-845a-c83cd0e67dc7_buggy.java b/tmp/899dff7c-0464-48b7-a06f-47849d5a4cfc_fixed.java
+diff --git a/tmp/58c36fd7-cfbc-4ff1-ac81-f39fed03624f_buggy.java b/tmp/5f997932-31bd-42d3-9348-b14c078d510a_fixed.java
 index 710fcc0..47aee68 100644
---- a/tmp/6d4dc94e-5393-4b12-845a-c83cd0e67dc7_buggy.java
-+++ b/tmp/899dff7c-0464-48b7-a06f-47849d5a4cfc_fixed.java
+--- a/tmp/58c36fd7-cfbc-4ff1-ac81-f39fed03624f_buggy.java
++++ b/tmp/5f997932-31bd-42d3-9348-b14c078d510a_fixed.java
 @@ -1,37 +1,39 @@
      Object returnValueFor(Class<?> type) {
          if (Primitives.isPrimitiveOrWrapper(type)) {

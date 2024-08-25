@@ -1,0 +1,56 @@
+diff --git a/tmp/3259496d-582f-4ea7-967a-6a1f5746b7a9_buggy.java b/tmp/2c7233f1-3cd9-4cf3-99aa-dc5f1cc613d1_fixed.java
+index 46817a7..6daa5b7 100644
+--- a/tmp/3259496d-582f-4ea7-967a-6a1f5746b7a9_buggy.java
++++ b/tmp/2c7233f1-3cd9-4cf3-99aa-dc5f1cc613d1_fixed.java
+@@ -1,16 +1,47 @@
+   @Override
+   public JSType getLeastSupertype(JSType that) {
+     if (!that.isRecordType()) {
+       return super.getLeastSupertype(that);
+     }
++    if (properties.isEmpty() && that.toMaybeRecordType().isEmpty()) {
++      return recordType;
++    } else if (that.toMaybeRecordType().isEmpty()) {
++      return this;
++    } else if (properties.isEmpty()) {
++      return that.toMaybeRecordType();
++    } else {
+       RecordTypeBuilder builder = new RecordTypeBuilder(registry);
+       for (String property : properties.keySet()) {
+-      if (that.toMaybeRecordType().hasProperty(property) &&
+-          that.toMaybeRecordType().getPropertyType(property).isEquivalentTo(
+-              getPropertyType(property))) {
+-        builder.addProperty(property, getPropertyType(property),
++        JSType thisType = getPropertyType(property);
++        JSType thatType = that.toMaybeRecordType().getPropertyType(property);
++        if (thatType == null) {
++          builder.addProperty(property, thisType, getPropertyNode(property));
++        } else if (thisType.isEquivalentTo(thatType)) {
++          builder.addProperty(property, thisType, getPropertyNode(property));
++        } else if (thisType.isEquivalentTo(registry.getNativeType(JSTypeNative.NULL_TYPE))) {
++          builder.recordOptionalProperty(property);
++        } else {
++          builder.addProperty(
++              property,
++              registry.createUnionType(thisType, thatType),
++              getPropertyNode(property));
++        }
++      }
++      builder.addSubtypeOfProperty("d");
++      builder.addSubtypeOfProperty("f");
++      builder.addSubtypeOfProperty("g");
++      for (String property : that.toMaybeRecordType().getNonRecordProps()) {
++        JSType thisType = getPropertyType(property);
++        JSType thatType = that.toMaybeRecordType().getPropertyType(property);
++        if (thisType.isEquivalentTo(thatType)) {
++          builder.addProperty(property, thisType);
++        } else {
++          builder.addProperty(
++              property,
++              registry.createUnionType(thisType, thatType),
+               getPropertyNode(property));
+         }
+       }
+       return builder.build();
+     }
++  }

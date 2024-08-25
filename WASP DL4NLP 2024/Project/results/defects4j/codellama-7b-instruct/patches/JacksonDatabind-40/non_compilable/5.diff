@@ -1,7 +1,7 @@
-diff --git a/tmp/2defc406-2993-4fef-84cf-7edc581dc2be_buggy.java b/tmp/175336d2-0d18-44f6-af31-d5cb6f76b8a0_fixed.java
+diff --git a/tmp/36d726b0-946a-430d-94a1-59e4ecc635f0_buggy.java b/tmp/97b331b9-d400-4e38-987d-6dbfa67c5ecd_fixed.java
 index e69de29..0403194 100644
---- a/tmp/2defc406-2993-4fef-84cf-7edc581dc2be_buggy.java
-+++ b/tmp/175336d2-0d18-44f6-af31-d5cb6f76b8a0_fixed.java
+--- a/tmp/36d726b0-946a-430d-94a1-59e4ecc635f0_buggy.java
++++ b/tmp/97b331b9-d400-4e38-987d-6dbfa67c5ecd_fixed.java
 @@ -0,0 +1,17 @@
 +public static <T extends Number> T toWrapperClass(Class<T> cls, int value) {
 +    if (value == 0) {

@@ -1,7 +1,7 @@
-diff --git a/tmp/6e4a2993-db4f-4f95-9e23-211904941c14_buggy.java b/tmp/ca67a0b1-122d-40a4-a385-7fa307d050c9_fixed.java
+diff --git a/tmp/915a1a8d-74dd-4871-bbd1-f49274de48d8_buggy.java b/tmp/b16d9d97-3097-4c00-a5cd-248a4526b522_fixed.java
 index d357c7e..e0910d4 100644
---- a/tmp/6e4a2993-db4f-4f95-9e23-211904941c14_buggy.java
-+++ b/tmp/ca67a0b1-122d-40a4-a385-7fa307d050c9_fixed.java
+--- a/tmp/915a1a8d-74dd-4871-bbd1-f49274de48d8_buggy.java
++++ b/tmp/b16d9d97-3097-4c00-a5cd-248a4526b522_fixed.java
 @@ -1,16 +1,22 @@
      private InputStream getCurrentStream() throws IOException {
          if (deferredBlockStreams.isEmpty()) {

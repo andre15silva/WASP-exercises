@@ -1,7 +1,7 @@
-diff --git a/tmp/76f006f4-2ae2-4c19-80a3-64438923eae5_buggy.java b/tmp/ab8a50d9-89cd-436f-b505-57f39a0cd21c_fixed.java
+diff --git a/tmp/7e7b5ff4-c1b6-44bd-8db7-654e47fe21fa_buggy.java b/tmp/9f3b618f-b1df-47a9-a7ed-3f27a0cb5d9f_fixed.java
 index b12de99..7211e92 100644
---- a/tmp/76f006f4-2ae2-4c19-80a3-64438923eae5_buggy.java
-+++ b/tmp/ab8a50d9-89cd-436f-b505-57f39a0cd21c_fixed.java
+--- a/tmp/7e7b5ff4-c1b6-44bd-8db7-654e47fe21fa_buggy.java
++++ b/tmp/9f3b618f-b1df-47a9-a7ed-3f27a0cb5d9f_fixed.java
 @@ -1,52 +1,40 @@
      @Override public void visit(NodeTraversal t, Node n, Node parent) {
 -      if (t.inGlobalScope()) {

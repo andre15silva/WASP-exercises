@@ -1,7 +1,7 @@
-diff --git a/tmp/77a66b61-5434-4f9a-8eca-f8e1c3bb52a2_buggy.java b/tmp/ed76baf3-e95e-4a9e-81e5-ac5d556c079d_fixed.java
+diff --git a/tmp/461ab060-11e9-4fda-aeb9-092ba572a118_buggy.java b/tmp/df585dec-0bb8-47ec-b2dc-75632341093a_fixed.java
 index 42b58d0..df65c95 100644
---- a/tmp/77a66b61-5434-4f9a-8eca-f8e1c3bb52a2_buggy.java
-+++ b/tmp/ed76baf3-e95e-4a9e-81e5-ac5d556c079d_fixed.java
+--- a/tmp/461ab060-11e9-4fda-aeb9-092ba572a118_buggy.java
++++ b/tmp/df585dec-0bb8-47ec-b2dc-75632341093a_fixed.java
 @@ -1,19 +1,30 @@
      protected void registerTypeVariablesOn(Type classType) {
          if (!(classType instanceof ParameterizedType)) {

@@ -1,7 +1,7 @@
-diff --git a/tmp/9c8a5327-a08a-44b1-b93e-efe9a429c104_buggy.java b/tmp/3e0f26d2-5140-4c66-8977-cbcdcdfc88fe_fixed.java
+diff --git a/tmp/264dc55b-4005-43d4-b4ec-5ebc05de09ba_buggy.java b/tmp/3a3ecfb9-a965-4fc4-b62b-0eb283a50deb_fixed.java
 index 135fc63..2b7adbd 100644
---- a/tmp/9c8a5327-a08a-44b1-b93e-efe9a429c104_buggy.java
-+++ b/tmp/3e0f26d2-5140-4c66-8977-cbcdcdfc88fe_fixed.java
+--- a/tmp/264dc55b-4005-43d4-b4ec-5ebc05de09ba_buggy.java
++++ b/tmp/3a3ecfb9-a965-4fc4-b62b-0eb283a50deb_fixed.java
 @@ -1,48 +1,51 @@
      void resetInsertionMode() {
 +        if (stack == null) {

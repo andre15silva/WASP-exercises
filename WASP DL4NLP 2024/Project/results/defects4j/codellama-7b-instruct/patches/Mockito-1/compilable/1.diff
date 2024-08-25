@@ -1,7 +1,7 @@
-diff --git a/tmp/72d5551f-ed21-463c-a4f1-b34984f562fe_buggy.java b/tmp/a1e2f2bf-aa03-41db-b91a-d74e86062f33_fixed.java
+diff --git a/tmp/2412b278-c41b-4cac-8ecf-623297ae5c7d_buggy.java b/tmp/62024bd1-1952-4b4b-9d3f-87af5a0fa883_fixed.java
 index 1c875ad..9171e47 100644
---- a/tmp/72d5551f-ed21-463c-a4f1-b34984f562fe_buggy.java
-+++ b/tmp/a1e2f2bf-aa03-41db-b91a-d74e86062f33_fixed.java
+--- a/tmp/2412b278-c41b-4cac-8ecf-623297ae5c7d_buggy.java
++++ b/tmp/62024bd1-1952-4b4b-9d3f-87af5a0fa883_fixed.java
 @@ -1,31 +1,14 @@
      public void captureArgumentsFrom(Invocation invocation) {
          if (invocation.getMethod().isVarArgs()) {

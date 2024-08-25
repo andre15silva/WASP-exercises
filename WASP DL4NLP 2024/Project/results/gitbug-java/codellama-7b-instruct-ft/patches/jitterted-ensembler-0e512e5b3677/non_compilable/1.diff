@@ -1,7 +1,7 @@
-diff --git a/tmp/870b5fb3-6a4a-4022-b861-68d0c7950fbd_buggy.java b/tmp/c07aece0-b264-4572-81f9-130b10825a0f_fixed.java
+diff --git a/tmp/225d4970-49fe-4946-9db0-4d2363682bd6_buggy.java b/tmp/04c39104-4a05-4980-bb30-61e563fe4308_fixed.java
 index d630b0e..6c9c7eb 100644
---- a/tmp/870b5fb3-6a4a-4022-b861-68d0c7950fbd_buggy.java
-+++ b/tmp/c07aece0-b264-4572-81f9-130b10825a0f_fixed.java
+--- a/tmp/225d4970-49fe-4946-9db0-4d2363682bd6_buggy.java
++++ b/tmp/04c39104-4a05-4980-bb30-61e563fe4308_fixed.java
 @@ -1,14 +1,16 @@
      public static EnsembleSummaryView toView(Ensemble ensemble, MemberId memberId, MemberService memberService) {
 +        Member spectator = ensemble.spectators().firstOrNull().member();

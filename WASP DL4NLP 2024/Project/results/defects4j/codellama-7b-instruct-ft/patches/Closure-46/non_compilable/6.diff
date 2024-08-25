@@ -1,0 +1,33 @@
+diff --git a/tmp/053f8d4a-15d7-4eb0-bcc6-95e725c00373_buggy.java b/tmp/b90fdb4f-c47a-4929-9ccd-095d90f3f8b0_fixed.java
+index 46817a7..2090edd 100644
+--- a/tmp/053f8d4a-15d7-4eb0-bcc6-95e725c00373_buggy.java
++++ b/tmp/b90fdb4f-c47a-4929-9ccd-095d90f3f8b0_fixed.java
+@@ -1,16 +1,22 @@
+   @Override
+   public JSType getLeastSupertype(JSType that) {
+-    if (!that.isRecordType()) {
+-      return super.getLeastSupertype(that);
++    if (isEquivalentTo(that)) {
++      return this;
+     }
+     RecordTypeBuilder builder = new RecordTypeBuilder(registry);
+-    for (String property : properties.keySet()) {
+-      if (that.toMaybeRecordType().hasProperty(property) &&
+-          that.toMaybeRecordType().getPropertyType(property).isEquivalentTo(
+-              getPropertyType(property))) {
++    List<String> infProperties = infGetAllPropNames();
++    for (String property : infProperties) {
++      if (that.toMaybeRecordType().hasProperty(property)) {
++        builder.addProperty(property, getPropertyType(property),
++            getPropertyNode(property));
++      }
++    }
++    List<String> supProperties = supGetAllPropNames();
++    for (String property : supProperties) {
++      if (that.toMaybeRecordType().hasProperty(property)) {
+         builder.addProperty(property, getPropertyType(property),
+             getPropertyNode(property));
+       }
+     }
+     return builder.build();
+   }

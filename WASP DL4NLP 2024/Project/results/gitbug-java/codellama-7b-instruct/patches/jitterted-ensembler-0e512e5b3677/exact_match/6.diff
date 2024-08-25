@@ -1,7 +1,7 @@
-diff --git a/tmp/69b607bf-599a-459f-aa99-660739d6369e_buggy.java b/tmp/0fad8657-c1f9-4d73-b244-361ffd448fe0_fixed.java
+diff --git a/tmp/d6ff1a7a-dd4b-4532-8a55-e53044902a82_buggy.java b/tmp/91d1a43b-3373-4267-9cb5-9395572bd0ed_fixed.java
 index d630b0e..bb16d53 100644
---- a/tmp/69b607bf-599a-459f-aa99-660739d6369e_buggy.java
-+++ b/tmp/0fad8657-c1f9-4d73-b244-361ffd448fe0_fixed.java
+--- a/tmp/d6ff1a7a-dd4b-4532-8a55-e53044902a82_buggy.java
++++ b/tmp/91d1a43b-3373-4267-9cb5-9395572bd0ed_fixed.java
 @@ -1,14 +1,15 @@
      public static EnsembleSummaryView toView(Ensemble ensemble, MemberId memberId, MemberService memberService) {
          List<MemberView> participantViews = transform(memberService, ensemble.acceptedMembers());

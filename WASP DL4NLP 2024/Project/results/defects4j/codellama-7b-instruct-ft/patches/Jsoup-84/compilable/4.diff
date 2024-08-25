@@ -1,7 +1,7 @@
-diff --git a/tmp/3615a8b9-bfc1-4474-98e2-db0351b7cf45_buggy.java b/tmp/3dbe7dca-a5eb-49d7-894b-aec2b01af272_fixed.java
+diff --git a/tmp/efbb555f-4fe6-4132-8d17-a6ed9599cea1_buggy.java b/tmp/748142de-ff2d-40da-90e3-952d05fa4c48_fixed.java
 index 98dde53..de18cc3 100644
---- a/tmp/3615a8b9-bfc1-4474-98e2-db0351b7cf45_buggy.java
-+++ b/tmp/3dbe7dca-a5eb-49d7-894b-aec2b01af272_fixed.java
+--- a/tmp/efbb555f-4fe6-4132-8d17-a6ed9599cea1_buggy.java
++++ b/tmp/748142de-ff2d-40da-90e3-952d05fa4c48_fixed.java
 @@ -1,34 +1,34 @@
          public void head(org.jsoup.nodes.Node source, int depth) {
              namespacesStack.push(new HashMap<>(namespacesStack.peek())); // inherit from above on the stack

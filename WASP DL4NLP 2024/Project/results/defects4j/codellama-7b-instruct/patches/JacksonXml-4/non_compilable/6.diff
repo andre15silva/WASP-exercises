@@ -1,7 +1,7 @@
-diff --git a/tmp/162f6eed-63bd-4631-a2ac-d6dead426d14_buggy.java b/tmp/b4bbf09b-1b3b-4d76-a8ef-25b5c9e5a6a2_fixed.java
+diff --git a/tmp/8c26363e-5845-4ab8-a19d-b5e82be3c2fa_buggy.java b/tmp/ea2c9c61-494b-49fd-808b-302e9e0ae7bf_fixed.java
 index df97798..646ee79 100644
---- a/tmp/162f6eed-63bd-4631-a2ac-d6dead426d14_buggy.java
-+++ b/tmp/b4bbf09b-1b3b-4d76-a8ef-25b5c9e5a6a2_fixed.java
+--- a/tmp/8c26363e-5845-4ab8-a19d-b5e82be3c2fa_buggy.java
++++ b/tmp/ea2c9c61-494b-49fd-808b-302e9e0ae7bf_fixed.java
 @@ -1,9 +1,10 @@
 -    protected void _serializeXmlNull(JsonGenerator jgen) throws IOException
 +    protected void _serializeXmlNull(ToXmlGenerator jgen, String rootName) throws IOException

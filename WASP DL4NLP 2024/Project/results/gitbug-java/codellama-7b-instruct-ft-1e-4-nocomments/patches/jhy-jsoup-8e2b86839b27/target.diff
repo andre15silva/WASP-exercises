@@ -1,9 +1,0 @@
-diff --git a/tmp/721101de-3868-4b8f-bd6d-1ee6e92b5a18_buggy.java b/tmp/70ca5db9-f3fd-429e-9abf-a49173389022_fixed.java
-index ae12a4d..f5fb98a 100644
---- a/tmp/721101de-3868-4b8f-bd6d-1ee6e92b5a18_buggy.java
-+++ b/tmp/70ca5db9-f3fd-429e-9abf-a49173389022_fixed.java
-@@ -1,3 +1,3 @@
-     private boolean isFormatAsBlock(Document.OutputSettings out) {
--        return tag.formatAsBlock() || (parent() != null && parent().tag().formatAsBlock()) || out.outline();
-+        return tag.isBlock() || (parent() != null && parent().tag().formatAsBlock()) || out.outline();
-     }

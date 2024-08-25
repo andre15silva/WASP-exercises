@@ -1,7 +1,7 @@
-diff --git a/tmp/64a707e5-1b7a-4b45-979f-dbcd45051658_buggy.java b/tmp/aedc82a4-b34f-4d73-a1c1-378d311c2692_fixed.java
+diff --git a/tmp/a1a2009c-b247-4370-b310-d4594d2bd78c_buggy.java b/tmp/25b3ab99-92ca-4b6a-9aaa-f3ac60a276ab_fixed.java
 index c4b260c..4514154 100644
---- a/tmp/64a707e5-1b7a-4b45-979f-dbcd45051658_buggy.java
-+++ b/tmp/aedc82a4-b34f-4d73-a1c1-378d311c2692_fixed.java
+--- a/tmp/a1a2009c-b247-4370-b310-d4594d2bd78c_buggy.java
++++ b/tmp/25b3ab99-92ca-4b6a-9aaa-f3ac60a276ab_fixed.java
 @@ -1,51 +1,61 @@
      // todo - this is getting gnarly. needs a rewrite.
      static Document parseByteData(ByteBuffer byteData, String charsetName, String baseUri, Parser parser) {

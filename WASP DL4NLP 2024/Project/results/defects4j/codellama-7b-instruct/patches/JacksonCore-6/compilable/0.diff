@@ -1,7 +1,7 @@
-diff --git a/tmp/37003417-b8e8-4f78-a62a-58f4136dd6ac_buggy.java b/tmp/4def1bec-aa38-4f82-8d60-2aa066929aac_fixed.java
+diff --git a/tmp/df5640db-143d-4091-b38f-c0cf5a87f82a_buggy.java b/tmp/f4654735-1f9e-4046-8918-1ca3ea030ad6_fixed.java
 index c3c1a6f..0eb7f5f 100644
---- a/tmp/37003417-b8e8-4f78-a62a-58f4136dd6ac_buggy.java
-+++ b/tmp/4def1bec-aa38-4f82-8d60-2aa066929aac_fixed.java
+--- a/tmp/df5640db-143d-4091-b38f-c0cf5a87f82a_buggy.java
++++ b/tmp/f4654735-1f9e-4046-8918-1ca3ea030ad6_fixed.java
 @@ -1,22 +1,26 @@
      private final static int _parseIndex(String str) {
 +        if (str.startsWith("0") || str.equals("0")) {

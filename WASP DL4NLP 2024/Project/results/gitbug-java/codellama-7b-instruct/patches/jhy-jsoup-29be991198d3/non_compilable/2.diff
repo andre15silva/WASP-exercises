@@ -1,7 +1,7 @@
-diff --git a/tmp/0d0f6010-6027-4e1a-9a64-5c18d935385d_buggy.java b/tmp/075fb151-4f50-458d-8ab6-84770dff4b33_fixed.java
+diff --git a/tmp/d8590c27-a46a-4941-8155-e052f47cce46_buggy.java b/tmp/25a7c4f3-92cc-49f5-b5f7-3c89fb39c10f_fixed.java
 index 862c60c..ca469ea 100644
---- a/tmp/0d0f6010-6027-4e1a-9a64-5c18d935385d_buggy.java
-+++ b/tmp/075fb151-4f50-458d-8ab6-84770dff4b33_fixed.java
+--- a/tmp/d8590c27-a46a-4941-8155-e052f47cce46_buggy.java
++++ b/tmp/25a7c4f3-92cc-49f5-b5f7-3c89fb39c10f_fixed.java
 @@ -1,25 +1,27 @@
      void outerHtmlHead(Appendable accum, int depth, Document.OutputSettings out) throws IOException {
          final boolean prettyPrint = out.prettyPrint();

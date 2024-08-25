@@ -1,7 +1,7 @@
-diff --git a/tmp/f6e84d59-b7ea-4a41-a49f-03946cdf263f_buggy.java b/tmp/099baa3c-b5c0-4d7d-a845-cd669b21a83b_fixed.java
+diff --git a/tmp/4e6815ad-30e4-45b0-943f-4348ad16e8a4_buggy.java b/tmp/f62ed7ef-018e-4a70-91a5-b15c25596f57_fixed.java
 index 741e96b..04f55ba 100644
---- a/tmp/f6e84d59-b7ea-4a41-a49f-03946cdf263f_buggy.java
-+++ b/tmp/099baa3c-b5c0-4d7d-a845-cd669b21a83b_fixed.java
+--- a/tmp/4e6815ad-30e4-45b0-943f-4348ad16e8a4_buggy.java
++++ b/tmp/f62ed7ef-018e-4a70-91a5-b15c25596f57_fixed.java
 @@ -1,7 +1,9 @@
      public ChecksumCalculatingInputStream(final Checksum checksum, final InputStream in) {
 +        super(in);

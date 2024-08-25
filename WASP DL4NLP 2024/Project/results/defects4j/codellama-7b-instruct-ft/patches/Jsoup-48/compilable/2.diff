@@ -1,7 +1,7 @@
-diff --git a/tmp/96949807-93ed-445a-8fdd-a1cbbb9cba03_buggy.java b/tmp/355d1d63-8fcf-4f59-a665-a74c60bdb1ad_fixed.java
+diff --git a/tmp/aac65105-5bb6-4a64-86d0-58fe9a065120_buggy.java b/tmp/56cfb24d-90b0-4e2a-b0d9-0a4a808924e4_fixed.java
 index bcd80aa..4e2f407 100644
---- a/tmp/96949807-93ed-445a-8fdd-a1cbbb9cba03_buggy.java
-+++ b/tmp/355d1d63-8fcf-4f59-a665-a74c60bdb1ad_fixed.java
+--- a/tmp/aac65105-5bb6-4a64-86d0-58fe9a065120_buggy.java
++++ b/tmp/56cfb24d-90b0-4e2a-b0d9-0a4a808924e4_fixed.java
 @@ -1,25 +1,30 @@
          void processResponseHeaders(Map<String, List<String>> resHeaders) {
 +            boolean first = true;

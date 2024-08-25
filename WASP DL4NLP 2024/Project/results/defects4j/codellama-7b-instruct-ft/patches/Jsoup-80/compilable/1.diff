@@ -1,7 +1,7 @@
-diff --git a/tmp/30712b30-4223-4a84-92f9-d8fd8ff79b11_buggy.java b/tmp/da9141cc-9b3a-4cd5-987d-a0a15ba47822_fixed.java
+diff --git a/tmp/7886c03c-76fe-4d67-b305-580ccbd03393_buggy.java b/tmp/61cf1bf1-db38-49ea-8651-a82289ae676a_fixed.java
 index cbfa753..3fd9863 100644
---- a/tmp/30712b30-4223-4a84-92f9-d8fd8ff79b11_buggy.java
-+++ b/tmp/da9141cc-9b3a-4cd5-987d-a0a15ba47822_fixed.java
+--- a/tmp/7886c03c-76fe-4d67-b305-580ccbd03393_buggy.java
++++ b/tmp/61cf1bf1-db38-49ea-8651-a82289ae676a_fixed.java
 @@ -1,15 +1,19 @@
      void insert(Token.Comment commentToken) {
          Comment comment = new Comment(commentToken.getData());

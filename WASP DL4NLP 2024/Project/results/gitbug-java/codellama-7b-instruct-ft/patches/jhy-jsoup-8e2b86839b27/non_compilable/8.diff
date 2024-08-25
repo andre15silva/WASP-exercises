@@ -1,7 +1,7 @@
-diff --git a/tmp/eccf1071-cb24-4077-8b3a-c81dc8181904_buggy.java b/tmp/25b7b0c1-0059-4a98-ab8a-4bc4d8e8db72_fixed.java
+diff --git a/tmp/6db0c963-aa33-4be1-a909-b6cb08ac0642_buggy.java b/tmp/911abc84-e263-4a3c-b784-f0f871d86c3f_fixed.java
 index ae12a4d..4bcf3a0 100644
---- a/tmp/eccf1071-cb24-4077-8b3a-c81dc8181904_buggy.java
-+++ b/tmp/25b7b0c1-0059-4a98-ab8a-4bc4d8e8db72_fixed.java
+--- a/tmp/6db0c963-aa33-4be1-a909-b6cb08ac0642_buggy.java
++++ b/tmp/911abc84-e263-4a3c-b784-f0f871d86c3f_fixed.java
 @@ -1,3 +1,3 @@
      private boolean isFormatAsBlock(Document.OutputSettings out) {
 -        return tag.formatAsBlock() || (parent() != null && parent().tag().formatAsBlock()) || out.outline();

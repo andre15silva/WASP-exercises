@@ -1,9 +1,0 @@
-diff --git a/tmp/2473b140-03ae-4bf5-a597-1afd660ae2e7_buggy.java b/tmp/6ffb8785-31c5-4229-96d1-18416029f3f6_fixed.java
-index 0878b6b..bbfe077 100644
---- a/tmp/2473b140-03ae-4bf5-a597-1afd660ae2e7_buggy.java
-+++ b/tmp/6ffb8785-31c5-4229-96d1-18416029f3f6_fixed.java
-@@ -1,3 +1,3 @@
-   public final boolean isEmptyType() {
--    return isNoType() || isNoObjectType() || isNoResolvedType();
-+    return isNoType() || isNoObjectType() || isNoResolvedType() || isNoArrayType();
-   }

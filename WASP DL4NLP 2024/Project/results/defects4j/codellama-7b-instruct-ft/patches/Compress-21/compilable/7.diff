@@ -1,7 +1,7 @@
-diff --git a/tmp/b4876c7b-b6d0-423a-9347-4ebb7238e256_buggy.java b/tmp/3df532ae-dc4f-482c-a29b-c3ad2b4bb7c0_fixed.java
+diff --git a/tmp/01e8654d-1e71-45c8-a34a-666cdff30f25_buggy.java b/tmp/063bb2cf-e942-4be8-9aaf-ad6383541c13_fixed.java
 index ce3d60f..7f92ef8 100644
---- a/tmp/b4876c7b-b6d0-423a-9347-4ebb7238e256_buggy.java
-+++ b/tmp/3df532ae-dc4f-482c-a29b-c3ad2b4bb7c0_fixed.java
+--- a/tmp/01e8654d-1e71-45c8-a34a-666cdff30f25_buggy.java
++++ b/tmp/063bb2cf-e942-4be8-9aaf-ad6383541c13_fixed.java
 @@ -1,16 +1,19 @@
      private void writeBits(final DataOutput header, final BitSet bits, final int length) throws IOException {
          int cache = 0;

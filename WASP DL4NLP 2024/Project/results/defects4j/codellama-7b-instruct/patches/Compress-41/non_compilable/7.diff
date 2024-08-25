@@ -1,7 +1,7 @@
-diff --git a/tmp/45826298-dfda-480a-8a96-b2827b0173e2_buggy.java b/tmp/6077f320-72e8-4893-bf4d-1cf2eb04c3d0_fixed.java
+diff --git a/tmp/429c3dbc-4dfb-47a2-8369-9e278f5c7e9e_buggy.java b/tmp/12630c4f-3a0a-4421-b40c-adaf9982dd4b_fixed.java
 index acdbb1a..15e8280 100644
---- a/tmp/45826298-dfda-480a-8a96-b2827b0173e2_buggy.java
-+++ b/tmp/6077f320-72e8-4893-bf4d-1cf2eb04c3d0_fixed.java
+--- a/tmp/429c3dbc-4dfb-47a2-8369-9e278f5c7e9e_buggy.java
++++ b/tmp/12630c4f-3a0a-4421-b40c-adaf9982dd4b_fixed.java
 @@ -1,106 +1,109 @@
      public ZipArchiveEntry getNextZipEntry() throws IOException {
 +        if (closed) {

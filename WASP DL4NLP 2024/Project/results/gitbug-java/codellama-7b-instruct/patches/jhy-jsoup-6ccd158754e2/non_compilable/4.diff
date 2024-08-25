@@ -1,7 +1,7 @@
-diff --git a/tmp/4f44f806-6721-4a3a-a21a-123b669d1435_buggy.java b/tmp/f2e20288-b0f8-43b6-ac9c-aadef865174f_fixed.java
+diff --git a/tmp/d726e4e9-7fc1-4523-bcfb-4a3857e19ff9_buggy.java b/tmp/c6e68b80-2f92-4747-8f44-79b8441e70b6_fixed.java
 index 23f078d..799d6f5 100644
---- a/tmp/4f44f806-6721-4a3a-a21a-123b669d1435_buggy.java
-+++ b/tmp/f2e20288-b0f8-43b6-ac9c-aadef865174f_fixed.java
+--- a/tmp/d726e4e9-7fc1-4523-bcfb-4a3857e19ff9_buggy.java
++++ b/tmp/c6e68b80-2f92-4747-8f44-79b8441e70b6_fixed.java
 @@ -1,14 +1,14 @@
      private static void appendToAscii(String s, boolean spaceAsPlus, StringBuilder sb) throws UnsupportedEncodingException {
          // minimal normalization of Unicode -> Ascii, and space normal. Existing escapes are left as-is.

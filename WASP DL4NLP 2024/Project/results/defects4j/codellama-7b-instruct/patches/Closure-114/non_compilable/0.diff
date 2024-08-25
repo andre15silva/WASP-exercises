@@ -1,7 +1,7 @@
-diff --git a/tmp/390d40ab-9b6d-43ed-b3e4-d8932f875c47_buggy.java b/tmp/46ccf5fc-3749-43df-85ce-3455285ec863_fixed.java
+diff --git a/tmp/9e9251de-4b4d-43db-a391-0ffccb865ab0_buggy.java b/tmp/a7ff44ad-3d1f-4444-b36f-f7d1474e580f_fixed.java
 index c51c8b1..f2056fc 100644
---- a/tmp/390d40ab-9b6d-43ed-b3e4-d8932f875c47_buggy.java
-+++ b/tmp/46ccf5fc-3749-43df-85ce-3455285ec863_fixed.java
+--- a/tmp/9e9251de-4b4d-43db-a391-0ffccb865ab0_buggy.java
++++ b/tmp/a7ff44ad-3d1f-4444-b36f-f7d1474e580f_fixed.java
 @@ -1,31 +1,16 @@
 -    private void recordAssignment(NodeTraversal t, Node n, Node recordNode) {
 +public void testFixedRecordAssignment(NodeTraversal t, Node n, Node recordNode) {

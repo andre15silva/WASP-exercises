@@ -1,0 +1,20 @@
+diff --git a/tmp/da1401a3-a9a2-44aa-b386-73f6d3c0268d_buggy.java b/tmp/e024e6c0-aecd-4271-b74e-09f355e65f47_fixed.java
+index a7cb64f..618f810 100644
+--- a/tmp/da1401a3-a9a2-44aa-b386-73f6d3c0268d_buggy.java
++++ b/tmp/e024e6c0-aecd-4271-b74e-09f355e65f47_fixed.java
+@@ -1,10 +1,5 @@
+-    /**
+-     * Test if this element has an attribute.
+-     * @param attributeKey The attribute key to check.
+-     * @return true if the attribute exists, false if not.
+-     */
+-    public boolean hasAttr(String attributeKey) {
+-        Validate.notNull(attributeKey);
++//public boolean hasAttr(String attributeKey) {
++   //Validate.notNull(attributeKey);
+    
+-        return attributes.hasKey(attributeKey);
+-    }
++   //return attributes.hasKey(attributeKey);
++//}
+\ No newline at end of file

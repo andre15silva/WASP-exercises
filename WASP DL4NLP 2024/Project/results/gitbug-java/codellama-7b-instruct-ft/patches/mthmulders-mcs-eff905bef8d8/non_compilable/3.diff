@@ -1,7 +1,7 @@
-diff --git a/tmp/1d8104e8-4c86-453c-90d8-c1d67cbf05c6_buggy.java b/tmp/f0950895-6bcb-4feb-8541-ed4ce3cf948b_fixed.java
+diff --git a/tmp/3a99bfdf-d770-4c63-954a-0c20e3738b3b_buggy.java b/tmp/65d6f73e-5469-4627-8a16-a208c1149ca5_fixed.java
 index 1186509..1a08cc7 100644
---- a/tmp/1d8104e8-4c86-453c-90d8-c1d67cbf05c6_buggy.java
-+++ b/tmp/f0950895-6bcb-4feb-8541-ed4ce3cf948b_fixed.java
+--- a/tmp/3a99bfdf-d770-4c63-954a-0c20e3738b3b_buggy.java
++++ b/tmp/65d6f73e-5469-4627-8a16-a208c1149ca5_fixed.java
 @@ -1,7 +1,8 @@
      private void printRow(final Help.TextTable table, final SearchResponse.Response.Doc doc) {
 +        var gav = doc.groupId() + ":" + doc.artifactId() + ":" + doc.version();

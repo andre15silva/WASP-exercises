@@ -1,7 +1,7 @@
-diff --git a/tmp/bf67a25a-0f6b-4580-a381-3fe0c079f278_buggy.java b/tmp/ce95f724-8dbf-4780-b6c2-c606df61fa81_fixed.java
+diff --git a/tmp/3f5ea937-db95-4d2e-901e-28ce7a35d050_buggy.java b/tmp/17919c4c-75cd-4e28-bcf5-bc1bd0d58227_fixed.java
 index fa6828a..fd68017 100644
---- a/tmp/bf67a25a-0f6b-4580-a381-3fe0c079f278_buggy.java
-+++ b/tmp/ce95f724-8dbf-4780-b6c2-c606df61fa81_fixed.java
+--- a/tmp/3f5ea937-db95-4d2e-901e-28ce7a35d050_buggy.java
++++ b/tmp/17919c4c-75cd-4e28-bcf5-bc1bd0d58227_fixed.java
 @@ -1,5 +1,6 @@
  private void injectMockCandidate(Class<?> awaitingInjectionClazz, Set<Object> mocks, Object fieldInstance) {
 +    this.mockCandidateFilter = new MockCandidateFilter();

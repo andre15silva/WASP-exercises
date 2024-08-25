@@ -1,7 +1,7 @@
-diff --git a/tmp/bbef6b22-6036-436a-afca-dc9246a63824_buggy.java b/tmp/34e7c64a-e1ec-48f5-bad1-56bb702a2664_fixed.java
+diff --git a/tmp/6b579189-d856-44f0-9075-c42819fa586b_buggy.java b/tmp/618d045c-9395-4ae2-898c-a939671c3fdd_fixed.java
 index 741e96b..80ed5e4 100644
---- a/tmp/bbef6b22-6036-436a-afca-dc9246a63824_buggy.java
-+++ b/tmp/34e7c64a-e1ec-48f5-bad1-56bb702a2664_fixed.java
+--- a/tmp/6b579189-d856-44f0-9075-c42819fa586b_buggy.java
++++ b/tmp/618d045c-9395-4ae2-898c-a939671c3fdd_fixed.java
 @@ -1,7 +1,6 @@
 -    public ChecksumCalculatingInputStream(final Checksum checksum, final InputStream in) {
 +    @Test(expected = NullPointerException.class)

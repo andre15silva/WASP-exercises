@@ -1,7 +1,7 @@
-diff --git a/tmp/eff6faa6-720b-4cb6-931a-392363e6b1ff_buggy.java b/tmp/b2544e8f-df72-4df4-8034-ef8e42e1a276_fixed.java
+diff --git a/tmp/468886c2-6bee-4794-9502-f8cdf8959325_buggy.java b/tmp/efa151c5-e076-45e8-86b1-d4b3b2d2f573_fixed.java
 index a5e7b85..bd1a868 100644
---- a/tmp/eff6faa6-720b-4cb6-931a-392363e6b1ff_buggy.java
-+++ b/tmp/b2544e8f-df72-4df4-8034-ef8e42e1a276_fixed.java
+--- a/tmp/468886c2-6bee-4794-9502-f8cdf8959325_buggy.java
++++ b/tmp/efa151c5-e076-45e8-86b1-d4b3b2d2f573_fixed.java
 @@ -1,52 +1,52 @@
 -    protected final JsonDeserializer<Object> _findDeserializer(DeserializationContext ctxt,
 +    protected final <T> JsonDeserializer<T> _findDeserializer(DeserializationContext ctxt,

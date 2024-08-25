@@ -1,7 +1,7 @@
-diff --git a/tmp/9687af94-18f4-4b78-91f2-4cc97a0d88da_buggy.java b/tmp/5514fb70-683b-4a55-8f01-16fa3d1338f5_fixed.java
+diff --git a/tmp/7fdd8ca7-dfeb-44b0-a202-f29a99213f2c_buggy.java b/tmp/a8893516-0303-45b4-b1e5-736b711e2268_fixed.java
 index db60019..455587f 100644
---- a/tmp/9687af94-18f4-4b78-91f2-4cc97a0d88da_buggy.java
-+++ b/tmp/5514fb70-683b-4a55-8f01-16fa3d1338f5_fixed.java
+--- a/tmp/7fdd8ca7-dfeb-44b0-a202-f29a99213f2c_buggy.java
++++ b/tmp/a8893516-0303-45b4-b1e5-736b711e2268_fixed.java
 @@ -1,3 +1,7 @@
      private boolean toStringEquals(Matcher m, Object arg) {
 +        if (arg == null) {

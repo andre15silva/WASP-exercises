@@ -1,7 +1,7 @@
-diff --git a/tmp/dcefa7d9-9888-4e3b-87f8-1defbf912c3c_buggy.java b/tmp/4e2d1d51-6f76-423c-b81f-374a9b341b0b_fixed.java
+diff --git a/tmp/2374be69-067d-411f-9ef3-ac584bb45565_buggy.java b/tmp/1c2479bf-12ef-448a-ab53-fa21491eb22f_fixed.java
 index 862c60c..8b8a433 100644
---- a/tmp/dcefa7d9-9888-4e3b-87f8-1defbf912c3c_buggy.java
-+++ b/tmp/4e2d1d51-6f76-423c-b81f-374a9b341b0b_fixed.java
+--- a/tmp/2374be69-067d-411f-9ef3-ac584bb45565_buggy.java
++++ b/tmp/1c2479bf-12ef-448a-ab53-fa21491eb22f_fixed.java
 @@ -1,25 +1,26 @@
      void outerHtmlHead(Appendable accum, int depth, Document.OutputSettings out) throws IOException {
 +        // fix the buggy code here

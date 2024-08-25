@@ -1,7 +1,7 @@
-diff --git a/tmp/34ffb0ca-39b9-46d8-9f60-146d17deff62_buggy.java b/tmp/dd4a7f17-95b1-4cad-82e3-3a0204ffd257_fixed.java
+diff --git a/tmp/7ae0d8ce-9d3c-4dad-acfa-a4194402dcc0_buggy.java b/tmp/6e26bd19-8b77-4212-a444-d5daec33796d_fixed.java
 index fa6828a..f3a0309 100644
---- a/tmp/34ffb0ca-39b9-46d8-9f60-146d17deff62_buggy.java
-+++ b/tmp/dd4a7f17-95b1-4cad-82e3-3a0204ffd257_fixed.java
+--- a/tmp/7ae0d8ce-9d3c-4dad-acfa-a4194402dcc0_buggy.java
++++ b/tmp/6e26bd19-8b77-4212-a444-d5daec33796d_fixed.java
 @@ -1,5 +1,17 @@
      private void injectMockCandidate(Class<?> awaitingInjectionClazz, Set<Object> mocks, Object fieldInstance) {
 -        for(Field field : orderedInstanceFieldsFrom(awaitingInjectionClazz)) {

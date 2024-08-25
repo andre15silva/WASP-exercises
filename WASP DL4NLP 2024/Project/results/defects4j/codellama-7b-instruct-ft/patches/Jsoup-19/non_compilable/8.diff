@@ -1,7 +1,7 @@
-diff --git a/tmp/12e081b0-a6b9-4724-a476-68b8f9547b0a_buggy.java b/tmp/38346a36-ecd6-4a4e-8a0e-809191dee587_fixed.java
+diff --git a/tmp/f9c08d8b-f18e-4975-8523-0ee414571814_buggy.java b/tmp/5d1807b2-11bd-410a-8b97-1923c20f9c24_fixed.java
 index 4aff4e4..c6690a2 100644
---- a/tmp/12e081b0-a6b9-4724-a476-68b8f9547b0a_buggy.java
-+++ b/tmp/38346a36-ecd6-4a4e-8a0e-809191dee587_fixed.java
+--- a/tmp/f9c08d8b-f18e-4975-8523-0ee414571814_buggy.java
++++ b/tmp/5d1807b2-11bd-410a-8b97-1923c20f9c24_fixed.java
 @@ -1,15 +1,16 @@
      private boolean testValidProtocol(Element el, Attribute attr, Set<Protocol> protocols) {
          // try to resolve relative urls to abs, and optionally update the attribute so output html has abs.

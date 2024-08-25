@@ -1,7 +1,7 @@
-diff --git a/tmp/1510026e-e98d-4cfe-b067-5695fb0ac0bc_buggy.java b/tmp/7a4c6cc8-a8aa-4867-b357-8dd019d37276_fixed.java
+diff --git a/tmp/b58e6cc3-42f2-4252-bf8e-b8e5a3cb6176_buggy.java b/tmp/11d35a8a-633d-41cd-872e-94c0b7837342_fixed.java
 index d28ed6a..35996e8 100644
---- a/tmp/1510026e-e98d-4cfe-b067-5695fb0ac0bc_buggy.java
-+++ b/tmp/7a4c6cc8-a8aa-4867-b357-8dd019d37276_fixed.java
+--- a/tmp/b58e6cc3-42f2-4252-bf8e-b8e5a3cb6176_buggy.java
++++ b/tmp/11d35a8a-633d-41cd-872e-94c0b7837342_fixed.java
 @@ -1,78 +1,39 @@
 -    // this method is ugly, and does a lot. but other breakups cause rescanning and stringbuilder generations
 -    static void escape(StringBuilder accum, String string, Document.OutputSettings out,

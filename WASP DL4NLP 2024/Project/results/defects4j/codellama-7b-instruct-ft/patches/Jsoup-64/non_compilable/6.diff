@@ -1,7 +1,7 @@
-diff --git a/tmp/11e4e977-bdd0-40e6-a9d3-23c679a30f88_buggy.java b/tmp/87f92587-4696-458a-94bd-27738df7ea51_fixed.java
+diff --git a/tmp/dfcad84d-d9e8-4dda-a9da-ef57b76fd475_buggy.java b/tmp/b8aa925e-2cfc-4dd9-9e65-b95857d87a8b_fixed.java
 index 5eedc11..50fd3de 100644
---- a/tmp/11e4e977-bdd0-40e6-a9d3-23c679a30f88_buggy.java
-+++ b/tmp/87f92587-4696-458a-94bd-27738df7ea51_fixed.java
+--- a/tmp/dfcad84d-d9e8-4dda-a9da-ef57b76fd475_buggy.java
++++ b/tmp/b8aa925e-2cfc-4dd9-9e65-b95857d87a8b_fixed.java
 @@ -1,6 +1,13 @@
      private static void handleRawtext(Token.StartTag startTag, HtmlTreeBuilder tb) {
          tb.insert(startTag);

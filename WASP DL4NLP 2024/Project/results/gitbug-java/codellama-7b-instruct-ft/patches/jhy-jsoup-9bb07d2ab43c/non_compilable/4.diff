@@ -1,7 +1,7 @@
-diff --git a/tmp/6a150020-ac85-4b19-9a15-ee4069308da9_buggy.java b/tmp/5130ac25-4acd-46e5-b53e-03d08ea822f7_fixed.java
+diff --git a/tmp/7defbdc5-97ec-4745-962d-d105a7b9510a_buggy.java b/tmp/e34b266b-ee5a-48ff-8c22-57c67e5967c0_fixed.java
 index dcc36a4..90e9265 100644
---- a/tmp/6a150020-ac85-4b19-9a15-ee4069308da9_buggy.java
-+++ b/tmp/5130ac25-4acd-46e5-b53e-03d08ea822f7_fixed.java
+--- a/tmp/7defbdc5-97ec-4745-962d-d105a7b9510a_buggy.java
++++ b/tmp/e34b266b-ee5a-48ff-8c22-57c67e5967c0_fixed.java
 @@ -1,12 +1,18 @@
      protected void replaceChild(Node out, Node in) {
          Validate.isTrue(out.parentNode == this);

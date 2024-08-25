@@ -1,7 +1,7 @@
-diff --git a/tmp/57de60c3-4e78-4797-848c-48c76b62ec6e_buggy.java b/tmp/18d2b57b-ce7e-4fee-afc2-2a0c117807e4_fixed.java
+diff --git a/tmp/ddb5c0d2-fccd-4c46-bcec-42a1100e00a2_buggy.java b/tmp/e42d5aac-8ee6-4f13-b332-0b75b604dcbb_fixed.java
 index e69de29..0c08d95 100644
---- a/tmp/57de60c3-4e78-4797-848c-48c76b62ec6e_buggy.java
-+++ b/tmp/18d2b57b-ce7e-4fee-afc2-2a0c117807e4_fixed.java
+--- a/tmp/ddb5c0d2-fccd-4c46-bcec-42a1100e00a2_buggy.java
++++ b/tmp/e42d5aac-8ee6-4f13-b332-0b75b604dcbb_fixed.java
 @@ -0,0 +1,4 @@
 +private void _testEmptyToNullCoercion(Class<T> cls, T expected) {
 +    T actual = coerceToNull(cls, "");

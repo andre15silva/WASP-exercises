@@ -1,7 +1,7 @@
-diff --git a/tmp/4b8e1570-2eae-4227-986b-6afa15c5c34f_buggy.java b/tmp/df3f3a8e-db32-4b3a-af18-c54ba29924d1_fixed.java
+diff --git a/tmp/9dce663e-2a4e-4da0-80d3-a8062f8794c8_buggy.java b/tmp/1989a7b2-ef8f-455b-88c6-ce6768fdce28_fixed.java
 index 111ba5e..5ab54d9 100644
---- a/tmp/4b8e1570-2eae-4227-986b-6afa15c5c34f_buggy.java
-+++ b/tmp/df3f3a8e-db32-4b3a-af18-c54ba29924d1_fixed.java
+--- a/tmp/9dce663e-2a4e-4da0-80d3-a8062f8794c8_buggy.java
++++ b/tmp/1989a7b2-ef8f-455b-88c6-ce6768fdce28_fixed.java
 @@ -1,9 +1,11 @@
      public static boolean areEqual(Object o1, Object o2) {
 +	if (o1==o2) return true;

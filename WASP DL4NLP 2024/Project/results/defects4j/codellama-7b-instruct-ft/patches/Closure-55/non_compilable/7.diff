@@ -1,7 +1,7 @@
-diff --git a/tmp/a9a235e5-9531-4b75-be85-9e247c0d0ad3_buggy.java b/tmp/c8056609-c4d2-4a33-974c-90db2152c804_fixed.java
+diff --git a/tmp/1a4e853f-febc-4390-a87a-54d568a3322e_buggy.java b/tmp/34da1521-7dbd-4310-8cfe-8ed344b956a4_fixed.java
 index 43937f5..8ac1f63 100644
---- a/tmp/a9a235e5-9531-4b75-be85-9e247c0d0ad3_buggy.java
-+++ b/tmp/c8056609-c4d2-4a33-974c-90db2152c804_fixed.java
+--- a/tmp/1a4e853f-febc-4390-a87a-54d568a3322e_buggy.java
++++ b/tmp/34da1521-7dbd-4310-8cfe-8ed344b956a4_fixed.java
 @@ -1,3 +1,12 @@
    private static boolean isReduceableFunctionExpression(Node n) {
 +    Node enclosingClass = NodeUtil.getEnclosingClass(n);

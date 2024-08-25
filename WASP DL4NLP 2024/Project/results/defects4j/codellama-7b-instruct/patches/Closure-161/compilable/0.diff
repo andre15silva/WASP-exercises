@@ -1,7 +1,7 @@
-diff --git a/tmp/b286b51c-6075-4633-a5d4-1075c6a077c9_buggy.java b/tmp/2b9412fb-38cc-41f0-a5da-9f0100f05ec0_fixed.java
+diff --git a/tmp/9f6836c2-7af6-4e6f-8606-8692e2a78fe0_buggy.java b/tmp/18ba4258-c495-47fd-b185-3bd3fd2dfff2_fixed.java
 index 1303a19..7acfc36 100644
---- a/tmp/b286b51c-6075-4633-a5d4-1075c6a077c9_buggy.java
-+++ b/tmp/2b9412fb-38cc-41f0-a5da-9f0100f05ec0_fixed.java
+--- a/tmp/9f6836c2-7af6-4e6f-8606-8692e2a78fe0_buggy.java
++++ b/tmp/18ba4258-c495-47fd-b185-3bd3fd2dfff2_fixed.java
 @@ -1,45 +1,40 @@
    private Node tryFoldArrayAccess(Node n, Node left, Node right) {
      Node parent = n.getParent();

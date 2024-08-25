@@ -1,0 +1,40 @@
+diff --git a/tmp/2daa5817-cc1c-4a1a-9229-9593543276bf_buggy.java b/tmp/2f0f1893-a070-4f98-ab60-69950f6c29b0_fixed.java
+index 46817a7..909e389 100644
+--- a/tmp/2daa5817-cc1c-4a1a-9229-9593543276bf_buggy.java
++++ b/tmp/2f0f1893-a070-4f98-ab60-69950f6c29b0_fixed.java
+@@ -1,16 +1,32 @@
+   @Override
+   public JSType getLeastSupertype(JSType that) {
+     if (!that.isRecordType()) {
+       return super.getLeastSupertype(that);
+     }
+-    RecordTypeBuilder builder = new RecordTypeBuilder(registry);
++    RecordTypeBuilder builder;
++    if (isSupersetOf(that.toMaybeRecordType())) {
++      builder = new RecordTypeBuilder(registry);
++      for (String property : that.toMaybeRecordType().getPropertyNames()) {
++        if (property.startsWith("d")) {
++          continue;
++        }
++        builder.addProperty(property,
++            that.toMaybeRecordType().getPropertyType(property),
++            getPropertyNode(property));
++      }
++    } else if (that.toMaybeRecordType().isSupersetOf(recordType)) {
++      return that;
++    } else {
++      builder = new RecordTypeBuilder(registry);
++      RecordTypeBuilder other = this.toMaybeRecordType();
+       for (String property : properties.keySet()) {
+-      if (that.toMaybeRecordType().hasProperty(property) &&
+-          that.toMaybeRecordType().getPropertyType(property).isEquivalentTo(
++        if (other.hasProperty(property) &&
++            other.getPropertyType(property).isEquivalentTo(
+                 getPropertyType(property))) {
+           builder.addProperty(property, getPropertyType(property),
+               getPropertyNode(property));
+         }
+       }
++    }
+     return builder.build();
+   }

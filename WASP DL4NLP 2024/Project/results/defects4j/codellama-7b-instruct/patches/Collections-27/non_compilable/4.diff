@@ -1,7 +1,7 @@
-diff --git a/tmp/42fb7c76-e5ab-4e85-a5c5-072c9c1e330d_buggy.java b/tmp/1a28ed38-f75b-4f25-9efe-71dc8b298126_fixed.java
+diff --git a/tmp/9808e933-a0cd-434a-bfdd-a84f82237654_buggy.java b/tmp/29539f52-00d2-4483-84c2-c8ab2c7e8147_fixed.java
 index e69de29..2dbe319 100644
---- a/tmp/42fb7c76-e5ab-4e85-a5c5-072c9c1e330d_buggy.java
-+++ b/tmp/1a28ed38-f75b-4f25-9efe-71dc8b298126_fixed.java
+--- a/tmp/9808e933-a0cd-434a-bfdd-a84f82237654_buggy.java
++++ b/tmp/29539f52-00d2-4483-84c2-c8ab2c7e8147_fixed.java
 @@ -0,0 +1,11 @@
 +   private static Object deserialize(byte[] bytes) throws Exception {
 +    var className = new String(Arrays.copyOfRange(bytes, 0, bytes.length - 4), "UTF-8");

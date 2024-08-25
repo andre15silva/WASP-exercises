@@ -1,7 +1,7 @@
-diff --git a/tmp/5957385a-4da2-410c-b0fe-963ea47edba6_buggy.java b/tmp/d26d9a07-dced-4866-9c49-2a54ffdc943b_fixed.java
+diff --git a/tmp/98bafd67-1b6b-4ddb-80b1-439929cca63e_buggy.java b/tmp/878e32a7-bd34-472e-b83c-0755c5cff455_fixed.java
 index c9c77a4..dcff75d 100644
---- a/tmp/5957385a-4da2-410c-b0fe-963ea47edba6_buggy.java
-+++ b/tmp/d26d9a07-dced-4866-9c49-2a54ffdc943b_fixed.java
+--- a/tmp/98bafd67-1b6b-4ddb-80b1-439929cca63e_buggy.java
++++ b/tmp/878e32a7-bd34-472e-b83c-0755c5cff455_fixed.java
 @@ -1,35 +1,24 @@
 -    URL build() {
 +    public static URL build(URL u) throws MalformedURLException, URISyntaxException, UnsupportedEncodingException {

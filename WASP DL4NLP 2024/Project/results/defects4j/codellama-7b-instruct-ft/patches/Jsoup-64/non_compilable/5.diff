@@ -1,7 +1,7 @@
-diff --git a/tmp/ae62b139-7113-4cbc-96d8-a06beebb86f2_buggy.java b/tmp/c5736bb3-d0f5-4b88-81b3-a74e4a0309be_fixed.java
+diff --git a/tmp/7a9aa93e-e5d6-4344-bca8-d0dda79a9248_buggy.java b/tmp/75eccef6-1c9a-420a-ba99-edbda31284c9_fixed.java
 index 5eedc11..3050fca 100644
---- a/tmp/ae62b139-7113-4cbc-96d8-a06beebb86f2_buggy.java
-+++ b/tmp/c5736bb3-d0f5-4b88-81b3-a74e4a0309be_fixed.java
+--- a/tmp/7a9aa93e-e5d6-4344-bca8-d0dda79a9248_buggy.java
++++ b/tmp/75eccef6-1c9a-420a-ba99-edbda31284c9_fixed.java
 @@ -1,6 +1,10 @@
      private static void handleRawtext(Token.StartTag startTag, HtmlTreeBuilder tb) {
 +        if (startTag.isSelfClosing())

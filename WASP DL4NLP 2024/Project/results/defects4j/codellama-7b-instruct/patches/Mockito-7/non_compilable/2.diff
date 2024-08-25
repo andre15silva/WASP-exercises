@@ -1,7 +1,7 @@
-diff --git a/tmp/513e7884-ad33-4194-a025-ea8eff332a7b_buggy.java b/tmp/96f28511-3f9e-4572-8321-697966e57143_fixed.java
+diff --git a/tmp/2172fffe-7b72-4c74-b11f-c5f470a68997_buggy.java b/tmp/7b3f3f4a-5b1f-4bb5-89eb-9ab9c6640c5f_fixed.java
 index 91b7957..5477b7e 100644
---- a/tmp/513e7884-ad33-4194-a025-ea8eff332a7b_buggy.java
-+++ b/tmp/96f28511-3f9e-4572-8321-697966e57143_fixed.java
+--- a/tmp/2172fffe-7b72-4c74-b11f-c5f470a68997_buggy.java
++++ b/tmp/7b3f3f4a-5b1f-4bb5-89eb-9ab9c6640c5f_fixed.java
 @@ -1,6 +1,8 @@
 -        private void readTypeVariables() {
 +    private void readTypeVariables(TypeVariable typeVariable) {

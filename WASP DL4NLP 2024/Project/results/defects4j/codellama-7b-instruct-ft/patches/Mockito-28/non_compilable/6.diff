@@ -1,7 +1,7 @@
-diff --git a/tmp/93978728-4918-43ad-ab8f-58ae7d8bcfda_buggy.java b/tmp/02564cf2-43a5-41ac-b3d5-2fe227986179_fixed.java
+diff --git a/tmp/40ee8edd-2b23-4a78-8b45-f2b26363a321_buggy.java b/tmp/ccf1c699-f823-4ecc-b9c6-ec802830b0eb_fixed.java
 index fa6828a..20cf76f 100644
---- a/tmp/93978728-4918-43ad-ab8f-58ae7d8bcfda_buggy.java
-+++ b/tmp/02564cf2-43a5-41ac-b3d5-2fe227986179_fixed.java
+--- a/tmp/40ee8edd-2b23-4a78-8b45-f2b26363a321_buggy.java
++++ b/tmp/ccf1c699-f823-4ecc-b9c6-ec802830b0eb_fixed.java
 @@ -1,5 +1,6 @@
      private void injectMockCandidate(Class<?> awaitingInjectionClazz, Set<Object> mocks, Object fieldInstance) {
 +        Object mock = null;

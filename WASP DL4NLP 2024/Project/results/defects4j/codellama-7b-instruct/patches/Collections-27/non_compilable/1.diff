@@ -1,7 +1,7 @@
-diff --git a/tmp/0888b44a-74bc-4330-9e2f-89f8572e956c_buggy.java b/tmp/52f755b3-e29d-4de9-90cc-36997c0070f0_fixed.java
+diff --git a/tmp/c22bc2dc-857c-411c-b39b-50b2fdcf67c4_buggy.java b/tmp/cf63e740-1ad3-4f8d-b8c4-5af25a8231db_fixed.java
 index e69de29..0b3c9a1 100644
---- a/tmp/0888b44a-74bc-4330-9e2f-89f8572e956c_buggy.java
-+++ b/tmp/52f755b3-e29d-4de9-90cc-36997c0070f0_fixed.java
+--- a/tmp/c22bc2dc-857c-411c-b39b-50b2fdcf67c4_buggy.java
++++ b/tmp/cf63e740-1ad3-4f8d-b8c4-5af25a8231db_fixed.java
 @@ -0,0 +1,7 @@
 +public static Object deserialize(byte[] bytes, Class<?> clazz) {
 +    if (!MultiValueMap.isSupportedClass(clazz)) {

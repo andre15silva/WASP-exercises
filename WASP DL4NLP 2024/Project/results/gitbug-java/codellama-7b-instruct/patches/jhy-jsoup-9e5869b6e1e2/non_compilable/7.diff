@@ -1,7 +1,7 @@
-diff --git a/tmp/7726052a-a648-4fd6-a1cc-dfd92572219c_buggy.java b/tmp/f5b9b6d1-da00-40d2-998b-2c2481d844cd_fixed.java
+diff --git a/tmp/305af741-24f6-4a58-b306-5d04d0a341a7_buggy.java b/tmp/e03ff288-dad1-4898-bb69-422ad86c4f72_fixed.java
 index 0583946..d0394ae 100644
---- a/tmp/7726052a-a648-4fd6-a1cc-dfd92572219c_buggy.java
-+++ b/tmp/f5b9b6d1-da00-40d2-998b-2c2481d844cd_fixed.java
+--- a/tmp/305af741-24f6-4a58-b306-5d04d0a341a7_buggy.java
++++ b/tmp/e03ff288-dad1-4898-bb69-422ad86c4f72_fixed.java
 @@ -1,30 +1,31 @@
 -    void outerHtmlHead(Appendable accum, int depth, Document.OutputSettings out) throws IOException {
 +    static String outerHtmlHead(Element el, int depth, Document.OutputSettings out) throws IOException {

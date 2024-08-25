@@ -1,7 +1,7 @@
-diff --git a/tmp/989d2599-cecb-4873-a052-b35319aa4ebc_buggy.java b/tmp/bf0c7318-d62c-4837-b5c3-85e924205176_fixed.java
+diff --git a/tmp/1dc75f1d-e6de-4ca6-a74c-c6951ed6ead0_buggy.java b/tmp/bd0e926c-e3c5-4b54-bdfc-464c21de7b7d_fixed.java
 index 855afa5..282da8f 100644
---- a/tmp/989d2599-cecb-4873-a052-b35319aa4ebc_buggy.java
-+++ b/tmp/bf0c7318-d62c-4837-b5c3-85e924205176_fixed.java
+--- a/tmp/1dc75f1d-e6de-4ca6-a74c-c6951ed6ead0_buggy.java
++++ b/tmp/bd0e926c-e3c5-4b54-bdfc-464c21de7b7d_fixed.java
 @@ -1,13 +1,21 @@
 -    static URL encodeUrl(URL u) {
 +	public static URL encodeUrl(final URL u) {

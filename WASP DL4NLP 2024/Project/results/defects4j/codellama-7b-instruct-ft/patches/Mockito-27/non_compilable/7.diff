@@ -1,7 +1,7 @@
-diff --git a/tmp/99433d26-369d-4af9-a507-5cd10dbbe8f6_buggy.java b/tmp/e5c12d85-7b37-479d-b113-e6537d3012fb_fixed.java
+diff --git a/tmp/09c00bd6-4858-4dbf-afca-2f4315d66653_buggy.java b/tmp/0a4472d6-7eff-4484-9cb1-8189b1234d4d_fixed.java
 index 5c5286c..f6e2183 100644
---- a/tmp/99433d26-369d-4af9-a507-5cd10dbbe8f6_buggy.java
-+++ b/tmp/e5c12d85-7b37-479d-b113-e6537d3012fb_fixed.java
+--- a/tmp/09c00bd6-4858-4dbf-afca-2f4315d66653_buggy.java
++++ b/tmp/0a4472d6-7eff-4484-9cb1-8189b1234d4d_fixed.java
 @@ -1,6 +1,8 @@
      public <T> void resetMock(T mock) {
          MockHandlerInterface<T> oldMockHandler = getMockHandler(mock);

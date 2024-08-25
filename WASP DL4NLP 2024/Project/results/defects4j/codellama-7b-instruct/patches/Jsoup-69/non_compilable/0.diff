@@ -1,7 +1,7 @@
-diff --git a/tmp/13a017f3-6732-4966-887b-4c173449d3fc_buggy.java b/tmp/52c12a0c-9b6c-4fd7-9473-eccd7086a2f8_fixed.java
+diff --git a/tmp/339da394-53c3-4c81-87d6-f4acea1fc5f9_buggy.java b/tmp/2e141a7b-675b-4d33-b90d-83530e658ba4_fixed.java
 index e69de29..f0f0842 100644
---- a/tmp/13a017f3-6732-4966-887b-4c173449d3fc_buggy.java
-+++ b/tmp/52c12a0c-9b6c-4fd7-9473-eccd7086a2f8_fixed.java
+--- a/tmp/339da394-53c3-4c81-87d6-f4acea1fc5f9_buggy.java
++++ b/tmp/2e141a7b-675b-4d33-b90d-83530e658ba4_fixed.java
 @@ -0,0 +1,2 @@
 +
 +In this case, the bug in the function is that it does not remove all occurrences of the form fields. It only removes the first occurrence, and the test fails because there are still two occurrences of the form fields after calling the `remove()` method. To fix the bug, you can modify the function to iterate through all occurrences of the form fields and remove them one by one. Here is the fixed version of the function:

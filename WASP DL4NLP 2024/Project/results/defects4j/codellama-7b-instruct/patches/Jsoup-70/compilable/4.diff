@@ -1,7 +1,7 @@
-diff --git a/tmp/e6e4e680-f0c0-4168-a9d0-f540cbdf0fc0_buggy.java b/tmp/1ed616da-238f-4eb5-aa03-f7f6db4dbcea_fixed.java
+diff --git a/tmp/b205d5d1-fb70-4c73-aebf-ed0e48e2173e_buggy.java b/tmp/96bfd338-fb35-4f03-a853-67318b7eccc0_fixed.java
 index 6c87721..471b4b2 100644
---- a/tmp/e6e4e680-f0c0-4168-a9d0-f540cbdf0fc0_buggy.java
-+++ b/tmp/1ed616da-238f-4eb5-aa03-f7f6db4dbcea_fixed.java
+--- a/tmp/b205d5d1-fb70-4c73-aebf-ed0e48e2173e_buggy.java
++++ b/tmp/96bfd338-fb35-4f03-a853-67318b7eccc0_fixed.java
 @@ -1,11 +1,10 @@
      static boolean preserveWhitespace(Node node) {
 -        // looks only at this element and five levels up, to prevent recursion & needless stack searches

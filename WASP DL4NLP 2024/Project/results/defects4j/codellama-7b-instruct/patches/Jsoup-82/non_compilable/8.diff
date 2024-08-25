@@ -1,7 +1,7 @@
-diff --git a/tmp/1f01f49c-e739-41d5-a0b5-90d454953b43_buggy.java b/tmp/d3285d34-b90e-4bf1-aca5-e2b48becda74_fixed.java
+diff --git a/tmp/06da7ab1-3871-4dfc-8550-3158262e0190_buggy.java b/tmp/98e455fe-2403-4108-a657-dac5873cfbbc_fixed.java
 index 7c7fdc2..16ccf83 100644
---- a/tmp/1f01f49c-e739-41d5-a0b5-90d454953b43_buggy.java
-+++ b/tmp/d3285d34-b90e-4bf1-aca5-e2b48becda74_fixed.java
+--- a/tmp/06da7ab1-3871-4dfc-8550-3158262e0190_buggy.java
++++ b/tmp/98e455fe-2403-4108-a657-dac5873cfbbc_fixed.java
 @@ -1,81 +1,72 @@
      static Document parseInputStream(InputStream input, String charsetName, String baseUri, Parser parser) throws IOException  {
 -        if (input == null) // empty body

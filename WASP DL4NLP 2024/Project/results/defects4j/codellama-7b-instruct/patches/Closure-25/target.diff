@@ -1,7 +1,7 @@
-diff --git a/tmp/10ab15a8-1e8e-4417-bef1-8095b80b1114_buggy.java b/tmp/ea989f88-1469-4656-a96c-6412469b1a03_fixed.java
+diff --git a/tmp/0b378920-8c42-4c29-98a2-664443fad0a3_buggy.java b/tmp/c8dd7efb-a02a-419f-af87-5b0ae94769fa_fixed.java
 index b98f0a7..57b2f04 100644
---- a/tmp/10ab15a8-1e8e-4417-bef1-8095b80b1114_buggy.java
-+++ b/tmp/ea989f88-1469-4656-a96c-6412469b1a03_fixed.java
+--- a/tmp/0b378920-8c42-4c29-98a2-664443fad0a3_buggy.java
++++ b/tmp/c8dd7efb-a02a-419f-af87-5b0ae94769fa_fixed.java
 @@ -1,29 +1,27 @@
    private FlowScope traverseNew(Node n, FlowScope scope) {
 +    scope = traverseChildren(n, scope);

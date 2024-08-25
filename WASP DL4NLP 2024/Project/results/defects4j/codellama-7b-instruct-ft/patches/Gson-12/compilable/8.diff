@@ -1,7 +1,7 @@
-diff --git a/tmp/7cf0af4b-ba14-4c04-84fa-6c18871f16ba_buggy.java b/tmp/28aba2a1-aacc-4d78-92c3-c085997ba558_fixed.java
+diff --git a/tmp/f93749bb-318d-4520-9b95-7946cb92490a_buggy.java b/tmp/99ff8a32-db06-4c03-8791-cc7763bbcfdf_fixed.java
 index 6e155da..2612023 100644
---- a/tmp/7cf0af4b-ba14-4c04-84fa-6c18871f16ba_buggy.java
-+++ b/tmp/28aba2a1-aacc-4d78-92c3-c085997ba558_fixed.java
+--- a/tmp/f93749bb-318d-4520-9b95-7946cb92490a_buggy.java
++++ b/tmp/99ff8a32-db06-4c03-8791-cc7763bbcfdf_fixed.java
 @@ -1,10 +1,17 @@
    @Override public void skipValue() throws IOException {
      if (peek() == JsonToken.NAME) {

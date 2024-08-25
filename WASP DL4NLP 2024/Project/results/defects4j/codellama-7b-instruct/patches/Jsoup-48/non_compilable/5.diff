@@ -1,7 +1,7 @@
-diff --git a/tmp/e0cf5748-e928-4942-8b81-f58959cc3d40_buggy.java b/tmp/fcff26d0-461c-4b80-8969-fda33a5f0359_fixed.java
+diff --git a/tmp/26aada69-21a1-4dab-bb38-43c99e052cbb_buggy.java b/tmp/fa11b690-52f6-410b-921c-9dbeddcf9b53_fixed.java
 index bcd80aa..ab321c8 100644
---- a/tmp/e0cf5748-e928-4942-8b81-f58959cc3d40_buggy.java
-+++ b/tmp/fcff26d0-461c-4b80-8969-fda33a5f0359_fixed.java
+--- a/tmp/26aada69-21a1-4dab-bb38-43c99e052cbb_buggy.java
++++ b/tmp/fa11b690-52f6-410b-921c-9dbeddcf9b53_fixed.java
 @@ -1,25 +1,16 @@
      void processResponseHeaders(Map<String, List<String>> resHeaders) {
          for (Map.Entry<String, List<String>> entry : resHeaders.entrySet()) {

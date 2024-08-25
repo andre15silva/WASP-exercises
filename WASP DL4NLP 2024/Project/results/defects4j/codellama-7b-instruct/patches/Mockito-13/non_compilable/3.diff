@@ -1,7 +1,7 @@
-diff --git a/tmp/634659fb-be89-4f0c-be2b-bb2f8b547a79_buggy.java b/tmp/cc8edb8f-a1f8-4839-9b6a-fe868ced5e76_fixed.java
+diff --git a/tmp/10308258-7fed-4340-9148-0ab66779a6e2_buggy.java b/tmp/3cab5060-d190-46a6-b324-2597d2fac113_fixed.java
 index 5481b94..cc23089 100644
---- a/tmp/634659fb-be89-4f0c-be2b-bb2f8b547a79_buggy.java
-+++ b/tmp/cc8edb8f-a1f8-4839-9b6a-fe868ced5e76_fixed.java
+--- a/tmp/10308258-7fed-4340-9148-0ab66779a6e2_buggy.java
++++ b/tmp/3cab5060-d190-46a6-b324-2597d2fac113_fixed.java
 @@ -1,49 +1,17 @@
 -    public Object handle(Invocation invocation) throws Throwable {
 +    public void verify(Invocation invocation) {

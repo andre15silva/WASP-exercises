@@ -1,7 +1,7 @@
-diff --git a/tmp/6128f577-a133-4010-bb7f-13c8def2c59c_buggy.java b/tmp/50d600b9-9fb9-4045-b046-11713751174b_fixed.java
+diff --git a/tmp/19323454-db91-49b1-ba62-7da9056c13e0_buggy.java b/tmp/81bd2fcb-e114-44d7-927d-c17a8fcbbe8f_fixed.java
 index e69de29..a792769 100644
---- a/tmp/6128f577-a133-4010-bb7f-13c8def2c59c_buggy.java
-+++ b/tmp/50d600b9-9fb9-4045-b046-11713751174b_fixed.java
+--- a/tmp/19323454-db91-49b1-ba62-7da9056c13e0_buggy.java
++++ b/tmp/81bd2fcb-e114-44d7-927d-c17a8fcbbe8f_fixed.java
 @@ -0,0 +1,4 @@
 + private void _testEmptyToNullCoercion(Class<?> type, Object value) {
 +        Object empty = type.getName().equals("class") ? null : "";

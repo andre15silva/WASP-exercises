@@ -1,7 +1,7 @@
-diff --git a/tmp/4c50cd1b-b910-40be-a1ef-6b033e8b8916_buggy.java b/tmp/41e0eb3e-2ccd-4b8c-bf71-d4388dc7255f_fixed.java
+diff --git a/tmp/4f5f47c4-44ad-412b-bc43-9c1d8adafeba_buggy.java b/tmp/4e8e1aa0-5eaa-496b-998c-d4be6aeb74b4_fixed.java
 index 1186509..0d09b0f 100644
---- a/tmp/4c50cd1b-b910-40be-a1ef-6b033e8b8916_buggy.java
-+++ b/tmp/41e0eb3e-2ccd-4b8c-bf71-d4388dc7255f_fixed.java
+--- a/tmp/4f5f47c4-44ad-412b-bc43-9c1d8adafeba_buggy.java
++++ b/tmp/4e8e1aa0-5eaa-496b-998c-d4be6aeb74b4_fixed.java
 @@ -1,7 +1,8 @@
      private void printRow(final Help.TextTable table, final SearchResponse.Response.Doc doc) {
          var lastUpdated = DATE_TIME_FORMATTER.format(

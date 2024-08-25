@@ -1,7 +1,7 @@
-diff --git a/tmp/521831b2-9e39-4f4c-b123-909157ed46ae_buggy.java b/tmp/0fee3b12-f090-4d42-8c1d-9899a58df7b7_fixed.java
+diff --git a/tmp/ce9b5aaa-ccf9-4cbc-95f7-8f0ff672bdc4_buggy.java b/tmp/c21da5b7-127d-4034-ab07-a66ac8b1d29b_fixed.java
 index f47d784..7c28cc1 100644
---- a/tmp/521831b2-9e39-4f4c-b123-909157ed46ae_buggy.java
-+++ b/tmp/0fee3b12-f090-4d42-8c1d-9899a58df7b7_fixed.java
+--- a/tmp/ce9b5aaa-ccf9-4cbc-95f7-8f0ff672bdc4_buggy.java
++++ b/tmp/c21da5b7-127d-4034-ab07-a66ac8b1d29b_fixed.java
 @@ -1,12 +1,37 @@
 +  class MakeDeclaredNamesUnique implements NodeTraversal.Callback {
 +    private Set<String> assignedNames = new HashSet<>();

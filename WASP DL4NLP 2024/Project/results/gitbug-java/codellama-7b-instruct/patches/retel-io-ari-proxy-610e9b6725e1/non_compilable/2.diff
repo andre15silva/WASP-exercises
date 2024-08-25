@@ -1,7 +1,7 @@
-diff --git a/tmp/b96bd72c-f253-4e85-942c-7015397d49cb_buggy.java b/tmp/e9cec06c-9a35-4077-9222-48886d1130e3_fixed.java
+diff --git a/tmp/853fc923-da84-4b7d-b9c0-71efbaf58365_buggy.java b/tmp/0b736df0-401b-416d-82d3-b7a106cb3fb9_fixed.java
 index eb0a5c8..fb5d9db 100644
---- a/tmp/b96bd72c-f253-4e85-942c-7015397d49cb_buggy.java
-+++ b/tmp/e9cec06c-9a35-4077-9222-48886d1130e3_fixed.java
+--- a/tmp/853fc923-da84-4b7d-b9c0-71efbaf58365_buggy.java
++++ b/tmp/0b736df0-401b-416d-82d3-b7a106cb3fb9_fixed.java
 @@ -1,27 +1,25 @@
  public static Try<Done> registerCallContext(
        final ActorRef<CallContextProviderMessage> callContextProvider,

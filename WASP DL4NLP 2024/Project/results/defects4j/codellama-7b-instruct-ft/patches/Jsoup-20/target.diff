@@ -1,7 +1,7 @@
-diff --git a/tmp/a8b526f2-6658-47e7-b1d9-84d71721807f_buggy.java b/tmp/6d0ff019-9872-4530-9f0d-16f6157fffb8_fixed.java
+diff --git a/tmp/64030fef-e096-431b-9b6b-b711ef1c2426_buggy.java b/tmp/d39392f4-9648-47a4-bd74-e0b48d376808_fixed.java
 index db19f52..cf2b4f6 100644
---- a/tmp/a8b526f2-6658-47e7-b1d9-84d71721807f_buggy.java
-+++ b/tmp/6d0ff019-9872-4530-9f0d-16f6157fffb8_fixed.java
+--- a/tmp/64030fef-e096-431b-9b6b-b711ef1c2426_buggy.java
++++ b/tmp/d39392f4-9648-47a4-bd74-e0b48d376808_fixed.java
 @@ -1,32 +1,34 @@
      // switching the chartset midstream when a meta http-equiv tag defines the charset.
      static Document parseByteData(ByteBuffer byteData, String charsetName, String baseUri, Parser parser) {

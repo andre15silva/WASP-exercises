@@ -1,7 +1,7 @@
-diff --git a/tmp/8a618097-0a41-4683-a362-622799ded34b_buggy.java b/tmp/a0f3f6c9-3121-4a96-b8fa-342a7db8bdb9_fixed.java
+diff --git a/tmp/3f831790-4a47-4311-8712-59d392fb2811_buggy.java b/tmp/6255610d-7c0d-4751-9509-32c783cd60d0_fixed.java
 index b86b44d..2fcd5c4 100644
---- a/tmp/8a618097-0a41-4683-a362-622799ded34b_buggy.java
-+++ b/tmp/a0f3f6c9-3121-4a96-b8fa-342a7db8bdb9_fixed.java
+--- a/tmp/3f831790-4a47-4311-8712-59d392fb2811_buggy.java
++++ b/tmp/6255610d-7c0d-4751-9509-32c783cd60d0_fixed.java
 @@ -1,4 +1,8 @@
      public final Object computeValue(EvalContext context) {
 -        return compute(args[0].computeValue(context), args[1].computeValue(context))
