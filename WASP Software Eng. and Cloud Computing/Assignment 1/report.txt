@@ -1,0 +1,5 @@
+In this assignment we have setup a VM running on Ericssons data centers and deployed a publicly accessible web app.
+
+To do this, we allocated a VM running Ubuntu 24 with 4GB RAM, 2 vCPUs and 20GB disk. To make it publicly accessible, we also created a network connected to this VM, a router routing traffic between external internet IPs and the internal network, made ports 20 (SSH) and 5000 (for HTTP) publicly accessible, and attributed a public IP to the machine. Finally, we also created an object storage for persisting the counter value.
+
+Then, we installed the required dependencies in the server by sshing into it and doing it manually (python dependencies). Finally, we copied the server code and ran it (first fixing the hard-coded variable name).

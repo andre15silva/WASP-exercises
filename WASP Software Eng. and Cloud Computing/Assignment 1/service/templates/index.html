@@ -1,0 +1,33 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <!-- The title of the page shown in browser tab -->
+    <title>Visitor Counter</title>
+    <!-- Simple built-in CSS for styling -->
+    <style>
+      body {
+        font-family: Arial, sans-serif; /* clean font */
+        background-color: #f4f4f9;      /* light grey background */
+        color: #333;                    /* dark grey text */
+        text-align: center;             /* center everything */
+        padding-top: 10vh;              /* push content down a little */
+      }
+      .counter {
+        font-size: 4em;      /* make the number big */
+        font-weight: bold;   /* bold number */
+        color: #2c7be5;      /* nice blue */
+      }
+    </style>
+  </head>
+  <body>
+    <!-- Main heading -->
+    <h1>You are number</h1>
+
+    <!-- Show the counter value passed from Flask -->
+    <div class="counter">{{ value }}</div>
+
+    <!-- Small text note -->
+    <p>visiting this page.</p>
+  </body>
+</html>
